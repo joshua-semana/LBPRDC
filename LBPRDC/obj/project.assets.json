@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Sonny\\source\\LBPRDC\\LBPRDC\\LBPRDC.csproj",
+      "projectUniqueName": "C:\\Users\\Sonny\\source\\repos\\LBPRDC\\LBPRDC\\LBPRDC.csproj",
       "projectName": "LBPRDC",
-      "projectPath": "C:\\Users\\Sonny\\source\\LBPRDC\\LBPRDC\\LBPRDC.csproj",
+      "projectPath": "C:\\Users\\Sonny\\source\\repos\\LBPRDC\\LBPRDC\\LBPRDC.csproj",
       "packagesPath": "C:\\Users\\Sonny\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Sonny\\source\\LBPRDC\\LBPRDC\\obj\\",
+      "outputPath": "C:\\Users\\Sonny\\source\\repos\\LBPRDC\\LBPRDC\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Sonny\\AppData\\Roaming\\NuGet\\NuGet.Config",

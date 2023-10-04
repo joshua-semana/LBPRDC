@@ -29,32 +29,139 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmLogin));
-            splitHorizontal = new SplitContainer();
+            panel1 = new Panel();
+            chkShowPassword = new CheckBox();
+            btnLogin = new Button();
+            label3 = new Label();
+            txtPassword = new TextBox();
+            label2 = new Label();
+            txtUsername = new TextBox();
+            label1 = new Label();
+            panel2 = new Panel();
             pictureBox1 = new PictureBox();
-            ((System.ComponentModel.ISupportInitialize)splitHorizontal).BeginInit();
-            splitHorizontal.Panel1.SuspendLayout();
-            splitHorizontal.SuspendLayout();
+            panel1.SuspendLayout();
+            panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
-            // splitHorizontal
+            // panel1
             // 
-            splitHorizontal.Dock = DockStyle.Fill;
-            splitHorizontal.Location = new Point(0, 0);
-            splitHorizontal.Name = "splitHorizontal";
+            panel1.BackColor = SystemColors.Window;
+            panel1.Controls.Add(chkShowPassword);
+            panel1.Controls.Add(btnLogin);
+            panel1.Controls.Add(label3);
+            panel1.Controls.Add(txtPassword);
+            panel1.Controls.Add(label2);
+            panel1.Controls.Add(txtUsername);
+            panel1.Controls.Add(label1);
+            panel1.Dock = DockStyle.Right;
+            panel1.Location = new Point(804, 0);
+            panel1.Margin = new Padding(3, 4, 3, 4);
+            panel1.Name = "panel1";
+            panel1.Padding = new Padding(72, 0, 72, 0);
+            panel1.Size = new Size(460, 681);
+            panel1.TabIndex = 0;
             // 
-            // splitHorizontal.Panel1
+            // chkShowPassword
             // 
-            splitHorizontal.Panel1.Controls.Add(pictureBox1);
-            splitHorizontal.Size = new Size(1264, 681);
-            splitHorizontal.SplitterDistance = 720;
-            splitHorizontal.TabIndex = 0;
+            chkShowPassword.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            chkShowPassword.AutoSize = true;
+            chkShowPassword.Location = new Point(75, 394);
+            chkShowPassword.Margin = new Padding(3, 3, 3, 24);
+            chkShowPassword.Name = "chkShowPassword";
+            chkShowPassword.Size = new Size(138, 25);
+            chkShowPassword.TabIndex = 2;
+            chkShowPassword.Text = "Show Password";
+            chkShowPassword.UseVisualStyleBackColor = true;
+            chkShowPassword.CheckedChanged += chkShowPassword_CheckedChanged;
+            // 
+            // btnLogin
+            // 
+            btnLogin.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            btnLogin.Location = new Point(75, 446);
+            btnLogin.Name = "btnLogin";
+            btnLogin.Size = new Size(310, 34);
+            btnLogin.TabIndex = 3;
+            btnLogin.Text = "Login";
+            btnLogin.UseVisualStyleBackColor = true;
+            btnLogin.Click += btnLogin_Click;
+            // 
+            // label3
+            // 
+            label3.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            label3.AutoSize = true;
+            label3.Location = new Point(70, 330);
+            label3.Margin = new Padding(3, 0, 3, 4);
+            label3.Name = "label3";
+            label3.Size = new Size(76, 21);
+            label3.TabIndex = 4;
+            label3.Text = "Password";
+            // 
+            // txtPassword
+            // 
+            txtPassword.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            txtPassword.Location = new Point(75, 358);
+            txtPassword.Margin = new Padding(3, 3, 3, 4);
+            txtPassword.MaxLength = 16;
+            txtPassword.Name = "txtPassword";
+            txtPassword.Size = new Size(310, 29);
+            txtPassword.TabIndex = 1;
+            txtPassword.UseSystemPasswordChar = true;
+            txtPassword.KeyPress += txtPassword_KeyPress;
+            // 
+            // label2
+            // 
+            label2.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            label2.AutoSize = true;
+            label2.Location = new Point(70, 257);
+            label2.Margin = new Padding(3, 0, 3, 4);
+            label2.Name = "label2";
+            label2.Size = new Size(81, 21);
+            label2.TabIndex = 2;
+            label2.Text = "Username";
+            // 
+            // txtUsername
+            // 
+            txtUsername.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            txtUsername.Location = new Point(75, 285);
+            txtUsername.Margin = new Padding(3, 3, 3, 16);
+            txtUsername.MaxLength = 50;
+            txtUsername.Name = "txtUsername";
+            txtUsername.Size = new Size(310, 29);
+            txtUsername.TabIndex = 0;
+            // 
+            // label1
+            // 
+            label1.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point);
+            label1.Location = new Point(67, 201);
+            label1.Margin = new Padding(3, 0, 3, 24);
+            label1.Name = "label1";
+            label1.Size = new Size(78, 32);
+            label1.TabIndex = 0;
+            label1.Text = "Login";
+            // 
+            // panel2
+            // 
+            panel2.BackColor = Color.FromArgb(240, 253, 244);
+            panel2.Controls.Add(pictureBox1);
+            panel2.Dock = DockStyle.Fill;
+            panel2.Location = new Point(0, 0);
+            panel2.Margin = new Padding(3, 4, 3, 4);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(804, 681);
+            panel2.TabIndex = 1;
             // 
             // pictureBox1
             // 
-            pictureBox1.Location = new Point(310, 306);
+            pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
+            pictureBox1.Location = new Point(182, 140);
+            pictureBox1.Margin = new Padding(3, 4, 3, 4);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(100, 50);
+            pictureBox1.Size = new Size(397, 400);
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             // 
@@ -64,23 +171,31 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Window;
             ClientSize = new Size(1264, 681);
-            Controls.Add(splitHorizontal);
+            Controls.Add(panel2);
+            Controls.Add(panel1);
             Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4);
             Name = "frmLogin";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Login ";
-            splitHorizontal.Panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)splitHorizontal).EndInit();
-            splitHorizontal.ResumeLayout(false);
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
 
-        private SplitContainer splitHorizontal;
+        private Panel panel1;
+        private Panel panel2;
         private PictureBox pictureBox1;
+        private Label label1;
+        private Label label3;
+        private TextBox txtPassword;
+        private Label label2;
+        private TextBox txtUsername;
+        private CheckBox chkShowPassword;
+        private Button btnLogin;
     }
 }
