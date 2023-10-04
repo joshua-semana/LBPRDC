@@ -1,0 +1,16 @@
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows\LBPRDC.csproj.GenerateResource.cache
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows\LBPRDC.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows\LBPRDC.AssemblyInfoInputs.cache
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows\LBPRDC.AssemblyInfo.cs
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows\LBPRDC.csproj.CoreCompileInputs.cache
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\bin\Debug\net6.0-windows\LBPRDC.exe
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\bin\Debug\net6.0-windows\LBPRDC.deps.json
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\bin\Debug\net6.0-windows\LBPRDC.runtimeconfig.json
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\bin\Debug\net6.0-windows\LBPRDC.dll
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\bin\Debug\net6.0-windows\LBPRDC.pdb
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows\LBPRDC.dll
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows\refint\LBPRDC.dll
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows\LBPRDC.pdb
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows\LBPRDC.genruntimeconfig.cache
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows\ref\LBPRDC.dll
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows\LBPRDC.Source.Views.frmLogin.resources
