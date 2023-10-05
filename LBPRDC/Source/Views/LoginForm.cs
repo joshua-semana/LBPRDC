@@ -7,51 +7,86 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BCrypt.Net;
+using LBPRDC.Source.Services;
 
 namespace LBPRDC.Source.Views
 {
     public partial class frmLogin : Form
     {
+
         public frmLogin()
         {
             InitializeComponent();
         }
 
-        private bool ValidateInputs()
+        private void ClearInputs(Control container)
         {
-            if (string.IsNullOrWhiteSpace(txtUsername.Text) || string.IsNullOrWhiteSpace(txtPassword.Text))
+            foreach (Control c in container.Controls)
             {
-                MessageBox.Show("Please enter both username and password.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            return true;
-        }
-
-        private bool AuthenticateAccount()
-        {
-            //TODO: Check username and password from database
-            if (txtUsername.Text != "admin" && txtPassword.Text != "admin")
-            {
-                MessageBox.Show("Invalid username or password.", "Authentication Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            return true;
-        }
-
-        private void btnLogin_Click(object sender, EventArgs e)
-        {
-            if (ValidateInputs())
-            {
-                if (AuthenticateAccount())
+                if (c is TextBox textBox)
                 {
-                    //TODO: Display the main form
-                    //this.Hide();
-                    //MainForm mainForm = new MainForm();
-                    //mainForm.ShowDialog(); // Use ShowDialog to make the main form modal
-                    //this.Close();
-                    MessageBox.Show("Login successfully.", "Authentication Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    textBox.Text = string.Empty;
                 }
             }
+        }
+
+        private async void btnLogin_Click(object sender, EventArgs e)
+        {
+            if (Utilities.ControlUtils.AreInputsEmpty(pnlLogin))
+            {
+                MessageBox.Show("Please enter both username and password.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            string username = txtUsername.Text;
+            string password = txtPassword.Text;
+
+            try
+            {
+                bool isAuthenticated = AuthenticationService.ValidateCredentials(username, password);
+
+                if (isAuthenticated)
+                {
+                    UserService.GetUserInfoByUsername(username);
+
+                    if (UserManager.Instance.CurrentUser != null)
+                    {
+                        if (UserManager.Instance.CurrentUser?.Status == "Active")
+                        {
+                            bool updateSuccessful = await Task.Run(() => UserService.UpdateLastLoginDate(username));
+
+                            if (!updateSuccessful)
+                            {
+                                MessageBox.Show("Failed to update 'LastLoginDate'.", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
+
+                            ClearInputs(pnlLogin);
+                            this.Hide();
+                            frmMain mainForm = new frmMain();
+                            mainForm.ShowDialog();
+                            this.Close();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Invalid username or password.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to get user info. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Invalid username or password.", "Authentication Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.HandleException(ex);
+            }
+            
         }
 
         private void chkShowPassword_CheckedChanged(object sender, EventArgs e)

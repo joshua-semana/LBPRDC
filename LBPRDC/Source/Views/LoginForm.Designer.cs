@@ -29,7 +29,8 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmLogin));
-            panel1 = new Panel();
+            pnlLogin = new Panel();
+            label5 = new Label();
             lblVersionNumber = new Label();
             pictureBox1 = new PictureBox();
             chkShowPassword = new CheckBox();
@@ -40,31 +41,42 @@
             txtUsername = new TextBox();
             label1 = new Label();
             panel2 = new Panel();
-            label5 = new Label();
-            panel1.SuspendLayout();
+            pnlLogin.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
-            // panel1
+            // pnlLogin
             // 
-            panel1.BackColor = SystemColors.Window;
-            panel1.Controls.Add(label5);
-            panel1.Controls.Add(lblVersionNumber);
-            panel1.Controls.Add(pictureBox1);
-            panel1.Controls.Add(chkShowPassword);
-            panel1.Controls.Add(btnLogin);
-            panel1.Controls.Add(label3);
-            panel1.Controls.Add(txtPassword);
-            panel1.Controls.Add(label2);
-            panel1.Controls.Add(txtUsername);
-            panel1.Controls.Add(label1);
-            panel1.Dock = DockStyle.Right;
-            panel1.Location = new Point(764, 0);
-            panel1.Margin = new Padding(3, 4, 3, 4);
-            panel1.Name = "panel1";
-            panel1.Padding = new Padding(80);
-            panel1.Size = new Size(500, 681);
-            panel1.TabIndex = 0;
+            pnlLogin.BackColor = SystemColors.Window;
+            pnlLogin.Controls.Add(label5);
+            pnlLogin.Controls.Add(lblVersionNumber);
+            pnlLogin.Controls.Add(pictureBox1);
+            pnlLogin.Controls.Add(chkShowPassword);
+            pnlLogin.Controls.Add(btnLogin);
+            pnlLogin.Controls.Add(label3);
+            pnlLogin.Controls.Add(txtPassword);
+            pnlLogin.Controls.Add(label2);
+            pnlLogin.Controls.Add(txtUsername);
+            pnlLogin.Controls.Add(label1);
+            pnlLogin.Dock = DockStyle.Right;
+            pnlLogin.Location = new Point(764, 0);
+            pnlLogin.Margin = new Padding(3, 4, 3, 4);
+            pnlLogin.Name = "pnlLogin";
+            pnlLogin.Padding = new Padding(80);
+            pnlLogin.Size = new Size(500, 681);
+            pnlLogin.TabIndex = 0;
+            // 
+            // label5
+            // 
+            label5.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label5.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            label5.Location = new Point(83, 653);
+            label5.Margin = new Padding(3, 0, 3, 4);
+            label5.Name = "label5";
+            label5.Size = new Size(334, 15);
+            label5.TabIndex = 6;
+            label5.Text = "© LBP Resource And Development Corporation, 2023";
+            label5.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // lblVersionNumber
             // 
@@ -181,41 +193,29 @@
             panel2.Size = new Size(764, 681);
             panel2.TabIndex = 1;
             // 
-            // label5
-            // 
-            label5.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            label5.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            label5.Location = new Point(83, 653);
-            label5.Margin = new Padding(3, 0, 3, 4);
-            label5.Name = "label5";
-            label5.Size = new Size(334, 15);
-            label5.TabIndex = 6;
-            label5.Text = "© LBP Resource And Development Corporation, 2023";
-            label5.TextAlign = ContentAlignment.MiddleCenter;
-            // 
             // frmLogin
             // 
-            AutoScaleDimensions = new SizeF(9F, 21F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleMode = AutoScaleMode.None;
             BackColor = SystemColors.Window;
             ClientSize = new Size(1264, 681);
             Controls.Add(panel2);
-            Controls.Add(panel1);
+            Controls.Add(pnlLogin);
             Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4);
             MinimumSize = new Size(1280, 720);
             Name = "frmLogin";
+            ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
-            panel1.ResumeLayout(false);
-            panel1.PerformLayout();
+            pnlLogin.ResumeLayout(false);
+            pnlLogin.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
 
-        private Panel panel1;
+        private Panel pnlLogin;
         private Panel panel2;
         private PictureBox pictureBox1;
         private CheckBox chkShowPassword;
