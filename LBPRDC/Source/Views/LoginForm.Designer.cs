@@ -203,7 +203,7 @@
             Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4);
-            MinimumSize = new Size(1280, 720);
+            MinimumSize = new Size(800, 600);
             Name = "frmLogin";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
