@@ -39,54 +39,46 @@ namespace LBPRDC.Source.Views
                 return;
             }
 
-            string username = txtUsername.Text;
-            string password = txtPassword.Text;
-
             try
             {
+                string username = txtUsername.Text;
+                string password = txtPassword.Text;
                 bool isAuthenticated = AuthenticationService.ValidateCredentials(username, password);
 
-                if (isAuthenticated)
-                {
-                    UserService.GetUserInfoByUsername(username);
-
-                    if (UserManager.Instance.CurrentUser != null)
-                    {
-                        if (UserManager.Instance.CurrentUser?.Status == "Active")
-                        {
-                            bool updateSuccessful = await Task.Run(() => UserService.UpdateLastLoginDate(username));
-
-                            if (!updateSuccessful)
-                            {
-                                MessageBox.Show("Failed to update 'LastLoginDate'.", "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            }
-
-                            ClearInputs(pnlLogin);
-                            this.Hide();
-                            frmMain mainForm = new frmMain();
-                            mainForm.ShowDialog();
-                            this.Close();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Invalid username or password.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Failed to get user info. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                else
+                if (!isAuthenticated)
                 {
                     MessageBox.Show("Invalid username or password.", "Authentication Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
+
+                UserService.GetUserInfoByUsername(username);
+                var currentUser = UserManager.Instance.CurrentUser;
+
+                if (currentUser == null)
+                {
+                    MessageBox.Show("Failed to get user info. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (currentUser.Status != "Active")
+                {
+                    MessageBox.Show("Invalid username or password.", "Authentication Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                await Task.Run(() => LoggingService.LogActivity(currentUser.UserID, "Sign In Log", "This user signed in to the software."));
+                await Task.Run(() => UserService.UpdateLastLoginDate(username));
+
+                //ClearInputs(pnlLogin);
+                this.Hide();
+                frmMain mainForm = new frmMain();
+                mainForm.ShowDialog();
+                this.Close();
             }
             catch (Exception ex)
             {
                 ExceptionHandler.HandleException(ex);
             }
-            
         }
 
         private void chkShowPassword_CheckedChanged(object sender, EventArgs e)

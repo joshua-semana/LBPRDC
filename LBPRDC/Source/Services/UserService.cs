@@ -20,7 +20,6 @@ namespace LBPRDC.Source.Services
                                "VALUES (@Username, @PasswordHash, @Email, @FirstName, @LastName, @Role, 'Active', GETDATE(), GETDATE())";
 
                 using (SqlConnection connection = new SqlConnection(Data.DataAccessHelper.GetConnectionString()))
-
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Username", username);
@@ -44,7 +43,7 @@ namespace LBPRDC.Source.Services
             }
         }
 
-        public static bool UpdateLastLoginDate(string username)
+        public static void UpdateLastLoginDate(string username)
         {
             try
             {
@@ -52,7 +51,6 @@ namespace LBPRDC.Source.Services
                                "WHERE Username = @Username";
 
                 using (SqlConnection connection = new SqlConnection(Data.DataAccessHelper.GetConnectionString()))
-
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Username", username);
@@ -60,14 +58,12 @@ namespace LBPRDC.Source.Services
 
                     connection.Open();
 
-                    int rowsAffected = command.ExecuteNonQuery();
-
-                    return rowsAffected > 0;
+                    command.ExecuteNonQuery();
                 }
             }
             catch (Exception ex)
             {
-                return ExceptionHandler.HandleException(ex);
+                ExceptionHandler.HandleException(ex);
             }
         }
 
@@ -75,11 +71,9 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string query = "SELECT * FROM Users " +
-                               "WHERE Username = @Username";
+                string query = "SELECT * FROM Users WHERE Username = @Username";
 
                 using (SqlConnection connection = new SqlConnection(Data.DataAccessHelper.GetConnectionString()))
-
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Username", username);

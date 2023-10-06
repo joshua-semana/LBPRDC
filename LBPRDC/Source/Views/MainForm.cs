@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using LBPRDC.Source.Services;
 
 namespace LBPRDC.Source.Views
 {
@@ -19,9 +20,8 @@ namespace LBPRDC.Source.Views
 
         private void frmMain_Load(object sender, EventArgs e)
         {
-            DateTime currentDate = DateTime.Now;
-            string formattedDate = currentDate.ToString("MMM. dd, yyyy (ddd)");
-            lblDateToday.Text = formattedDate;
+            lblDateToday.Text = DateTime.Now.ToString("MMM. dd, yyyy (ddd)");
+            lblGreetUser.Text = "Hello, " + UserManager.Instance.CurrentUser?.FirstName;
         }
 
         private void btnSignOut_Click(object sender, EventArgs e)
