@@ -14,7 +14,8 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string query = "SELECT PasswordHash FROM Users WHERE Username = @Username";
+                // By adding COLLATE Latin1_General_BIN, the word "admin" is not the same with "ADmin"
+                string query = "SELECT PasswordHash FROM Users WHERE Username COLLATE Latin1_General_BIN = @Username";
 
                 using (SqlConnection connection = new SqlConnection(Data.DataAccessHelper.GetConnectionString()))
                 {

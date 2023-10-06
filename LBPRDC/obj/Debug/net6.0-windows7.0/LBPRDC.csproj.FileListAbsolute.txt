@@ -43,4 +43,3 @@ C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.pdb
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.genruntimeconfig.cache
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\ref\LBPRDC.dll
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\bin\Debug\net6.0-windows7.0\BCrypt.Net-Next.dll
-C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\bin\Debug\net6.0-windows7.0\MaterialSkin.dll

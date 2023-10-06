@@ -25,6 +25,10 @@ namespace LBPRDC.Source.Services
                     command.Parameters.AddWithValue("@ActivityType", activityType);
                     command.Parameters.AddWithValue("@ActivityDetails", activityDetails);
                     command.Parameters.AddWithValue("@Timestamp", DateTime.Now);
+
+                    connection.Open();
+
+                    command.ExecuteNonQuery();
                 };
             }
             catch (Exception ex)
