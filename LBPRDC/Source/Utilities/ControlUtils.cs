@@ -23,5 +23,16 @@ namespace LBPRDC.Source.Utilities
             }
             return false;
         }
+
+        public static void ToggleInputState(Control container)
+        {
+            foreach(Control control in container.Controls)
+            {
+                if (control is TextBox textBox)
+                {
+                    textBox.Enabled = !textBox.Enabled;
+                }
+            }
+        }
     }
 }

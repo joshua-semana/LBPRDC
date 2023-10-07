@@ -30,7 +30,13 @@ namespace LBPRDC.Source.Views
             }
         }
 
-        private async void btnLogin_Click(object sender, EventArgs e)
+        private void SetSignInButtonState(string buttonText, bool enabled)
+        {
+            btnSignIn.Text = buttonText;
+            btnSignIn.Enabled = enabled;
+        }
+
+        private async void btnSignIn_Click(object sender, EventArgs e)
         {
             if (Utilities.ControlUtils.AreInputsEmpty(pnlLogin))
             {
@@ -42,6 +48,9 @@ namespace LBPRDC.Source.Views
             {
                 string username = txtUsername.Text;
                 string password = txtPassword.Text;
+
+                SetSignInButtonState("Signing in...", false);
+
                 bool isAuthenticated = AuthenticationService.ValidateCredentials(username, password);
 
                 if (!isAuthenticated)
@@ -68,7 +77,6 @@ namespace LBPRDC.Source.Views
                 await Task.Run(() => LoggingService.LogActivity(currentUser.UserID, "Sign In Log", "This user signed in to the software."));
                 await Task.Run(() => UserService.UpdateLastLoginDate(username));
 
-                //ClearInputs(pnlLogin);
                 this.Hide();
                 frmMain mainForm = new frmMain();
                 mainForm.ShowDialog();
@@ -77,6 +85,10 @@ namespace LBPRDC.Source.Views
             catch (Exception ex)
             {
                 ExceptionHandler.HandleException(ex);
+            }
+            finally
+            {
+                SetSignInButtonState("Sign In", true);
             }
         }
 
@@ -90,7 +102,21 @@ namespace LBPRDC.Source.Views
             if (e.KeyChar == (char)Keys.Enter)
             {
                 e.Handled = true;
-                btnLogin.PerformClick();
+                btnSignIn.PerformClick();
+            }
+        }
+
+        private void btnConfiguration_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Changing these settings incorrectly can disrupt the functionality of the application. " +
+                "Only modify these settings if you are sure about the changes you are making and have the necessary knowledge. " +
+                "Incorrect settings may require technical support to restore proper functionality. \n\nDo you still want to proceed?",
+                "Settings Modification Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Yes)
+            {
+                frmServerSetup serverSetupForm = new frmServerSetup();
+                serverSetupForm.ShowDialog();
             }
         }
     }
