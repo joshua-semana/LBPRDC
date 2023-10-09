@@ -8,7 +8,7 @@ namespace LBPRDC.Source.Utilities
 {
     internal class ColorConstants
     {
-        public static readonly Color PageSwitchButton = Color.FromArgb(188, 211, 201);
-        public static readonly Color PanelHeader = Color.FromArgb(209, 235, 224);
+        public static readonly Color PageSwitchButton = Color.FromArgb(229, 229, 229);
+        public static readonly Color Default = Color.White;
     }
 }

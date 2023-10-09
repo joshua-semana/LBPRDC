@@ -17,10 +17,12 @@ namespace LBPRDC.Source.Views
         private List<Button> pageSwitchButtons = new List<Button>();
         private string currentPage = "Home";
 
+        UserControl employeesControl = new ucEmployees();
+
         public frmMain()
         {
             InitializeComponent();
-            InitializePageSwitchButtons(flowHeader);
+            InitializePageSwitchButtons(flowSideNavTop);
         }
 
         private void frmMain_Load(object sender, EventArgs e)
@@ -38,7 +40,6 @@ namespace LBPRDC.Source.Views
             if (userRole != "Admin")
             {
                 btnAccounts.Visible = false;
-                menuItemLogs.Visible = false;
             }
         }
 
@@ -58,15 +59,13 @@ namespace LBPRDC.Source.Views
         {
             foreach (Button button in pageSwitchButtons)
             {
-                if (button.Text == currentPage)
+                if ((string)button.Tag == currentPage)
                 {
                     button.BackColor = Utilities.ColorConstants.PageSwitchButton;
-                    button.Font = new Font(button.Font, FontStyle.Bold);
                 }
                 else
                 {
-                    button.BackColor = Utilities.ColorConstants.PanelHeader;
-                    button.Font = new Font(button.Font, FontStyle.Regular);
+                    button.BackColor = Utilities.ColorConstants.Default;
                 }
             }
         }
@@ -74,11 +73,44 @@ namespace LBPRDC.Source.Views
         private void btnPageSwitch_Click(object sender, EventArgs e)
         {
             Button clickedButton = (Button)sender;
-            currentPage = clickedButton.Text;
+            currentPage = (string)clickedButton.Tag;
 
             UpdatePageSwitchButtonsStyle();
+            DisplayPage(currentPage);
+        }
 
-            if (clickedButton.Text == "Home") { }
+        private void DisplayPage(string pageName)
+        {
+            //homeControl.Hide();
+            employeesControl.Hide();
+            //accountsControl.Hide();
+            //logsControl.Hide();
+
+            switch (pageName)
+            {
+                case "Home":
+                    //homeControl.Dock = DockStyle.Fill;
+                    //pnlMainContent.Controls.Add(homeControl);
+                    //homeControl.Show();
+                    break;
+                case "Employees":
+                    employeesControl.Dock = DockStyle.Fill;
+                    pnlContent.Controls.Add(employeesControl);
+                    employeesControl.Show();
+                    break;
+
+                case "Accounts":
+                    //accountsControl.Dock = DockStyle.Fill;
+                    //pnlMainContent.Controls.Add(accountsControl);
+                    //accountsControl.Show();
+                    break;
+
+                case "Logs":
+                    //logsControl.Dock = DockStyle.Fill;
+                    //pnlMainContent.Controls.Add(logsControl);
+                    //logsControl.Show();
+                    break;
+            }
         }
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -92,7 +124,7 @@ namespace LBPRDC.Source.Views
             }
         }
 
-        private void menuItemSignOut_Click(object sender, EventArgs e)
+        private void btnSignOut_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show("Are you sure you want to sign out?", "Sign Out Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
@@ -103,6 +135,31 @@ namespace LBPRDC.Source.Views
                 loginForm.ShowDialog();
                 this.Close();
             }
+        }
+
+        private void picLogo_Click(object sender, EventArgs e)
+        {
+            List<Employee> employees = EmployeeService.GetAllEmployees();
+
+            var filteredAndTransformedData = employees.Select(emp => new
+            {
+                emp.EmployeeID,
+                FullName = $"{emp.FirstName} {emp.MiddleName} {emp.LastName} {emp.Suffix}".Trim(),
+                emp.DepartmentName,
+                emp.EmailAddress,
+                emp.ContactNumber,
+                emp.MarriageStatus,
+                emp.DateOfUpdateOfMarriageStatus,
+                emp.DateHired,
+                emp.EmploymentStatus,
+                emp.DateOfEmploymentStatusChange
+            }).ToList();
+
+            //dataGridView1.DataSource = filteredAndTransformedData;
+            //Panel test = new Panel();
+            //test.Dock = DockStyle.Fill;
+            //test.BackColor = Color.Yellow;
+            //pnlMainContainer.Controls.Add(test);
         }
     }
 }

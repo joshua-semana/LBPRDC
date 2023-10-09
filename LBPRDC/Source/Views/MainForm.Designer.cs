@@ -30,210 +30,285 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             pnlHeader = new Panel();
-            flowHeaderActions = new FlowLayoutPanel();
-            lblDateToday = new Label();
-            label2 = new Label();
-            lblGreetUser = new Label();
-            flowHeader = new FlowLayoutPanel();
+            flowHeaderLeft = new FlowLayoutPanel();
             picLogo = new PictureBox();
-            label1 = new Label();
-            btnHome = new Button();
-            btnEmployees = new Button();
+            flowHeaderRight = new FlowLayoutPanel();
+            lblDateToday = new Label();
+            lblLine1 = new Label();
+            lblGreetUser = new Label();
+            pnlLine1 = new Panel();
+            pnlMainContainer = new Panel();
+            pnlContent = new Panel();
+            pnlLine2 = new Panel();
+            pnlSideNav = new Panel();
+            flowSideNavBottom = new FlowLayoutPanel();
+            btnSignOut = new Button();
+            flowSideNavTop = new FlowLayoutPanel();
+            btnNavHome = new Button();
+            btnNavEmployees = new Button();
             btnAccounts = new Button();
-            menuStrip1 = new MenuStrip();
-            menuAccount = new ToolStripMenuItem();
-            menuItemLogs = new ToolStripMenuItem();
-            menuItemSignOut = new ToolStripMenuItem();
+            btnLogs = new Button();
+            pnlLine3 = new Panel();
             pnlHeader.SuspendLayout();
-            flowHeaderActions.SuspendLayout();
-            flowHeader.SuspendLayout();
+            flowHeaderLeft.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)picLogo).BeginInit();
-            menuStrip1.SuspendLayout();
+            flowHeaderRight.SuspendLayout();
+            pnlMainContainer.SuspendLayout();
+            pnlSideNav.SuspendLayout();
+            flowSideNavBottom.SuspendLayout();
+            flowSideNavTop.SuspendLayout();
             SuspendLayout();
             // 
             // pnlHeader
             // 
-            pnlHeader.BackColor = Color.FromArgb(187, 247, 208);
-            pnlHeader.Controls.Add(flowHeaderActions);
-            pnlHeader.Controls.Add(flowHeader);
+            pnlHeader.BackColor = SystemColors.Window;
+            pnlHeader.Controls.Add(flowHeaderLeft);
+            pnlHeader.Controls.Add(flowHeaderRight);
             pnlHeader.Dock = DockStyle.Top;
-            pnlHeader.Location = new Point(0, 24);
+            pnlHeader.Location = new Point(0, 0);
             pnlHeader.Name = "pnlHeader";
             pnlHeader.Size = new Size(1264, 50);
             pnlHeader.TabIndex = 0;
             // 
-            // flowHeaderActions
+            // flowHeaderLeft
             // 
-            flowHeaderActions.BackColor = Color.FromArgb(209, 235, 224);
-            flowHeaderActions.Controls.Add(lblDateToday);
-            flowHeaderActions.Controls.Add(label2);
-            flowHeaderActions.Controls.Add(lblGreetUser);
-            flowHeaderActions.Dock = DockStyle.Right;
-            flowHeaderActions.FlowDirection = FlowDirection.RightToLeft;
-            flowHeaderActions.Location = new Point(964, 0);
-            flowHeaderActions.Name = "flowHeaderActions";
-            flowHeaderActions.Padding = new Padding(8, 0, 8, 0);
-            flowHeaderActions.Size = new Size(300, 50);
-            flowHeaderActions.TabIndex = 4;
-            // 
-            // lblDateToday
-            // 
-            lblDateToday.AutoEllipsis = true;
-            lblDateToday.AutoSize = true;
-            lblDateToday.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblDateToday.Location = new Point(215, 17);
-            lblDateToday.Margin = new Padding(0, 17, 0, 0);
-            lblDateToday.Name = "lblDateToday";
-            lblDateToday.Size = new Size(69, 15);
-            lblDateToday.TabIndex = 5;
-            lblDateToday.Text = "Date Today";
-            lblDateToday.TextAlign = ContentAlignment.MiddleRight;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 14F, FontStyle.Regular, GraphicsUnit.Point);
-            label2.Location = new Point(198, 10);
-            label2.Margin = new Padding(3, 10, 0, 0);
-            label2.Name = "label2";
-            label2.Size = new Size(17, 25);
-            label2.TabIndex = 4;
-            label2.Text = "|";
-            label2.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // lblGreetUser
-            // 
-            lblGreetUser.AutoEllipsis = true;
-            lblGreetUser.AutoSize = true;
-            lblGreetUser.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lblGreetUser.Location = new Point(126, 17);
-            lblGreetUser.Margin = new Padding(0, 17, 0, 0);
-            lblGreetUser.Name = "lblGreetUser";
-            lblGreetUser.Size = new Size(69, 15);
-            lblGreetUser.TabIndex = 3;
-            lblGreetUser.Text = "Greet User";
-            lblGreetUser.TextAlign = ContentAlignment.MiddleRight;
-            // 
-            // flowHeader
-            // 
-            flowHeader.BackColor = Color.FromArgb(209, 235, 224);
-            flowHeader.Controls.Add(picLogo);
-            flowHeader.Controls.Add(label1);
-            flowHeader.Controls.Add(btnHome);
-            flowHeader.Controls.Add(btnEmployees);
-            flowHeader.Controls.Add(btnAccounts);
-            flowHeader.Dock = DockStyle.Fill;
-            flowHeader.Location = new Point(0, 0);
-            flowHeader.Name = "flowHeader";
-            flowHeader.Padding = new Padding(12, 0, 12, 0);
-            flowHeader.Size = new Size(1264, 50);
-            flowHeader.TabIndex = 2;
+            flowHeaderLeft.BackColor = SystemColors.Window;
+            flowHeaderLeft.Controls.Add(picLogo);
+            flowHeaderLeft.Dock = DockStyle.Fill;
+            flowHeaderLeft.Location = new Point(0, 0);
+            flowHeaderLeft.Name = "flowHeaderLeft";
+            flowHeaderLeft.Padding = new Padding(10, 0, 0, 0);
+            flowHeaderLeft.Size = new Size(976, 50);
+            flowHeaderLeft.TabIndex = 2;
             // 
             // picLogo
             // 
             picLogo.BackgroundImage = (Image)resources.GetObject("picLogo.BackgroundImage");
             picLogo.BackgroundImageLayout = ImageLayout.Zoom;
-            picLogo.Location = new Point(12, 9);
-            picLogo.Margin = new Padding(0, 9, 0, 0);
+            picLogo.Location = new Point(10, 0);
+            picLogo.Margin = new Padding(0);
             picLogo.Name = "picLogo";
-            picLogo.Size = new Size(30, 30);
+            picLogo.Size = new Size(32, 50);
             picLogo.TabIndex = 0;
             picLogo.TabStop = false;
+            picLogo.Click += picLogo_Click;
             // 
-            // label1
+            // flowHeaderRight
             // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 14F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(50, 10);
-            label1.Margin = new Padding(8, 10, 0, 0);
-            label1.Name = "label1";
-            label1.Size = new Size(17, 25);
-            label1.TabIndex = 5;
-            label1.Text = "|";
-            label1.TextAlign = ContentAlignment.MiddleCenter;
+            flowHeaderRight.BackColor = SystemColors.Window;
+            flowHeaderRight.Controls.Add(lblDateToday);
+            flowHeaderRight.Controls.Add(lblLine1);
+            flowHeaderRight.Controls.Add(lblGreetUser);
+            flowHeaderRight.Dock = DockStyle.Right;
+            flowHeaderRight.FlowDirection = FlowDirection.RightToLeft;
+            flowHeaderRight.Location = new Point(976, 0);
+            flowHeaderRight.Name = "flowHeaderRight";
+            flowHeaderRight.Padding = new Padding(8, 0, 8, 0);
+            flowHeaderRight.Size = new Size(288, 50);
+            flowHeaderRight.TabIndex = 4;
             // 
-            // btnHome
+            // lblDateToday
             // 
-            btnHome.Cursor = Cursors.Hand;
-            btnHome.FlatAppearance.BorderSize = 0;
-            btnHome.FlatStyle = FlatStyle.Flat;
-            btnHome.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            btnHome.Location = new Point(67, 13);
-            btnHome.Margin = new Padding(0, 13, 4, 0);
-            btnHome.Name = "btnHome";
-            btnHome.Size = new Size(49, 23);
-            btnHome.TabIndex = 6;
-            btnHome.Text = "Home";
-            btnHome.UseVisualStyleBackColor = true;
+            lblDateToday.AutoEllipsis = true;
+            lblDateToday.AutoSize = true;
+            lblDateToday.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            lblDateToday.Location = new Point(193, 17);
+            lblDateToday.Margin = new Padding(0, 17, 0, 0);
+            lblDateToday.Name = "lblDateToday";
+            lblDateToday.Size = new Size(79, 16);
+            lblDateToday.TabIndex = 5;
+            lblDateToday.Text = "Date Today";
+            lblDateToday.TextAlign = ContentAlignment.MiddleRight;
             // 
-            // btnEmployees
+            // lblLine1
             // 
-            btnEmployees.Cursor = Cursors.Hand;
-            btnEmployees.FlatAppearance.BorderSize = 0;
-            btnEmployees.FlatStyle = FlatStyle.Flat;
-            btnEmployees.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            btnEmployees.Location = new Point(120, 13);
-            btnEmployees.Margin = new Padding(0, 13, 4, 0);
-            btnEmployees.Name = "btnEmployees";
-            btnEmployees.Size = new Size(76, 23);
-            btnEmployees.TabIndex = 2;
-            btnEmployees.Text = "Employees";
-            btnEmployees.UseVisualStyleBackColor = true;
+            lblLine1.AutoSize = true;
+            lblLine1.Font = new Font("Arial", 14F, FontStyle.Regular, GraphicsUnit.Point);
+            lblLine1.Location = new Point(177, 12);
+            lblLine1.Margin = new Padding(3, 12, 0, 0);
+            lblLine1.Name = "lblLine1";
+            lblLine1.Size = new Size(16, 22);
+            lblLine1.TabIndex = 4;
+            lblLine1.Text = "|";
+            lblLine1.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // lblGreetUser
+            // 
+            lblGreetUser.AutoEllipsis = true;
+            lblGreetUser.AutoSize = true;
+            lblGreetUser.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            lblGreetUser.Location = new Point(98, 17);
+            lblGreetUser.Margin = new Padding(0, 17, 0, 0);
+            lblGreetUser.Name = "lblGreetUser";
+            lblGreetUser.Size = new Size(76, 16);
+            lblGreetUser.TabIndex = 3;
+            lblGreetUser.Text = "Greet User";
+            lblGreetUser.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // pnlLine1
+            // 
+            pnlLine1.BorderStyle = BorderStyle.FixedSingle;
+            pnlLine1.Dock = DockStyle.Top;
+            pnlLine1.Location = new Point(0, 0);
+            pnlLine1.Name = "pnlLine1";
+            pnlLine1.Size = new Size(1264, 1);
+            pnlLine1.TabIndex = 1;
+            // 
+            // pnlMainContainer
+            // 
+            pnlMainContainer.Controls.Add(pnlContent);
+            pnlMainContainer.Controls.Add(pnlLine2);
+            pnlMainContainer.Controls.Add(pnlSideNav);
+            pnlMainContainer.Controls.Add(pnlLine3);
+            pnlMainContainer.Controls.Add(pnlHeader);
+            pnlMainContainer.Dock = DockStyle.Fill;
+            pnlMainContainer.Location = new Point(0, 1);
+            pnlMainContainer.Name = "pnlMainContainer";
+            pnlMainContainer.Size = new Size(1264, 680);
+            pnlMainContainer.TabIndex = 2;
+            // 
+            // pnlContent
+            // 
+            pnlContent.Dock = DockStyle.Fill;
+            pnlContent.Location = new Point(51, 51);
+            pnlContent.Name = "pnlContent";
+            pnlContent.Size = new Size(1213, 629);
+            pnlContent.TabIndex = 5;
+            // 
+            // pnlLine2
+            // 
+            pnlLine2.BorderStyle = BorderStyle.FixedSingle;
+            pnlLine2.Dock = DockStyle.Left;
+            pnlLine2.Location = new Point(50, 51);
+            pnlLine2.Name = "pnlLine2";
+            pnlLine2.Size = new Size(1, 629);
+            pnlLine2.TabIndex = 2;
+            // 
+            // pnlSideNav
+            // 
+            pnlSideNav.Controls.Add(flowSideNavBottom);
+            pnlSideNav.Controls.Add(flowSideNavTop);
+            pnlSideNav.Dock = DockStyle.Left;
+            pnlSideNav.Location = new Point(0, 51);
+            pnlSideNav.Name = "pnlSideNav";
+            pnlSideNav.Size = new Size(50, 629);
+            pnlSideNav.TabIndex = 4;
+            // 
+            // flowSideNavBottom
+            // 
+            flowSideNavBottom.Controls.Add(btnSignOut);
+            flowSideNavBottom.Dock = DockStyle.Bottom;
+            flowSideNavBottom.FlowDirection = FlowDirection.BottomUp;
+            flowSideNavBottom.Location = new Point(0, 576);
+            flowSideNavBottom.Name = "flowSideNavBottom";
+            flowSideNavBottom.Size = new Size(50, 53);
+            flowSideNavBottom.TabIndex = 5;
+            // 
+            // btnSignOut
+            // 
+            btnSignOut.Cursor = Cursors.Hand;
+            btnSignOut.FlatAppearance.BorderSize = 0;
+            btnSignOut.FlatStyle = FlatStyle.Flat;
+            btnSignOut.Image = (Image)resources.GetObject("btnSignOut.Image");
+            btnSignOut.Location = new Point(0, 3);
+            btnSignOut.Margin = new Padding(0);
+            btnSignOut.Name = "btnSignOut";
+            btnSignOut.Size = new Size(50, 50);
+            btnSignOut.TabIndex = 12;
+            btnSignOut.Tag = "";
+            btnSignOut.UseVisualStyleBackColor = true;
+            btnSignOut.Click += btnSignOut_Click;
+            // 
+            // flowSideNavTop
+            // 
+            flowSideNavTop.Controls.Add(btnNavHome);
+            flowSideNavTop.Controls.Add(btnNavEmployees);
+            flowSideNavTop.Controls.Add(btnAccounts);
+            flowSideNavTop.Controls.Add(btnLogs);
+            flowSideNavTop.Dock = DockStyle.Fill;
+            flowSideNavTop.FlowDirection = FlowDirection.TopDown;
+            flowSideNavTop.Location = new Point(0, 0);
+            flowSideNavTop.Name = "flowSideNavTop";
+            flowSideNavTop.Size = new Size(50, 629);
+            flowSideNavTop.TabIndex = 1;
+            // 
+            // btnNavHome
+            // 
+            btnNavHome.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnNavHome.Cursor = Cursors.Hand;
+            btnNavHome.FlatAppearance.BorderSize = 0;
+            btnNavHome.FlatStyle = FlatStyle.Flat;
+            btnNavHome.Image = (Image)resources.GetObject("btnNavHome.Image");
+            btnNavHome.Location = new Point(0, 0);
+            btnNavHome.Margin = new Padding(0);
+            btnNavHome.Name = "btnNavHome";
+            btnNavHome.Size = new Size(50, 50);
+            btnNavHome.TabIndex = 8;
+            btnNavHome.Tag = "Home";
+            btnNavHome.UseVisualStyleBackColor = true;
+            // 
+            // btnNavEmployees
+            // 
+            btnNavEmployees.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnNavEmployees.Cursor = Cursors.Hand;
+            btnNavEmployees.FlatAppearance.BorderSize = 0;
+            btnNavEmployees.FlatStyle = FlatStyle.Flat;
+            btnNavEmployees.Image = (Image)resources.GetObject("btnNavEmployees.Image");
+            btnNavEmployees.Location = new Point(0, 50);
+            btnNavEmployees.Margin = new Padding(0);
+            btnNavEmployees.Name = "btnNavEmployees";
+            btnNavEmployees.Size = new Size(50, 50);
+            btnNavEmployees.TabIndex = 9;
+            btnNavEmployees.Tag = "Employees";
+            btnNavEmployees.UseVisualStyleBackColor = true;
             // 
             // btnAccounts
             // 
+            btnAccounts.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnAccounts.Cursor = Cursors.Hand;
             btnAccounts.FlatAppearance.BorderSize = 0;
             btnAccounts.FlatStyle = FlatStyle.Flat;
-            btnAccounts.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            btnAccounts.Location = new Point(200, 13);
-            btnAccounts.Margin = new Padding(0, 13, 4, 0);
+            btnAccounts.Image = (Image)resources.GetObject("btnAccounts.Image");
+            btnAccounts.Location = new Point(0, 100);
+            btnAccounts.Margin = new Padding(0);
             btnAccounts.Name = "btnAccounts";
-            btnAccounts.Size = new Size(65, 23);
-            btnAccounts.TabIndex = 7;
-            btnAccounts.Text = "Accounts";
+            btnAccounts.Size = new Size(50, 50);
+            btnAccounts.TabIndex = 10;
+            btnAccounts.Tag = "Accounts";
             btnAccounts.UseVisualStyleBackColor = true;
             // 
-            // menuStrip1
+            // btnLogs
             // 
-            menuStrip1.BackColor = Color.FromArgb(173, 220, 202);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { menuAccount });
-            menuStrip1.Location = new Point(0, 0);
-            menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(1264, 24);
-            menuStrip1.TabIndex = 1;
-            menuStrip1.Text = "menuStrip1";
+            btnLogs.Cursor = Cursors.Hand;
+            btnLogs.FlatAppearance.BorderSize = 0;
+            btnLogs.FlatStyle = FlatStyle.Flat;
+            btnLogs.Image = (Image)resources.GetObject("btnLogs.Image");
+            btnLogs.Location = new Point(0, 150);
+            btnLogs.Margin = new Padding(0);
+            btnLogs.Name = "btnLogs";
+            btnLogs.Size = new Size(50, 50);
+            btnLogs.TabIndex = 11;
+            btnLogs.Tag = "Logs";
+            btnLogs.UseVisualStyleBackColor = true;
             // 
-            // menuAccount
+            // pnlLine3
             // 
-            menuAccount.DropDownItems.AddRange(new ToolStripItem[] { menuItemLogs, menuItemSignOut });
-            menuAccount.Name = "menuAccount";
-            menuAccount.Size = new Size(64, 20);
-            menuAccount.Text = "Account";
-            // 
-            // menuItemLogs
-            // 
-            menuItemLogs.Name = "menuItemLogs";
-            menuItemLogs.Size = new Size(120, 22);
-            menuItemLogs.Text = "Logs";
-            // 
-            // menuItemSignOut
-            // 
-            menuItemSignOut.Name = "menuItemSignOut";
-            menuItemSignOut.Size = new Size(120, 22);
-            menuItemSignOut.Text = "Sign Out";
-            menuItemSignOut.Click += menuItemSignOut_Click;
+            pnlLine3.BorderStyle = BorderStyle.FixedSingle;
+            pnlLine3.Dock = DockStyle.Top;
+            pnlLine3.Location = new Point(0, 50);
+            pnlLine3.Name = "pnlLine3";
+            pnlLine3.Size = new Size(1264, 1);
+            pnlLine3.TabIndex = 3;
             // 
             // frmMain
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = SystemColors.Window;
             ClientSize = new Size(1264, 681);
-            Controls.Add(pnlHeader);
-            Controls.Add(menuStrip1);
-            Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            Controls.Add(pnlMainContainer);
+            Controls.Add(pnlLine1);
+            Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MainMenuStrip = menuStrip1;
             MinimumSize = new Size(800, 600);
             Name = "frmMain";
             ShowIcon = false;
@@ -241,34 +316,41 @@
             FormClosing += frmMain_FormClosing;
             Load += frmMain_Load;
             pnlHeader.ResumeLayout(false);
-            flowHeaderActions.ResumeLayout(false);
-            flowHeaderActions.PerformLayout();
-            flowHeader.ResumeLayout(false);
-            flowHeader.PerformLayout();
+            flowHeaderLeft.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)picLogo).EndInit();
-            menuStrip1.ResumeLayout(false);
-            menuStrip1.PerformLayout();
+            flowHeaderRight.ResumeLayout(false);
+            flowHeaderRight.PerformLayout();
+            pnlMainContainer.ResumeLayout(false);
+            pnlSideNav.ResumeLayout(false);
+            flowSideNavBottom.ResumeLayout(false);
+            flowSideNavTop.ResumeLayout(false);
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
 
         private Panel pnlHeader;
         private PictureBox picLogo;
-        private FlowLayoutPanel flowHeaderActions;
+        private FlowLayoutPanel flowHeaderRight;
         private FlowLayoutPanel flowHeaderPages;
-        private FlowLayoutPanel flowHeader;
-        private Button btnEmployees;
+        private FlowLayoutPanel flowHeaderLeft;
+        private Button btnNavEmployees;
         private Label lblGreetUser;
         private Label lblDateToday;
-        private Label label2;
-        private MenuStrip menuStrip1;
-        private ToolStripMenuItem menuAccount;
-        private ToolStripMenuItem menuItemSignOut;
+        private Label lblLine1;
         private Label label1;
         private Button btnHome;
         private Button btnAccounts;
-        private ToolStripMenuItem menuItemLogs;
+        private Panel pnlLine1;
+        private Panel pnlMainContainer;
+        private FlowLayoutPanel flowSideNavTop;
+        private Panel pnlLine2;
+        private Button btnNavHome;
+        private Button btnSignOut;
+        private Panel pnlLine3;
+        private Button btnLogs;
+        private Panel pnlSideNav;
+        private FlowLayoutPanel flowSideNavBottom;
+        private Panel pnlContent;
     }
 }
