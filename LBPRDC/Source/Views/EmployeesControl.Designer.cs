@@ -29,12 +29,14 @@
         private void InitializeComponent()
         {
             label1 = new Label();
-            flowLayoutPanel1 = new FlowLayoutPanel();
+            flowControls = new FlowLayoutPanel();
             panel1 = new Panel();
             dgvEmployees = new DataGridView();
             groupBox1 = new GroupBox();
             btnSearch = new Button();
             txtSearch = new TextBox();
+            btnAddBatch = new Button();
+            flowControls.SuspendLayout();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvEmployees).BeginInit();
             groupBox1.SuspendLayout();
@@ -51,14 +53,17 @@
             label1.TabIndex = 0;
             label1.Text = "Employees";
             // 
-            // flowLayoutPanel1
+            // flowControls
             // 
-            flowLayoutPanel1.BackColor = SystemColors.Menu;
-            flowLayoutPanel1.Dock = DockStyle.Bottom;
-            flowLayoutPanel1.Location = new Point(0, 569);
-            flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(1213, 60);
-            flowLayoutPanel1.TabIndex = 1;
+            flowControls.BackColor = SystemColors.Menu;
+            flowControls.Controls.Add(btnAddBatch);
+            flowControls.Dock = DockStyle.Bottom;
+            flowControls.FlowDirection = FlowDirection.RightToLeft;
+            flowControls.Location = new Point(0, 569);
+            flowControls.Name = "flowControls";
+            flowControls.Padding = new Padding(16, 16, 0, 16);
+            flowControls.Size = new Size(1213, 60);
+            flowControls.TabIndex = 1;
             // 
             // panel1
             // 
@@ -120,16 +125,30 @@
             txtSearch.Size = new Size(200, 26);
             txtSearch.TabIndex = 0;
             // 
+            // btnAddBatch
+            // 
+            btnAddBatch.AutoSize = true;
+            btnAddBatch.Location = new Point(1097, 16);
+            btnAddBatch.Margin = new Padding(0);
+            btnAddBatch.Name = "btnAddBatch";
+            btnAddBatch.Size = new Size(100, 28);
+            btnAddBatch.TabIndex = 5;
+            btnAddBatch.Text = "Add Batch";
+            btnAddBatch.UseVisualStyleBackColor = true;
+            btnAddBatch.Click += btnAddBatch_Click;
+            // 
             // ucEmployees
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = SystemColors.Window;
             Controls.Add(panel1);
-            Controls.Add(flowLayoutPanel1);
+            Controls.Add(flowControls);
             Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             MinimumSize = new Size(733, 509);
             Name = "ucEmployees";
             Size = new Size(1213, 629);
+            flowControls.ResumeLayout(false);
+            flowControls.PerformLayout();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvEmployees).EndInit();
@@ -141,11 +160,12 @@
         #endregion
 
         private Label label1;
-        private FlowLayoutPanel flowLayoutPanel1;
+        private FlowLayoutPanel flowControls;
         private Panel panel1;
         private GroupBox groupBox1;
         private DataGridView dgvEmployees;
         private TextBox txtSearch;
         private Button btnSearch;
+        private Button btnAddBatch;
     }
 }

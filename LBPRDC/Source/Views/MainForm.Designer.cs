@@ -91,7 +91,6 @@
             picLogo.Size = new Size(32, 50);
             picLogo.TabIndex = 0;
             picLogo.TabStop = false;
-            picLogo.Click += picLogo_Click;
             // 
             // flowHeaderRight
             // 

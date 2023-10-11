@@ -9,20 +9,22 @@ namespace LBPRDC.Source.Services
 {
     public class Employee
     {
-        public int ID { get; set; }
         public string? EmployeeID { get; set; }
+        public string? LastName { get; set; }
         public string? FirstName { get; set; }
         public string? MiddleName { get; set; }
-        public string? LastName { get; set; }
         public string? Suffix { get; set; }
-        public string? DepartmentName { get; set; }
-        public string? EmailAddress { get; set; }
-        public string? ContactNumber { get; set; }
-        public string? MarriageStatus { get; set; }
-        public DateTime? DateOfUpdateOfMarriageStatus { get; set; }
-        public DateTime DateHired { get; set; }
-        public string? EmploymentStatus { get; set; }
-        public DateTime? DateOfEmploymentStatusChange { get; set; }
+        public string? Gender { get; set; }
+        public DateTime? Birthday { get; set; }
+        public string? Education { get; set; }
+        public string? Department { get; set; }
+        public string? EmailAddress1 { get; set; }
+        public string? EmailAddress2 { get; set; }
+        public string? ContactNumber1 { get; set; }
+        public string? ContactNumber2 { get; set; }
+        public int CivilStatusID { get; set; }
+        public int PositionID { get; set; }
+        public int EmploymentStatusID { get; set; }
     }
 
     internal class EmployeeService
@@ -45,20 +47,22 @@ namespace LBPRDC.Source.Services
                         {
                             Employee emp = new Employee()
                             {
-                                ID = Convert.ToInt32(reader["ID"]),
                                 EmployeeID = reader["EmployeeID"].ToString(),
+                                LastName = reader["LastName"].ToString(),
                                 FirstName = reader["FirstName"].ToString(),
                                 MiddleName = reader["MiddleName"].ToString(),
-                                LastName = reader["LastName"].ToString(),
                                 Suffix = reader["Suffix"].ToString(),
-                                DepartmentName = reader["DepartmentName"].ToString(),
-                                EmailAddress = reader["EmailAddress"].ToString(),
-                                ContactNumber = reader["ContactNumber"].ToString(),
-                                MarriageStatus = reader["MarriageStatus"].ToString(),
-                                DateOfUpdateOfMarriageStatus = reader["DateOfUpdateOfMarriageStatus"] as DateTime?,
-                                DateHired = Convert.ToDateTime(reader["DateHired"]),
-                                EmploymentStatus = reader["EmploymentStatus"].ToString(),
-                                DateOfEmploymentStatusChange = reader["DateOfEmploymentStatusChange"] as DateTime?
+                                Gender = reader["Gender"].ToString(),
+                                Birthday = reader["Birthday"] as DateTime?,
+                                Education = reader["Education"].ToString(),
+                                Department = reader["Department"].ToString(),
+                                EmailAddress1 = reader["EmailAddress1"].ToString(),
+                                EmailAddress2 = reader["EmailAddress2"].ToString(),
+                                ContactNumber1 = reader["ContactNumber1"].ToString(),
+                                ContactNumber2 = reader["ContactNumber2"].ToString(),
+                                CivilStatusID = Convert.ToInt32(reader["CivilStatusID"]),
+                                PositionID = Convert.ToInt32(reader["PositionID"]),
+                                EmploymentStatusID = Convert.ToInt32("EmploymentStatusID")
                             };
 
                             employees.Add(emp);
