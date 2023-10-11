@@ -42,9 +42,12 @@
             txtUsername = new TextBox();
             label1 = new Label();
             panel2 = new Panel();
+            pnlLine1 = new Panel();
+            pnlLine2 = new Panel();
             panel1 = new Panel();
             pnlLogin.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            panel2.SuspendLayout();
             panel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -63,11 +66,11 @@
             pnlLogin.Controls.Add(txtUsername);
             pnlLogin.Controls.Add(label1);
             pnlLogin.Dock = DockStyle.Right;
-            pnlLogin.Location = new Point(762, 0);
+            pnlLogin.Location = new Point(764, 0);
             pnlLogin.Margin = new Padding(3, 4, 3, 4);
             pnlLogin.Name = "pnlLogin";
             pnlLogin.Padding = new Padding(80);
-            pnlLogin.Size = new Size(500, 759);
+            pnlLogin.Size = new Size(500, 760);
             pnlLogin.TabIndex = 0;
             // 
             // btnConfiguration
@@ -88,7 +91,7 @@
             // 
             lblVersionNumber.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lblVersionNumber.Font = new Font("Arial", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            lblVersionNumber.Location = new Point(83, 713);
+            lblVersionNumber.Location = new Point(83, 714);
             lblVersionNumber.Margin = new Padding(4);
             lblVersionNumber.Name = "lblVersionNumber";
             lblVersionNumber.Size = new Size(334, 15);
@@ -100,7 +103,7 @@
             // 
             label5.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label5.Font = new Font("Arial", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            label5.Location = new Point(83, 732);
+            label5.Location = new Point(83, 733);
             label5.Margin = new Padding(3, 0, 3, 4);
             label5.Name = "label5";
             label5.Size = new Size(334, 15);
@@ -112,7 +115,7 @@
             // 
             pictureBox1.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(83, 81);
+            pictureBox1.Location = new Point(83, 82);
             pictureBox1.Margin = new Padding(3, 4, 3, 48);
             pictureBox1.MinimumSize = new Size(100, 100);
             pictureBox1.Name = "pictureBox1";
@@ -125,7 +128,7 @@
             // 
             chkShowPassword.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             chkShowPassword.AutoSize = true;
-            chkShowPassword.Location = new Point(83, 419);
+            chkShowPassword.Location = new Point(83, 420);
             chkShowPassword.Margin = new Padding(3, 3, 3, 32);
             chkShowPassword.Name = "chkShowPassword";
             chkShowPassword.Size = new Size(140, 22);
@@ -138,7 +141,7 @@
             // 
             btnSignIn.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             btnSignIn.AutoSize = true;
-            btnSignIn.Location = new Point(83, 476);
+            btnSignIn.Location = new Point(83, 477);
             btnSignIn.Name = "btnSignIn";
             btnSignIn.Size = new Size(334, 34);
             btnSignIn.TabIndex = 3;
@@ -150,7 +153,7 @@
             // 
             label3.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             label3.AutoSize = true;
-            label3.Location = new Point(79, 361);
+            label3.Location = new Point(79, 362);
             label3.Margin = new Padding(3, 0, 3, 4);
             label3.Name = "label3";
             label3.Size = new Size(78, 18);
@@ -160,7 +163,7 @@
             // txtPassword
             // 
             txtPassword.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            txtPassword.Location = new Point(83, 386);
+            txtPassword.Location = new Point(83, 387);
             txtPassword.Margin = new Padding(3, 3, 3, 4);
             txtPassword.MaxLength = 16;
             txtPassword.Name = "txtPassword";
@@ -173,7 +176,7 @@
             // 
             label2.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             label2.AutoSize = true;
-            label2.Location = new Point(79, 290);
+            label2.Location = new Point(79, 291);
             label2.Margin = new Padding(3, 0, 3, 4);
             label2.Name = "label2";
             label2.Size = new Size(80, 18);
@@ -184,7 +187,7 @@
             // 
             txtUsername.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             txtUsername.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            txtUsername.Location = new Point(83, 315);
+            txtUsername.Location = new Point(83, 316);
             txtUsername.Margin = new Padding(3, 3, 3, 20);
             txtUsername.MaxLength = 50;
             txtUsername.Name = "txtUsername";
@@ -196,7 +199,7 @@
             label1.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             label1.AutoSize = true;
             label1.Font = new Font("Arial", 18F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.Location = new Point(76, 229);
+            label1.Location = new Point(76, 230);
             label1.Margin = new Padding(3, 0, 3, 32);
             label1.Name = "label1";
             label1.Size = new Size(95, 29);
@@ -206,23 +209,41 @@
             // panel2
             // 
             panel2.BackgroundImage = (Image)resources.GetObject("panel2.BackgroundImage");
+            panel2.Controls.Add(pnlLine1);
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(0, 0);
             panel2.Margin = new Padding(3, 4, 3, 4);
             panel2.Name = "panel2";
-            panel2.Size = new Size(762, 759);
+            panel2.Size = new Size(764, 760);
             panel2.TabIndex = 1;
+            // 
+            // pnlLine1
+            // 
+            pnlLine1.BorderStyle = BorderStyle.FixedSingle;
+            pnlLine1.Dock = DockStyle.Right;
+            pnlLine1.Location = new Point(763, 0);
+            pnlLine1.Name = "pnlLine1";
+            pnlLine1.Size = new Size(1, 760);
+            pnlLine1.TabIndex = 0;
+            // 
+            // pnlLine2
+            // 
+            pnlLine2.BorderStyle = BorderStyle.FixedSingle;
+            pnlLine2.Dock = DockStyle.Top;
+            pnlLine2.Location = new Point(0, 0);
+            pnlLine2.Name = "pnlLine2";
+            pnlLine2.Size = new Size(1264, 1);
+            pnlLine2.TabIndex = 2;
             // 
             // panel1
             // 
-            panel1.BorderStyle = BorderStyle.FixedSingle;
             panel1.Controls.Add(panel2);
             panel1.Controls.Add(pnlLogin);
             panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(0, 0);
+            panel1.Location = new Point(0, 1);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1264, 761);
-            panel1.TabIndex = 0;
+            panel1.Size = new Size(1264, 760);
+            panel1.TabIndex = 3;
             // 
             // frmLogin
             // 
@@ -230,6 +251,7 @@
             BackColor = SystemColors.Window;
             ClientSize = new Size(1264, 761);
             Controls.Add(panel1);
+            Controls.Add(pnlLine2);
             Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4);
@@ -240,6 +262,7 @@
             pnlLogin.ResumeLayout(false);
             pnlLogin.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            panel2.ResumeLayout(false);
             panel1.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -257,8 +280,10 @@
         private Label label1;
         private Label lblVersionNumber;
         private Label label5;
-        private Panel panel1;
         private Button btnConfiguration;
         private Button btnSignIn;
+        private Panel pnlLine1;
+        private Panel pnlLine2;
+        private Panel panel1;
     }
 }
