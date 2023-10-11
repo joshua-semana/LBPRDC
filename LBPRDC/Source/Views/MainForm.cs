@@ -136,30 +136,5 @@ namespace LBPRDC.Source.Views
                 this.Close();
             }
         }
-
-        private void picLogo_Click(object sender, EventArgs e)
-        {
-            List<Employee> employees = EmployeeService.GetAllEmployees();
-
-            var filteredAndTransformedData = employees.Select(emp => new
-            {
-                emp.EmployeeID,
-                FullName = $"{emp.FirstName} {emp.MiddleName} {emp.LastName} {emp.Suffix}".Trim(),
-                emp.DepartmentName,
-                emp.EmailAddress,
-                emp.ContactNumber,
-                emp.MarriageStatus,
-                emp.DateOfUpdateOfMarriageStatus,
-                emp.DateHired,
-                emp.EmploymentStatus,
-                emp.DateOfEmploymentStatusChange
-            }).ToList();
-
-            //dataGridView1.DataSource = filteredAndTransformedData;
-            //Panel test = new Panel();
-            //test.Dock = DockStyle.Fill;
-            //test.BackColor = Color.Yellow;
-            //pnlMainContainer.Controls.Add(test);
-        }
     }
 }

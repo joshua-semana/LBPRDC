@@ -56,13 +56,49 @@ namespace LBPRDC.Source.Views
         {
             if (e.Error == null)
             {
-                dgvEmployees.DataSource = e.Result as List<Employee>;
+                var filteredList = e.Result as List<Employee>;
+                filteredList.Select(emp => new
+                {
+                    FillName = $"{emp.FirstName} {emp.LastName}",
+                }).ToList();
+                dgvEmployees.DataSource = filteredList;
 
                 HideLoadingProgressBar();
             }
             else
             {
                 MessageBox.Show("Error loading data: " + e.Error.Message);
+            }
+        }
+
+        private void btnAddBatch_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFile = new OpenFileDialog())
+            {
+                openFile.Title = "Select an Excel File";
+                openFile.Filter = "Excel Files|*.xlsx";
+                openFile.Multiselect = false;
+
+                if (openFile.ShowDialog() == DialogResult.OK)
+                {   
+                    try
+                    {
+                        string filePath = openFile.FileName;
+                        if (filePath != null)
+                        {
+                            var viewRawDataForm = new frmViewRawData(filePath);
+                            viewRawDataForm.ShowDialog();
+                        }
+                        else
+                        {
+                            MessageBox.Show("File path is empty. Please try again.", "Error Opening Excel File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ExceptionHandler.HandleException(ex);
+                    }
+                }
             }
         }
     }
