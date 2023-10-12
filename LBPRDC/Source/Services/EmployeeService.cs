@@ -27,6 +27,12 @@ namespace LBPRDC.Source.Services
         public int EmploymentStatusID { get; set; }
     }
 
+    public class NewEmployee : Employee
+    {
+        public DateTime StartDate { get; set; }
+        public string? PositionTitle { get; set; }
+    }
+
     internal class EmployeeService
     {
         public static List<Employee> GetAllEmployees()
@@ -76,6 +82,63 @@ namespace LBPRDC.Source.Services
             }
 
             return employees;
+        }
+
+        public static bool IDExists(string ID)
+        {
+            try
+            {
+                string query = "SELECT COUNT(*) FROM Employee WHERE EmployeeID = @ID";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(query, connection))
+                {
+                    command.Parameters.AddWithValue("@ID", ID);
+                    connection.Open();
+                    int count = (int)command.ExecuteScalar();
+                    return count > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                return ExceptionHandler.HandleException(ex);
+            }
+        }
+
+        public void AddNewEmployee(NewEmployee employee)
+        {
+            try
+            {
+                string query = "INSERT INTO Employee (EmployeeID, LastName, FirstName, MiddleName, Suffix, Gender, Birthday, Education, Department, EmailAddress1, EmailAddress2, ContactNumber1, ContactNumber2, CivilStatusID, PositionID, EmploymentStatusID) " +
+                    "VALUES (@EmployeeID, @LastName, @FirstName, @MiddleName, @Suffix, @Gender, @Birthday, @Education, @Department, @EmailAddress1, @EmailAddress2, @ContactNumber1, @ContactNumber2, @CivilStatusID, @PositionID, @EmploymentStatusID)";
+
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(query, connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeID", employee.EmployeeID);
+                    command.Parameters.AddWithValue("@LastName", employee.LastName);
+                    command.Parameters.AddWithValue("@FirstName", employee.FirstName);
+                    command.Parameters.AddWithValue("@MiddleName", employee.MiddleName);
+                    command.Parameters.AddWithValue("@Suffix", employee.Suffix);
+                    command.Parameters.AddWithValue("@Gender", employee.Gender);
+                    command.Parameters.AddWithValue("@Birthday", employee.Birthday);
+                    command.Parameters.AddWithValue("@Education", employee.Education);
+                    command.Parameters.AddWithValue("@Department", employee.Department);
+                    command.Parameters.AddWithValue("@EmailAddress1", employee.EmailAddress1);
+                    command.Parameters.AddWithValue("@EmailAddress2", employee.EmailAddress2);
+                    command.Parameters.AddWithValue("@ContactNumber1", employee.ContactNumber1);
+                    command.Parameters.AddWithValue("@ContactNumber2", employee.ContactNumber2);
+                    command.Parameters.AddWithValue("@CivilStatusID", employee.CivilStatusID);
+                    command.Parameters.AddWithValue("@PositionID", employee.PositionID);
+                    command.Parameters.AddWithValue("@EmploymentStatusID", employee.EmploymentStatusID);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            } 
+            catch (Exception ex)
+            {
+                ExceptionHandler.HandleException(ex);
+            }
         }
     }
 }

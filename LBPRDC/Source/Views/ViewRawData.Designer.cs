@@ -30,11 +30,15 @@
         {
             pnlLine1 = new Panel();
             pnlMain = new Panel();
+            groupBox1 = new GroupBox();
+            lblRowCount = new Label();
+            lblFilePath = new Label();
             dgvRawData = new DataGridView();
             flowControls = new FlowLayoutPanel();
             btnConfirm = new Button();
             btnCancel = new Button();
             pnlMain.SuspendLayout();
+            groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvRawData).BeginInit();
             flowControls.SuspendLayout();
             SuspendLayout();
@@ -50,6 +54,7 @@
             // 
             // pnlMain
             // 
+            pnlMain.Controls.Add(groupBox1);
             pnlMain.Controls.Add(dgvRawData);
             pnlMain.Dock = DockStyle.Fill;
             pnlMain.Location = new Point(0, 1);
@@ -58,6 +63,40 @@
             pnlMain.Size = new Size(1264, 620);
             pnlMain.TabIndex = 1;
             // 
+            // groupBox1
+            // 
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox1.Controls.Add(lblRowCount);
+            groupBox1.Controls.Add(lblFilePath);
+            groupBox1.Location = new Point(16, 16);
+            groupBox1.Margin = new Padding(0, 0, 0, 16);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(1232, 70);
+            groupBox1.TabIndex = 1;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "File Details";
+            // 
+            // lblRowCount
+            // 
+            lblRowCount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            lblRowCount.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            lblRowCount.Location = new Point(6, 42);
+            lblRowCount.Name = "lblRowCount";
+            lblRowCount.Size = new Size(1220, 16);
+            lblRowCount.TabIndex = 1;
+            lblRowCount.Text = "Total row count:";
+            // 
+            // lblFilePath
+            // 
+            lblFilePath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            lblFilePath.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            lblFilePath.Location = new Point(6, 22);
+            lblFilePath.Margin = new Padding(3, 0, 3, 4);
+            lblFilePath.Name = "lblFilePath";
+            lblFilePath.Size = new Size(1220, 15);
+            lblFilePath.TabIndex = 0;
+            lblFilePath.Text = "File path:";
+            // 
             // dgvRawData
             // 
             dgvRawData.AllowUserToAddRows = false;
@@ -65,11 +104,11 @@
             dgvRawData.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvRawData.BackgroundColor = SystemColors.Window;
             dgvRawData.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvRawData.Location = new Point(16, 16);
+            dgvRawData.Location = new Point(16, 102);
             dgvRawData.Margin = new Padding(0);
             dgvRawData.Name = "dgvRawData";
             dgvRawData.RowTemplate.Height = 25;
-            dgvRawData.Size = new Size(1232, 588);
+            dgvRawData.Size = new Size(1232, 502);
             dgvRawData.TabIndex = 0;
             // 
             // flowControls
@@ -123,6 +162,7 @@
             StartPosition = FormStartPosition.CenterParent;
             Text = "Data from Excel file";
             pnlMain.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvRawData).EndInit();
             flowControls.ResumeLayout(false);
             flowControls.PerformLayout();
@@ -137,5 +177,8 @@
         private DataGridView dgvRawData;
         private Button btnConfirm;
         private Button btnCancel;
+        private GroupBox groupBox1;
+        private Label lblRowCount;
+        private Label lblFilePath;
     }
 }

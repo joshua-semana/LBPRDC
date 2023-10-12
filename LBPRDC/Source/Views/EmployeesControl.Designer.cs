@@ -30,12 +30,13 @@
         {
             label1 = new Label();
             flowControls = new FlowLayoutPanel();
+            btnAddBatch = new Button();
             panel1 = new Panel();
             dgvEmployees = new DataGridView();
             groupBox1 = new GroupBox();
             btnSearch = new Button();
             txtSearch = new TextBox();
-            btnAddBatch = new Button();
+            btnAddEmployee = new Button();
             flowControls.SuspendLayout();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvEmployees).BeginInit();
@@ -57,6 +58,7 @@
             // 
             flowControls.BackColor = SystemColors.Menu;
             flowControls.Controls.Add(btnAddBatch);
+            flowControls.Controls.Add(btnAddEmployee);
             flowControls.Dock = DockStyle.Bottom;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
             flowControls.Location = new Point(0, 569);
@@ -64,6 +66,18 @@
             flowControls.Padding = new Padding(16, 16, 0, 16);
             flowControls.Size = new Size(1213, 60);
             flowControls.TabIndex = 1;
+            // 
+            // btnAddBatch
+            // 
+            btnAddBatch.AutoSize = true;
+            btnAddBatch.Location = new Point(1097, 16);
+            btnAddBatch.Margin = new Padding(0);
+            btnAddBatch.Name = "btnAddBatch";
+            btnAddBatch.Size = new Size(100, 28);
+            btnAddBatch.TabIndex = 5;
+            btnAddBatch.Text = "Add Batch";
+            btnAddBatch.UseVisualStyleBackColor = true;
+            btnAddBatch.Click += btnAddBatch_Click;
             // 
             // panel1
             // 
@@ -125,17 +139,17 @@
             txtSearch.Size = new Size(200, 26);
             txtSearch.TabIndex = 0;
             // 
-            // btnAddBatch
+            // btnAddEmployee
             // 
-            btnAddBatch.AutoSize = true;
-            btnAddBatch.Location = new Point(1097, 16);
-            btnAddBatch.Margin = new Padding(0);
-            btnAddBatch.Name = "btnAddBatch";
-            btnAddBatch.Size = new Size(100, 28);
-            btnAddBatch.TabIndex = 5;
-            btnAddBatch.Text = "Add Batch";
-            btnAddBatch.UseVisualStyleBackColor = true;
-            btnAddBatch.Click += btnAddBatch_Click;
+            btnAddEmployee.AutoSize = true;
+            btnAddEmployee.Location = new Point(976, 16);
+            btnAddEmployee.Margin = new Padding(0);
+            btnAddEmployee.Name = "btnAddEmployee";
+            btnAddEmployee.Size = new Size(121, 28);
+            btnAddEmployee.TabIndex = 6;
+            btnAddEmployee.Text = "Add Employee";
+            btnAddEmployee.UseVisualStyleBackColor = true;
+            btnAddEmployee.Click += btnAddEmployee_Click;
             // 
             // ucEmployees
             // 
@@ -167,5 +181,6 @@
         private TextBox txtSearch;
         private Button btnSearch;
         private Button btnAddBatch;
+        private Button btnAddEmployee;
     }
 }
