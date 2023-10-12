@@ -33,12 +33,8 @@ namespace LBPRDC.Source.Views
                 var worksheet = package.Workbook.Worksheets[0];
                 var dataTable = new DataTable();
 
-                if (worksheet.Dimension == null)
-                {
-                    MessageBox.Show("The file you have loaded is empty. Please select another file.", "Empty Excel File", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    this.Close();
-                    return;
-                }
+                lblFilePath.Text = $"File path: {filePath}";
+                lblRowCount.Text = $"Total row count: {(worksheet.Dimension.End.Row - 1).ToString()}"; // Get total row count excluding row 1 'Column Names'
 
                 for (int colIndex = worksheet.Dimension.Start.Column; colIndex <= worksheet.Dimension.End.Column; colIndex++)
                 {

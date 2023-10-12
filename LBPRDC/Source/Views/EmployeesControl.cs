@@ -1,4 +1,6 @@
 ﻿using LBPRDC.Source.Services;
+using LBPRDC.Source.Utilities;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -56,12 +58,7 @@ namespace LBPRDC.Source.Views
         {
             if (e.Error == null)
             {
-                var filteredList = e.Result as List<Employee>;
-                filteredList.Select(emp => new
-                {
-                    FillName = $"{emp.FirstName} {emp.LastName}",
-                }).ToList();
-                dgvEmployees.DataSource = filteredList;
+                dgvEmployees.DataSource = e.Result;
 
                 HideLoadingProgressBar();
             }
@@ -73,33 +70,34 @@ namespace LBPRDC.Source.Views
 
         private void btnAddBatch_Click(object sender, EventArgs e)
         {
-            using (OpenFileDialog openFile = new OpenFileDialog())
+            try
             {
-                openFile.Title = "Select an Excel File";
-                openFile.Filter = "Excel Files|*.xlsx";
-                openFile.Multiselect = false;
+                string? selectedFile = FileManager.OpenFile();
 
-                if (openFile.ShowDialog() == DialogResult.OK)
-                {   
-                    try
+                if (selectedFile != null)
+                {
+                    ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+
+                    if (FileManager.isFileNotEmpty(selectedFile))
                     {
-                        string filePath = openFile.FileName;
-                        if (filePath != null)
+                        if (FileManager.isFileAdheresTo(selectedFile, "Add Batch"))
                         {
-                            var viewRawDataForm = new frmViewRawData(filePath);
+                            var viewRawDataForm = new frmViewRawData(selectedFile);
                             viewRawDataForm.ShowDialog();
                         }
-                        else
-                        {
-                            MessageBox.Show("File path is empty. Please try again.", "Error Opening Excel File", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ExceptionHandler.HandleException(ex);
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                ExceptionHandler.HandleException(ex);
+            }
+        }
+
+        private void btnAddEmployee_Click(object sender, EventArgs e)
+        {
+            var employeeDataEntryForm = new frmEmployeeDataEntry();
+            employeeDataEntryForm.ShowDialog();
         }
     }
 }
