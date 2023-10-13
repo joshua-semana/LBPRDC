@@ -42,28 +42,28 @@ namespace LBPRDC.Source.Views
 
         private void InitializePositionComboBoxItems()
         {
-            cmbPosition.DataSource = Services.PositionService.GetPositionItems();
+            cmbPosition.DataSource = PositionService.GetPositionItems();
             cmbPosition.DisplayMember = "DisplayText";
             cmbPosition.ValueMember = "ID";
         }
 
         private void InitializeCivilStatusComboBoxItems()
         {
-            cmbCivilStatus.DataSource = Services.CivilStatusService.GetCivilStatusItems();
+            cmbCivilStatus.DataSource = CivilStatusService.GetCivilStatusItems();
             cmbCivilStatus.DisplayMember = "Status";
             cmbCivilStatus.ValueMember = "ID";
         }
 
         private void InitializeEmploymentStatusComboBoxItems()
         {
-            cmbEmploymentStatus.DataSource = Services.EmploymentStatusService.GetEmploymentStatusItems();
+            cmbEmploymentStatus.DataSource = EmploymentStatusService.GetEmploymentStatusItems();
             cmbEmploymentStatus.DisplayMember = "Status";
             cmbEmploymentStatus.ValueMember = "ID";
         }
 
         private void InitializeSuffixComboBoxItems()
         {
-            cmbSuffix.DataSource = Services.SuffixService.GetSuffixItems();
+            cmbSuffix.DataSource = SuffixService.GetSuffixItems();
             cmbSuffix.DisplayMember = "Name";
             cmbSuffix.ValueMember = "ID";
         }
@@ -105,11 +105,12 @@ namespace LBPRDC.Source.Views
             return true;
         }
 
-        private void btnConfirm_Click(object sender, EventArgs e)
+        private async void btnConfirm_Click(object sender, EventArgs e)
         {
-            if(AreRequiredFieldsFilled())
+            
+            if (AreRequiredFieldsFilled())
             {
-                if(Services.EmployeeService.IDExists(txtEmployeeID.Text))
+                if (EmployeeService.IDExists(txtEmployeeID.Text))
                 {
                     MessageBox.Show("The Employee ID you entered already exists in the database. Please enter a different ID.", "Employee ID Already Exists", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
@@ -117,8 +118,34 @@ namespace LBPRDC.Source.Views
 
                 NewEmployee newEmployee = new()
                 {
-                    
+                    EmployeeID = txtEmployeeID.Text.ToUpper(),
+                    LastName = txtLastName.Text.ToUpper(),
+                    FirstName = txtFirstName.Text.ToUpper(),
+                    MiddleName = txtMiddleName.Text.ToUpper(),
+                    SuffixID = cmbSuffix.SelectedIndex + 1,
+                    Gender = cmbGender.Text,
+                    Birthday = dtpBirthday.Value,
+                    Education = txtEducation.Text,
+                    Department = txtDepartment.Text,
+                    EmailAddress1 = txtEmailAddress1.Text,
+                    EmailAddress2 = txtEmailAddress2.Text,
+                    ContactNumber1 = txtContactNumber1.Text,
+                    ContactNumber2 = txtContactNumber2.Text,
+                    CivilStatusID = cmbCivilStatus.SelectedIndex,
+                    PositionID = cmbPosition.SelectedIndex,
+                    EmploymentStatusID = cmbEmploymentStatus.SelectedIndex,
+
+                    StartDate = dtpStartDate.Value,
+                    PositionTitle = txtPositionTitle.Text,
+                    Remarks = txtRemarks.Text
                 };
+
+                bool isAdded = await EmployeeService.AddNewEmployee(newEmployee);
+
+                if (isAdded)
+                {
+                    MessageBox.Show("Successfully Added.");
+                }
             }
         }
 
