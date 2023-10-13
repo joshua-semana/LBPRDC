@@ -58,6 +58,15 @@ namespace LBPRDC.Source.Views
         {
             if (e.Error == null)
             {
+                dgvEmployees.AutoGenerateColumns = false;
+
+                dgvEmployees.Columns.Add(new DataGridViewTextBoxColumn
+                {
+                    Name = "FullName",
+                    HeaderText = "Full Name",
+                    DataPropertyName = "FullName"
+                });
+
                 dgvEmployees.DataSource = e.Result;
 
                 HideLoadingProgressBar();

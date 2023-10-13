@@ -10,11 +10,15 @@ namespace LBPRDC.Source.Services
 {
     internal class PositionService
     {
-        public class PositionItems
+        public class Position
         {
             public int ID { get; set; }
             public string? Code { get; set; }
             public string? Name { get; set; }
+        }
+
+        public class PositionItems : Position
+        {
             public string DisplayText => $"{Code} - {Name}";
         }
 
@@ -57,6 +61,40 @@ namespace LBPRDC.Source.Services
             }
 
             return items;
+        }
+
+        public class NewHistory
+        {
+            public string? EmployeeID { get; set; }
+            public int PositionID { get; set; }
+            public string? PositionTitle { get; set; }
+            public DateTime? Timestamp { get; set; }
+            public string? Remarks { get; set;}
+        }
+
+        public static void AddToHistory(NewHistory history)
+        {
+            try
+            {
+                string query = "INSERT INTO EmployeePositionHistory (EmployeeID, PositionID, PositionTitle, Timestamp, Remarks)" +
+                    "VALUES (@EmployeeID, @PositionID, @PositionTitle, @Timestamp, @Remarks)";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(query, connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
+                    command.Parameters.AddWithValue("@PositionID", history.PositionID);
+                    command.Parameters.AddWithValue("@PositionTitle", history.PositionTitle);
+                    command.Parameters.AddWithValue("@Timestamp", history.Timestamp);
+                    command.Parameters.AddWithValue("@Remarks", history.Remarks);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.HandleException(ex);
+            }
         }
     }
 }

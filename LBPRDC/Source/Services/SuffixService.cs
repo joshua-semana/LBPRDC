@@ -21,13 +21,6 @@ namespace LBPRDC.Source.Services
 
             try
             {
-                SuffixItems blankItem = new()
-                {
-                    ID = 0,
-                    Name = "None"
-                };
-                items.Add(blankItem);
-
                 string query = "SELECT ID, Name FROM Suffix";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new SqlCommand(query, connection))

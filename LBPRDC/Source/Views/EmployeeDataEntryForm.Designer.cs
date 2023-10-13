@@ -34,6 +34,8 @@
             btnCancel = new Button();
             pnlMain = new Panel();
             grpJobData = new GroupBox();
+            txtRemarks = new TextBox();
+            label15 = new Label();
             txtPositionTitle = new TextBox();
             label14 = new Label();
             txtEmployeeID = new TextBox();
@@ -91,7 +93,7 @@
             flowControls.Controls.Add(btnCancel);
             flowControls.Dock = DockStyle.Bottom;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
-            flowControls.Location = new Point(0, 573);
+            flowControls.Location = new Point(0, 639);
             flowControls.Name = "flowControls";
             flowControls.Padding = new Padding(16, 16, 0, 16);
             flowControls.Size = new Size(860, 60);
@@ -130,12 +132,14 @@
             pnlMain.Location = new Point(0, 1);
             pnlMain.Name = "pnlMain";
             pnlMain.Padding = new Padding(16);
-            pnlMain.Size = new Size(860, 572);
+            pnlMain.Size = new Size(860, 638);
             pnlMain.TabIndex = 2;
             // 
             // grpJobData
             // 
             grpJobData.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpJobData.Controls.Add(txtRemarks);
+            grpJobData.Controls.Add(label15);
             grpJobData.Controls.Add(txtPositionTitle);
             grpJobData.Controls.Add(label14);
             grpJobData.Controls.Add(txtEmployeeID);
@@ -152,10 +156,33 @@
             grpJobData.Margin = new Padding(0);
             grpJobData.Name = "grpJobData";
             grpJobData.Padding = new Padding(3, 8, 3, 3);
-            grpJobData.Size = new Size(827, 166);
+            grpJobData.Size = new Size(827, 232);
             grpJobData.TabIndex = 14;
             grpJobData.TabStop = false;
             grpJobData.Text = "Job Information";
+            // 
+            // txtRemarks
+            // 
+            txtRemarks.AccessibleName = "Position Title";
+            txtRemarks.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            txtRemarks.Location = new Point(10, 180);
+            txtRemarks.Margin = new Padding(6, 3, 3, 16);
+            txtRemarks.MaxLength = 500;
+            txtRemarks.Name = "txtRemarks";
+            txtRemarks.Size = new Size(806, 26);
+            txtRemarks.TabIndex = 18;
+            // 
+            // label15
+            // 
+            label15.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label15.AutoSize = true;
+            label15.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label15.Location = new Point(6, 157);
+            label15.Margin = new Padding(3, 0, 3, 4);
+            label15.Name = "label15";
+            label15.Size = new Size(63, 16);
+            label15.TabIndex = 23;
+            label15.Text = "Remarks";
             // 
             // txtPositionTitle
             // 
@@ -242,7 +269,7 @@
             // 
             dtpStartDate.AccessibleName = "Start Date";
             dtpStartDate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            dtpStartDate.CustomFormat = "MM-d-yyy";
+            dtpStartDate.CustomFormat = "MM-dd-yyy";
             dtpStartDate.Format = DateTimePickerFormat.Custom;
             dtpStartDate.Location = new Point(213, 50);
             dtpStartDate.Margin = new Padding(3, 3, 3, 16);
@@ -486,7 +513,8 @@
             // 
             dtpBirthday.AccessibleName = "Birthday";
             dtpBirthday.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            dtpBirthday.CustomFormat = "MM-d-yyy";
+            dtpBirthday.Checked = false;
+            dtpBirthday.CustomFormat = "MM-dd-yyy";
             dtpBirthday.Format = DateTimePickerFormat.Custom;
             dtpBirthday.Location = new Point(416, 115);
             dtpBirthday.Name = "dtpBirthday";
@@ -577,7 +605,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = SystemColors.Window;
-            ClientSize = new Size(860, 633);
+            ClientSize = new Size(860, 699);
             Controls.Add(pnlMain);
             Controls.Add(flowControls);
             Controls.Add(pnlLine1);
@@ -645,5 +673,7 @@
         private Label label13;
         private TextBox txtPositionTitle;
         private Label label14;
+        private TextBox txtRemarks;
+        private Label label15;
     }
 }

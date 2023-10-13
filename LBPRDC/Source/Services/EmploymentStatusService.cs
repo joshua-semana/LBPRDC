@@ -54,5 +54,37 @@ namespace LBPRDC.Source.Services
 
             return items;
         }
+
+        public class NewHistory
+        {
+            public string? EmployeeID { get; set; }
+            public int EmploymentStatusID { get; set; }
+            public DateTime? Timestamp { get; set; }
+            public string? Remarks { get; set; }
+        }
+
+        public static void AddToHistory(NewHistory history)
+        {
+            try
+            {
+                string query = "INSERT INTO EmployeeCivilStatusHistory (EmployeeID, EmploymentStatusID, Timestamp, Remarks)" +
+                    "VALUES (@EmployeeID, @EmploymentStatusID, @Timestamp, @Remarks)";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(query, connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
+                    command.Parameters.AddWithValue("@EmploymentStatusID", history.EmploymentStatusID);
+                    command.Parameters.AddWithValue("@Timestamp", history.Timestamp);
+                    command.Parameters.AddWithValue("@Remarks", history.Remarks);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.HandleException(ex);
+            }
+        }
     }
 }
