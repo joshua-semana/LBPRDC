@@ -31,12 +31,13 @@
             label1 = new Label();
             flowControls = new FlowLayoutPanel();
             btnAddBatch = new Button();
+            btnAddEmployee = new Button();
             panel1 = new Panel();
             dgvEmployees = new DataGridView();
             groupBox1 = new GroupBox();
+            btnSettings = new Button();
             btnSearch = new Button();
             txtSearch = new TextBox();
-            btnAddEmployee = new Button();
             flowControls.SuspendLayout();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvEmployees).BeginInit();
@@ -79,6 +80,18 @@
             btnAddBatch.UseVisualStyleBackColor = true;
             btnAddBatch.Click += btnAddBatch_Click;
             // 
+            // btnAddEmployee
+            // 
+            btnAddEmployee.AutoSize = true;
+            btnAddEmployee.Location = new Point(976, 16);
+            btnAddEmployee.Margin = new Padding(0);
+            btnAddEmployee.Name = "btnAddEmployee";
+            btnAddEmployee.Size = new Size(121, 28);
+            btnAddEmployee.TabIndex = 6;
+            btnAddEmployee.Text = "Add Employee";
+            btnAddEmployee.UseVisualStyleBackColor = true;
+            btnAddEmployee.Click += btnAddEmployee_Click;
+            // 
             // panel1
             // 
             panel1.Controls.Add(dgvEmployees);
@@ -107,6 +120,7 @@
             // groupBox1
             // 
             groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox1.Controls.Add(btnSettings);
             groupBox1.Controls.Add(btnSearch);
             groupBox1.Controls.Add(txtSearch);
             groupBox1.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
@@ -118,6 +132,18 @@
             groupBox1.TabIndex = 1;
             groupBox1.TabStop = false;
             groupBox1.Text = "Tools";
+            // 
+            // btnSettings
+            // 
+            btnSettings.AutoSize = true;
+            btnSettings.Location = new Point(1098, 24);
+            btnSettings.Margin = new Padding(0);
+            btnSettings.Name = "btnSettings";
+            btnSettings.Size = new Size(75, 26);
+            btnSettings.TabIndex = 5;
+            btnSettings.Text = "Settings";
+            btnSettings.UseVisualStyleBackColor = true;
+            btnSettings.Click += btnSettings_Click;
             // 
             // btnSearch
             // 
@@ -139,18 +165,6 @@
             txtSearch.Size = new Size(200, 26);
             txtSearch.TabIndex = 0;
             // 
-            // btnAddEmployee
-            // 
-            btnAddEmployee.AutoSize = true;
-            btnAddEmployee.Location = new Point(976, 16);
-            btnAddEmployee.Margin = new Padding(0);
-            btnAddEmployee.Name = "btnAddEmployee";
-            btnAddEmployee.Size = new Size(121, 28);
-            btnAddEmployee.TabIndex = 6;
-            btnAddEmployee.Text = "Add Employee";
-            btnAddEmployee.UseVisualStyleBackColor = true;
-            btnAddEmployee.Click += btnAddEmployee_Click;
-            // 
             // ucEmployees
             // 
             AutoScaleMode = AutoScaleMode.None;
@@ -161,6 +175,7 @@
             MinimumSize = new Size(733, 509);
             Name = "ucEmployees";
             Size = new Size(1213, 629);
+            VisibleChanged += ucEmployees_VisibleChanged;
             flowControls.ResumeLayout(false);
             flowControls.PerformLayout();
             panel1.ResumeLayout(false);
@@ -182,5 +197,6 @@
         private Button btnSearch;
         private Button btnAddBatch;
         private Button btnAddEmployee;
+        private Button btnSettings;
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace LBPRDC.Source.Views
 {
-    partial class frmEmployeeDataEntry
+    partial class frmNewEntryEmployee
     {
         /// <summary>
         /// Required designer variable.
@@ -163,7 +163,7 @@
             // 
             // txtRemarks
             // 
-            txtRemarks.AccessibleName = "Position Title";
+            txtRemarks.AccessibleName = "Remarks";
             txtRemarks.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             txtRemarks.Location = new Point(10, 180);
             txtRemarks.Margin = new Padding(6, 3, 3, 16);
@@ -601,7 +601,7 @@
             label1.TabIndex = 0;
             label1.Text = "Name";
             // 
-            // frmEmployeeDataEntry
+            // frmNewEntryEmployee
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = SystemColors.Window;
@@ -614,7 +614,7 @@
             Margin = new Padding(4);
             MaximizeBox = false;
             MinimumSize = new Size(876, 672);
-            Name = "frmEmployeeDataEntry";
+            Name = "frmNewEntryEmployee";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "Employee Data Entry Form";

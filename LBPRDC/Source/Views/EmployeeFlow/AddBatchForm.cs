@@ -12,9 +12,9 @@ using OfficeOpenXml;
 
 namespace LBPRDC.Source.Views
 {
-    public partial class frmViewRawData : Form
+    public partial class frmAddBatchEmployees : Form
     {
-        public frmViewRawData(string filePath)
+        public frmAddBatchEmployees(string filePath)
         {
             InitializeComponent();
 

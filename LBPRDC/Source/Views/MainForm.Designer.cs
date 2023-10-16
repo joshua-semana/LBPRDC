@@ -163,7 +163,7 @@
             pnlMainContainer.Dock = DockStyle.Fill;
             pnlMainContainer.Location = new Point(0, 1);
             pnlMainContainer.Name = "pnlMainContainer";
-            pnlMainContainer.Size = new Size(1264, 680);
+            pnlMainContainer.Size = new Size(1264, 760);
             pnlMainContainer.TabIndex = 2;
             // 
             // pnlContent
@@ -171,7 +171,7 @@
             pnlContent.Dock = DockStyle.Fill;
             pnlContent.Location = new Point(51, 51);
             pnlContent.Name = "pnlContent";
-            pnlContent.Size = new Size(1213, 629);
+            pnlContent.Size = new Size(1213, 709);
             pnlContent.TabIndex = 5;
             // 
             // pnlLine2
@@ -180,7 +180,7 @@
             pnlLine2.Dock = DockStyle.Left;
             pnlLine2.Location = new Point(50, 51);
             pnlLine2.Name = "pnlLine2";
-            pnlLine2.Size = new Size(1, 629);
+            pnlLine2.Size = new Size(1, 709);
             pnlLine2.TabIndex = 2;
             // 
             // pnlSideNav
@@ -190,7 +190,7 @@
             pnlSideNav.Dock = DockStyle.Left;
             pnlSideNav.Location = new Point(0, 51);
             pnlSideNav.Name = "pnlSideNav";
-            pnlSideNav.Size = new Size(50, 629);
+            pnlSideNav.Size = new Size(50, 709);
             pnlSideNav.TabIndex = 4;
             // 
             // flowSideNavBottom
@@ -198,7 +198,7 @@
             flowSideNavBottom.Controls.Add(btnSignOut);
             flowSideNavBottom.Dock = DockStyle.Bottom;
             flowSideNavBottom.FlowDirection = FlowDirection.BottomUp;
-            flowSideNavBottom.Location = new Point(0, 576);
+            flowSideNavBottom.Location = new Point(0, 656);
             flowSideNavBottom.Name = "flowSideNavBottom";
             flowSideNavBottom.Size = new Size(50, 53);
             flowSideNavBottom.TabIndex = 5;
@@ -228,7 +228,7 @@
             flowSideNavTop.FlowDirection = FlowDirection.TopDown;
             flowSideNavTop.Location = new Point(0, 0);
             flowSideNavTop.Name = "flowSideNavTop";
-            flowSideNavTop.Size = new Size(50, 629);
+            flowSideNavTop.Size = new Size(50, 709);
             flowSideNavTop.TabIndex = 1;
             // 
             // btnNavHome
@@ -303,7 +303,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = SystemColors.Window;
-            ClientSize = new Size(1264, 681);
+            ClientSize = new Size(1264, 761);
             Controls.Add(pnlMainContainer);
             Controls.Add(pnlLine1);
             Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);

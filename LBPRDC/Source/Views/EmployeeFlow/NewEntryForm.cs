@@ -12,11 +12,12 @@ using System.Windows.Forms;
 
 namespace LBPRDC.Source.Views
 {
-    public partial class frmEmployeeDataEntry : Form
+    public partial class frmNewEntryEmployee : Form
     {
-        private List<Control> requiredFields;
+        public ucEmployees? EmployeesControl { get; set; }
+        private readonly List<Control> requiredFields;
 
-        public frmEmployeeDataEntry()
+        public frmNewEntryEmployee()
         {
             InitializeComponent();
 
@@ -24,10 +25,11 @@ namespace LBPRDC.Source.Views
             {
                 txtFirstName,
                 txtLastName,
+                cmbGender,
                 cmbCivilStatus,
                 txtEmployeeID,
                 cmbPosition,
-                cmbEmploymentStatus
+                cmbEmploymentStatus,
             };
         }
 
@@ -97,8 +99,8 @@ namespace LBPRDC.Source.Views
 
             if (emptyField.Count > 0)
             {
-                string emptyFields = string.Join(", ", emptyField);
-                MessageBox.Show($"The following fields are required: {emptyFields}", "Required Fields", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                string emptyFields = string.Join("\n", emptyField);
+                MessageBox.Show($"The following fields are required:\n{emptyFields}", "Required Fields", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
@@ -107,7 +109,7 @@ namespace LBPRDC.Source.Views
 
         private async void btnConfirm_Click(object sender, EventArgs e)
         {
-            
+
             if (AreRequiredFieldsFilled())
             {
                 if (EmployeeService.IDExists(txtEmployeeID.Text))
@@ -144,7 +146,9 @@ namespace LBPRDC.Source.Views
 
                 if (isAdded)
                 {
-                    MessageBox.Show("Successfully Added.");
+                    MessageBox.Show("You have successfully added a new employee.", "New Employee", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    EmployeesControl?.PopulateTable();
+                    this.Close();
                 }
             }
         }
