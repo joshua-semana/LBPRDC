@@ -46,5 +46,34 @@ namespace LBPRDC.Source.Services
 
             return items;
         }
+
+        public static string? GetSuffixByID(int id)
+        {
+            string result = string.Empty;
+
+            try
+            {
+                string query = "SELECT Name FROM Suffix WHERE ID = @ID";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(query, connection))
+                {
+                    command.Parameters.AddWithValue("@ID", id);
+                    connection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            result = reader["Name"].ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.HandleException(ex);
+            }
+
+            return (result == "None") ? "" : result;
+        }
     }
 }

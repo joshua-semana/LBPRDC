@@ -13,8 +13,6 @@ namespace LBPRDC.Source.Services
         public string? LastName { get; set; }
         public string? FirstName { get; set; }
         public string? MiddleName { get; set; }
-        public string? FullName { get; set; }
-        public int SuffixID { get; set; }
         public string? Gender { get; set; }
         public DateTime? Birthday { get; set; }
         public string? Education { get; set; }
@@ -26,6 +24,13 @@ namespace LBPRDC.Source.Services
         public int CivilStatusID { get; set; }
         public int PositionID { get; set; }
         public int EmploymentStatusID { get; set; }
+        public int SuffixID { get; set; }
+        public string? FullName { get; set; }
+        public string? CivilStatus { get; set; }
+        public string? PositionCode { get; set; }
+        public string? PositionName { get; set; }
+        public string? EmploymentStatus { get; set; }
+        public string? Suffix { get; set; }
     }
 
     public class NewEmployee : Employee
@@ -59,7 +64,6 @@ namespace LBPRDC.Source.Services
                                 LastName = reader["LastName"].ToString(),
                                 FirstName = reader["FirstName"].ToString(),
                                 MiddleName = reader["MiddleName"].ToString(),
-                                SuffixID = Convert.ToInt32(reader["SuffixID"]),
                                 Gender = reader["Gender"].ToString(),
                                 Birthday = reader["Birthday"] as DateTime?,
                                 Education = reader["Education"].ToString(),
@@ -70,11 +74,20 @@ namespace LBPRDC.Source.Services
                                 ContactNumber2 = reader["ContactNumber2"].ToString(),
                                 CivilStatusID = Convert.ToInt32(reader["CivilStatusID"]),
                                 PositionID = Convert.ToInt32(reader["PositionID"]),
-                                EmploymentStatusID = Convert.ToInt32(reader["EmploymentStatusID"])
+                                EmploymentStatusID = Convert.ToInt32(reader["EmploymentStatusID"]),
+                                SuffixID = Convert.ToInt32(reader["SuffixID"]),
                             };
 
                             string middleInitial = string.IsNullOrWhiteSpace(emp.MiddleName) ? "" : $"{emp.MiddleName[0]}.";
-                            emp.FullName = $"{emp.LastName}, {emp.FirstName} {middleInitial}.".Trim();
+                            string fullNameWithMiddleInitial = $"{emp.LastName}, {emp.FirstName} {middleInitial}.".Trim();
+                            string fullNameWithoutMiddleInitial = $"{emp.LastName}, {emp.FirstName}".Trim();
+                            emp.FullName = (middleInitial != null) ? fullNameWithMiddleInitial : fullNameWithoutMiddleInitial;
+
+                            emp.CivilStatus = CivilStatusService.GetStatusByID(emp.CivilStatusID);
+                            emp.PositionCode = PositionService.GetCodeByID(emp.PositionID);
+                            emp.PositionName = PositionService.GetNameByID(emp.PositionID);
+                            emp.EmploymentStatus = EmploymentStatusService.GetStatusByID(emp.EmploymentStatusID);
+                            emp.Suffix = SuffixService.GetSuffixByID(emp.SuffixID);
 
                             employees.Add(emp);
                         }

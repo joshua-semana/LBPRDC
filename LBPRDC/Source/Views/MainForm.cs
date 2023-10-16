@@ -17,7 +17,7 @@ namespace LBPRDC.Source.Views
         private List<Button> pageSwitchButtons = new List<Button>();
         private string currentPage = "Home";
 
-        UserControl employeesControl = new ucEmployees();
+        UserControl employeesMainControl = new ucEmployees();
 
         public frmMain()
         {
@@ -82,7 +82,7 @@ namespace LBPRDC.Source.Views
         private void DisplayPage(string pageName)
         {
             //homeControl.Hide();
-            employeesControl.Hide();
+            employeesMainControl.Hide();
             //accountsControl.Hide();
             //logsControl.Hide();
 
@@ -94,9 +94,9 @@ namespace LBPRDC.Source.Views
                     //homeControl.Show();
                     break;
                 case "Employees":
-                    employeesControl.Dock = DockStyle.Fill;
-                    pnlContent.Controls.Add(employeesControl);
-                    employeesControl.Show();
+                    employeesMainControl.Dock = DockStyle.Fill;
+                    pnlContent.Controls.Add(employeesMainControl);
+                    employeesMainControl.Show();
                     break;
 
                 case "Accounts":
