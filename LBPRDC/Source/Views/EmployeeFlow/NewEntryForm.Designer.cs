@@ -34,6 +34,16 @@
             btnCancel = new Button();
             pnlMain = new Panel();
             grpJobData = new GroupBox();
+            grpPreviousWork = new GroupBox();
+            txtOtherInformation = new TextBox();
+            label19 = new Label();
+            label18 = new Label();
+            dtpToDate = new DateTimePicker();
+            label17 = new Label();
+            dtpFromDate = new DateTimePicker();
+            txtPreviousPosition = new TextBox();
+            label16 = new Label();
+            chkPreviousEmployee = new CheckBox();
             txtRemarks = new TextBox();
             label15 = new Label();
             txtPositionTitle = new TextBox();
@@ -73,6 +83,7 @@
             flowControls.SuspendLayout();
             pnlMain.SuspendLayout();
             grpJobData.SuspendLayout();
+            grpPreviousWork.SuspendLayout();
             grpContactData.SuspendLayout();
             grpPersonalData.SuspendLayout();
             SuspendLayout();
@@ -93,7 +104,7 @@
             flowControls.Controls.Add(btnCancel);
             flowControls.Dock = DockStyle.Bottom;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
-            flowControls.Location = new Point(0, 639);
+            flowControls.Location = new Point(0, 697);
             flowControls.Name = "flowControls";
             flowControls.Padding = new Padding(16, 16, 0, 16);
             flowControls.Size = new Size(860, 60);
@@ -106,7 +117,7 @@
             btnConfirm.Margin = new Padding(8, 0, 0, 0);
             btnConfirm.Name = "btnConfirm";
             btnConfirm.Size = new Size(75, 28);
-            btnConfirm.TabIndex = 19;
+            btnConfirm.TabIndex = 25;
             btnConfirm.Text = "Confirm";
             btnConfirm.UseVisualStyleBackColor = true;
             btnConfirm.Click += btnConfirm_Click;
@@ -118,7 +129,7 @@
             btnCancel.Margin = new Padding(0);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(75, 28);
-            btnCancel.TabIndex = 18;
+            btnCancel.TabIndex = 24;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
@@ -132,12 +143,14 @@
             pnlMain.Location = new Point(0, 1);
             pnlMain.Name = "pnlMain";
             pnlMain.Padding = new Padding(16);
-            pnlMain.Size = new Size(860, 638);
+            pnlMain.Size = new Size(860, 696);
             pnlMain.TabIndex = 2;
             // 
             // grpJobData
             // 
             grpJobData.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpJobData.Controls.Add(grpPreviousWork);
+            grpJobData.Controls.Add(chkPreviousEmployee);
             grpJobData.Controls.Add(txtRemarks);
             grpJobData.Controls.Add(label15);
             grpJobData.Controls.Add(txtPositionTitle);
@@ -156,20 +169,148 @@
             grpJobData.Margin = new Padding(0);
             grpJobData.Name = "grpJobData";
             grpJobData.Padding = new Padding(3, 8, 3, 3);
-            grpJobData.Size = new Size(827, 232);
+            grpJobData.Size = new Size(827, 294);
             grpJobData.TabIndex = 14;
             grpJobData.TabStop = false;
-            grpJobData.Text = "Job Information";
+            grpJobData.Text = "Work Information";
+            // 
+            // grpPreviousWork
+            // 
+            grpPreviousWork.Controls.Add(txtOtherInformation);
+            grpPreviousWork.Controls.Add(label19);
+            grpPreviousWork.Controls.Add(label18);
+            grpPreviousWork.Controls.Add(dtpToDate);
+            grpPreviousWork.Controls.Add(label17);
+            grpPreviousWork.Controls.Add(dtpFromDate);
+            grpPreviousWork.Controls.Add(txtPreviousPosition);
+            grpPreviousWork.Controls.Add(label16);
+            grpPreviousWork.Enabled = false;
+            grpPreviousWork.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            grpPreviousWork.Location = new Point(10, 188);
+            grpPreviousWork.Margin = new Padding(0);
+            grpPreviousWork.Name = "grpPreviousWork";
+            grpPreviousWork.Padding = new Padding(3, 8, 3, 3);
+            grpPreviousWork.Size = new Size(806, 82);
+            grpPreviousWork.TabIndex = 25;
+            grpPreviousWork.TabStop = false;
+            grpPreviousWork.Text = "Previous Work Information";
+            // 
+            // txtOtherInformation
+            // 
+            txtOtherInformation.AccessibleName = "Other Information";
+            txtOtherInformation.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            txtOtherInformation.Location = new Point(609, 47);
+            txtOtherInformation.Margin = new Padding(6, 3, 3, 16);
+            txtOtherInformation.MaxLength = 500;
+            txtOtherInformation.Name = "txtOtherInformation";
+            txtOtherInformation.Size = new Size(187, 23);
+            txtOtherInformation.TabIndex = 23;
+            // 
+            // label19
+            // 
+            label19.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label19.AutoSize = true;
+            label19.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label19.Location = new Point(605, 24);
+            label19.Margin = new Padding(3, 0, 3, 4);
+            label19.Name = "label19";
+            label19.Size = new Size(117, 16);
+            label19.TabIndex = 27;
+            label19.Text = "Other Information";
+            // 
+            // label18
+            // 
+            label18.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label18.AutoSize = true;
+            label18.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label18.Location = new Point(402, 24);
+            label18.Margin = new Padding(3, 0, 3, 4);
+            label18.Name = "label18";
+            label18.Size = new Size(22, 16);
+            label18.TabIndex = 25;
+            label18.Text = "To";
+            // 
+            // dtpToDate
+            // 
+            dtpToDate.AccessibleName = "Previous Work To Date";
+            dtpToDate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            dtpToDate.CustomFormat = "MM-dd-yyy";
+            dtpToDate.Format = DateTimePickerFormat.Custom;
+            dtpToDate.Location = new Point(406, 47);
+            dtpToDate.Margin = new Padding(3, 3, 3, 16);
+            dtpToDate.Name = "dtpToDate";
+            dtpToDate.Size = new Size(197, 23);
+            dtpToDate.TabIndex = 22;
+            // 
+            // label17
+            // 
+            label17.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label17.AutoSize = true;
+            label17.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label17.Location = new Point(199, 24);
+            label17.Margin = new Padding(3, 0, 3, 4);
+            label17.Name = "label17";
+            label17.Size = new Size(40, 16);
+            label17.TabIndex = 23;
+            label17.Text = "From";
+            // 
+            // dtpFromDate
+            // 
+            dtpFromDate.AccessibleName = "Previous Work From Date";
+            dtpFromDate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            dtpFromDate.CustomFormat = "MM-dd-yyy";
+            dtpFromDate.Format = DateTimePickerFormat.Custom;
+            dtpFromDate.Location = new Point(203, 47);
+            dtpFromDate.Margin = new Padding(3, 3, 3, 16);
+            dtpFromDate.Name = "dtpFromDate";
+            dtpFromDate.Size = new Size(197, 23);
+            dtpFromDate.TabIndex = 21;
+            // 
+            // txtPreviousPosition
+            // 
+            txtPreviousPosition.AccessibleName = "Previous Work Position";
+            txtPreviousPosition.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtPreviousPosition.Location = new Point(10, 47);
+            txtPreviousPosition.Margin = new Padding(6, 3, 3, 16);
+            txtPreviousPosition.MaxLength = 50;
+            txtPreviousPosition.Name = "txtPreviousPosition";
+            txtPreviousPosition.Size = new Size(187, 23);
+            txtPreviousPosition.TabIndex = 20;
+            // 
+            // label16
+            // 
+            label16.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label16.AutoSize = true;
+            label16.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label16.Location = new Point(6, 24);
+            label16.Margin = new Padding(3, 0, 3, 4);
+            label16.Name = "label16";
+            label16.Size = new Size(57, 16);
+            label16.TabIndex = 21;
+            label16.Text = "Position";
+            // 
+            // chkPreviousEmployee
+            // 
+            chkPreviousEmployee.AutoSize = true;
+            chkPreviousEmployee.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            chkPreviousEmployee.Location = new Point(10, 160);
+            chkPreviousEmployee.Margin = new Padding(3, 3, 3, 8);
+            chkPreviousEmployee.Name = "chkPreviousEmployee";
+            chkPreviousEmployee.Size = new Size(317, 20);
+            chkPreviousEmployee.TabIndex = 19;
+            chkPreviousEmployee.Text = "This person is a previous employee of LBRDC";
+            chkPreviousEmployee.UseVisualStyleBackColor = true;
+            chkPreviousEmployee.CheckedChanged += chkPreviousEmployee_CheckedChanged;
             // 
             // txtRemarks
             // 
             txtRemarks.AccessibleName = "Remarks";
             txtRemarks.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            txtRemarks.Location = new Point(10, 180);
+            txtRemarks.Location = new Point(619, 115);
             txtRemarks.Margin = new Padding(6, 3, 3, 16);
             txtRemarks.MaxLength = 500;
             txtRemarks.Name = "txtRemarks";
-            txtRemarks.Size = new Size(806, 26);
+            txtRemarks.Size = new Size(197, 26);
             txtRemarks.TabIndex = 18;
             // 
             // label15
@@ -177,7 +318,7 @@
             label15.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label15.AutoSize = true;
             label15.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label15.Location = new Point(6, 157);
+            label15.Location = new Point(615, 92);
             label15.Margin = new Padding(3, 0, 3, 4);
             label15.Name = "label15";
             label15.Size = new Size(63, 16);
@@ -193,7 +334,7 @@
             txtPositionTitle.MaxLength = 50;
             txtPositionTitle.Name = "txtPositionTitle";
             txtPositionTitle.Size = new Size(197, 26);
-            txtPositionTitle.TabIndex = 16;
+            txtPositionTitle.TabIndex = 17;
             // 
             // label14
             // 
@@ -235,7 +376,7 @@
             label12.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label12.AutoSize = true;
             label12.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label12.Location = new Point(615, 92);
+            label12.Location = new Point(615, 27);
             label12.Margin = new Padding(3, 0, 3, 4);
             label12.Name = "label12";
             label12.Size = new Size(128, 16);
@@ -248,10 +389,10 @@
             cmbEmploymentStatus.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             cmbEmploymentStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbEmploymentStatus.FormattingEnabled = true;
-            cmbEmploymentStatus.Location = new Point(619, 115);
+            cmbEmploymentStatus.Location = new Point(619, 50);
             cmbEmploymentStatus.Name = "cmbEmploymentStatus";
             cmbEmploymentStatus.Size = new Size(197, 26);
-            cmbEmploymentStatus.TabIndex = 17;
+            cmbEmploymentStatus.TabIndex = 15;
             // 
             // label11
             // 
@@ -285,7 +426,7 @@
             txtDepartment.Margin = new Padding(6, 3, 3, 16);
             txtDepartment.MaxLength = 50;
             txtDepartment.Name = "txtDepartment";
-            txtDepartment.Size = new Size(400, 26);
+            txtDepartment.Size = new Size(197, 26);
             txtDepartment.TabIndex = 14;
             // 
             // cmbPosition
@@ -298,7 +439,7 @@
             cmbPosition.Margin = new Padding(3, 3, 3, 16);
             cmbPosition.Name = "cmbPosition";
             cmbPosition.Size = new Size(400, 26);
-            cmbPosition.TabIndex = 15;
+            cmbPosition.TabIndex = 16;
             // 
             // label7
             // 
@@ -605,7 +746,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = SystemColors.Window;
-            ClientSize = new Size(860, 699);
+            ClientSize = new Size(860, 757);
             Controls.Add(pnlMain);
             Controls.Add(flowControls);
             Controls.Add(pnlLine1);
@@ -624,6 +765,8 @@
             pnlMain.ResumeLayout(false);
             grpJobData.ResumeLayout(false);
             grpJobData.PerformLayout();
+            grpPreviousWork.ResumeLayout(false);
+            grpPreviousWork.PerformLayout();
             grpContactData.ResumeLayout(false);
             grpContactData.PerformLayout();
             grpPersonalData.ResumeLayout(false);
@@ -675,5 +818,15 @@
         private Label label14;
         private TextBox txtRemarks;
         private Label label15;
+        private CheckBox chkPreviousEmployee;
+        private GroupBox grpPreviousWork;
+        private TextBox txtPreviousPosition;
+        private Label label16;
+        private TextBox txtOtherInformation;
+        private Label label19;
+        private Label label18;
+        private DateTimePicker dtpToDate;
+        private Label label17;
+        private DateTimePicker dtpFromDate;
     }
 }

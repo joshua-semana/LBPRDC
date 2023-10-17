@@ -28,10 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            label1 = new Label();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             flowControls = new FlowLayoutPanel();
             btnAddBatch = new Button();
             btnAddEmployee = new Button();
+            btnEditEmployee = new Button();
             panel1 = new Panel();
             dgvEmployees = new DataGridView();
             groupBox1 = new GroupBox();
@@ -44,22 +47,12 @@
             groupBox1.SuspendLayout();
             SuspendLayout();
             // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Arial", 18F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.Location = new Point(16, 16);
-            label1.Margin = new Padding(0, 0, 0, 12);
-            label1.Name = "label1";
-            label1.Size = new Size(139, 29);
-            label1.TabIndex = 0;
-            label1.Text = "Employees";
-            // 
             // flowControls
             // 
             flowControls.BackColor = SystemColors.Menu;
             flowControls.Controls.Add(btnAddBatch);
             flowControls.Controls.Add(btnAddEmployee);
+            flowControls.Controls.Add(btnEditEmployee);
             flowControls.Dock = DockStyle.Bottom;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
             flowControls.Location = new Point(0, 569);
@@ -83,38 +76,82 @@
             // btnAddEmployee
             // 
             btnAddEmployee.AutoSize = true;
-            btnAddEmployee.Location = new Point(976, 16);
+            btnAddEmployee.Location = new Point(997, 16);
             btnAddEmployee.Margin = new Padding(0);
             btnAddEmployee.Name = "btnAddEmployee";
-            btnAddEmployee.Size = new Size(121, 28);
+            btnAddEmployee.Size = new Size(100, 28);
             btnAddEmployee.TabIndex = 6;
-            btnAddEmployee.Text = "Add Employee";
+            btnAddEmployee.Text = "Add";
             btnAddEmployee.UseVisualStyleBackColor = true;
             btnAddEmployee.Click += btnAddEmployee_Click;
+            // 
+            // btnEditEmployee
+            // 
+            btnEditEmployee.AutoSize = true;
+            btnEditEmployee.Location = new Point(897, 16);
+            btnEditEmployee.Margin = new Padding(0);
+            btnEditEmployee.Name = "btnEditEmployee";
+            btnEditEmployee.Size = new Size(100, 28);
+            btnEditEmployee.TabIndex = 7;
+            btnEditEmployee.Text = "Edit";
+            btnEditEmployee.UseVisualStyleBackColor = true;
             // 
             // panel1
             // 
             panel1.Controls.Add(dgvEmployees);
             panel1.Controls.Add(groupBox1);
-            panel1.Controls.Add(label1);
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
-            panel1.Padding = new Padding(16);
+            panel1.Padding = new Padding(16, 10, 16, 16);
             panel1.Size = new Size(1213, 569);
             panel1.TabIndex = 2;
             // 
             // dgvEmployees
             // 
+            dgvEmployees.AllowUserToAddRows = false;
+            dgvEmployees.AllowUserToDeleteRows = false;
+            dgvEmployees.AllowUserToOrderColumns = true;
+            dgvEmployees.AllowUserToResizeRows = false;
+            dataGridViewCellStyle1.BackColor = Color.Honeydew;
+            dataGridViewCellStyle1.SelectionBackColor = Color.SeaGreen;
+            dgvEmployees.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             dgvEmployees.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvEmployees.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvEmployees.BackgroundColor = SystemColors.Window;
+            dgvEmployees.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.Padding = new Padding(0, 2, 0, 2);
+            dataGridViewCellStyle2.SelectionBackColor = Color.MediumSeaGreen;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            dgvEmployees.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dgvEmployees.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvEmployees.Location = new Point(16, 140);
+            dgvEmployees.EditMode = DataGridViewEditMode.EditOnF2;
+            dgvEmployees.GridColor = SystemColors.Window;
+            dgvEmployees.Location = new Point(16, 93);
             dgvEmployees.Margin = new Padding(0);
+            dgvEmployees.MultiSelect = false;
             dgvEmployees.Name = "dgvEmployees";
-            dgvEmployees.RowTemplate.Height = 25;
-            dgvEmployees.Size = new Size(1181, 413);
+            dgvEmployees.ReadOnly = true;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Control;
+            dataGridViewCellStyle3.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle3.Padding = new Padding(4);
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            dgvEmployees.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dgvEmployees.RowHeadersVisible = false;
+            dgvEmployees.RowTemplate.DefaultCellStyle.Padding = new Padding(4);
+            dgvEmployees.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
+            dgvEmployees.RowTemplate.Height = 37;
+            dgvEmployees.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvEmployees.Size = new Size(1181, 460);
             dgvEmployees.TabIndex = 3;
             // 
             // groupBox1
@@ -124,7 +161,7 @@
             groupBox1.Controls.Add(btnSearch);
             groupBox1.Controls.Add(txtSearch);
             groupBox1.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            groupBox1.Location = new Point(16, 57);
+            groupBox1.Location = new Point(16, 10);
             groupBox1.Margin = new Padding(0, 0, 0, 16);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new Padding(8);
@@ -135,6 +172,7 @@
             // 
             // btnSettings
             // 
+            btnSettings.Anchor = AnchorStyles.Right;
             btnSettings.AutoSize = true;
             btnSettings.Location = new Point(1098, 24);
             btnSettings.Margin = new Padding(0);
@@ -179,7 +217,6 @@
             flowControls.ResumeLayout(false);
             flowControls.PerformLayout();
             panel1.ResumeLayout(false);
-            panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvEmployees).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
@@ -187,8 +224,6 @@
         }
 
         #endregion
-
-        private Label label1;
         private FlowLayoutPanel flowControls;
         private Panel panel1;
         private GroupBox groupBox1;
@@ -198,5 +233,6 @@
         private Button btnAddBatch;
         private Button btnAddEmployee;
         private Button btnSettings;
+        private Button btnEditEmployee;
     }
 }

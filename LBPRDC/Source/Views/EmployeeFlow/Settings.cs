@@ -1,16 +1,16 @@
-﻿using LBPRDC.Source.Services;
-using LBPRDC.Source.Views.EmployeeFlow;
+﻿using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views.Employee
 {
     public partial class frmSettingsEmployee : Form
     {
+        public ucEmployees? ParentControl { get; set; }
         private readonly UserPreference preference;
 
         public frmSettingsEmployee()
         {
             InitializeComponent();
-            preference = PreferenceManager.LoadPreference();
+            preference = UserPreferenceManager.LoadPreference();
             InitializePreferences();
         }
 
@@ -27,6 +27,8 @@ namespace LBPRDC.Source.Views.Employee
             chkEmailAddress.Checked = preference.ShowEmailAddress;
             chkContactNumber.Checked = preference.ShowContactNumber;
             chkPosition.Checked = preference.ShowPosition;
+            chkSalaryRate.Checked = preference.ShowSalaryRate;
+            chkBillingRate.Checked = preference.ShowBillingRate;
 
             SetSelectedRadioButton(flowRadioGroupForName, preference.SelectedNameFormat.ToString());
             SetSelectedRadioButton(flowRadioGroupForEmail, preference.SelectedEmailFormat.ToString());
@@ -53,11 +55,11 @@ namespace LBPRDC.Source.Views.Employee
 
         private void btnApply_Click(object sender, EventArgs e)
         {
-            if (chkEmployeeID.Checked == false && chkName.Checked == false)
-            {
-                MessageBox.Show("Please select at least one (1) identifier to continue.\nIdentifiers:\nEmployee ID\nEmployee Name", "Error Saving Settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+            //if (chkEmployeeID.Checked == false && chkName.Checked == false)
+            //{
+            //    MessageBox.Show("Please select at least one (1) identifier to proceed.\nIdentifiers:\nEmployee ID\nEmployee Name", "Error Saving Settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    return;
+            //}
 
             preference.ShowEmployeeID = chkEmployeeID.Checked;
             preference.ShowName = chkName.Checked;
@@ -70,13 +72,17 @@ namespace LBPRDC.Source.Views.Employee
             preference.ShowEmailAddress = chkEmailAddress.Checked;
             preference.ShowContactNumber = chkContactNumber.Checked;
             preference.ShowPosition = chkPosition.Checked;
+            preference.ShowSalaryRate = chkSalaryRate.Checked;
+            preference.ShowBillingRate = chkBillingRate.Checked;
             preference.SelectedNameFormat = Enum.Parse<NameFormat>(GetSelectedRadioButton(flowRadioGroupForName));
             preference.SelectedEmailFormat = Enum.Parse<EmailFormat>(GetSelectedRadioButton(flowRadioGroupForEmail));
             preference.SelectedContactFormat = Enum.Parse<ContactFormat>(GetSelectedRadioButton(flowRadioGroupForContact));
             preference.SelectedPositionFormat = Enum.Parse<PositionFormat>(GetSelectedRadioButton(flowRadioGroupForPosition));
 
-            PreferenceManager.SavePreferences(preference);
+            UserPreferenceManager.SavePreferences(preference);
             MessageBox.Show("Preferences saved.", "User Settings", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            ParentControl?.PopulateTable();
+            this.Close();
         }
 
         private string GetSelectedRadioButton(FlowLayoutPanel container)
@@ -115,6 +121,31 @@ namespace LBPRDC.Source.Views.Employee
         private void chkPosition_CheckedChanged(object sender, EventArgs e)
         {
             flowRadioGroupForPosition.Enabled = chkPosition.Checked;
+        }
+
+        private void chkFilterDepartment_CheckedChanged(object sender, EventArgs e)
+        {
+            cmbFilterDepartment.Enabled = chkFilterDepartment.Checked;
+        }
+
+        private void chkFilterPosition_CheckedChanged(object sender, EventArgs e)
+        {
+            cmbFilterPosition.Enabled = chkFilterPosition.Checked;
+        }
+
+        private void chkFilterCivilStatus_CheckedChanged(object sender, EventArgs e)
+        {
+            cmbFilterCivilStatus.Enabled = chkFilterCivilStatus.Checked;
+        }
+
+        private void chkFilterGender_CheckedChanged(object sender, EventArgs e)
+        {
+            cmbFilterGender.Enabled = chkFilterGender.Checked;
+        }
+
+        private void chkFilterEmploymentStatus_CheckedChanged(object sender, EventArgs e)
+        {
+            cmbFilterEmploymentStatus.Enabled = chkFilterEmploymentStatus.Checked;
         }
     }
 }

@@ -1,14 +1,13 @@
-﻿using LBPRDC.Source.Views.EmployeeFlow;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace LBPRDC.Source.Services
+namespace LBPRDC.Source.Utilities
 {
-    internal class PreferenceManager
+    internal class UserPreferenceManager
     {
         public static UserPreference LoadPreference()
         {
@@ -38,7 +37,9 @@ namespace LBPRDC.Source.Services
                     ShowContactNumber = true,
                     SelectedContactFormat = ContactFormat.FirstOnly,
                     ShowPosition = true,
-                    SelectedPositionFormat = PositionFormat.NameOnly
+                    SelectedPositionFormat = PositionFormat.NameOnly,
+                    ShowSalaryRate = true,
+                    ShowBillingRate = true
                 };
             }
         }

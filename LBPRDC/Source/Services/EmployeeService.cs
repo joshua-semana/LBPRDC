@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LBPRDC.Source.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -26,11 +27,16 @@ namespace LBPRDC.Source.Services
         public int EmploymentStatusID { get; set; }
         public int SuffixID { get; set; }
         public string? FullName { get; set; }
+        public string? EmailAddress { get; set; }
+        public string? ContactNumber { get; set; }
         public string? CivilStatus { get; set; }
         public string? PositionCode { get; set; }
         public string? PositionName { get; set; }
+        public string? Position { get; set; }
         public string? EmploymentStatus { get; set; }
         public string? Suffix { get; set; }
+        public decimal SalaryRate { get; set; }
+        public decimal BillingRate { get; set; }
     }
 
     public class NewEmployee : Employee
@@ -38,14 +44,20 @@ namespace LBPRDC.Source.Services
         public DateTime StartDate { get; set; }
         public string? PositionTitle { get; set; }
         public string? Remarks { get; set; }
+        public bool? isPreviousEmployee { get; set; }
+        public string? PreviousPosition { get; set; }
+        public DateTime PreviousFrom { get; set; }
+        public DateTime PreviousTo { get; set; }
+        public string? OtherInformation { get; set; }
     }
 
     internal class EmployeeService
     {
+        private static UserPreference preference;
         public static List<Employee> GetAllEmployees()
         {
             List<Employee> employees = new List<Employee>();
-
+            preference = UserPreferenceManager.LoadPreference();
             try
             {
                 string query = "SELECT * FROM Employee";
@@ -78,16 +90,58 @@ namespace LBPRDC.Source.Services
                                 SuffixID = Convert.ToInt32(reader["SuffixID"]),
                             };
 
-                            string middleInitial = string.IsNullOrWhiteSpace(emp.MiddleName) ? "" : $"{emp.MiddleName[0]}.";
-                            string fullNameWithMiddleInitial = $"{emp.LastName}, {emp.FirstName} {middleInitial}.".Trim();
-                            string fullNameWithoutMiddleInitial = $"{emp.LastName}, {emp.FirstName}".Trim();
-                            emp.FullName = (middleInitial != null) ? fullNameWithMiddleInitial : fullNameWithoutMiddleInitial;
-
                             emp.CivilStatus = CivilStatusService.GetStatusByID(emp.CivilStatusID);
-                            emp.PositionCode = PositionService.GetCodeByID(emp.PositionID);
-                            emp.PositionName = PositionService.GetNameByID(emp.PositionID);
                             emp.EmploymentStatus = EmploymentStatusService.GetStatusByID(emp.EmploymentStatusID);
                             emp.Suffix = SuffixService.GetSuffixByID(emp.SuffixID);
+                            emp.PositionName = PositionService.GetPositionDetailsByID(emp.PositionID).Select(s => s.Name).FirstOrDefault()?.ToString();
+                            emp.PositionCode = PositionService.GetPositionDetailsByID(emp.PositionID).Select(s => s.Code).FirstOrDefault()?.ToString();
+                            emp.BillingRate = Convert.ToDecimal(PositionService.GetPositionDetailsByID(emp.PositionID).Select(s => s.BillingRate).FirstOrDefault());
+                            emp.SalaryRate = Convert.ToDecimal(PositionService.GetPositionDetailsByID(emp.PositionID).Select(s => s.SalaryRate).FirstOrDefault());
+
+                            if (preference.ShowName)
+                            {
+                                string middleInitial = string.IsNullOrWhiteSpace(emp.MiddleName) ? "" : $"{emp.MiddleName[0]}.";
+                                emp.FullName = preference.SelectedNameFormat switch
+                                {
+                                    NameFormat.Full1 => $"{emp.FirstName} {middleInitial} {emp.LastName} {emp.Suffix}".Trim(),
+                                    NameFormat.Full2 => $"{emp.LastName}, {emp.FirstName} {middleInitial} {emp.Suffix}".Trim(),
+                                    NameFormat.FirstAndLastOnly => $"{emp.FirstName} {emp.LastName}".Trim(),
+                                    _ => "Error"
+                                };
+                            }
+
+                            if (preference.ShowEmailAddress)
+                            {
+                                string[] emailAddresses = new[] { emp.EmailAddress1, emp.EmailAddress2 };
+                                emp.EmailAddress = preference.SelectedEmailFormat switch
+                                {
+                                    EmailFormat.FirstOnly => emp.EmailAddress1,
+                                    EmailFormat.Both => string.Join(" / ", emailAddresses.Where(email => !string.IsNullOrWhiteSpace(email))),
+                                    _ => "Error"
+                                };
+                            }
+
+                            if (preference.ShowContactNumber)
+                            {
+                                string[] contactNumbers = new[] { emp.ContactNumber1, emp.ContactNumber2 };
+                                emp.ContactNumber = preference.SelectedContactFormat switch
+                                {
+                                    ContactFormat.FirstOnly => emp.ContactNumber1,
+                                    ContactFormat.Both => string.Join(" / ", contactNumbers.Where(number => !string.IsNullOrWhiteSpace(number))),
+                                    _ => "Error"
+                                };
+                            }
+
+                            if (preference.ShowPosition )
+                            {
+                                emp.Position = preference.SelectedPositionFormat switch
+                                {
+                                    PositionFormat.NameOnly => emp.PositionName,
+                                    PositionFormat.CodeOnly => emp.PositionCode,
+                                    PositionFormat.Both => string.Join(" - ", emp.PositionCode, emp.PositionName),
+                                    _ => "Error"
+                                };
+                            }
 
                             employees.Add(emp);
                         }
@@ -169,17 +223,40 @@ namespace LBPRDC.Source.Services
                     EmployeeID = employee.EmployeeID,
                     CivilStatusID = employee.CivilStatusID,
                     Timestamp = employee.StartDate,
-                    Remarks = "Status when hired."
+                    Remarks = "Status as a new hire."
                 };
 
                 CivilStatusService.AddToHistory(newCivilStatus);
+
+                if ((bool) employee.isPreviousEmployee)
+                {
+                    EmploymentStatusService.NewHistory previousWorkFrom = new()
+                    {
+                        EmployeeID = employee.EmployeeID,
+                        EmploymentStatusID = 1, // 1 for Active as of Oct. 17, 2023
+                        Timestamp = employee.PreviousFrom,
+                        Remarks = $"Previous LBRDC employee as {employee.PreviousPosition}, start information."
+                    };
+
+                    EmploymentStatusService.AddToHistory(previousWorkFrom);
+
+                    EmploymentStatusService.NewHistory previousWorkTo = new()
+                    {
+                        EmployeeID = employee.EmployeeID,
+                        EmploymentStatusID = 3, // 3 for Resigned as of Oct. 17, 2023
+                        Timestamp = employee.PreviousTo,
+                        Remarks = (String.IsNullOrWhiteSpace(employee.OtherInformation)) ? $"Previous LBRDC employee as {employee.PreviousPosition}, end information." : $"Previous LBRDC employee as {employee.PreviousPosition}, end information. Other information: {employee.OtherInformation}",
+                    };
+
+                    EmploymentStatusService.AddToHistory(previousWorkTo);
+                }
 
                 EmploymentStatusService.NewHistory newEmploymentStatus = new()
                 {
                     EmployeeID = employee.EmployeeID,
                     EmploymentStatusID = employee.EmploymentStatusID,
                     Timestamp = employee.StartDate,
-                    Remarks = "Status when hired."
+                    Remarks = "New hire."
                 };
 
                 EmploymentStatusService.AddToHistory(newEmploymentStatus);
