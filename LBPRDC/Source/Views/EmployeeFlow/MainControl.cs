@@ -1,6 +1,7 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using LBPRDC.Source.Views.Employee;
+using LBPRDC.Source.Views.EmployeeFlow;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -17,12 +18,12 @@ namespace LBPRDC.Source.Views
     public partial class ucEmployees : UserControl
     {
         UserControl loadingControl = new ucLoading();
+        private UserPreference preference;
         //private BackgroundWorker dataLoader;
 
         public ucEmployees()
         {
             InitializeComponent();
-
             this.Controls.Add(loadingControl);
 
             //dataLoader = new BackgroundWorker();
@@ -57,13 +58,43 @@ namespace LBPRDC.Source.Views
         public async void PopulateTable()
         {
             ShowLoadingProgressBar();
-            await Task.Delay(500);
+            preference = PreferenceManager.LoadPreference();
             List<Services.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
+
+            dgvEmployees.Columns.Clear();
+
             if (employees.Count > 0)
             {
+                dgvEmployees.AutoGenerateColumns = false;
+                ApplySettingsToTable();
                 dgvEmployees.DataSource = employees;
             }
             HideLoadingProgressBar();
+        }
+
+        private void ApplySettingsToTable()
+        {
+            if (preference.ShowEmployeeID) { AddColumn("EmployeeID", "Employee ID", "EmployeeID"); }
+            //if (preference.ShowName) { AddColumn("EmployeeID", "Employee ID", "EmployeeID"); }
+            if (preference.ShowGender) { AddColumn("Gender", "Gender", "Gender"); }
+            if (preference.ShowBirthday) { AddColumn("Birthday", "Birthday", "Birthday"); }
+            if (preference.ShowEducation) { AddColumn("Education", "Education", "Education"); }
+            if (preference.ShowCivilStatus) { AddColumn("CivilStatus", "Civil Status", "CivilStatus"); }
+            if (preference.ShowEmploymentStatus) { AddColumn("EmploymentStatus", "Employment Status", "EmploymentStatus"); }
+            if (preference.ShowDepartment) { AddColumn("Department", "Department", "Department"); }
+            //if (preference.ShowEmailAddress) { AddColumn("EmploymentStatus", "Employment Status", "EmploymentStatus"); }
+            //if (preference.ShowContactNumber) { AddColumn("EmploymentStatus", "Employment Status", "EmploymentStatus"); }
+            //if (preference.ShowPosition) { AddColumn("EmploymentStatus", "Employment Status", "EmploymentStatus"); }
+        }
+
+        private void AddColumn(string name, string header, string property)
+        {
+            dgvEmployees.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = name,
+                HeaderText = header,
+                DataPropertyName = property
+            });
         }
 
         //private void DataLoadingWorker_DoWork(object sender, DoWorkEventArgs e)

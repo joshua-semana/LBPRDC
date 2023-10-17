@@ -55,7 +55,7 @@ namespace LBPRDC.Source.Views.Employee
         {
             if (chkEmployeeID.Checked == false && chkName.Checked == false)
             {
-                MessageBox.Show("Please select at least one (1) identifier to continue.\nIdentifiers:\nEmployee ID\nEmployee Name", "Error Saving Settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please select at least one (1) identifier to proceed.\nIdentifiers:\nEmployee ID\nEmployee Name", "Error Saving Settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -77,6 +77,8 @@ namespace LBPRDC.Source.Views.Employee
 
             PreferenceManager.SavePreferences(preference);
             MessageBox.Show("Preferences saved.", "User Settings", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            this.Close();
+
         }
 
         private string GetSelectedRadioButton(FlowLayoutPanel container)

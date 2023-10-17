@@ -135,6 +135,7 @@
             // 
             // btnSettings
             // 
+            btnSettings.Anchor = AnchorStyles.Right;
             btnSettings.AutoSize = true;
             btnSettings.Location = new Point(1098, 24);
             btnSettings.Margin = new Padding(0);
