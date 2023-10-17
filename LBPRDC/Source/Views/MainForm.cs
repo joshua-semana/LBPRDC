@@ -86,6 +86,8 @@ namespace LBPRDC.Source.Views
             //accountsControl.Hide();
             //logsControl.Hide();
 
+            lblPageName.Text = pageName;
+
             switch (pageName)
             {
                 case "Home":

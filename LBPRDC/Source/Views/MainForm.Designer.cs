@@ -32,6 +32,7 @@
             pnlHeader = new Panel();
             flowHeaderLeft = new FlowLayoutPanel();
             picLogo = new PictureBox();
+            lblPageName = new Label();
             flowHeaderRight = new FlowLayoutPanel();
             lblDateToday = new Label();
             lblLine1 = new Label();
@@ -74,6 +75,7 @@
             // 
             flowHeaderLeft.BackColor = SystemColors.Window;
             flowHeaderLeft.Controls.Add(picLogo);
+            flowHeaderLeft.Controls.Add(lblPageName);
             flowHeaderLeft.Dock = DockStyle.Fill;
             flowHeaderLeft.Location = new Point(0, 0);
             flowHeaderLeft.Name = "flowHeaderLeft";
@@ -86,11 +88,21 @@
             picLogo.BackgroundImage = (Image)resources.GetObject("picLogo.BackgroundImage");
             picLogo.BackgroundImageLayout = ImageLayout.Zoom;
             picLogo.Location = new Point(10, 0);
-            picLogo.Margin = new Padding(0);
+            picLogo.Margin = new Padding(0, 0, 18, 0);
             picLogo.Name = "picLogo";
             picLogo.Size = new Size(32, 50);
             picLogo.TabIndex = 0;
             picLogo.TabStop = false;
+            // 
+            // lblPageName
+            // 
+            lblPageName.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            lblPageName.Location = new Point(63, 0);
+            lblPageName.Name = "lblPageName";
+            lblPageName.Size = new Size(200, 50);
+            lblPageName.TabIndex = 1;
+            lblPageName.Text = "Page Name";
+            lblPageName.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // flowHeaderRight
             // 
@@ -351,5 +363,6 @@
         private Panel pnlSideNav;
         private FlowLayoutPanel flowSideNavBottom;
         private Panel pnlContent;
+        private Label lblPageName;
     }
 }

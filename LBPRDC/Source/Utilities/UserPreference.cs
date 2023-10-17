@@ -2,7 +2,7 @@
 using System;
 using System.Text.Json;
 
-namespace LBPRDC.Source.Views.EmployeeFlow
+namespace LBPRDC.Source.Utilities
 {
     [Serializable]
     internal class UserPreference
@@ -22,6 +22,8 @@ namespace LBPRDC.Source.Views.EmployeeFlow
         public ContactFormat SelectedContactFormat { get; set; }
         public bool ShowPosition { get; set; }
         public PositionFormat SelectedPositionFormat { get; set; }
+        public bool ShowSalaryRate { get; set; }
+        public bool ShowBillingRate { get; set; }
     }
 
     public enum NameFormat

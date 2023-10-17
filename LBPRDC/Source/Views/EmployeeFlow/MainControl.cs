@@ -1,7 +1,6 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using LBPRDC.Source.Views.Employee;
-using LBPRDC.Source.Views.EmployeeFlow;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -58,7 +57,7 @@ namespace LBPRDC.Source.Views
         public async void PopulateTable()
         {
             ShowLoadingProgressBar();
-            preference = PreferenceManager.LoadPreference();
+            preference = UserPreferenceManager.LoadPreference();
             List<Services.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
 
             dgvEmployees.Columns.Clear();
@@ -74,9 +73,9 @@ namespace LBPRDC.Source.Views
 
         private void ApplySettingsToTable()
         {
-            if (preference.ShowEmployeeID) { AddColumn("EmployeeID", "Employee ID", "EmployeeID"); }
-            if (preference.ShowName) 
-            { 
+            if (preference.ShowEmployeeID) { AddColumn("EmployeeID", "ID", "EmployeeID"); }
+            if (preference.ShowName)
+            {
                 if (preference.SelectedNameFormat == NameFormat.Full1 ||
                     preference.SelectedNameFormat == NameFormat.Full2 ||
                     preference.SelectedNameFormat == NameFormat.FirstAndLastOnly)
@@ -103,7 +102,9 @@ namespace LBPRDC.Source.Views
             if (preference.ShowEmailAddress) { AddColumn("EmailAddress", "Email Address", "EmailAddress"); }
             if (preference.ShowContactNumber) { AddColumn("ContactNumber", "Contact Number", "ContactNumber"); }
             if (preference.ShowPosition) { AddColumn("Position", "Position", "Position"); }
-            if (preference.ShowEmploymentStatus) { AddColumn("EmploymentStatus", "Employment Status", "EmploymentStatus"); }
+            if (preference.ShowSalaryRate) { AddColumn("SalaryRate", "Salary Rate", "SalaryRate"); }
+            if (preference.ShowBillingRate) { AddColumn("BillingRate", "Billing Rate", "BillingRate"); }
+            if (preference.ShowEmploymentStatus) { AddColumn("EmploymentStatus", "Status", "EmploymentStatus"); }
         }
 
         private void AddColumn(string name, string header, string property)

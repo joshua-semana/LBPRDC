@@ -29,7 +29,7 @@ namespace LBPRDC.Source.Views
                 cmbCivilStatus,
                 txtEmployeeID,
                 cmbPosition,
-                cmbEmploymentStatus,
+                cmbEmploymentStatus
             };
         }
 
@@ -109,12 +109,23 @@ namespace LBPRDC.Source.Views
 
         private async void btnConfirm_Click(object sender, EventArgs e)
         {
-
             if (AreRequiredFieldsFilled())
             {
                 if (EmployeeService.IDExists(txtEmployeeID.Text))
                 {
-                    MessageBox.Show("The Employee ID you entered already exists in the database. Please enter a different ID.", "Employee ID Already Exists", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("The Employee ID you entered already exists in the database. Please enter a different ID.", "Employee ID Already Exists", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (txtContactNumber1.Text != "" && txtContactNumber1.Text.Length < 11)
+                {
+                    MessageBox.Show("Contact number should be 11 digits.", "Contact Number Validation", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (txtContactNumber2.Text != "" && txtContactNumber2.Text.Length < 11)
+                {
+                    MessageBox.Show("Contact number should be 11 digits.", "Contact Number Validation", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -139,7 +150,12 @@ namespace LBPRDC.Source.Views
 
                     StartDate = dtpStartDate.Value,
                     PositionTitle = txtPositionTitle.Text,
-                    Remarks = txtRemarks.Text
+                    Remarks = txtRemarks.Text,
+                    isPreviousEmployee = true,
+                    PreviousFrom = dtpFromDate.Value,
+                    PreviousTo = dtpToDate.Value,
+                    PreviousPosition = txtPreviousPosition.Text,
+                    OtherInformation = txtOtherInformation.Text
                 };
 
                 bool isAdded = await EmployeeService.AddNewEmployee(newEmployee);
@@ -167,6 +183,19 @@ namespace LBPRDC.Source.Views
             if (result == DialogResult.Yes)
             {
                 this.Close();
+            }
+        }
+
+        private void chkPreviousEmployee_CheckedChanged(object sender, EventArgs e)
+        {
+            grpPreviousWork.Enabled = chkPreviousEmployee.Checked;
+            if (chkPreviousEmployee.Checked)
+            {
+                requiredFields.Add(txtPreviousPosition);
+            }
+            else if(requiredFields.Contains(txtPreviousPosition))
+            {
+                requiredFields.Remove(txtPreviousPosition);
             }
         }
     }

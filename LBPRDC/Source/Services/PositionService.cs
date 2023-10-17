@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static LBPRDC.Source.Services.EmploymentStatusService;
+﻿using System.Data.SqlClient;
 
 namespace LBPRDC.Source.Services
 {
@@ -15,6 +9,8 @@ namespace LBPRDC.Source.Services
             public int ID { get; set; }
             public string? Code { get; set; }
             public string? Name { get; set; }
+            public decimal SalaryRate { get; set; }
+            public decimal BillingRate { get; set; }
         }
 
         public class PositionItems : Position
@@ -55,50 +51,18 @@ namespace LBPRDC.Source.Services
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                ExceptionHandler.HandleException(ex);
-            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
         }
 
-        public static string? GetNameByID(int id)
+        public static List<Position> GetPositionDetailsByID(int id)
         {
-            string result = string.Empty;
+            List<Position> items = new();
 
             try
             {
-                string query = "SELECT Name FROM Position WHERE ID = @ID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@ID", id);
-                    connection.Open();
-                    using(SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            result = reader["Name"].ToString();
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ExceptionHandler.HandleException(ex);
-            }
-
-            return result;
-        }
-
-        public static string? GetCodeByID(int id)
-        {
-            string result = string.Empty;
-
-            try
-            {
-                string query = "SELECT Code FROM Position WHERE ID = @ID";
+                string query = "SELECT * FROM Position WHERE ID = @ID";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
@@ -108,17 +72,22 @@ namespace LBPRDC.Source.Services
                     {
                         if (reader.Read())
                         {
-                            result = reader["Code"].ToString();
+                            Position item = new()
+                            {
+                                Code = reader["Code"].ToString(),
+                                Name = reader["Name"].ToString(),
+                                SalaryRate = Convert.ToDecimal(reader["SalaryRate"]),
+                                BillingRate = Convert.ToDecimal(reader["BillingRate"])
+                            };
+
+                            items.Add(item);
                         }
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                ExceptionHandler.HandleException(ex);
-            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
-            return result;
+            return items;
         }
 
         public class NewHistory
@@ -149,10 +118,7 @@ namespace LBPRDC.Source.Services
                     command.ExecuteNonQuery();
                 }
             }
-            catch (Exception ex)
-            {
-                ExceptionHandler.HandleException(ex);
-            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
     }
 }
