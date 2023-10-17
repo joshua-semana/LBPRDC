@@ -75,16 +75,35 @@ namespace LBPRDC.Source.Views
         private void ApplySettingsToTable()
         {
             if (preference.ShowEmployeeID) { AddColumn("EmployeeID", "Employee ID", "EmployeeID"); }
-            //if (preference.ShowName) { AddColumn("EmployeeID", "Employee ID", "EmployeeID"); }
+            if (preference.ShowName) 
+            { 
+                if (preference.SelectedNameFormat == NameFormat.Full1 ||
+                    preference.SelectedNameFormat == NameFormat.Full2 ||
+                    preference.SelectedNameFormat == NameFormat.FirstAndLastOnly)
+                {
+                    AddColumn("FullName", "Full Name", "FullName");
+                }
+                else if (preference.SelectedNameFormat == NameFormat.LastNameOnly)
+                {
+                    AddColumn("LastName", "Last Name", "LastName");
+                }
+                else if (preference.SelectedNameFormat == NameFormat.Separated)
+                {
+                    AddColumn("FirstName", "First Name", "FirstName");
+                    AddColumn("MiddleName", "Middle Name", "MiddleName");
+                    AddColumn("LastName", "Last Name", "LastName");
+                    AddColumn("Suffix", "Suffix", "Suffix");
+                }
+            }
             if (preference.ShowGender) { AddColumn("Gender", "Gender", "Gender"); }
             if (preference.ShowBirthday) { AddColumn("Birthday", "Birthday", "Birthday"); }
             if (preference.ShowEducation) { AddColumn("Education", "Education", "Education"); }
             if (preference.ShowCivilStatus) { AddColumn("CivilStatus", "Civil Status", "CivilStatus"); }
-            if (preference.ShowEmploymentStatus) { AddColumn("EmploymentStatus", "Employment Status", "EmploymentStatus"); }
             if (preference.ShowDepartment) { AddColumn("Department", "Department", "Department"); }
-            //if (preference.ShowEmailAddress) { AddColumn("EmploymentStatus", "Employment Status", "EmploymentStatus"); }
-            //if (preference.ShowContactNumber) { AddColumn("EmploymentStatus", "Employment Status", "EmploymentStatus"); }
-            //if (preference.ShowPosition) { AddColumn("EmploymentStatus", "Employment Status", "EmploymentStatus"); }
+            if (preference.ShowEmailAddress) { AddColumn("EmailAddress", "Email Address", "EmailAddress"); }
+            if (preference.ShowContactNumber) { AddColumn("ContactNumber", "Contact Number", "ContactNumber"); }
+            if (preference.ShowPosition) { AddColumn("Position", "Position", "Position"); }
+            if (preference.ShowEmploymentStatus) { AddColumn("EmploymentStatus", "Employment Status", "EmploymentStatus"); }
         }
 
         private void AddColumn(string name, string header, string property)
@@ -154,13 +173,14 @@ namespace LBPRDC.Source.Views
         private void btnAddEmployee_Click(object sender, EventArgs e)
         {
             frmNewEntryEmployee newEntryForm = new();
-            newEntryForm.EmployeesControl = this;
+            newEntryForm.ParentControl = this;
             newEntryForm.ShowDialog();
         }
 
         private void btnSettings_Click(object sender, EventArgs e)
         {
             frmSettingsEmployee settingEmployeeForm = new();
+            settingEmployeeForm.ParentControl = this;
             settingEmployeeForm.ShowDialog();
         }
     }

@@ -14,7 +14,7 @@ namespace LBPRDC.Source.Views
 {
     public partial class frmNewEntryEmployee : Form
     {
-        public ucEmployees? EmployeesControl { get; set; }
+        public ucEmployees? ParentControl { get; set; }
         private readonly List<Control> requiredFields;
 
         public frmNewEntryEmployee()
@@ -147,7 +147,7 @@ namespace LBPRDC.Source.Views
                 if (isAdded)
                 {
                     MessageBox.Show("You have successfully added a new employee.", "New Employee", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    EmployeesControl?.PopulateTable();
+                    ParentControl?.PopulateTable();
                     this.Close();
                 }
             }

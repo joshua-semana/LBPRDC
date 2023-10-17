@@ -5,6 +5,7 @@ namespace LBPRDC.Source.Views.Employee
 {
     public partial class frmSettingsEmployee : Form
     {
+        public ucEmployees? ParentControl { get; set; }
         private readonly UserPreference preference;
 
         public frmSettingsEmployee()
@@ -77,8 +78,8 @@ namespace LBPRDC.Source.Views.Employee
 
             PreferenceManager.SavePreferences(preference);
             MessageBox.Show("Preferences saved.", "User Settings", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            ParentControl?.PopulateTable();
             this.Close();
-
         }
 
         private string GetSelectedRadioButton(FlowLayoutPanel container)
