@@ -16,6 +16,7 @@ namespace LBPRDC.Source.Utilities
         public bool ShowCivilStatus { get; set; }
         public bool ShowEmploymentStatus { get; set; }
         public bool ShowDepartment { get; set; }
+        public bool ShowSection { get; set; }
         public bool ShowEmailAddress { get; set; }
         public EmailFormat SelectedEmailFormat { get; set; }
         public bool ShowContactNumber { get; set; }
@@ -24,6 +25,7 @@ namespace LBPRDC.Source.Utilities
         public PositionFormat SelectedPositionFormat { get; set; }
         public bool ShowSalaryRate { get; set; }
         public bool ShowBillingRate { get; set; }
+        
     }
 
     public enum NameFormat

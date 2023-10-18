@@ -10,7 +10,14 @@ namespace LBPRDC.Source.Services
 {
     internal class LoggingService
     {
-        public static void LogActivity(int userID, string activityType, string activityDetails)
+        public class Log
+        {
+            public int UserID { get; set; }
+            public string? Type { get; set; }
+            public string? Details { get; set; }
+        }
+
+        public static void LogActivity(Log log)
         {
             try
             {
@@ -18,12 +25,11 @@ namespace LBPRDC.Source.Services
                                "VALUES (@UserID, @ActivityType, @ActivityDetails, @Timestamp)";
 
                 using (SqlConnection connection = new SqlConnection(Data.DataAccessHelper.GetConnectionString()))
-
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@UserID", userID);
-                    command.Parameters.AddWithValue("@ActivityType", activityType);
-                    command.Parameters.AddWithValue("@ActivityDetails", activityDetails);
+                    command.Parameters.AddWithValue("@UserID", log.UserID);
+                    command.Parameters.AddWithValue("@ActivityType", log.Type);
+                    command.Parameters.AddWithValue("@ActivityDetails", log.Details);
                     command.Parameters.AddWithValue("@Timestamp", DateTime.Now);
 
                     connection.Open();
@@ -31,10 +37,7 @@ namespace LBPRDC.Source.Services
                     command.ExecuteNonQuery();
                 };
             }
-            catch (Exception ex)
-            {
-                ExceptionHandler.HandleException(ex);
-            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
     }
 }

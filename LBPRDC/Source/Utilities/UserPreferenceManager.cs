@@ -32,6 +32,7 @@ namespace LBPRDC.Source.Utilities
                     ShowCivilStatus = true,
                     ShowEmploymentStatus = true,
                     ShowDepartment = true,
+                    ShowSection = true,
                     ShowEmailAddress = true,
                     SelectedEmailFormat = EmailFormat.FirstOnly,
                     ShowContactNumber = true,

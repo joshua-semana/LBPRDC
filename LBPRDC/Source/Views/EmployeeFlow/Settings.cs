@@ -1,4 +1,5 @@
-﻿using LBPRDC.Source.Utilities;
+﻿using LBPRDC.Source.Services;
+using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views.Employee
 {
@@ -12,6 +13,39 @@ namespace LBPRDC.Source.Views.Employee
             InitializeComponent();
             preference = UserPreferenceManager.LoadPreference();
             InitializePreferences();
+            InitializePositionComboBoxItems();
+            InitializeCivilStatusComboBoxItems();
+            InitializeEmploymentStatusComboBoxItems();
+            InitializeDepartmentComboBoxItems();
+            InitializeDepartmentComboBoxItems();
+        }
+
+        private void InitializePositionComboBoxItems()
+        {
+            cmbFilterPosition.DataSource = PositionService.GetAllItemsForComboBox();
+            cmbFilterPosition.DisplayMember = "Name";
+            cmbFilterPosition.ValueMember = "ID";
+        }
+
+        private void InitializeCivilStatusComboBoxItems()
+        {
+            cmbFilterCivilStatus.DataSource = CivilStatusService.GetAllItemsForComboBox();
+            cmbFilterCivilStatus.DisplayMember = "Name";
+            cmbFilterCivilStatus.ValueMember = "ID";
+        }
+
+        private void InitializeEmploymentStatusComboBoxItems()
+        {
+            cmbFilterEmploymentStatus.DataSource = EmploymentStatusService.GetAllItemsForComboBox();
+            cmbFilterEmploymentStatus.DisplayMember = "Name";
+            cmbFilterEmploymentStatus.ValueMember = "ID";
+        }
+
+        private void InitializeDepartmentComboBoxItems()
+        {
+            cmbFilterDepartment.DataSource = DepartmentService.GetAllItemsForComboBox();
+            cmbFilterDepartment.DisplayMember = "Name";
+            cmbFilterDepartment.ValueMember = "ID";
         }
 
         private void InitializePreferences()
@@ -24,6 +58,7 @@ namespace LBPRDC.Source.Views.Employee
             chkCivilStatus.Checked = preference.ShowCivilStatus;
             chkEmploymentStatus.Checked = preference.ShowEmploymentStatus;
             chkDepartment.Checked = preference.ShowDepartment;
+            chkSection.Checked = preference.ShowSection;
             chkEmailAddress.Checked = preference.ShowEmailAddress;
             chkContactNumber.Checked = preference.ShowContactNumber;
             chkPosition.Checked = preference.ShowPosition;
@@ -69,6 +104,7 @@ namespace LBPRDC.Source.Views.Employee
             preference.ShowCivilStatus = chkCivilStatus.Checked;
             preference.ShowEmploymentStatus = chkEmploymentStatus.Checked;
             preference.ShowDepartment = chkDepartment.Checked;
+            preference.ShowSection = chkSection.Checked;
             preference.ShowEmailAddress = chkEmailAddress.Checked;
             preference.ShowContactNumber = chkContactNumber.Checked;
             preference.ShowPosition = chkPosition.Checked;
@@ -146,6 +182,11 @@ namespace LBPRDC.Source.Views.Employee
         private void chkFilterEmploymentStatus_CheckedChanged(object sender, EventArgs e)
         {
             cmbFilterEmploymentStatus.Enabled = chkFilterEmploymentStatus.Checked;
+        }
+
+        private void chkFilterSection_CheckedChanged(object sender, EventArgs e)
+        {
+            cmbFilterSection.Enabled = chkFilterSection.Checked;
         }
     }
 }

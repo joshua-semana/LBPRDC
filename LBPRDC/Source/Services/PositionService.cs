@@ -1,4 +1,5 @@
 ﻿using System.Data.SqlClient;
+using static LBPRDC.Source.Services.CivilStatusService;
 
 namespace LBPRDC.Source.Services
 {
@@ -11,28 +12,17 @@ namespace LBPRDC.Source.Services
             public string? Name { get; set; }
             public decimal SalaryRate { get; set; }
             public decimal BillingRate { get; set; }
+            public string? Description { get; set; }
+            public string? Status { get; set; }
         }
 
-        public class PositionItems : Position
+        public static List<Position> GetAllItems()
         {
-            public string DisplayText => $"{Code} - {Name}";
-        }
-
-        public static List<PositionItems> GetPositionItems()
-        {
-            List<PositionItems> items = new();
+            List<Position> items = new();
 
             try
             {
-                PositionItems blankItem = new()
-                {
-                    ID = 0,
-                    Code = "(Choose Position)",
-                    Name = ""
-                };
-                items.Add(blankItem);
-
-                string query = "SELECT ID, Code, Name FROM Position";
+                string query = "SELECT * FROM Position";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
@@ -40,11 +30,15 @@ namespace LBPRDC.Source.Services
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        PositionItems item = new()
+                        Position item = new()
                         {
                             ID = Convert.ToInt32(reader["ID"]),
                             Code = reader["Code"].ToString(),
-                            Name = reader["Name"].ToString()
+                            Name = reader["Name"].ToString(),
+                            SalaryRate = Convert.ToDecimal(reader["SalaryRate"]),
+                            BillingRate = Convert.ToDecimal(reader["BillingRate"]),
+                            Description = reader["Description"].ToString(),
+                            Status = reader["Status"].ToString()
                         };
 
                         items.Add(item);
@@ -56,32 +50,35 @@ namespace LBPRDC.Source.Services
             return items;
         }
 
-        public static List<Position> GetPositionDetailsByID(int id)
+        public static List<Position> GetAllItemsForComboBox()
         {
             List<Position> items = new();
 
             try
             {
-                string query = "SELECT * FROM Position WHERE ID = @ID";
+                Position blankItem = new()
+                {
+                    ID = 0,
+                    Name = "(Choose Position)"
+                };
+
+                items.Add(blankItem);
+
+                string query = "SELECT ID, Name FROM Position WHERE Status = 'Active'";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
-                    command.Parameters.AddWithValue("@ID", id);
                     connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
                     {
-                        if (reader.Read())
+                        Position item = new()
                         {
-                            Position item = new()
-                            {
-                                Code = reader["Code"].ToString(),
-                                Name = reader["Name"].ToString(),
-                                SalaryRate = Convert.ToDecimal(reader["SalaryRate"]),
-                                BillingRate = Convert.ToDecimal(reader["BillingRate"])
-                            };
+                            ID = Convert.ToInt32(reader["ID"]),
+                            Name = reader["Name"].ToString()
+                        };
 
-                            items.Add(item);
-                        }
+                        items.Add(item);
                     }
                 }
             }

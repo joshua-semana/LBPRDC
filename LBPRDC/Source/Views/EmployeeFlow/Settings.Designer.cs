@@ -34,6 +34,8 @@
             flowLayoutPanel2 = new FlowLayoutPanel();
             chkFilterDepartment = new CheckBox();
             cmbFilterDepartment = new ComboBox();
+            chkFilterSection = new CheckBox();
+            cmbFilterSection = new ComboBox();
             chkFilterPosition = new CheckBox();
             cmbFilterPosition = new ComboBox();
             chkFilterCivilStatus = new CheckBox();
@@ -57,6 +59,7 @@
             chkEducation = new CheckBox();
             chkCivilStatus = new CheckBox();
             chkDepartment = new CheckBox();
+            chkSection = new CheckBox();
             chkEmailAddress = new CheckBox();
             flowRadioGroupForEmail = new FlowLayoutPanel();
             rdbEmail1 = new RadioButton();
@@ -121,7 +124,7 @@
             label2.Location = new Point(8, 8);
             label2.Margin = new Padding(0);
             label2.Name = "label2";
-            label2.Size = new Size(344, 21);
+            label2.Size = new Size(327, 21);
             label2.TabIndex = 1;
             label2.Text = "Options:";
             // 
@@ -129,6 +132,8 @@
             // 
             flowLayoutPanel2.Controls.Add(chkFilterDepartment);
             flowLayoutPanel2.Controls.Add(cmbFilterDepartment);
+            flowLayoutPanel2.Controls.Add(chkFilterSection);
+            flowLayoutPanel2.Controls.Add(cmbFilterSection);
             flowLayoutPanel2.Controls.Add(chkFilterPosition);
             flowLayoutPanel2.Controls.Add(cmbFilterPosition);
             flowLayoutPanel2.Controls.Add(chkFilterCivilStatus);
@@ -141,7 +146,7 @@
             flowLayoutPanel2.Location = new Point(11, 29);
             flowLayoutPanel2.Name = "flowLayoutPanel2";
             flowLayoutPanel2.Padding = new Padding(0, 8, 0, 0);
-            flowLayoutPanel2.Size = new Size(338, 333);
+            flowLayoutPanel2.Size = new Size(321, 382);
             flowLayoutPanel2.TabIndex = 0;
             // 
             // chkFilterDepartment
@@ -164,13 +169,36 @@
             cmbFilterDepartment.Location = new Point(3, 36);
             cmbFilterDepartment.Margin = new Padding(3, 0, 0, 8);
             cmbFilterDepartment.Name = "cmbFilterDepartment";
-            cmbFilterDepartment.Size = new Size(332, 26);
+            cmbFilterDepartment.Size = new Size(315, 26);
             cmbFilterDepartment.TabIndex = 1;
+            // 
+            // chkFilterSection
+            // 
+            chkFilterSection.AutoSize = true;
+            chkFilterSection.Location = new Point(3, 73);
+            chkFilterSection.Name = "chkFilterSection";
+            chkFilterSection.Size = new Size(80, 22);
+            chkFilterSection.TabIndex = 34;
+            chkFilterSection.Tag = "cmbFilterSection";
+            chkFilterSection.Text = "Section";
+            chkFilterSection.UseVisualStyleBackColor = true;
+            chkFilterSection.CheckedChanged += chkFilterSection_CheckedChanged;
+            // 
+            // cmbFilterSection
+            // 
+            cmbFilterSection.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbFilterSection.Enabled = false;
+            cmbFilterSection.FormattingEnabled = true;
+            cmbFilterSection.Location = new Point(3, 98);
+            cmbFilterSection.Margin = new Padding(3, 0, 0, 8);
+            cmbFilterSection.Name = "cmbFilterSection";
+            cmbFilterSection.Size = new Size(315, 26);
+            cmbFilterSection.TabIndex = 33;
             // 
             // chkFilterPosition
             // 
             chkFilterPosition.AutoSize = true;
-            chkFilterPosition.Location = new Point(3, 73);
+            chkFilterPosition.Location = new Point(3, 135);
             chkFilterPosition.Name = "chkFilterPosition";
             chkFilterPosition.Size = new Size(84, 22);
             chkFilterPosition.TabIndex = 26;
@@ -184,16 +212,16 @@
             cmbFilterPosition.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbFilterPosition.Enabled = false;
             cmbFilterPosition.FormattingEnabled = true;
-            cmbFilterPosition.Location = new Point(3, 98);
+            cmbFilterPosition.Location = new Point(3, 160);
             cmbFilterPosition.Margin = new Padding(3, 0, 0, 8);
             cmbFilterPosition.Name = "cmbFilterPosition";
-            cmbFilterPosition.Size = new Size(332, 26);
+            cmbFilterPosition.Size = new Size(315, 26);
             cmbFilterPosition.TabIndex = 25;
             // 
             // chkFilterCivilStatus
             // 
             chkFilterCivilStatus.AutoSize = true;
-            chkFilterCivilStatus.Location = new Point(3, 135);
+            chkFilterCivilStatus.Location = new Point(3, 197);
             chkFilterCivilStatus.Name = "chkFilterCivilStatus";
             chkFilterCivilStatus.Size = new Size(105, 22);
             chkFilterCivilStatus.TabIndex = 28;
@@ -207,16 +235,16 @@
             cmbFilterCivilStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbFilterCivilStatus.Enabled = false;
             cmbFilterCivilStatus.FormattingEnabled = true;
-            cmbFilterCivilStatus.Location = new Point(3, 160);
+            cmbFilterCivilStatus.Location = new Point(3, 222);
             cmbFilterCivilStatus.Margin = new Padding(3, 0, 0, 8);
             cmbFilterCivilStatus.Name = "cmbFilterCivilStatus";
-            cmbFilterCivilStatus.Size = new Size(332, 26);
+            cmbFilterCivilStatus.Size = new Size(315, 26);
             cmbFilterCivilStatus.TabIndex = 27;
             // 
             // chkFilterGender
             // 
             chkFilterGender.AutoSize = true;
-            chkFilterGender.Location = new Point(3, 197);
+            chkFilterGender.Location = new Point(3, 259);
             chkFilterGender.Name = "chkFilterGender";
             chkFilterGender.Size = new Size(79, 22);
             chkFilterGender.TabIndex = 30;
@@ -230,16 +258,17 @@
             cmbFilterGender.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbFilterGender.Enabled = false;
             cmbFilterGender.FormattingEnabled = true;
-            cmbFilterGender.Location = new Point(3, 222);
+            cmbFilterGender.Items.AddRange(new object[] { "(Choose Gender)", "MALE", "FEMALE" });
+            cmbFilterGender.Location = new Point(3, 284);
             cmbFilterGender.Margin = new Padding(3, 0, 0, 8);
             cmbFilterGender.Name = "cmbFilterGender";
-            cmbFilterGender.Size = new Size(332, 26);
+            cmbFilterGender.Size = new Size(315, 26);
             cmbFilterGender.TabIndex = 29;
             // 
             // chkFilterEmploymentStatus
             // 
             chkFilterEmploymentStatus.AutoSize = true;
-            chkFilterEmploymentStatus.Location = new Point(3, 259);
+            chkFilterEmploymentStatus.Location = new Point(3, 321);
             chkFilterEmploymentStatus.Name = "chkFilterEmploymentStatus";
             chkFilterEmploymentStatus.Size = new Size(161, 22);
             chkFilterEmploymentStatus.TabIndex = 32;
@@ -253,10 +282,10 @@
             cmbFilterEmploymentStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbFilterEmploymentStatus.Enabled = false;
             cmbFilterEmploymentStatus.FormattingEnabled = true;
-            cmbFilterEmploymentStatus.Location = new Point(3, 284);
+            cmbFilterEmploymentStatus.Location = new Point(3, 346);
             cmbFilterEmploymentStatus.Margin = new Padding(3, 0, 0, 8);
             cmbFilterEmploymentStatus.Name = "cmbFilterEmploymentStatus";
-            cmbFilterEmploymentStatus.Size = new Size(332, 26);
+            cmbFilterEmploymentStatus.Size = new Size(315, 26);
             cmbFilterEmploymentStatus.TabIndex = 31;
             // 
             // tabTableSettings
@@ -284,6 +313,7 @@
             flowLayoutPanel1.Controls.Add(chkEducation);
             flowLayoutPanel1.Controls.Add(chkCivilStatus);
             flowLayoutPanel1.Controls.Add(chkDepartment);
+            flowLayoutPanel1.Controls.Add(chkSection);
             flowLayoutPanel1.Controls.Add(chkEmailAddress);
             flowLayoutPanel1.Controls.Add(flowRadioGroupForEmail);
             flowLayoutPanel1.Controls.Add(chkContactNumber);
@@ -297,7 +327,7 @@
             flowLayoutPanel1.Location = new Point(11, 29);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Padding = new Padding(0, 8, 0, 0);
-            flowLayoutPanel1.Size = new Size(321, 715);
+            flowLayoutPanel1.Size = new Size(321, 739);
             flowLayoutPanel1.TabIndex = 1;
             // 
             // chkEmployeeID
@@ -447,10 +477,20 @@
             chkDepartment.Text = "Department";
             chkDepartment.UseVisualStyleBackColor = true;
             // 
+            // chkSection
+            // 
+            chkSection.AutoSize = true;
+            chkSection.Location = new Point(3, 347);
+            chkSection.Name = "chkSection";
+            chkSection.Size = new Size(80, 22);
+            chkSection.TabIndex = 30;
+            chkSection.Text = "Section";
+            chkSection.UseVisualStyleBackColor = true;
+            // 
             // chkEmailAddress
             // 
             chkEmailAddress.AutoSize = true;
-            chkEmailAddress.Location = new Point(3, 347);
+            chkEmailAddress.Location = new Point(3, 375);
             chkEmailAddress.Name = "chkEmailAddress";
             chkEmailAddress.Size = new Size(128, 22);
             chkEmailAddress.TabIndex = 5;
@@ -463,7 +503,7 @@
             // 
             flowRadioGroupForEmail.Controls.Add(rdbEmail1);
             flowRadioGroupForEmail.Controls.Add(rdbEmail2);
-            flowRadioGroupForEmail.Location = new Point(19, 372);
+            flowRadioGroupForEmail.Location = new Point(19, 400);
             flowRadioGroupForEmail.Margin = new Padding(19, 0, 0, 0);
             flowRadioGroupForEmail.Name = "flowRadioGroupForEmail";
             flowRadioGroupForEmail.Size = new Size(200, 56);
@@ -496,7 +536,7 @@
             // chkContactNumber
             // 
             chkContactNumber.AutoSize = true;
-            chkContactNumber.Location = new Point(3, 431);
+            chkContactNumber.Location = new Point(3, 459);
             chkContactNumber.Name = "chkContactNumber";
             chkContactNumber.Size = new Size(137, 22);
             chkContactNumber.TabIndex = 6;
@@ -510,7 +550,7 @@
             flowRadioGroupForContact.Controls.Add(rdbContact1);
             flowRadioGroupForContact.Controls.Add(rdbContact2);
             flowRadioGroupForContact.FlowDirection = FlowDirection.TopDown;
-            flowRadioGroupForContact.Location = new Point(19, 456);
+            flowRadioGroupForContact.Location = new Point(19, 484);
             flowRadioGroupForContact.Margin = new Padding(19, 0, 0, 0);
             flowRadioGroupForContact.Name = "flowRadioGroupForContact";
             flowRadioGroupForContact.Size = new Size(200, 56);
@@ -543,7 +583,7 @@
             // chkPosition
             // 
             chkPosition.AutoSize = true;
-            chkPosition.Location = new Point(3, 515);
+            chkPosition.Location = new Point(3, 543);
             chkPosition.Name = "chkPosition";
             chkPosition.Size = new Size(84, 22);
             chkPosition.TabIndex = 17;
@@ -558,7 +598,7 @@
             flowRadioGroupForPosition.Controls.Add(rdbPosition2);
             flowRadioGroupForPosition.Controls.Add(rdbPosition3);
             flowRadioGroupForPosition.FlowDirection = FlowDirection.TopDown;
-            flowRadioGroupForPosition.Location = new Point(19, 540);
+            flowRadioGroupForPosition.Location = new Point(19, 568);
             flowRadioGroupForPosition.Margin = new Padding(19, 0, 0, 0);
             flowRadioGroupForPosition.Name = "flowRadioGroupForPosition";
             flowRadioGroupForPosition.Size = new Size(200, 84);
@@ -603,7 +643,7 @@
             // chkSalaryRate
             // 
             chkSalaryRate.AutoSize = true;
-            chkSalaryRate.Location = new Point(3, 627);
+            chkSalaryRate.Location = new Point(3, 655);
             chkSalaryRate.Name = "chkSalaryRate";
             chkSalaryRate.Size = new Size(108, 22);
             chkSalaryRate.TabIndex = 28;
@@ -613,7 +653,7 @@
             // chkBillingRate
             // 
             chkBillingRate.AutoSize = true;
-            chkBillingRate.Location = new Point(3, 655);
+            chkBillingRate.Location = new Point(3, 683);
             chkBillingRate.Name = "chkBillingRate";
             chkBillingRate.Size = new Size(102, 22);
             chkBillingRate.TabIndex = 29;
@@ -623,7 +663,7 @@
             // chkEmploymentStatus
             // 
             chkEmploymentStatus.AutoSize = true;
-            chkEmploymentStatus.Location = new Point(3, 683);
+            chkEmploymentStatus.Location = new Point(3, 711);
             chkEmploymentStatus.Name = "chkEmploymentStatus";
             chkEmploymentStatus.Size = new Size(161, 22);
             chkEmploymentStatus.TabIndex = 22;
@@ -767,5 +807,8 @@
         private Label label5;
         private Label label6;
         private Label label7;
+        private CheckBox chkSection;
+        private CheckBox chkFilterSection;
+        private ComboBox cmbFilterSection;
     }
 }
