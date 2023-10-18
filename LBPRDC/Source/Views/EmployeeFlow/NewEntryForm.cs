@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace LBPRDC.Source.Views
 {
@@ -29,7 +30,8 @@ namespace LBPRDC.Source.Views
                 cmbCivilStatus,
                 txtEmployeeID,
                 cmbPosition,
-                cmbEmploymentStatus
+                cmbEmploymentStatus,
+                cmbDepartment
             };
         }
 
@@ -40,35 +42,51 @@ namespace LBPRDC.Source.Views
             InitializeEmploymentStatusComboBoxItems();
             InitializeSuffixComboBoxItems();
             InitializeGenderComboBoxItems();
+            InitializeDepartmentComboBoxItems();
+            //InitializeSectionComboBoxItems();
         }
 
         private void InitializePositionComboBoxItems()
         {
-            cmbPosition.DataSource = PositionService.GetPositionItems();
-            cmbPosition.DisplayMember = "DisplayText";
+            cmbPosition.DataSource = PositionService.GetAllItemsForComboBox();
+            cmbPosition.DisplayMember = "Name";
             cmbPosition.ValueMember = "ID";
         }
 
         private void InitializeCivilStatusComboBoxItems()
         {
-            cmbCivilStatus.DataSource = CivilStatusService.GetCivilStatusItems();
-            cmbCivilStatus.DisplayMember = "Status";
+            cmbCivilStatus.DataSource = CivilStatusService.GetAllItemsForComboBox();
+            cmbCivilStatus.DisplayMember = "Name";
             cmbCivilStatus.ValueMember = "ID";
         }
 
         private void InitializeEmploymentStatusComboBoxItems()
         {
-            cmbEmploymentStatus.DataSource = EmploymentStatusService.GetEmploymentStatusItems();
-            cmbEmploymentStatus.DisplayMember = "Status";
+            cmbEmploymentStatus.DataSource = EmploymentStatusService.GetAllItemsForComboBox();
+            cmbEmploymentStatus.DisplayMember = "Name";
             cmbEmploymentStatus.ValueMember = "ID";
         }
 
         private void InitializeSuffixComboBoxItems()
         {
-            cmbSuffix.DataSource = SuffixService.GetSuffixItems();
+            cmbSuffix.DataSource = SuffixService.GetAllItemsForComboBox();
             cmbSuffix.DisplayMember = "Name";
             cmbSuffix.ValueMember = "ID";
         }
+
+        private void InitializeDepartmentComboBoxItems()
+        {
+            cmbDepartment.DataSource = DepartmentService.GetAllItemsForComboBox();
+            cmbDepartment.DisplayMember = "Name";
+            cmbDepartment.ValueMember = "ID";
+        }
+
+        //private void InitializeSectionComboBoxItems()
+        //{
+        //    cmbSection.DataSource = SectionService.GetAllItemsForComboBox();
+        //    cmbSection.DisplayMember = "Name";
+        //    cmbSection.ValueMember = "ID";
+        //}
 
         private void InitializeGenderComboBoxItems()
         {
@@ -135,22 +153,23 @@ namespace LBPRDC.Source.Views
                     LastName = txtLastName.Text.ToUpper(),
                     FirstName = txtFirstName.Text.ToUpper(),
                     MiddleName = txtMiddleName.Text.ToUpper(),
-                    SuffixID = cmbSuffix.SelectedIndex + 1,
+                    SuffixID = Convert.ToInt32(cmbSuffix.SelectedValue),
                     Gender = cmbGender.Text,
                     Birthday = dtpBirthday.Value,
                     Education = txtEducation.Text,
-                    Department = txtDepartment.Text,
+                    DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue),
+                    SectionID = Convert.ToInt32(cmbSection.SelectedValue),
                     EmailAddress1 = txtEmailAddress1.Text,
                     EmailAddress2 = txtEmailAddress2.Text,
                     ContactNumber1 = txtContactNumber1.Text,
                     ContactNumber2 = txtContactNumber2.Text,
-                    CivilStatusID = cmbCivilStatus.SelectedIndex,
-                    PositionID = cmbPosition.SelectedIndex,
-                    EmploymentStatusID = cmbEmploymentStatus.SelectedIndex,
+                    CivilStatusID = Convert.ToInt32(cmbCivilStatus.SelectedValue),
+                    PositionID = Convert.ToInt32(cmbPosition.SelectedValue),
+                    EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
+                    Remarks = txtRemarks.Text,
 
                     StartDate = dtpStartDate.Value,
                     PositionTitle = txtPositionTitle.Text,
-                    Remarks = txtRemarks.Text,
                     isPreviousEmployee = true,
                     PreviousFrom = dtpFromDate.Value,
                     PreviousTo = dtpToDate.Value,
@@ -193,10 +212,19 @@ namespace LBPRDC.Source.Views
             {
                 requiredFields.Add(txtPreviousPosition);
             }
-            else if(requiredFields.Contains(txtPreviousPosition))
+            else if (requiredFields.Contains(txtPreviousPosition))
             {
                 requiredFields.Remove(txtPreviousPosition);
             }
+        }
+
+        private void cmbDepartment_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var sections = SectionService.GetAllItemsForComboBox(cmbDepartment.SelectedIndex);
+
+            cmbSection.DataSource = sections;
+            cmbSection.DisplayMember = "Name";
+            cmbSection.ValueMember = "ID";
         }
     }
 }

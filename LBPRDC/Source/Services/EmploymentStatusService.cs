@@ -10,78 +10,80 @@ namespace LBPRDC.Source.Services
 {
     internal class EmploymentStatusService
     {
-        public class EmploymentStatusItems
+        public class EmploymentStatus
         {
             public int ID { get; set; }
+            public string? Name { get; set; }
+            public string? Description { get; set; }
             public string? Status { get; set; }
         }
 
-        public static List<EmploymentStatusItems> GetEmploymentStatusItems()
+        public static List<EmploymentStatus> GetAllItems()
         {
-            List<EmploymentStatusItems> items = new();
+            List<EmploymentStatus> items = new();
 
             try
             {
-                EmploymentStatusItems blankItem = new()
-                {
-                    ID = 0,
-                    Status = "(Choose Status)"
-                };
-                items.Add(blankItem);
-
-                string query = "SELECT ID, Status FROM EmploymentStatus";
+                string query = "SELECT * FROM EmploymentStatus";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new SqlCommand(query, connection))
+                using (SqlCommand command = new(query, connection))
                 {
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        EmploymentStatusItems item = new()
+                        EmploymentStatus item = new()
                         {
                             ID = Convert.ToInt32(reader["ID"]),
+                            Name = reader["Name"].ToString(),
+                            Description = reader["Description"].ToString(),
                             Status = reader["Status"].ToString()
                         };
 
                         items.Add(item);
                     }
                 }
-            } 
-            catch (Exception ex)
-            {
-                ExceptionHandler.HandleException(ex);
             }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
         }
 
-        public static string? GetStatusByID(int id)
+        public static List<EmploymentStatus> GetAllItemsForComboBox()
         {
-            string result = string.Empty;
+            List<EmploymentStatus> items = new();
 
             try
             {
-                string query = "SELECT Status FROM EmploymentStatus WHERE ID = @ID";
+                EmploymentStatus blankItem = new()
+                {
+                    ID = 0,
+                    Name = "(Choose Status)"
+                };
+
+                items.Add(blankItem);
+
+                string query = "SELECT ID, Name FROM EmploymentStatus WHERE Status = 'Active'";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
-                    command.Parameters.AddWithValue("@ID", id);
                     connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
                     {
-                        if (reader.Read())
+                        EmploymentStatus item = new()
                         {
-                            result = reader["Status"].ToString();
-                        }
+                            ID = Convert.ToInt32(reader["ID"]),
+                            Name = reader["Name"].ToString()
+                        };
+
+                        items.Add(item);
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                ExceptionHandler.HandleException(ex);
-            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
-            return result;
+            return items;
         }
 
         public class NewHistory

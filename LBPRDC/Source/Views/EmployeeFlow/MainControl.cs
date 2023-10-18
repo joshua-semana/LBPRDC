@@ -98,9 +98,10 @@ namespace LBPRDC.Source.Views
             if (preference.ShowBirthday) { AddColumn("Birthday", "Birthday", "Birthday"); }
             if (preference.ShowEducation) { AddColumn("Education", "Education", "Education"); }
             if (preference.ShowCivilStatus) { AddColumn("CivilStatus", "Civil Status", "CivilStatus"); }
-            if (preference.ShowDepartment) { AddColumn("Department", "Department", "Department"); }
             if (preference.ShowEmailAddress) { AddColumn("EmailAddress", "Email Address", "EmailAddress"); }
             if (preference.ShowContactNumber) { AddColumn("ContactNumber", "Contact Number", "ContactNumber"); }
+            if (preference.ShowDepartment) { AddColumn("Department", "Department", "Department"); }
+            if (preference.ShowSection) { AddColumn("Section", "Section", "Section"); }
             if (preference.ShowPosition) { AddColumn("Position", "Position", "Position"); }
             if (preference.ShowSalaryRate) { AddColumn("SalaryRate", "Salary Rate", "SalaryRate"); }
             if (preference.ShowBillingRate) { AddColumn("BillingRate", "Billing Rate", "BillingRate"); }

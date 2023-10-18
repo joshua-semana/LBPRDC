@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,7 +18,8 @@ namespace LBPRDC.Source.Services
         public string? Gender { get; set; }
         public DateTime? Birthday { get; set; }
         public string? Education { get; set; }
-        public string? Department { get; set; }
+        public int DepartmentID { get; set; }
+        public int SectionID { get; set; }
         public string? EmailAddress1 { get; set; }
         public string? EmailAddress2 { get; set; }
         public string? ContactNumber1 { get; set; }
@@ -26,6 +28,8 @@ namespace LBPRDC.Source.Services
         public int PositionID { get; set; }
         public int EmploymentStatusID { get; set; }
         public int SuffixID { get; set; }
+        public string? Remarks { get; set; }
+
         public string? FullName { get; set; }
         public string? EmailAddress { get; set; }
         public string? ContactNumber { get; set; }
@@ -37,13 +41,14 @@ namespace LBPRDC.Source.Services
         public string? Suffix { get; set; }
         public decimal SalaryRate { get; set; }
         public decimal BillingRate { get; set; }
+        public string? Department { get; set; }
+        public string? Section { get; set; }
     }
 
     public class NewEmployee : Employee
     {
         public DateTime StartDate { get; set; }
         public string? PositionTitle { get; set; }
-        public string? Remarks { get; set; }
         public bool? isPreviousEmployee { get; set; }
         public string? PreviousPosition { get; set; }
         public DateTime PreviousFrom { get; set; }
@@ -79,7 +84,8 @@ namespace LBPRDC.Source.Services
                                 Gender = reader["Gender"].ToString(),
                                 Birthday = reader["Birthday"] as DateTime?,
                                 Education = reader["Education"].ToString(),
-                                Department = reader["Department"].ToString(),
+                                DepartmentID = Convert.ToInt32(reader["DepartmentID"]),
+                                SectionID = Convert.ToInt32(reader["SectionID"]),
                                 EmailAddress1 = reader["EmailAddress1"].ToString(),
                                 EmailAddress2 = reader["EmailAddress2"].ToString(),
                                 ContactNumber1 = reader["ContactNumber1"].ToString(),
@@ -88,23 +94,27 @@ namespace LBPRDC.Source.Services
                                 PositionID = Convert.ToInt32(reader["PositionID"]),
                                 EmploymentStatusID = Convert.ToInt32(reader["EmploymentStatusID"]),
                                 SuffixID = Convert.ToInt32(reader["SuffixID"]),
+                                Remarks = reader["Remarks"].ToString()
                             };
 
-                            emp.CivilStatus = CivilStatusService.GetStatusByID(emp.CivilStatusID);
-                            emp.EmploymentStatus = EmploymentStatusService.GetStatusByID(emp.EmploymentStatusID);
-                            emp.Suffix = SuffixService.GetSuffixByID(emp.SuffixID);
-                            emp.PositionName = PositionService.GetPositionDetailsByID(emp.PositionID).Select(s => s.Name).FirstOrDefault()?.ToString();
-                            emp.PositionCode = PositionService.GetPositionDetailsByID(emp.PositionID).Select(s => s.Code).FirstOrDefault()?.ToString();
-                            emp.BillingRate = Convert.ToDecimal(PositionService.GetPositionDetailsByID(emp.PositionID).Select(s => s.BillingRate).FirstOrDefault());
-                            emp.SalaryRate = Convert.ToDecimal(PositionService.GetPositionDetailsByID(emp.PositionID).Select(s => s.SalaryRate).FirstOrDefault());
+                            emp.CivilStatus = CivilStatusService.GetAllItems().Where(w => w.ID == emp.CivilStatusID).Select(s => s.Name).FirstOrDefault()?.ToString();
+                            emp.EmploymentStatus = EmploymentStatusService.GetAllItems().Where(w => w.ID == emp.EmploymentStatusID).Select(s => s.Name).FirstOrDefault()?.ToString();
+                            emp.Suffix = SuffixService.GetAllItems().Where(w => w.ID == emp.SuffixID).Select(s => s.Name).FirstOrDefault()?.ToString();
+                            emp.PositionName = PositionService.GetAllItems().Where(w => w.ID == emp.PositionID).Select(s => s.Name).FirstOrDefault()?.ToString();
+                            emp.PositionCode = PositionService.GetAllItems().Where(w => w.ID == emp.PositionID).Select(s => s.Code).FirstOrDefault()?.ToString();
+                            emp.BillingRate = Convert.ToDecimal(PositionService.GetAllItems().Where(w => w.ID == emp.PositionID).Select(s => s.BillingRate).FirstOrDefault());
+                            emp.SalaryRate = Convert.ToDecimal(PositionService.GetAllItems().Where(w => w.ID == emp.PositionID).Select(s => s.SalaryRate).FirstOrDefault());
+                            emp.Department = DepartmentService.GetAllItems().Where(w => w.ID == emp.SuffixID).Select(s => s.Name).FirstOrDefault()?.ToString();
+                            emp.Section = SectionService.GetAllItems().Where(w => w.ID == emp.SuffixID).Select(s => s.Name).FirstOrDefault()?.ToString();
 
                             if (preference.ShowName)
                             {
                                 string middleInitial = string.IsNullOrWhiteSpace(emp.MiddleName) ? "" : $"{emp.MiddleName[0]}.";
+                                string suffix = emp.Suffix == "None" ? "" : emp.Suffix;
                                 emp.FullName = preference.SelectedNameFormat switch
                                 {
-                                    NameFormat.Full1 => $"{emp.FirstName} {middleInitial} {emp.LastName} {emp.Suffix}".Trim(),
-                                    NameFormat.Full2 => $"{emp.LastName}, {emp.FirstName} {middleInitial} {emp.Suffix}".Trim(),
+                                    NameFormat.Full1 => $"{emp.FirstName} {middleInitial} {emp.LastName} {suffix}".Trim(),
+                                    NameFormat.Full2 => $"{emp.LastName}, {emp.FirstName} {middleInitial} {suffix}".Trim(),
                                     NameFormat.FirstAndLastOnly => $"{emp.FirstName} {emp.LastName}".Trim(),
                                     _ => "Error"
                                 };
@@ -132,7 +142,7 @@ namespace LBPRDC.Source.Services
                                 };
                             }
 
-                            if (preference.ShowPosition )
+                            if (preference.ShowPosition)
                             {
                                 emp.Position = preference.SelectedPositionFormat switch
                                 {
@@ -148,10 +158,7 @@ namespace LBPRDC.Source.Services
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                ExceptionHandler.HandleException(ex);
-            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return employees;
         }
@@ -170,18 +177,15 @@ namespace LBPRDC.Source.Services
                     return count > 0;
                 }
             }
-            catch (Exception ex)
-            {
-                return ExceptionHandler.HandleException(ex);
-            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
         public static async Task<bool> AddNewEmployee(NewEmployee employee)
         {
             try
             {
-                string query = "INSERT INTO Employee (EmployeeID, LastName, FirstName, MiddleName, SuffixID, Gender, Birthday, Education, Department, EmailAddress1, EmailAddress2, ContactNumber1, ContactNumber2, CivilStatusID, PositionID, EmploymentStatusID) " +
-                    "VALUES (@EmployeeID, @LastName, @FirstName, @MiddleName, @SuffixID, @Gender, @Birthday, @Education, @Department, @EmailAddress1, @EmailAddress2, @ContactNumber1, @ContactNumber2, @CivilStatusID, @PositionID, @EmploymentStatusID)";
+                string query = "INSERT INTO Employee (EmployeeID, LastName, FirstName, MiddleName, SuffixID, Gender, Birthday, Education, DepartmentID, SectionID, EmailAddress1, EmailAddress2, ContactNumber1, ContactNumber2, CivilStatusID, PositionID, EmploymentStatusID, Remarks) " +
+                               "VALUES (@EmployeeID, @LastName, @FirstName, @MiddleName, @SuffixID, @Gender, @Birthday, @Education, @DepartmentID, @SectionID, @EmailAddress1, @EmailAddress2, @ContactNumber1, @ContactNumber2, @CivilStatusID, @PositionID, @EmploymentStatusID, @Remarks)";
 
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
@@ -194,7 +198,8 @@ namespace LBPRDC.Source.Services
                     command.Parameters.AddWithValue("@Gender", employee.Gender);
                     command.Parameters.AddWithValue("@Birthday", employee.Birthday);
                     command.Parameters.AddWithValue("@Education", employee.Education);
-                    command.Parameters.AddWithValue("@Department", employee.Department);
+                    command.Parameters.AddWithValue("@DepartmentID", employee.DepartmentID);
+                    command.Parameters.AddWithValue("@SectionID", employee.SectionID);
                     command.Parameters.AddWithValue("@EmailAddress1", employee.EmailAddress1);
                     command.Parameters.AddWithValue("@EmailAddress2", employee.EmailAddress2);
                     command.Parameters.AddWithValue("@ContactNumber1", employee.ContactNumber1);
@@ -202,6 +207,7 @@ namespace LBPRDC.Source.Services
                     command.Parameters.AddWithValue("@CivilStatusID", employee.CivilStatusID);
                     command.Parameters.AddWithValue("@PositionID", employee.PositionID);
                     command.Parameters.AddWithValue("@EmploymentStatusID", employee.EmploymentStatusID);
+                    command.Parameters.AddWithValue("@Remarks", employee.Remarks);
 
                     connection.Open();
                     await command.ExecuteNonQueryAsync();
@@ -213,7 +219,7 @@ namespace LBPRDC.Source.Services
                     PositionID = employee.PositionID,
                     PositionTitle = employee.PositionTitle,
                     Timestamp = employee.StartDate,
-                    Remarks = employee.Remarks,
+                    Remarks = "Position as newly added employee in the system."
                 };
 
                 PositionService.AddToHistory(newPosition);
@@ -261,17 +267,21 @@ namespace LBPRDC.Source.Services
 
                 EmploymentStatusService.AddToHistory(newEmploymentStatus);
 
-                if (UserManager.Instance.CurrentUser != null)
+                if (UserService.CurrentUser != null)
                 {
-                    LoggingService.LogActivity(UserManager.Instance.CurrentUser.UserID, "Added New Employee", $"This user added new employee with ID: {employee.EmployeeID}");
+                    LoggingService.Log newLog = new()
+                    { 
+                        UserID = UserService.CurrentUser.UserID,
+                        Type = "Added New Employee",
+                        Details = $"This user added new employee with ID: {employee.EmployeeID}"
+                    };
+
+                    LoggingService.LogActivity(newLog);
                 }
 
                 return true;
             } 
-            catch (Exception ex)
-            {
-                return ExceptionHandler.HandleException(ex);
-            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
     }
 }

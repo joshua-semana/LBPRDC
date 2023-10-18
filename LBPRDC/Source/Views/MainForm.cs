@@ -30,12 +30,12 @@ namespace LBPRDC.Source.Views
             UpdatePageSwitchButtonsStyle();
             InitializeFeatureBasedOnUserRole();
             lblDateToday.Text = DateTime.Now.ToString("MMM. dd, yyyy (ddd)");
-            lblGreetUser.Text = "Hello, " + UserManager.Instance.CurrentUser?.FirstName;
+            lblGreetUser.Text = "Hello, " + UserService.CurrentUser?.FirstName;
         }
 
         private void InitializeFeatureBasedOnUserRole()
         {
-            string? userRole = UserManager.Instance.CurrentUser?.Role;
+            string? userRole = UserService.CurrentUser?.Role;
 
             if (userRole != "Admin")
             {
@@ -131,7 +131,7 @@ namespace LBPRDC.Source.Views
             DialogResult result = MessageBox.Show("Are you sure you want to sign out?", "Sign Out Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
-                UserManager.Instance.ClearCurrentUser();
+                UserService.ClearCurrentUser();
                 this.Hide();
                 frmLogin loginForm = new frmLogin();
                 loginForm.ShowDialog();

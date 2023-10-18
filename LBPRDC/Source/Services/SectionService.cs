@@ -1,29 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LBPRDC.Source.Services
 {
-    internal class SuffixService
+    internal class SectionService
     {
-        public class Suffix
+        public class Section
         {
-            public int ID { get; set; }
+            public int? ID { get; set; }
             public string? Name { get; set; }
+            public int DepartmentID { get; set; }
             public string? Description { get; set; }
             public string? Status { get; set; }
         }
 
-        public static List<Suffix> GetAllItems()
+        public static List<Section> GetAllItems()
         {
-            List<Suffix> items = new();
+            List<Section> items = new();
 
             try
             {
-                string query = "SELECT * FROM Suffix";
+                string query = "SELECT * FROM Sections";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
@@ -31,7 +28,7 @@ namespace LBPRDC.Source.Services
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        Suffix item = new()
+                        Section item = new()
                         {
                             ID = Convert.ToInt32(reader["ID"]),
                             Name = reader["Name"].ToString(),
@@ -48,21 +45,30 @@ namespace LBPRDC.Source.Services
             return items;
         }
 
-        public static List<Suffix> GetAllItemsForComboBox()
+        public static List<Section> GetAllItemsForComboBox(int ID)
         {
-            List<Suffix> items = new();
+            List<Section> items = new();
+
+            Section defaultItem = new()
+            {
+                ID = 1,
+                Name = "None"
+            };
+
+            items.Add(defaultItem);
 
             try
             {
-                string query = "SELECT ID, Name FROM Suffix WHERE Status = 'Active'";
+                string query = "SELECT ID, Name FROM Sections WHERE DepartmentID = @ID AND Status = 'Active'";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
+                    command.Parameters.AddWithValue("@ID", ID);
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        Suffix item = new()
+                        Section item = new()
                         {
                             ID = Convert.ToInt32(reader["ID"]),
                             Name = reader["Name"].ToString()

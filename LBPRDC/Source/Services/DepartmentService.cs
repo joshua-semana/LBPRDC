@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LBPRDC.Source.Services
 {
-    internal class SuffixService
+    internal class DepartmentService
     {
-        public class Suffix
+        public class Department
         {
             public int ID { get; set; }
             public string? Name { get; set; }
@@ -17,13 +13,13 @@ namespace LBPRDC.Source.Services
             public string? Status { get; set; }
         }
 
-        public static List<Suffix> GetAllItems()
+        public static List<Department> GetAllItems()
         {
-            List<Suffix> items = new();
+            List<Department> items = new();
 
             try
             {
-                string query = "SELECT * FROM Suffix";
+                string query = "SELECT * FROM Departments";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
@@ -31,7 +27,7 @@ namespace LBPRDC.Source.Services
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        Suffix item = new()
+                        Department item = new()
                         {
                             ID = Convert.ToInt32(reader["ID"]),
                             Name = reader["Name"].ToString(),
@@ -48,13 +44,13 @@ namespace LBPRDC.Source.Services
             return items;
         }
 
-        public static List<Suffix> GetAllItemsForComboBox()
+        public static List<Department> GetAllItemsForComboBox()
         {
-            List<Suffix> items = new();
+            List<Department> items = new();
 
             try
             {
-                string query = "SELECT ID, Name FROM Suffix WHERE Status = 'Active'";
+                string query = "SELECT ID, Name FROM Departments WHERE Status = 'Active'";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
@@ -62,7 +58,7 @@ namespace LBPRDC.Source.Services
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        Suffix item = new()
+                        Department item = new()
                         {
                             ID = Convert.ToInt32(reader["ID"]),
                             Name = reader["Name"].ToString()

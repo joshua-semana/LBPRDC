@@ -34,6 +34,9 @@
             btnCancel = new Button();
             pnlMain = new Panel();
             grpJobData = new GroupBox();
+            label20 = new Label();
+            cmbSection = new ComboBox();
+            cmbDepartment = new ComboBox();
             grpPreviousWork = new GroupBox();
             txtOtherInformation = new TextBox();
             label19 = new Label();
@@ -54,7 +57,6 @@
             cmbEmploymentStatus = new ComboBox();
             label11 = new Label();
             dtpStartDate = new DateTimePicker();
-            txtDepartment = new TextBox();
             cmbPosition = new ComboBox();
             label7 = new Label();
             label8 = new Label();
@@ -104,7 +106,7 @@
             flowControls.Controls.Add(btnCancel);
             flowControls.Dock = DockStyle.Bottom;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
-            flowControls.Location = new Point(0, 697);
+            flowControls.Location = new Point(0, 764);
             flowControls.Name = "flowControls";
             flowControls.Padding = new Padding(16, 16, 0, 16);
             flowControls.Size = new Size(860, 60);
@@ -136,6 +138,7 @@
             // 
             // pnlMain
             // 
+            pnlMain.AutoScroll = true;
             pnlMain.Controls.Add(grpJobData);
             pnlMain.Controls.Add(grpContactData);
             pnlMain.Controls.Add(grpPersonalData);
@@ -143,12 +146,15 @@
             pnlMain.Location = new Point(0, 1);
             pnlMain.Name = "pnlMain";
             pnlMain.Padding = new Padding(16);
-            pnlMain.Size = new Size(860, 696);
+            pnlMain.Size = new Size(860, 763);
             pnlMain.TabIndex = 2;
             // 
             // grpJobData
             // 
             grpJobData.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpJobData.Controls.Add(label20);
+            grpJobData.Controls.Add(cmbSection);
+            grpJobData.Controls.Add(cmbDepartment);
             grpJobData.Controls.Add(grpPreviousWork);
             grpJobData.Controls.Add(chkPreviousEmployee);
             grpJobData.Controls.Add(txtRemarks);
@@ -161,7 +167,6 @@
             grpJobData.Controls.Add(cmbEmploymentStatus);
             grpJobData.Controls.Add(label11);
             grpJobData.Controls.Add(dtpStartDate);
-            grpJobData.Controls.Add(txtDepartment);
             grpJobData.Controls.Add(cmbPosition);
             grpJobData.Controls.Add(label7);
             grpJobData.Controls.Add(label8);
@@ -169,10 +174,46 @@
             grpJobData.Margin = new Padding(0);
             grpJobData.Name = "grpJobData";
             grpJobData.Padding = new Padding(3, 8, 3, 3);
-            grpJobData.Size = new Size(827, 294);
+            grpJobData.Size = new Size(827, 359);
             grpJobData.TabIndex = 14;
             grpJobData.TabStop = false;
             grpJobData.Text = "Work Information";
+            // 
+            // label20
+            // 
+            label20.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label20.AutoSize = true;
+            label20.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label20.Location = new Point(615, 27);
+            label20.Margin = new Padding(3, 0, 3, 4);
+            label20.Name = "label20";
+            label20.Size = new Size(54, 16);
+            label20.TabIndex = 28;
+            label20.Text = "Section";
+            // 
+            // cmbSection
+            // 
+            cmbSection.AccessibleName = "Section";
+            cmbSection.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            cmbSection.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbSection.FormattingEnabled = true;
+            cmbSection.Location = new Point(619, 50);
+            cmbSection.Name = "cmbSection";
+            cmbSection.Size = new Size(197, 26);
+            cmbSection.TabIndex = 15;
+            // 
+            // cmbDepartment
+            // 
+            cmbDepartment.AccessibleName = "Department";
+            cmbDepartment.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            cmbDepartment.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbDepartment.FormattingEnabled = true;
+            cmbDepartment.Location = new Point(416, 50);
+            cmbDepartment.Margin = new Padding(3, 3, 3, 16);
+            cmbDepartment.Name = "cmbDepartment";
+            cmbDepartment.Size = new Size(197, 26);
+            cmbDepartment.TabIndex = 14;
+            cmbDepartment.SelectedIndexChanged += cmbDepartment_SelectedIndexChanged;
             // 
             // grpPreviousWork
             // 
@@ -186,7 +227,7 @@
             grpPreviousWork.Controls.Add(label16);
             grpPreviousWork.Enabled = false;
             grpPreviousWork.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            grpPreviousWork.Location = new Point(10, 188);
+            grpPreviousWork.Location = new Point(10, 253);
             grpPreviousWork.Margin = new Padding(0);
             grpPreviousWork.Name = "grpPreviousWork";
             grpPreviousWork.Padding = new Padding(3, 8, 3, 3);
@@ -204,7 +245,7 @@
             txtOtherInformation.MaxLength = 500;
             txtOtherInformation.Name = "txtOtherInformation";
             txtOtherInformation.Size = new Size(187, 23);
-            txtOtherInformation.TabIndex = 23;
+            txtOtherInformation.TabIndex = 24;
             // 
             // label19
             // 
@@ -240,7 +281,7 @@
             dtpToDate.Margin = new Padding(3, 3, 3, 16);
             dtpToDate.Name = "dtpToDate";
             dtpToDate.Size = new Size(197, 23);
-            dtpToDate.TabIndex = 22;
+            dtpToDate.TabIndex = 23;
             // 
             // label17
             // 
@@ -264,7 +305,7 @@
             dtpFromDate.Margin = new Padding(3, 3, 3, 16);
             dtpFromDate.Name = "dtpFromDate";
             dtpFromDate.Size = new Size(197, 23);
-            dtpFromDate.TabIndex = 21;
+            dtpFromDate.TabIndex = 22;
             // 
             // txtPreviousPosition
             // 
@@ -275,7 +316,7 @@
             txtPreviousPosition.MaxLength = 50;
             txtPreviousPosition.Name = "txtPreviousPosition";
             txtPreviousPosition.Size = new Size(187, 23);
-            txtPreviousPosition.TabIndex = 20;
+            txtPreviousPosition.TabIndex = 21;
             // 
             // label16
             // 
@@ -293,11 +334,11 @@
             // 
             chkPreviousEmployee.AutoSize = true;
             chkPreviousEmployee.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            chkPreviousEmployee.Location = new Point(10, 160);
+            chkPreviousEmployee.Location = new Point(10, 225);
             chkPreviousEmployee.Margin = new Padding(3, 3, 3, 8);
             chkPreviousEmployee.Name = "chkPreviousEmployee";
             chkPreviousEmployee.Size = new Size(317, 20);
-            chkPreviousEmployee.TabIndex = 19;
+            chkPreviousEmployee.TabIndex = 20;
             chkPreviousEmployee.Text = "This person is a previous employee of LBRDC";
             chkPreviousEmployee.UseVisualStyleBackColor = true;
             chkPreviousEmployee.CheckedChanged += chkPreviousEmployee_CheckedChanged;
@@ -306,19 +347,19 @@
             // 
             txtRemarks.AccessibleName = "Remarks";
             txtRemarks.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            txtRemarks.Location = new Point(619, 115);
+            txtRemarks.Location = new Point(10, 180);
             txtRemarks.Margin = new Padding(6, 3, 3, 16);
             txtRemarks.MaxLength = 500;
             txtRemarks.Name = "txtRemarks";
-            txtRemarks.Size = new Size(197, 26);
-            txtRemarks.TabIndex = 18;
+            txtRemarks.Size = new Size(806, 26);
+            txtRemarks.TabIndex = 19;
             // 
             // label15
             // 
             label15.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label15.AutoSize = true;
             label15.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label15.Location = new Point(615, 92);
+            label15.Location = new Point(6, 157);
             label15.Margin = new Padding(3, 0, 3, 4);
             label15.Name = "label15";
             label15.Size = new Size(63, 16);
@@ -376,7 +417,7 @@
             label12.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label12.AutoSize = true;
             label12.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label12.Location = new Point(615, 27);
+            label12.Location = new Point(615, 92);
             label12.Margin = new Padding(3, 0, 3, 4);
             label12.Name = "label12";
             label12.Size = new Size(128, 16);
@@ -389,10 +430,10 @@
             cmbEmploymentStatus.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             cmbEmploymentStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbEmploymentStatus.FormattingEnabled = true;
-            cmbEmploymentStatus.Location = new Point(619, 50);
+            cmbEmploymentStatus.Location = new Point(619, 115);
             cmbEmploymentStatus.Name = "cmbEmploymentStatus";
             cmbEmploymentStatus.Size = new Size(197, 26);
-            cmbEmploymentStatus.TabIndex = 15;
+            cmbEmploymentStatus.TabIndex = 18;
             // 
             // label11
             // 
@@ -417,17 +458,6 @@
             dtpStartDate.Name = "dtpStartDate";
             dtpStartDate.Size = new Size(197, 26);
             dtpStartDate.TabIndex = 13;
-            // 
-            // txtDepartment
-            // 
-            txtDepartment.AccessibleName = "Department";
-            txtDepartment.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            txtDepartment.Location = new Point(416, 50);
-            txtDepartment.Margin = new Padding(6, 3, 3, 16);
-            txtDepartment.MaxLength = 50;
-            txtDepartment.Name = "txtDepartment";
-            txtDepartment.Size = new Size(197, 26);
-            txtDepartment.TabIndex = 14;
             // 
             // cmbPosition
             // 
@@ -746,7 +776,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = SystemColors.Window;
-            ClientSize = new Size(860, 757);
+            ClientSize = new Size(860, 824);
             Controls.Add(pnlMain);
             Controls.Add(flowControls);
             Controls.Add(pnlLine1);
@@ -758,7 +788,7 @@
             Name = "frmNewEntryEmployee";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Employee Data Entry Form";
+            Text = "Add Employee";
             Load += frmEmployeeDataEntry_Load;
             flowControls.ResumeLayout(false);
             flowControls.PerformLayout();
@@ -804,7 +834,6 @@
         private TextBox txtContactNumber2;
         private TextBox txtContactNumber1;
         private Label label6;
-        private TextBox txtDepartment;
         private ComboBox cmbPosition;
         private Label label7;
         private Label label9;
@@ -828,5 +857,8 @@
         private DateTimePicker dtpToDate;
         private Label label17;
         private DateTimePicker dtpFromDate;
+        private Label label20;
+        private ComboBox cmbSection;
+        private ComboBox cmbDepartment;
     }
 }

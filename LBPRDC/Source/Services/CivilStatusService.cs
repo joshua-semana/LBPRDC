@@ -1,45 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static LBPRDC.Source.Services.SuffixService;
+﻿using System.Data.SqlClient;
 
 namespace LBPRDC.Source.Services
 {
     internal class CivilStatusService
     {
-        public class CivilStatusItems
+        public class CivilStatus
         {
             public int ID { get; set; }
+            public string? Name { get; set; }
+            public string? Description { get; set; }
             public string? Status { get; set; }
         }
 
-        public static List<CivilStatusItems> GetCivilStatusItems()
+        public static List<CivilStatus> GetAllItems()
         {
-            List<CivilStatusItems> items = new();
+            List<CivilStatus> items = new();
 
             try
             {
-                CivilStatusItems blankItem = new()
-                {
-                    ID = 0,
-                    Status = "(Choose Status)"
-                };
-                items.Add(blankItem);
-
-                string query = "SELECT ID, Status FROM CivilStatus";
+                string query = "SELECT * FROM CivilStatus";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read()) 
+                    while (reader.Read())
                     {
-                        CivilStatusItems item = new()
+                        CivilStatus item = new()
                         {
                             ID = Convert.ToInt32(reader["ID"]),
+                            Name = reader["Name"].ToString(),
+                            Description = reader["Description"].ToString(),
                             Status = reader["Status"].ToString()
                         };
 
@@ -47,41 +38,46 @@ namespace LBPRDC.Source.Services
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                ExceptionHandler.HandleException(ex);
-            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
         }
 
-        public static string? GetStatusByID(int id)
+        public static List<CivilStatus> GetAllItemsForComboBox()
         {
-            string result = string.Empty;
+            List<CivilStatus> items = new();
 
             try
             {
-                string query = "SELECT Status FROM CivilStatus WHERE ID = @ID";
+                CivilStatus blankItem = new()
+                {
+                    ID = 0,
+                    Name = "(Choose Status)"
+                };
+
+                items.Add(blankItem);
+
+                string query = "SELECT ID, Name FROM CivilStatus WHERE Status = 'Active'";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
-                    command.Parameters.AddWithValue("@ID", id);
                     connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
                     {
-                        if (reader.Read())
+                        CivilStatus item = new()
                         {
-                            result = reader["Status"].ToString();
-                        }
+                            ID = Convert.ToInt32(reader["ID"]),
+                            Name = reader["Name"].ToString()
+                        };
+
+                        items.Add(item);
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                ExceptionHandler.HandleException(ex);
-            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
-            return result;
+            return items;
         }
 
         public class NewHistory
@@ -110,10 +106,7 @@ namespace LBPRDC.Source.Services
                     command.ExecuteNonQuery();
                 }
             }
-            catch (Exception ex)
-            {
-                ExceptionHandler.HandleException(ex);
-            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
     }
 }

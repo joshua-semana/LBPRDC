@@ -59,8 +59,8 @@ namespace LBPRDC.Source.Views
                     return;
                 }
 
-                UserService.GetUserInfoByUsername(username);
-                var currentUser = UserManager.Instance.CurrentUser;
+                UserService.GetUserByUsername(username);
+                var currentUser = UserService.CurrentUser;
 
                 if (currentUser == null)
                 {
@@ -74,7 +74,14 @@ namespace LBPRDC.Source.Views
                     return;
                 }
 
-                await Task.Run(() => LoggingService.LogActivity(currentUser.UserID, "Sign In Log", "This user signed in to the software."));
+                LoggingService.Log newLog = new()
+                {
+                    UserID = currentUser.UserID,
+                    Type = "Sign In Log",
+                    Details = "This user signed in to the software."
+                };
+
+                await Task.Run(() => LoggingService.LogActivity(newLog));
                 await Task.Run(() => UserService.UpdateLastLoginDate(username));
 
                 this.Hide();
