@@ -1,6 +1,7 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using LBPRDC.Source.Views.Employee;
+using LBPRDC.Source.Views.Shared;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
+using static LBPRDC.Source.Views.Shared.DynamicCheckedListBoxControl;
 
 namespace LBPRDC.Source.Views
 {
@@ -25,6 +28,7 @@ namespace LBPRDC.Source.Views
             InitializeComponent();
             this.Controls.Add(loadingControl);
 
+            PopulateFilters();
             //dataLoader = new BackgroundWorker();
             //dataLoader.DoWork += DataLoadingWorker_DoWork;
             //dataLoader.RunWorkerCompleted += DataLoadingWorker_RunWorkerCompleted;
@@ -51,12 +55,37 @@ namespace LBPRDC.Source.Views
 
         private void ucEmployees_VisibleChanged(object sender, EventArgs e)
         {
+            ShowLoadingProgressBar();
             PopulateTable();
+            HideLoadingProgressBar();
+        }
+
+        private static void InitializeFilter(Label label, DynamicCheckedListBoxControl control, List<CheckedListBoxItems> items)
+        {
+            bool hasItems = items.Count > 0;
+            label.Visible = hasItems;
+            control.Visible = hasItems;
+            if (hasItems)
+            {
+                control.SetItems(items);
+            }
+        }
+
+        public async void PopulateFilters()
+        {
+            await Task.Run(() =>
+            {
+                InitializeFilter(lblFilterDepartments, dchkListFilterDepartments, DepartmentService.GetAllItems().Select(s => new CheckedListBoxItems(s.ID, s.Name)).ToList());
+                InitializeFilter(lblFilterLocations, dchkListFilterLocations, LocationService.GetAllItems().Select(s => new CheckedListBoxItems(Convert.ToInt32(s.ID), s.Name)).ToList());
+                InitializeFilter(lblFilterPositions, dchkListFilterPositions, PositionService.GetAllItems().Select(s => new CheckedListBoxItems(s.ID, s.Name)).ToList());
+                InitializeFilter(lblFilterCivilStatus, dchkListFilterCivilStatus, CivilStatusService.GetAllItems().Select(s => new CheckedListBoxItems(s.ID, s.Name)).ToList());
+                InitializeFilter(lblFilterEmploymentStatus, dchkListFilterEmploymentStatus, EmploymentStatusService.GetAllItems().Select(s => new CheckedListBoxItems(s.ID, s.Name)).ToList());
+                InitializeFilter(lblFilterGender, dchkListFilterGender, new() { new CheckedListBoxItems(1, "MALE"), new CheckedListBoxItems(2, "FEMALE") });
+            });
         }
 
         public async void PopulateTable()
         {
-            ShowLoadingProgressBar();
             preference = UserPreferenceManager.LoadPreference();
             List<Services.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
 
@@ -68,7 +97,6 @@ namespace LBPRDC.Source.Views
                 ApplySettingsToTable();
                 dgvEmployees.DataSource = employees;
             }
-            HideLoadingProgressBar();
         }
 
         private void ApplySettingsToTable()
@@ -101,7 +129,7 @@ namespace LBPRDC.Source.Views
             if (preference.ShowEmailAddress) { AddColumn("EmailAddress", "Email Address", "EmailAddress"); }
             if (preference.ShowContactNumber) { AddColumn("ContactNumber", "Contact Number", "ContactNumber"); }
             if (preference.ShowDepartment) { AddColumn("Department", "Department", "Department"); }
-            if (preference.ShowSection) { AddColumn("Section", "Section", "Section"); }
+            if (preference.ShowLocation) { AddColumn("Location", "Location", "Location"); }
             if (preference.ShowPosition) { AddColumn("Position", "Position", "Position"); }
             if (preference.ShowSalaryRate) { AddColumn("SalaryRate", "Salary Rate", "SalaryRate"); }
             if (preference.ShowBillingRate) { AddColumn("BillingRate", "Billing Rate", "BillingRate"); }
@@ -116,6 +144,17 @@ namespace LBPRDC.Source.Views
                 HeaderText = header,
                 DataPropertyName = property
             });
+        }
+
+        private void ResetFilters()
+        {
+            foreach (Control control in flowFilters.Controls)
+            {
+                if (control is DynamicCheckedListBoxControl dynamicCheckbox)
+                {
+                    dynamicCheckbox.ClearCheckedItems();
+                }
+            }
         }
 
         //private void DataLoadingWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -184,6 +223,16 @@ namespace LBPRDC.Source.Views
             frmSettingsEmployee settingEmployeeForm = new();
             settingEmployeeForm.ParentControl = this;
             settingEmployeeForm.ShowDialog();
+        }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            ResetFilters();
+        }
+
+        private void btnFilter_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(dchkListFilterDepartments.GetCheckedItems().Select(s => s.ID).First().ToString());
         }
     }
 }

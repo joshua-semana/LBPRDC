@@ -28,5 +28,8 @@
     <Compile Update="Source\Views\EmployeeFlow\AddBatchForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Source\Views\Shared\DynamicCheckedListBoxControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

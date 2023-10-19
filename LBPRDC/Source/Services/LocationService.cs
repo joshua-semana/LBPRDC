@@ -3,9 +3,9 @@ using System.Data.SqlClient;
 
 namespace LBPRDC.Source.Services
 {
-    internal class SectionService
+    internal class LocationService
     {
-        public class Section
+        public class Location
         {
             public int? ID { get; set; }
             public string? Name { get; set; }
@@ -14,13 +14,13 @@ namespace LBPRDC.Source.Services
             public string? Status { get; set; }
         }
 
-        public static List<Section> GetAllItems()
+        public static List<Location> GetAllItems()
         {
-            List<Section> items = new();
+            List<Location> items = new();
 
             try
             {
-                string query = "SELECT * FROM Sections";
+                string query = "SELECT * FROM Locations";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
@@ -28,7 +28,7 @@ namespace LBPRDC.Source.Services
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        Section item = new()
+                        Location item = new()
                         {
                             ID = Convert.ToInt32(reader["ID"]),
                             Name = reader["Name"].ToString(),
@@ -45,11 +45,11 @@ namespace LBPRDC.Source.Services
             return items;
         }
 
-        public static List<Section> GetAllItemsForComboBox(int ID)
+        public static List<Location> GetAllItemsForComboBox(int ID)
         {
-            List<Section> items = new();
+            List<Location> items = new();
 
-            Section defaultItem = new()
+            Location defaultItem = new()
             {
                 ID = 1,
                 Name = "None"
@@ -59,7 +59,7 @@ namespace LBPRDC.Source.Services
 
             try
             {
-                string query = "SELECT ID, Name FROM Sections WHERE DepartmentID = @ID AND Status = 'Active'";
+                string query = "SELECT ID, Name FROM Locations WHERE DepartmentID = @ID AND Status = 'Active'";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
@@ -68,7 +68,7 @@ namespace LBPRDC.Source.Services
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        Section item = new()
+                        Location item = new()
                         {
                             ID = Convert.ToInt32(reader["ID"]),
                             Name = reader["Name"].ToString()
