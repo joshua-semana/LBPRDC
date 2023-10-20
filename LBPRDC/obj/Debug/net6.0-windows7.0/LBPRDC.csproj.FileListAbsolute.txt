@@ -97,3 +97,4 @@ C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\refint\LBP
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.pdb
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.genruntimeconfig.cache
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\ref\LBPRDC.dll
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.EditEmployeeForm.resources

@@ -78,9 +78,9 @@ namespace LBPRDC.Source.Services
                             Employee emp = new()
                             {
                                 EmployeeID = reader["EmployeeID"].ToString(),
-                                LastName = reader["LastName"].ToString(),
-                                FirstName = reader["FirstName"].ToString(),
-                                MiddleName = reader["MiddleName"].ToString(),
+                                LastName = Utilities.StringFormat.ToSentenceCase((string) reader["LastName"]),
+                                FirstName = Utilities.StringFormat.ToSentenceCase((string)reader["FirstName"]),
+                                MiddleName = Utilities.StringFormat.ToSentenceCase((string)reader["MiddleName"]),
                                 Gender = reader["Gender"].ToString(),
                                 Birthday = reader["Birthday"] as DateTime?,
                                 Education = reader["Education"].ToString(),

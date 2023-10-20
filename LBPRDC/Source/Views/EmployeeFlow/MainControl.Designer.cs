@@ -209,6 +209,7 @@
             lblFilterLocations.Size = new Size(68, 16);
             lblFilterLocations.TabIndex = 7;
             lblFilterLocations.Text = "Locations";
+            lblFilterLocations.Visible = false;
             // 
             // dchkListFilterLocations
             // 
@@ -220,6 +221,7 @@
             dchkListFilterLocations.Name = "dchkListFilterLocations";
             dchkListFilterLocations.Size = new Size(180, 0);
             dchkListFilterLocations.TabIndex = 8;
+            dchkListFilterLocations.Visible = false;
             // 
             // lblFilterPositions
             // 
@@ -253,6 +255,7 @@
             lblFilterCivilStatus.Size = new Size(77, 16);
             lblFilterCivilStatus.TabIndex = 11;
             lblFilterCivilStatus.Text = "Civil Status";
+            lblFilterCivilStatus.Visible = false;
             // 
             // dchkListFilterCivilStatus
             // 
@@ -264,6 +267,7 @@
             dchkListFilterCivilStatus.Name = "dchkListFilterCivilStatus";
             dchkListFilterCivilStatus.Size = new Size(180, 0);
             dchkListFilterCivilStatus.TabIndex = 12;
+            dchkListFilterCivilStatus.Visible = false;
             // 
             // lblFilterGender
             // 
@@ -275,6 +279,7 @@
             lblFilterGender.Size = new Size(55, 16);
             lblFilterGender.TabIndex = 13;
             lblFilterGender.Text = "Gender";
+            lblFilterGender.Visible = false;
             // 
             // dchkListFilterGender
             // 
@@ -286,6 +291,7 @@
             dchkListFilterGender.Name = "dchkListFilterGender";
             dchkListFilterGender.Size = new Size(180, 0);
             dchkListFilterGender.TabIndex = 14;
+            dchkListFilterGender.Visible = false;
             // 
             // lblFilterEmploymentStatus
             // 
@@ -441,6 +447,7 @@
             btnSearch.TabIndex = 4;
             btnSearch.Text = "Search";
             btnSearch.UseVisualStyleBackColor = true;
+            btnSearch.Click += btnSearch_Click;
             // 
             // txtSearch
             // 

@@ -52,14 +52,14 @@ namespace LBPRDC.Source.Views.Shared
 
         public List<CheckedListBoxItems> GetCheckedItems()
         {
-            List<CheckedListBoxItems> checkedNames = new();
+            List<CheckedListBoxItems> items = new();
 
             foreach (CheckedListBoxItems item in chkListItems.CheckedItems)
             {
-                checkedNames.Add(item);
+                items.Add(item);
             }
 
-            return checkedNames;
+            return items;
         }
 
         public void ClearCheckedItems()
