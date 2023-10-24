@@ -43,7 +43,6 @@ namespace LBPRDC.Source.Views
             InitializeSuffixComboBoxItems();
             InitializeGenderComboBoxItems();
             InitializeDepartmentComboBoxItems();
-            //InitializeSectionComboBoxItems();
         }
 
         private void InitializePositionComboBoxItems()
@@ -81,12 +80,22 @@ namespace LBPRDC.Source.Views
             cmbDepartment.ValueMember = "ID";
         }
 
-        //private void InitializeSectionComboBoxItems()
-        //{
-        //    cmbSection.DataSource = SectionService.GetAllItemsForComboBox();
-        //    cmbSection.DisplayMember = "Name";
-        //    cmbSection.ValueMember = "ID";
-        //}
+        private void GetLocationComboBoxItems()
+        {
+            if (cmbDepartment.SelectedIndex != 0)
+            {
+                cmbLocation.Enabled = true;
+                int DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue);
+                cmbLocation.DataSource = LocationService.GetAllItemsForComboBox(DepartmentID);
+                cmbLocation.DisplayMember = "Name";
+                cmbLocation.ValueMember = "ID";
+            }
+            else
+            {
+                cmbLocation.DataSource = null;
+                cmbLocation.Enabled = false;
+            }
+        }
 
         private void InitializeGenderComboBoxItems()
         {
@@ -158,7 +167,7 @@ namespace LBPRDC.Source.Views
                     Birthday = dtpBirthday.Value,
                     Education = txtEducation.Text,
                     DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue),
-                    SectionID = Convert.ToInt32(cmbSection.SelectedValue),
+                    LocationID = Convert.ToInt32(cmbLocation.SelectedValue),
                     EmailAddress1 = txtEmailAddress1.Text,
                     EmailAddress2 = txtEmailAddress2.Text,
                     ContactNumber1 = txtContactNumber1.Text,
@@ -220,11 +229,7 @@ namespace LBPRDC.Source.Views
 
         private void cmbDepartment_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var sections = SectionService.GetAllItemsForComboBox(cmbDepartment.SelectedIndex);
-
-            cmbSection.DataSource = sections;
-            cmbSection.DisplayMember = "Name";
-            cmbSection.ValueMember = "ID";
+            GetLocationComboBoxItems();
         }
     }
 }

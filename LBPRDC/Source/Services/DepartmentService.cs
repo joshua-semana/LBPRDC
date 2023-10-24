@@ -1,5 +1,6 @@
 ﻿
 using System.Data.SqlClient;
+using static LBPRDC.Source.Services.CivilStatusService;
 
 namespace LBPRDC.Source.Services
 {
@@ -50,6 +51,14 @@ namespace LBPRDC.Source.Services
 
             try
             {
+                Department blankItem = new()
+                {
+                    ID = 0,
+                    Name = "(Choose Department)"
+                };
+
+                items.Add(blankItem);
+
                 string query = "SELECT ID, Name FROM Departments WHERE Status = 'Active'";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))

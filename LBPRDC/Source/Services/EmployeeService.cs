@@ -19,7 +19,7 @@ namespace LBPRDC.Source.Services
         public DateTime? Birthday { get; set; }
         public string? Education { get; set; }
         public int DepartmentID { get; set; }
-        public int SectionID { get; set; }
+        public int LocationID { get; set; }
         public string? EmailAddress1 { get; set; }
         public string? EmailAddress2 { get; set; }
         public string? ContactNumber1 { get; set; }
@@ -42,7 +42,7 @@ namespace LBPRDC.Source.Services
         public decimal SalaryRate { get; set; }
         public decimal BillingRate { get; set; }
         public string? Department { get; set; }
-        public string? Section { get; set; }
+        public string? Location { get; set; }
     }
 
     public class NewEmployee : Employee
@@ -78,14 +78,14 @@ namespace LBPRDC.Source.Services
                             Employee emp = new()
                             {
                                 EmployeeID = reader["EmployeeID"].ToString(),
-                                LastName = reader["LastName"].ToString(),
-                                FirstName = reader["FirstName"].ToString(),
-                                MiddleName = reader["MiddleName"].ToString(),
+                                LastName = Utilities.StringFormat.ToSentenceCase((string) reader["LastName"]),
+                                FirstName = Utilities.StringFormat.ToSentenceCase((string)reader["FirstName"]),
+                                MiddleName = Utilities.StringFormat.ToSentenceCase((string)reader["MiddleName"]),
                                 Gender = reader["Gender"].ToString(),
                                 Birthday = reader["Birthday"] as DateTime?,
                                 Education = reader["Education"].ToString(),
                                 DepartmentID = Convert.ToInt32(reader["DepartmentID"]),
-                                SectionID = Convert.ToInt32(reader["SectionID"]),
+                                LocationID = Convert.ToInt32(reader["LocationID"]),
                                 EmailAddress1 = reader["EmailAddress1"].ToString(),
                                 EmailAddress2 = reader["EmailAddress2"].ToString(),
                                 ContactNumber1 = reader["ContactNumber1"].ToString(),
@@ -104,8 +104,8 @@ namespace LBPRDC.Source.Services
                             emp.PositionCode = PositionService.GetAllItems().Where(w => w.ID == emp.PositionID).Select(s => s.Code).FirstOrDefault()?.ToString();
                             emp.BillingRate = Convert.ToDecimal(PositionService.GetAllItems().Where(w => w.ID == emp.PositionID).Select(s => s.BillingRate).FirstOrDefault());
                             emp.SalaryRate = Convert.ToDecimal(PositionService.GetAllItems().Where(w => w.ID == emp.PositionID).Select(s => s.SalaryRate).FirstOrDefault());
-                            emp.Department = DepartmentService.GetAllItems().Where(w => w.ID == emp.SuffixID).Select(s => s.Name).FirstOrDefault()?.ToString();
-                            emp.Section = SectionService.GetAllItems().Where(w => w.ID == emp.SuffixID).Select(s => s.Name).FirstOrDefault()?.ToString();
+                            emp.Department = DepartmentService.GetAllItems().Where(w => w.ID == emp.DepartmentID).Select(s => s.Name).FirstOrDefault()?.ToString();
+                            emp.Location = LocationService.GetAllItems().Where(w => w.ID == emp.LocationID).Select(s => s.Name).FirstOrDefault()?.ToString();
 
                             if (preference.ShowName)
                             {
@@ -184,8 +184,8 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string query = "INSERT INTO Employee (EmployeeID, LastName, FirstName, MiddleName, SuffixID, Gender, Birthday, Education, DepartmentID, SectionID, EmailAddress1, EmailAddress2, ContactNumber1, ContactNumber2, CivilStatusID, PositionID, EmploymentStatusID, Remarks) " +
-                               "VALUES (@EmployeeID, @LastName, @FirstName, @MiddleName, @SuffixID, @Gender, @Birthday, @Education, @DepartmentID, @SectionID, @EmailAddress1, @EmailAddress2, @ContactNumber1, @ContactNumber2, @CivilStatusID, @PositionID, @EmploymentStatusID, @Remarks)";
+                string query = "INSERT INTO Employee (EmployeeID, LastName, FirstName, MiddleName, SuffixID, Gender, Birthday, Education, DepartmentID, LocationID, EmailAddress1, EmailAddress2, ContactNumber1, ContactNumber2, CivilStatusID, PositionID, EmploymentStatusID, Remarks) " +
+                               "VALUES (@EmployeeID, @LastName, @FirstName, @MiddleName, @SuffixID, @Gender, @Birthday, @Education, @DepartmentID, @LocationID, @EmailAddress1, @EmailAddress2, @ContactNumber1, @ContactNumber2, @CivilStatusID, @PositionID, @EmploymentStatusID, @Remarks)";
 
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
@@ -199,7 +199,7 @@ namespace LBPRDC.Source.Services
                     command.Parameters.AddWithValue("@Birthday", employee.Birthday);
                     command.Parameters.AddWithValue("@Education", employee.Education);
                     command.Parameters.AddWithValue("@DepartmentID", employee.DepartmentID);
-                    command.Parameters.AddWithValue("@SectionID", employee.SectionID);
+                    command.Parameters.AddWithValue("@LocationID", employee.LocationID);
                     command.Parameters.AddWithValue("@EmailAddress1", employee.EmailAddress1);
                     command.Parameters.AddWithValue("@EmailAddress2", employee.EmailAddress2);
                     command.Parameters.AddWithValue("@ContactNumber1", employee.ContactNumber1);

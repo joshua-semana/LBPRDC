@@ -18,6 +18,7 @@ namespace LBPRDC.Source.Views.Employee
             InitializeEmploymentStatusComboBoxItems();
             InitializeDepartmentComboBoxItems();
             InitializeDepartmentComboBoxItems();
+            InitializeGenderComboBoxItems();
         }
 
         private void InitializePositionComboBoxItems()
@@ -39,6 +40,7 @@ namespace LBPRDC.Source.Views.Employee
             cmbFilterEmploymentStatus.DataSource = EmploymentStatusService.GetAllItemsForComboBox();
             cmbFilterEmploymentStatus.DisplayMember = "Name";
             cmbFilterEmploymentStatus.ValueMember = "ID";
+
         }
 
         private void InitializeDepartmentComboBoxItems()
@@ -46,6 +48,11 @@ namespace LBPRDC.Source.Views.Employee
             cmbFilterDepartment.DataSource = DepartmentService.GetAllItemsForComboBox();
             cmbFilterDepartment.DisplayMember = "Name";
             cmbFilterDepartment.ValueMember = "ID";
+        }
+
+        private void InitializeGenderComboBoxItems()
+        {
+            cmbFilterGender.SelectedIndex = 0;
         }
 
         private void InitializePreferences()
@@ -58,7 +65,7 @@ namespace LBPRDC.Source.Views.Employee
             chkCivilStatus.Checked = preference.ShowCivilStatus;
             chkEmploymentStatus.Checked = preference.ShowEmploymentStatus;
             chkDepartment.Checked = preference.ShowDepartment;
-            chkSection.Checked = preference.ShowSection;
+            chkLocation.Checked = preference.ShowLocation;
             chkEmailAddress.Checked = preference.ShowEmailAddress;
             chkContactNumber.Checked = preference.ShowContactNumber;
             chkPosition.Checked = preference.ShowPosition;
@@ -104,7 +111,7 @@ namespace LBPRDC.Source.Views.Employee
             preference.ShowCivilStatus = chkCivilStatus.Checked;
             preference.ShowEmploymentStatus = chkEmploymentStatus.Checked;
             preference.ShowDepartment = chkDepartment.Checked;
-            preference.ShowSection = chkSection.Checked;
+            preference.ShowLocation = chkLocation.Checked;
             preference.ShowEmailAddress = chkEmailAddress.Checked;
             preference.ShowContactNumber = chkContactNumber.Checked;
             preference.ShowPosition = chkPosition.Checked;
@@ -162,6 +169,7 @@ namespace LBPRDC.Source.Views.Employee
         private void chkFilterDepartment_CheckedChanged(object sender, EventArgs e)
         {
             cmbFilterDepartment.Enabled = chkFilterDepartment.Checked;
+            chkFilterLocation.Enabled = chkFilterDepartment.Checked;
         }
 
         private void chkFilterPosition_CheckedChanged(object sender, EventArgs e)
@@ -184,9 +192,9 @@ namespace LBPRDC.Source.Views.Employee
             cmbFilterEmploymentStatus.Enabled = chkFilterEmploymentStatus.Checked;
         }
 
-        private void chkFilterSection_CheckedChanged(object sender, EventArgs e)
+        private void chkFilterLocation_CheckedChanged(object sender, EventArgs e)
         {
-            cmbFilterSection.Enabled = chkFilterSection.Checked;
+            cmbFilterLocation.Enabled = chkFilterLocation.Checked;
         }
     }
 }

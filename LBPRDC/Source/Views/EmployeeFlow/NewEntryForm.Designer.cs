@@ -35,7 +35,7 @@
             pnlMain = new Panel();
             grpJobData = new GroupBox();
             label20 = new Label();
-            cmbSection = new ComboBox();
+            cmbLocation = new ComboBox();
             cmbDepartment = new ComboBox();
             grpPreviousWork = new GroupBox();
             txtOtherInformation = new TextBox();
@@ -153,7 +153,7 @@
             // 
             grpJobData.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             grpJobData.Controls.Add(label20);
-            grpJobData.Controls.Add(cmbSection);
+            grpJobData.Controls.Add(cmbLocation);
             grpJobData.Controls.Add(cmbDepartment);
             grpJobData.Controls.Add(grpPreviousWork);
             grpJobData.Controls.Add(chkPreviousEmployee);
@@ -187,20 +187,20 @@
             label20.Location = new Point(615, 27);
             label20.Margin = new Padding(3, 0, 3, 4);
             label20.Name = "label20";
-            label20.Size = new Size(54, 16);
+            label20.Size = new Size(61, 16);
             label20.TabIndex = 28;
-            label20.Text = "Section";
+            label20.Text = "Location";
             // 
-            // cmbSection
+            // cmbLocation
             // 
-            cmbSection.AccessibleName = "Section";
-            cmbSection.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            cmbSection.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbSection.FormattingEnabled = true;
-            cmbSection.Location = new Point(619, 50);
-            cmbSection.Name = "cmbSection";
-            cmbSection.Size = new Size(197, 26);
-            cmbSection.TabIndex = 15;
+            cmbLocation.AccessibleName = "Location";
+            cmbLocation.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            cmbLocation.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbLocation.FormattingEnabled = true;
+            cmbLocation.Location = new Point(619, 50);
+            cmbLocation.Name = "cmbLocation";
+            cmbLocation.Size = new Size(197, 26);
+            cmbLocation.TabIndex = 15;
             // 
             // cmbDepartment
             // 
@@ -858,7 +858,7 @@
         private Label label17;
         private DateTimePicker dtpFromDate;
         private Label label20;
-        private ComboBox cmbSection;
+        private ComboBox cmbLocation;
         private ComboBox cmbDepartment;
     }
 }
