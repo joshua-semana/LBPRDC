@@ -13,47 +13,8 @@ namespace LBPRDC.Source.Views.Employee
             InitializeComponent();
             preference = UserPreferenceManager.LoadPreference();
             InitializePreferences();
-            InitializePositionComboBoxItems();
-            InitializeCivilStatusComboBoxItems();
-            InitializeEmploymentStatusComboBoxItems();
-            InitializeDepartmentComboBoxItems();
-            InitializeDepartmentComboBoxItems();
-            InitializeGenderComboBoxItems();
         }
 
-        private void InitializePositionComboBoxItems()
-        {
-            cmbFilterPosition.DataSource = PositionService.GetAllItemsForComboBox();
-            cmbFilterPosition.DisplayMember = "Name";
-            cmbFilterPosition.ValueMember = "ID";
-        }
-
-        private void InitializeCivilStatusComboBoxItems()
-        {
-            cmbFilterCivilStatus.DataSource = CivilStatusService.GetAllItemsForComboBox();
-            cmbFilterCivilStatus.DisplayMember = "Name";
-            cmbFilterCivilStatus.ValueMember = "ID";
-        }
-
-        private void InitializeEmploymentStatusComboBoxItems()
-        {
-            cmbFilterEmploymentStatus.DataSource = EmploymentStatusService.GetAllItemsForComboBox();
-            cmbFilterEmploymentStatus.DisplayMember = "Name";
-            cmbFilterEmploymentStatus.ValueMember = "ID";
-
-        }
-
-        private void InitializeDepartmentComboBoxItems()
-        {
-            cmbFilterDepartment.DataSource = DepartmentService.GetAllItemsForComboBox();
-            cmbFilterDepartment.DisplayMember = "Name";
-            cmbFilterDepartment.ValueMember = "ID";
-        }
-
-        private void InitializeGenderComboBoxItems()
-        {
-            cmbFilterGender.SelectedIndex = 0;
-        }
 
         private void InitializePreferences()
         {
@@ -164,37 +125,6 @@ namespace LBPRDC.Source.Views.Employee
         private void chkPosition_CheckedChanged(object sender, EventArgs e)
         {
             flowRadioGroupForPosition.Enabled = chkPosition.Checked;
-        }
-
-        private void chkFilterDepartment_CheckedChanged(object sender, EventArgs e)
-        {
-            cmbFilterDepartment.Enabled = chkFilterDepartment.Checked;
-            chkFilterLocation.Enabled = chkFilterDepartment.Checked;
-        }
-
-        private void chkFilterPosition_CheckedChanged(object sender, EventArgs e)
-        {
-            cmbFilterPosition.Enabled = chkFilterPosition.Checked;
-        }
-
-        private void chkFilterCivilStatus_CheckedChanged(object sender, EventArgs e)
-        {
-            cmbFilterCivilStatus.Enabled = chkFilterCivilStatus.Checked;
-        }
-
-        private void chkFilterGender_CheckedChanged(object sender, EventArgs e)
-        {
-            cmbFilterGender.Enabled = chkFilterGender.Checked;
-        }
-
-        private void chkFilterEmploymentStatus_CheckedChanged(object sender, EventArgs e)
-        {
-            cmbFilterEmploymentStatus.Enabled = chkFilterEmploymentStatus.Checked;
-        }
-
-        private void chkFilterLocation_CheckedChanged(object sender, EventArgs e)
-        {
-            cmbFilterLocation.Enabled = chkFilterLocation.Checked;
         }
     }
 }

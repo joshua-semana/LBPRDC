@@ -32,70 +32,61 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             if (EmployeeId != null)
             {
                 InitializeEmployeeInformation(EmployeeId);
-                InitializePositionComboBoxItems();
-                InitializeCivilStatusComboBoxItems();
-                InitializeEmploymentStatusComboBoxItems();
-                InitializeSuffixComboBoxItems();
-                InitializeGenderComboBoxItems();
-                InitializeDepartmentComboBoxItems();
             }
         }
 
-        private void InitializePositionComboBoxItems()
+        private void InitializePositionComboBoxItems(int value)
         {
             cmbPosition.DataSource = PositionService.GetAllItemsForComboBox();
             cmbPosition.DisplayMember = "Name";
             cmbPosition.ValueMember = "ID";
+            cmbPosition.SelectedValue = value;
         }
 
-        private void InitializeCivilStatusComboBoxItems()
+        private void InitializeCivilStatusComboBoxItems(int value)
         {
             cmbCivilStatus.DataSource = CivilStatusService.GetAllItemsForComboBox();
             cmbCivilStatus.DisplayMember = "Name";
             cmbCivilStatus.ValueMember = "ID";
+            cmbCivilStatus.SelectedValue = value;
         }
 
-        private void InitializeEmploymentStatusComboBoxItems()
+        private void InitializeEmploymentStatusComboBoxItems(int value)
         {
             cmbEmploymentStatus.DataSource = EmploymentStatusService.GetAllItemsForComboBox();
             cmbEmploymentStatus.DisplayMember = "Name";
             cmbEmploymentStatus.ValueMember = "ID";
+            cmbEmploymentStatus.SelectedValue = value;
         }
 
-        private void InitializeSuffixComboBoxItems()
+        private void InitializeSuffixComboBoxItems(int value)
         {
             cmbSuffix.DataSource = SuffixService.GetAllItemsForComboBox();
             cmbSuffix.DisplayMember = "Name";
             cmbSuffix.ValueMember = "ID";
+            cmbSuffix.SelectedValue = value;
         }
 
-        private void InitializeDepartmentComboBoxItems()
+        private void InitializeDepartmentComboBoxItems(int value)
         {
             cmbDepartment.DataSource = DepartmentService.GetAllItemsForComboBox();
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
+            cmbDepartment.SelectedValue = value;
         }
 
-        private void GetLocationComboBoxItems()
+        private void InitializeLocationComboBoxItems(int deparment, int value)
         {
-            if (cmbDepartment.SelectedIndex != 0)
-            {
-                cmbLocation.Enabled = true;
-                int DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue);
-                cmbLocation.DataSource = LocationService.GetAllItemsForComboBox(DepartmentID);
-                cmbLocation.DisplayMember = "Name";
-                cmbLocation.ValueMember = "ID";
-            }
-            else
-            {
-                cmbLocation.DataSource = null;
-                cmbLocation.Enabled = false;
-            }
+            int DepartmentID = Convert.ToInt32(deparment);
+            cmbLocation.DataSource = LocationService.GetAllItemsForComboBox(DepartmentID);
+            cmbLocation.DisplayMember = "Name";
+            cmbLocation.ValueMember = "ID";
+            cmbLocation.SelectedValue = value;
         }
 
-        private void InitializeGenderComboBoxItems()
+        private void InitializeGenderComboBoxItems(string value)
         {
-            cmbGender.SelectedIndex = 0;
+            cmbGender.SelectedItem = value;
         }
 
         private void InitializeEmployeeInformation(string ID)
@@ -111,19 +102,26 @@ namespace LBPRDC.Source.Views.EmployeeFlow
                 txtOtherInformation.Text = previousRecord.Information;
             }
 
-            List<EmployeeService.Employee> record = EmployeeService.GetAllEmployees();
-            record = record.Where(w => w.EmployeeID == ID).ToList();
-            txtFirstName.Text = record.First().FirstName;
-            txtMiddleName.Text = record.First().MiddleName;
-            txtLastName.Text = record.First().LastName;
-            txtEducation.Text = record.First().Education;
-            dtpBirthday.Value = record.First().Birthday.Value;
-            txtEmailAddress1.Text = record.First().EmailAddress1;
-            txtEmailAddress2.Text = record.First().EmailAddress2;
-            txtContactNumber1.Text = record.First().ContactNumber1;
-            txtContactNumber2.Text = record.First().ContactNumber2;
-            txtEmployeeID.Text = record.First().EmployeeID;
-            txtRemarks.Text = record.First().Remarks;
+            List<EmployeeService.Employee> employee = EmployeeService.GetAllEmployees();
+            employee = employee.Where(w => w.EmployeeID == ID).ToList();
+            txtFirstName.Text = employee.First().FirstName;
+            txtMiddleName.Text = employee.First().MiddleName;
+            txtLastName.Text = employee.First().LastName;
+            txtEducation.Text = employee.First().Education;
+            dtpBirthday.Value = employee.First().Birthday.Value;
+            txtEmailAddress1.Text = employee.First().EmailAddress1;
+            txtEmailAddress2.Text = employee.First().EmailAddress2;
+            txtContactNumber1.Text = employee.First().ContactNumber1;
+            txtContactNumber2.Text = employee.First().ContactNumber2;
+            txtEmployeeID.Text = employee.First().EmployeeID;
+            txtRemarks.Text = employee.First().Remarks;
+            InitializeGenderComboBoxItems(employee.First().Gender);
+            InitializePositionComboBoxItems(employee.First().PositionID);
+            InitializeCivilStatusComboBoxItems(employee.First().CivilStatusID);
+            InitializeEmploymentStatusComboBoxItems(employee.First().EmploymentStatusID);
+            InitializeSuffixComboBoxItems(employee.First().SuffixID);
+            InitializeDepartmentComboBoxItems(employee.First().DepartmentID);
+            InitializeLocationComboBoxItems(employee.First().DepartmentID, employee.First().LocationID);
         }
 
         private void chkPreviousEmployee_CheckedChanged(object sender, EventArgs e)
