@@ -1,6 +1,7 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using LBPRDC.Source.Views.Employee;
+using LBPRDC.Source.Views.EmployeeFlow;
 using LBPRDC.Source.Views.Shared;
 using OfficeOpenXml;
 using System;
@@ -102,7 +103,7 @@ namespace LBPRDC.Source.Views
         {
             ShowLoadingProgressBar();
             preference = UserPreferenceManager.LoadPreference();
-            List<Services.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
+            List<EmployeeService.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
 
             dgvEmployees.Columns.Clear();
 
@@ -119,7 +120,7 @@ namespace LBPRDC.Source.Views
         {
             ShowLoadingProgressBar();
             preference = UserPreferenceManager.LoadPreference();
-            List<Services.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
+            List<EmployeeService.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
 
             dgvEmployees.Columns.Clear();
 
@@ -127,7 +128,7 @@ namespace LBPRDC.Source.Views
             {
                 dgvEmployees.AutoGenerateColumns = false;
 
-                List<Services.Employee> filteredEmployees = employees;
+                List<EmployeeService.Employee> filteredEmployees = employees;
 
                 if (deparmentIDs.Count > 0)
                 {
@@ -152,7 +153,7 @@ namespace LBPRDC.Source.Views
         {
             ShowLoadingProgressBar();
             preference = UserPreferenceManager.LoadPreference();
-            List<Services.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
+            List<EmployeeService.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
 
             dgvEmployees.Columns.Clear();
 
@@ -160,7 +161,7 @@ namespace LBPRDC.Source.Views
             {
                 dgvEmployees.AutoGenerateColumns = false;
 
-                List<Services.Employee> filteredEmployees = employees;
+                List<EmployeeService.Employee> filteredEmployees = employees;
 
                 filteredEmployees = filteredEmployees.Where(emp => searchword.Contains(emp.FullName)).ToList();
 
@@ -288,6 +289,18 @@ namespace LBPRDC.Source.Views
         private void btnSearch_Click(object sender, EventArgs e)
         {
             PopulateTableWithSearch(txtSearch.Text.Trim());
+        }
+
+        private void btnEditEmployee_Click(object sender, EventArgs e)
+        {
+            if (dgvEmployees.SelectedRows.Count == 1)
+            {
+                string employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+                EditEmployeeForm frmEditEmployee = new();
+                frmEditEmployee.ParentControl = this;
+                frmEditEmployee.EmployeeId = employeeID;
+                frmEditEmployee.ShowDialog();
+            }
         }
 
         //private void DataLoadingWorker_DoWork(object sender, DoWorkEventArgs e)

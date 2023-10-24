@@ -9,59 +9,60 @@ using System.Threading.Tasks;
 
 namespace LBPRDC.Source.Services
 {
-    public class Employee
-    {
-        public string? EmployeeID { get; set; }
-        public string? LastName { get; set; }
-        public string? FirstName { get; set; }
-        public string? MiddleName { get; set; }
-        public string? Gender { get; set; }
-        public DateTime? Birthday { get; set; }
-        public string? Education { get; set; }
-        public int DepartmentID { get; set; }
-        public int LocationID { get; set; }
-        public string? EmailAddress1 { get; set; }
-        public string? EmailAddress2 { get; set; }
-        public string? ContactNumber1 { get; set; }
-        public string? ContactNumber2 { get; set; }
-        public int CivilStatusID { get; set; }
-        public int PositionID { get; set; }
-        public int EmploymentStatusID { get; set; }
-        public int SuffixID { get; set; }
-        public string? Remarks { get; set; }
-
-        public string? FullName { get; set; }
-        public string? EmailAddress { get; set; }
-        public string? ContactNumber { get; set; }
-        public string? CivilStatus { get; set; }
-        public string? PositionCode { get; set; }
-        public string? PositionName { get; set; }
-        public string? Position { get; set; }
-        public string? EmploymentStatus { get; set; }
-        public string? Suffix { get; set; }
-        public decimal SalaryRate { get; set; }
-        public decimal BillingRate { get; set; }
-        public string? Department { get; set; }
-        public string? Location { get; set; }
-    }
-
-    public class NewEmployee : Employee
-    {
-        public DateTime StartDate { get; set; }
-        public string? PositionTitle { get; set; }
-        public bool? isPreviousEmployee { get; set; }
-        public string? PreviousPosition { get; set; }
-        public DateTime PreviousFrom { get; set; }
-        public DateTime PreviousTo { get; set; }
-        public string? OtherInformation { get; set; }
-    }
-
+    
     internal class EmployeeService
     {
+        public class Employee
+        {
+            public string? EmployeeID { get; set; }
+            public string? LastName { get; set; }
+            public string? FirstName { get; set; }
+            public string? MiddleName { get; set; }
+            public string? Gender { get; set; }
+            public DateTime? Birthday { get; set; }
+            public string? Education { get; set; }
+            public int DepartmentID { get; set; }
+            public int LocationID { get; set; }
+            public string? EmailAddress1 { get; set; }
+            public string? EmailAddress2 { get; set; }
+            public string? ContactNumber1 { get; set; }
+            public string? ContactNumber2 { get; set; }
+            public int CivilStatusID { get; set; }
+            public int PositionID { get; set; }
+            public int EmploymentStatusID { get; set; }
+            public int SuffixID { get; set; }
+            public string? Remarks { get; set; }
+
+            public string? FullName { get; set; }
+            public string? EmailAddress { get; set; }
+            public string? ContactNumber { get; set; }
+            public string? CivilStatus { get; set; }
+            public string? PositionCode { get; set; }
+            public string? PositionName { get; set; }
+            public string? Position { get; set; }
+            public string? EmploymentStatus { get; set; }
+            public string? Suffix { get; set; }
+            public decimal SalaryRate { get; set; }
+            public decimal BillingRate { get; set; }
+            public string? Department { get; set; }
+            public string? Location { get; set; }
+        }
+
+        public class NewEmployee : Employee
+        {
+            public DateTime StartDate { get; set; }
+            public string? PositionTitle { get; set; }
+            public bool? isPreviousEmployee { get; set; }
+            public string? PreviousPosition { get; set; }
+            public DateTime PreviousFrom { get; set; }
+            public DateTime PreviousTo { get; set; }
+            public string? OtherInformation { get; set; }
+        }
+
         private static UserPreference preference;
         public static List<Employee> GetAllEmployees()
         {
-            List<Employee> employees = new List<Employee>();
+            List<Employee> employees = new();
             preference = UserPreferenceManager.LoadPreference();
             try
             {
@@ -163,6 +164,8 @@ namespace LBPRDC.Source.Services
             return employees;
         }
 
+       
+
         public static bool IDExists(string ID)
         {
             try
@@ -236,25 +239,35 @@ namespace LBPRDC.Source.Services
 
                 if ((bool) employee.isPreviousEmployee)
                 {
-                    EmploymentStatusService.NewHistory previousWorkFrom = new()
+                    PreviousEmployeeService.PreviousEmployee entry = new()
                     {
                         EmployeeID = employee.EmployeeID,
-                        EmploymentStatusID = 1, // 1 for Active as of Oct. 17, 2023
-                        Timestamp = employee.PreviousFrom,
-                        Remarks = $"Previous LBRDC employee as {employee.PreviousPosition}, start information."
+                        Position = employee.PreviousPosition,
+                        StartDate = employee.PreviousFrom,
+                        EndDate = employee.PreviousTo,
+                        Information = employee.OtherInformation
                     };
 
-                    EmploymentStatusService.AddToHistory(previousWorkFrom);
+                    PreviousEmployeeService.AddRecord(entry);
+                    //EmploymentStatusService.NewHistory previousWorkFrom = new()
+                    //{
+                    //    EmployeeID = employee.EmployeeID,
+                    //    EmploymentStatusID = 1, // 1 for Active as of Oct. 17, 2023
+                    //    Timestamp = employee.PreviousFrom,
+                    //    Remarks = $"Previous LBRDC employee as {employee.PreviousPosition}, start information."
+                    //};
 
-                    EmploymentStatusService.NewHistory previousWorkTo = new()
-                    {
-                        EmployeeID = employee.EmployeeID,
-                        EmploymentStatusID = 3, // 3 for Resigned as of Oct. 17, 2023
-                        Timestamp = employee.PreviousTo,
-                        Remarks = (String.IsNullOrWhiteSpace(employee.OtherInformation)) ? $"Previous LBRDC employee as {employee.PreviousPosition}, end information." : $"Previous LBRDC employee as {employee.PreviousPosition}, end information. Other information: {employee.OtherInformation}",
-                    };
+                    //EmploymentStatusService.AddToHistory(previousWorkFrom);
 
-                    EmploymentStatusService.AddToHistory(previousWorkTo);
+                    //EmploymentStatusService.NewHistory previousWorkTo = new()
+                    //{
+                    //    EmployeeID = employee.EmployeeID,
+                    //    EmploymentStatusID = 3, // 3 for Resigned as of Oct. 17, 2023
+                    //    Timestamp = employee.PreviousTo,
+                    //    Remarks = (String.IsNullOrWhiteSpace(employee.OtherInformation)) ? $"Previous LBRDC employee as {employee.PreviousPosition}, end information." : $"Previous LBRDC employee as {employee.PreviousPosition}, end information. Other information: {employee.OtherInformation}",
+                    //};
+
+                    //EmploymentStatusService.AddToHistory(previousWorkTo);
                 }
 
                 EmploymentStatusService.NewHistory newEmploymentStatus = new()

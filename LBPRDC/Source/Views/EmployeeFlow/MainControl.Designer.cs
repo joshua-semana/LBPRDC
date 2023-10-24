@@ -118,6 +118,7 @@
             btnEditEmployee.TabIndex = 7;
             btnEditEmployee.Text = "Edit";
             btnEditEmployee.UseVisualStyleBackColor = true;
+            btnEditEmployee.Click += btnEditEmployee_Click;
             // 
             // panel1
             // 

@@ -156,7 +156,7 @@ namespace LBPRDC.Source.Views
                     return;
                 }
 
-                NewEmployee newEmployee = new()
+                EmployeeService.NewEmployee newEmployee = new()
                 {
                     EmployeeID = txtEmployeeID.Text.ToUpper(),
                     LastName = txtLastName.Text.ToUpper(),
@@ -179,7 +179,7 @@ namespace LBPRDC.Source.Views
 
                     StartDate = dtpStartDate.Value,
                     PositionTitle = txtPositionTitle.Text,
-                    isPreviousEmployee = true,
+                    isPreviousEmployee = chkPreviousEmployee.Checked,
                     PreviousFrom = dtpFromDate.Value,
                     PreviousTo = dtpToDate.Value,
                     PreviousPosition = txtPreviousPosition.Text,
