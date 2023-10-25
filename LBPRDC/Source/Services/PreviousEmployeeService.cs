@@ -11,6 +11,7 @@ namespace LBPRDC.Source.Services
     {
         public class PreviousEmployee
         {
+            public int ID { get; set; }
             public bool HasRecord { get; set; }
             public string? EmployeeID { get; set; }
             public string? Position { get; set; }
@@ -19,21 +20,21 @@ namespace LBPRDC.Source.Services
             public string? Information { get; set; }
         }
 
-        public static void AddRecord(PreviousEmployee emp)
+        public static void AddRecord(PreviousEmployee employee)
         {
             try
             {
-                string query = "INSERT INTO PreviousEmployee (EmployeeID, Position, StartDate, EndDate, Information) " +
+                string query = "INSERT INTO EmployeePreviousRecord (EmployeeID, Position, StartDate, EndDate, Information) " +
                                "VALUES (@EmployeeID, @Position, @StartDate, @EndDate, @Information)";
 
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
-                    command.Parameters.AddWithValue("@EmployeeID", emp.EmployeeID);
-                    command.Parameters.AddWithValue("@Position", emp.Position);
-                    command.Parameters.AddWithValue("@StartDate", emp.StartDate);
-                    command.Parameters.AddWithValue("@EndDate", emp.EndDate);
-                    command.Parameters.AddWithValue("@Information", emp.Information);
+                    command.Parameters.AddWithValue("@EmployeeID", employee.EmployeeID);
+                    command.Parameters.AddWithValue("@Position", employee.Position);
+                    command.Parameters.AddWithValue("@StartDate", employee.StartDate);
+                    command.Parameters.AddWithValue("@EndDate", employee.EndDate);
+                    command.Parameters.AddWithValue("@Information", employee.Information);
 
                     connection.Open();
                     command.ExecuteNonQuery();
@@ -42,17 +43,17 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
-        public static PreviousEmployee GetRecordByEmployeeID(string empID)
+        public static PreviousEmployee GetRecordByEmployeeID(string ID)
         {
             PreviousEmployee record = new();
 
             try
             {
-                string query = "SELECT * FROM PreviousEmployee WHERE EmployeeID = @EmployeeID";
+                string query = "SELECT * FROM EmployeePreviousRecord WHERE EmployeeID = @EmployeeID";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
-                    command.Parameters.AddWithValue("@EmployeeID", empID);
+                    command.Parameters.AddWithValue("@EmployeeID", ID);
                     connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -62,6 +63,7 @@ namespace LBPRDC.Source.Services
                             record = new()
                             {
                                 HasRecord = true,
+                                ID = Convert.ToInt32(reader["ID"]),
                                 EmployeeID = reader["EmployeeID"].ToString(),
                                 Position = reader["Position"].ToString(),
                                 StartDate = reader["StartDate"] as DateTime?,
@@ -82,6 +84,66 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { ExceptionHandler.HandleException (ex); }
 
             return record;
+        }
+
+        public static bool RecordExists(string ID)
+        {
+            try
+            {
+                string query = "SELECT COUNT(*) FROM EmployeePreviousRecord WHERE EmployeeID = @EmployeeID";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(query, connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeID", ID);
+                    connection.Open();
+                    int count = (int)command.ExecuteScalar();
+                    return count > 0;
+                }
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static void UpdateRecord(PreviousEmployee data)
+        {
+            try
+            {
+                string updateQuery = "UPDATE EmployeePreviousRecord SET " +
+                    "Position = @Position," +
+                    "StartDate = @StartDate," +
+                    "EndDate = @EndDate," +
+                    "Information = @Information " +
+                    "WHERE EmployeeID = @EmployeeID";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(updateQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@Position", data.Position);
+                    command.Parameters.AddWithValue("@StartDate", data.StartDate);
+                    command.Parameters.AddWithValue("@EndDate", data.EndDate);
+                    command.Parameters.AddWithValue("@Information", data.Information);
+                    command.Parameters.AddWithValue("@EmployeeID", data.EmployeeID);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static void DeleteRecord(string EmployeeID)
+        {
+            try
+            {
+                string updateQuery = "DELETE FROM EmployeePreviousRecord WHERE EmployeeID = @EmployeeID";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(updateQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeID", EmployeeID);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
     }
 }

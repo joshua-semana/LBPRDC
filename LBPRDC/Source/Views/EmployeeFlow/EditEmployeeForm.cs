@@ -1,4 +1,5 @@
 ﻿using LBPRDC.Source.Services;
+using LBPRDC.Source.Utilities;
 using System.Data;
 
 namespace LBPRDC.Source.Views.EmployeeFlow
@@ -9,6 +10,8 @@ namespace LBPRDC.Source.Views.EmployeeFlow
         public ucEmployees? ParentControl { get; set; }
 
         private readonly List<Control> requiredFields;
+
+        private bool employeeHasRecord;
 
         public EditEmployeeForm()
         {
@@ -91,18 +94,10 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void InitializeEmployeeInformation(string ID)
         {
-            PreviousEmployeeService.PreviousEmployee previousRecord = PreviousEmployeeService.GetRecordByEmployeeID(ID);
-            if (previousRecord.HasRecord)
-            {
-                chkPreviousEmployee.Checked = true;
-                grpPreviousWork.Enabled = true;
-                txtPreviousPosition.Text = previousRecord.Position;
-                dtpFromDate.Value = previousRecord.StartDate.Value;
-                dtpToDate.Value = previousRecord.EndDate.Value;
-                txtOtherInformation.Text = previousRecord.Information;
-            }
-
             List<EmployeeService.Employee> employee = EmployeeService.GetAllEmployees();
+            List<PositionService.History> positionHistory = PositionService.GetAllHistory();
+            PreviousEmployeeService.PreviousEmployee employeeRecord = PreviousEmployeeService.GetRecordByEmployeeID(ID);
+
             employee = employee.Where(w => w.EmployeeID == ID).ToList();
             txtFirstName.Text = employee.First().FirstName;
             txtMiddleName.Text = employee.First().MiddleName;
@@ -114,6 +109,8 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             txtContactNumber1.Text = employee.First().ContactNumber1;
             txtContactNumber2.Text = employee.First().ContactNumber2;
             txtEmployeeID.Text = employee.First().EmployeeID;
+            dtpStartDate.Value = positionHistory.Where(w => w.EmployeeID == ID && w.Remarks == "[Initial Status]").First().Timestamp.Value;
+            txtPositionTitle.Text = positionHistory.Where(w => w.EmployeeID == ID && w.Status == "Active").First().PositionTitle;
             txtRemarks.Text = employee.First().Remarks;
             InitializeGenderComboBoxItems(employee.First().Gender);
             InitializePositionComboBoxItems(employee.First().PositionID);
@@ -122,11 +119,113 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             InitializeSuffixComboBoxItems(employee.First().SuffixID);
             InitializeDepartmentComboBoxItems(employee.First().DepartmentID);
             InitializeLocationComboBoxItems(employee.First().DepartmentID, employee.First().LocationID);
+
+            employeeHasRecord = employeeRecord.HasRecord;
+
+            if (employeeRecord.HasRecord)
+            {
+                chkPreviousEmployee.Checked = true;
+                grpPreviousWork.Enabled = true;
+                txtPreviousPosition.Text = employeeRecord.Position;
+                dtpFromDate.Value = employeeRecord.StartDate.Value;
+                dtpToDate.Value = employeeRecord.EndDate.Value;
+                txtOtherInformation.Text = employeeRecord.Information;
+            }
         }
 
         private void chkPreviousEmployee_CheckedChanged(object sender, EventArgs e)
         {
             grpPreviousWork.Enabled = chkPreviousEmployee.Checked;
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Adding of Employee", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                this.Close();
+            }
+        }
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            if (ControlUtils.AreRequiredFieldsFilled(requiredFields))
+            {
+                if (employeeHasRecord && !chkPreviousEmployee.Checked)
+                {
+                    var result = MessageBox.Show("It has been detected that you've unchecked the checkbox for stating that this person is a previous employee of LBRDC. Are you sure you want to proceed?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (result == DialogResult.No) return;
+                }
+
+                var result1 = MessageBox.Show("Are you sure you want to update this employee's information?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (result1 == DialogResult.No) return;
+
+                UpdateEmployeeInformation();
+            }
+        }
+
+        private async void UpdateEmployeeInformation()
+        {
+            EmployeeService.EmployeeHistory data = new()
+            {
+                EmployeeID = txtEmployeeID.Text,
+                LastName = txtLastName.Text.ToUpper(),
+                FirstName = txtFirstName.Text.ToUpper(),
+                MiddleName = txtMiddleName.Text.ToUpper(),
+                SuffixID = Convert.ToInt32(cmbSuffix.SelectedValue),
+                Gender = cmbGender.Text,
+                Birthday = dtpBirthday.Value,
+                Education = txtEducation.Text,
+                DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue),
+                LocationID = Convert.ToInt32(cmbLocation.SelectedValue),
+                EmailAddress1 = txtEmailAddress1.Text,
+                EmailAddress2 = txtEmailAddress2.Text,
+                ContactNumber1 = txtContactNumber1.Text,
+                ContactNumber2 = txtContactNumber2.Text,
+                CivilStatusID = Convert.ToInt32(cmbCivilStatus.SelectedValue),
+                PositionID = Convert.ToInt32(cmbPosition.SelectedValue),
+                EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
+                Remarks = txtRemarks.Text,
+
+                StartDate = dtpStartDate.Value,
+                PositionTitle = txtPositionTitle.Text,
+                isPreviousEmployee = chkPreviousEmployee.Checked,
+                PreviousFrom = dtpFromDate.Value,
+                PreviousTo = dtpToDate.Value,
+                PreviousPosition = txtPreviousPosition.Text,
+                OtherInformation = txtOtherInformation.Text
+            };
+
+            bool isUpdated = await EmployeeService.UpdateEmployee(data);
+
+            if (isUpdated)
+            {
+                MessageBox.Show("You have successfully updated this employee's information.", "Update Employee Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ParentControl?.PopulateTable();
+                this.Close();
+            }
+        }
+
+        private void cmbDepartment_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            GetLocationComboBoxItems();
+        }
+
+        private void GetLocationComboBoxItems()
+        {
+            if (cmbDepartment.SelectedIndex != 0)
+            {
+                cmbLocation.Enabled = true;
+                int DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue);
+                cmbLocation.DataSource = LocationService.GetAllItemsForComboBox(DepartmentID);
+                cmbLocation.DisplayMember = "Name";
+                cmbLocation.ValueMember = "ID";
+            }
+            else
+            {
+                cmbLocation.DataSource = null;
+                cmbLocation.Enabled = false;
+            }
         }
     }
 }

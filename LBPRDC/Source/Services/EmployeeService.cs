@@ -48,7 +48,7 @@ namespace LBPRDC.Source.Services
             public string? Location { get; set; }
         }
 
-        public class NewEmployee : Employee
+        public class EmployeeHistory : Employee
         {
             public DateTime StartDate { get; set; }
             public string? PositionTitle { get; set; }
@@ -183,7 +183,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static async Task<bool> AddNewEmployee(NewEmployee employee)
+        public static async Task<bool> AddNewEmployee(EmployeeHistory employee)
         {
             try
             {
@@ -216,28 +216,50 @@ namespace LBPRDC.Source.Services
                     await command.ExecuteNonQueryAsync();
                 }
 
-                PositionService.NewHistory newPosition = new()
+                PositionService.History newPosition = new()
                 {
                     EmployeeID = employee.EmployeeID,
                     PositionID = employee.PositionID,
                     PositionTitle = employee.PositionTitle,
                     Timestamp = employee.StartDate,
-                    Remarks = "Position as newly added employee in the system."
+                    Remarks = "[Initial Status]",
+                    Status = "Active"
                 };
 
-                PositionService.AddToHistory(newPosition);
-
-                CivilStatusService.NewHistory newCivilStatus = new()
+                CivilStatusService.History newCivilStatus = new()
                 {
                     EmployeeID = employee.EmployeeID,
                     CivilStatusID = employee.CivilStatusID,
                     Timestamp = employee.StartDate,
-                    Remarks = "Status as a new hire."
+                    Remarks = "[Initial Status]",
+                    Status = "Active"
                 };
 
-                CivilStatusService.AddToHistory(newCivilStatus);
+                DepartmentService.History newDepartmentLocation = new()
+                { 
+                    EmployeeID = employee.EmployeeID,
+                    DepartmentID = employee.DepartmentID,
+                    LocationID = employee.LocationID,
+                    Timestamp = employee.StartDate,
+                    Remarks = "[Initial Status]",
+                    Status = "Active"
+                };
 
-                if ((bool) employee.isPreviousEmployee)
+                EmploymentStatusService.History newEmploymentStatus = new()
+                {
+                    EmployeeID = employee.EmployeeID,
+                    EmploymentStatusID = employee.EmploymentStatusID,
+                    Timestamp = employee.StartDate,
+                    Remarks = "[Initial Status]",
+                    Status = "Active"
+                };
+
+                PositionService.AddNewHistory(newPosition);
+                CivilStatusService.AddNewHistory(newCivilStatus);
+                DepartmentService.AddNewHistory(newDepartmentLocation);
+                EmploymentStatusService.AddNewHistory(newEmploymentStatus);
+
+                if ((bool)employee.isPreviousEmployee)
                 {
                     PreviousEmployeeService.PreviousEmployee entry = new()
                     {
@@ -249,36 +271,7 @@ namespace LBPRDC.Source.Services
                     };
 
                     PreviousEmployeeService.AddRecord(entry);
-                    //EmploymentStatusService.NewHistory previousWorkFrom = new()
-                    //{
-                    //    EmployeeID = employee.EmployeeID,
-                    //    EmploymentStatusID = 1, // 1 for Active as of Oct. 17, 2023
-                    //    Timestamp = employee.PreviousFrom,
-                    //    Remarks = $"Previous LBRDC employee as {employee.PreviousPosition}, start information."
-                    //};
-
-                    //EmploymentStatusService.AddToHistory(previousWorkFrom);
-
-                    //EmploymentStatusService.NewHistory previousWorkTo = new()
-                    //{
-                    //    EmployeeID = employee.EmployeeID,
-                    //    EmploymentStatusID = 3, // 3 for Resigned as of Oct. 17, 2023
-                    //    Timestamp = employee.PreviousTo,
-                    //    Remarks = (String.IsNullOrWhiteSpace(employee.OtherInformation)) ? $"Previous LBRDC employee as {employee.PreviousPosition}, end information." : $"Previous LBRDC employee as {employee.PreviousPosition}, end information. Other information: {employee.OtherInformation}",
-                    //};
-
-                    //EmploymentStatusService.AddToHistory(previousWorkTo);
                 }
-
-                EmploymentStatusService.NewHistory newEmploymentStatus = new()
-                {
-                    EmployeeID = employee.EmployeeID,
-                    EmploymentStatusID = employee.EmploymentStatusID,
-                    Timestamp = employee.StartDate,
-                    Remarks = "New hire."
-                };
-
-                EmploymentStatusService.AddToHistory(newEmploymentStatus);
 
                 if (UserService.CurrentUser != null)
                 {
@@ -286,7 +279,7 @@ namespace LBPRDC.Source.Services
                     { 
                         UserID = UserService.CurrentUser.UserID,
                         Type = "Added New Employee",
-                        Details = $"This user added new employee with ID: {employee.EmployeeID}"
+                        Details = $"This user added a new employee with ID of {employee.EmployeeID}."
                     };
 
                     LoggingService.LogActivity(newLog);
@@ -294,6 +287,139 @@ namespace LBPRDC.Source.Services
 
                 return true;
             } 
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> UpdateEmployee(EmployeeHistory employee)
+        {
+            try
+            {
+                string updateQuery = "UPDATE Employee SET " +
+                    "LastName = @LastName, " +
+                    "FirstName = @FirstName, " +
+                    "MiddleName = @MiddleName, " +
+                    "SuffixID = @SuffixID, " +
+                    "Gender = @Gender, " +
+                    "Birthday = @Birthday, " +
+                    "Education = @Education, " +
+                    "DepartmentID = @DepartmentID, " +
+                    "LocationID = @LocationID, " +
+                    "EmailAddress1 = @EmailAddress1, " +
+                    "EmailAddress2 = @EmailAddress2, " +
+                    "ContactNumber1 = @ContactNumber1, " +
+                    "ContactNumber2 = @ContactNumber2, " +
+                    "CivilStatusID = @CivilStatusID, " +
+                    "PositionID = @PositionID, " +
+                    "EmploymentStatusId = @EmploymentStatusId, " +
+                    "Remarks = @Remarks " +
+                    "WHERE EmployeeID = @EmployeeID";
+
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(updateQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@LastName", employee.LastName);
+                    command.Parameters.AddWithValue("@FirstName", employee.FirstName);
+                    command.Parameters.AddWithValue("@MiddleName", employee.MiddleName);
+                    command.Parameters.AddWithValue("@SuffixID", employee.SuffixID);
+                    command.Parameters.AddWithValue("@Gender", employee.Gender);
+                    command.Parameters.AddWithValue("@Birthday", employee.Birthday);
+                    command.Parameters.AddWithValue("@Education", employee.Education);
+                    command.Parameters.AddWithValue("@DepartmentID", employee.DepartmentID);
+                    command.Parameters.AddWithValue("@LocationID", employee.LocationID);
+                    command.Parameters.AddWithValue("@EmailAddress1", employee.EmailAddress1);
+                    command.Parameters.AddWithValue("@EmailAddress2", employee.EmailAddress2);
+                    command.Parameters.AddWithValue("@ContactNumber1", employee.ContactNumber1);
+                    command.Parameters.AddWithValue("@ContactNumber2", employee.ContactNumber2);
+                    command.Parameters.AddWithValue("@CivilStatusID", employee.CivilStatusID);
+                    command.Parameters.AddWithValue("@PositionID", employee.PositionID);
+                    command.Parameters.AddWithValue("@EmploymentStatusID", employee.EmploymentStatusID);
+                    command.Parameters.AddWithValue("@Remarks", employee.Remarks);
+                    command.Parameters.AddWithValue("@EmployeeID", employee.EmployeeID);
+
+                    connection.Open();
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                int positionHistoryID = PositionService.GetAllHistory().Where(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").First().HistoryID;
+                int civilStatusHistoryID = CivilStatusService.GetAllHistory().Where(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").First().HistoryID;
+                int departmentlocationHistoryID = DepartmentService.GetAllHistory().Where(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").First().HistoryID;
+                int employmentStatusHistoryID = EmploymentStatusService.GetAllHistory().Where(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").First().HistoryID;
+                bool hasRecord = PreviousEmployeeService.RecordExists(employee.EmployeeID);
+
+                PositionService.HistoryUpdate updatedPosition = new()
+                {
+                    HistoryID = positionHistoryID,
+                    PositionID = employee.PositionID,
+                    PositionTitle = employee.PositionTitle
+                };
+
+                CivilStatusService.HistoryUpdate updatedCivilStatus = new()
+                {
+                    HistoryID = civilStatusHistoryID,
+                    CivilStatusID = employee.CivilStatusID
+                };
+
+                DepartmentService.HistoryUpdate updatedDepartmentLocation = new()
+                {
+                    HistoryID = departmentlocationHistoryID,
+                    DepartmentID = employee.DepartmentID,
+                    LocationID = employee.LocationID
+                };
+
+                EmploymentStatusService.HistoryUpdate updatedEmploymentStatus = new()
+                {
+                    HistoryID = employmentStatusHistoryID,
+                    EmploymentStatusID = employee.EmploymentStatusID
+                };
+                
+                if (!hasRecord && (bool)employee.isPreviousEmployee)
+                {
+                    PreviousEmployeeService.PreviousEmployee newPreviousEmployee = new()
+                    {
+                        EmployeeID = employee.EmployeeID,
+                        Position = employee.PreviousPosition,
+                        StartDate = employee.PreviousFrom,
+                        EndDate = employee.PreviousTo,
+                        Information = employee.OtherInformation
+                    };
+                    PreviousEmployeeService.AddRecord(newPreviousEmployee);
+                }
+                else if (hasRecord && (bool)employee.isPreviousEmployee)
+                {
+                    PreviousEmployeeService.PreviousEmployee updatedPreviousEmployee = new()
+                    {
+                        EmployeeID = employee.EmployeeID,
+                        Position = employee.PreviousPosition,
+                        StartDate = employee.PreviousFrom,
+                        EndDate = employee.PreviousTo,
+                        Information = employee.OtherInformation
+                    };
+                    PreviousEmployeeService.UpdateRecord(updatedPreviousEmployee);
+                }
+                else if (hasRecord && (bool) !employee.isPreviousEmployee)
+                {
+                    PreviousEmployeeService.DeleteRecord(employee.EmployeeID);
+                }
+
+                PositionService.UpdateHistory(updatedPosition);
+                CivilStatusService.UpdateHistory(updatedCivilStatus);
+                DepartmentService.UpdateHistory(updatedDepartmentLocation);
+                EmploymentStatusService.UpdateHistory(updatedEmploymentStatus);
+
+                if (UserService.CurrentUser != null)
+                {
+                    LoggingService.Log newLog = new()
+                    {
+                        UserID = UserService.CurrentUser.UserID,
+                        Type = "Updating Employee Information",
+                        Details = $"This user has edited the information of an employee with the ID {employee.EmployeeID}."
+                    };
+
+                    LoggingService.LogActivity(newLog);
+                }
+
+                return true;
+            }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
     }

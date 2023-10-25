@@ -81,5 +81,143 @@ namespace LBPRDC.Source.Services
 
             return items;
         }
+
+        public class History
+        {
+            public int HistoryID { get; set; }
+            public string? EmployeeID { get; set; }
+            public int DepartmentID { get; set; }
+            public int LocationID { get; set; }
+            public DateTime? Timestamp { get; set; }
+            public string? Remarks { get; set; }
+            public string? Status { get; set; }
+        }
+
+        public class HistoryUpdate
+        {
+            public int HistoryID { get; set; }
+            public int DepartmentID { get; set; }
+            public int LocationID { get; set; }
+        }
+
+        public static void AddNewHistory(History history)
+        {
+            try
+            {
+                string query = "SELECT HistoryID FROM EmployeeDepartmentLocationHistory WHERE EmployeeID = @EmployeeID AND Status = 'Active'";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(query, connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
+                    connection.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            int historyID = Convert.ToInt32(reader["HistoryID"]);
+                            UpdateStatusToInactiveByID(historyID);
+                        }
+                        AddToHistory(history);
+                    }
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static void AddToHistory(History history)
+        {
+            try
+            {
+                string query = "INSERT INTO EmployeeDepartmentLocationHistory (EmployeeID, DepartmentID, LocationID, Timestamp, Remarks, Status)" +
+                    "VALUES (@EmployeeID, @DepartmentID, @LocationID, @Timestamp, @Remarks, @Status)";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(query, connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
+                    command.Parameters.AddWithValue("@DepartmentID", history.DepartmentID);
+                    command.Parameters.AddWithValue("@LocationID", history.LocationID);
+                    command.Parameters.AddWithValue("@Timestamp", history.Timestamp);
+                    command.Parameters.AddWithValue("@Remarks", history.Remarks);
+                    command.Parameters.AddWithValue("@Status", history.Status);
+
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        private static void UpdateStatusToInactiveByID(int historyID)
+        {
+            try
+            {
+                string updateQuery = "UPDATE EmployeeDepartmentLocationHistory SET Status = @Status WHERE HistoryID = @HistoryID";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(updateQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@Status", "Inactive");
+                    command.Parameters.AddWithValue("@HistoryID", historyID);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static List<History> GetAllHistory()
+        {
+            List<History> items = new();
+
+            try
+            {
+                string query = "SELECT * FROM EmployeeDepartmentLocationHistory";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(query, connection))
+                {
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        History item = new()
+                        {
+                            HistoryID = Convert.ToInt32(reader["HistoryID"]),
+                            EmployeeID = reader["EmployeeID"].ToString(),
+                            DepartmentID = Convert.ToInt32(reader["DepartmentID"]),
+                            LocationID = Convert.ToInt32(reader["LocationID"]),
+                            Timestamp = reader["Timestamp"] as DateTime?,
+                            Remarks = reader["Remarks"].ToString(),
+                            Status = reader["Status"].ToString()
+                        };
+
+                        items.Add(item);
+                    }
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
+        }
+
+        public static void UpdateHistory(HistoryUpdate data)
+        {
+            try
+            {
+                string updateQuery = "UPDATE EmployeeDepartmentLocationHistory SET " +
+                    "DepartmentID = @DepartmentID, " +
+                    "LocationID = @LocationID " +
+                    "WHERE HistoryID = @HistoryID";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(updateQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@DepartmentID", data.DepartmentID);
+                    command.Parameters.AddWithValue("@LocationID", data.LocationID);
+                    command.Parameters.AddWithValue("@HistoryID", data.HistoryID);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
     }
 }

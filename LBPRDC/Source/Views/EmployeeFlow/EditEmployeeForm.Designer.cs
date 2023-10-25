@@ -113,6 +113,7 @@
             btnUpdate.TabIndex = 25;
             btnUpdate.Text = "Update";
             btnUpdate.UseVisualStyleBackColor = true;
+            btnUpdate.Click += btnUpdate_Click;
             // 
             // btnCancel
             // 
@@ -124,6 +125,7 @@
             btnCancel.TabIndex = 24;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Click += btnCancel_Click;
             // 
             // pnlLine1
             // 
@@ -210,6 +212,7 @@
             cmbDepartment.Name = "cmbDepartment";
             cmbDepartment.Size = new Size(197, 26);
             cmbDepartment.TabIndex = 14;
+            cmbDepartment.SelectedIndexChanged += cmbDepartment_SelectedIndexChanged;
             // 
             // grpPreviousWork
             // 

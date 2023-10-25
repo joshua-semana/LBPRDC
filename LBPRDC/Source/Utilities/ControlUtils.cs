@@ -34,5 +34,37 @@ namespace LBPRDC.Source.Utilities
                 }
             }
         }
+
+        public static bool AreRequiredFieldsFilled(List<Control> fields)
+        {
+            List<string> emptyField = new();
+
+            foreach (Control control in fields)
+            {
+                if (control is TextBox)
+                {
+                    if (string.IsNullOrWhiteSpace(control.Text))
+                    {
+                        emptyField.Add(control.AccessibleName);
+                    }
+                }
+                else if (control is ComboBox comboBox)
+                {
+                    if (comboBox.SelectedIndex == 0)
+                    {
+                        emptyField.Add(control.AccessibleName);
+                    }
+                }
+            }
+
+            if (emptyField.Count > 0)
+            {
+                string emptyFields = string.Join("\n", emptyField);
+                MessageBox.Show($"The following fields are required:\n{emptyFields}", "Required Fields", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            return true;
+        }
     }
 }

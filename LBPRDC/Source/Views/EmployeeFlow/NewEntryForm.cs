@@ -134,7 +134,7 @@ namespace LBPRDC.Source.Views
             return true;
         }
 
-        private async void btnConfirm_Click(object sender, EventArgs e)
+        private void btnConfirm_Click(object sender, EventArgs e)
         {
             if (AreRequiredFieldsFilled())
             {
@@ -156,44 +156,49 @@ namespace LBPRDC.Source.Views
                     return;
                 }
 
-                EmployeeService.NewEmployee newEmployee = new()
-                {
-                    EmployeeID = txtEmployeeID.Text.ToUpper(),
-                    LastName = txtLastName.Text.ToUpper(),
-                    FirstName = txtFirstName.Text.ToUpper(),
-                    MiddleName = txtMiddleName.Text.ToUpper(),
-                    SuffixID = Convert.ToInt32(cmbSuffix.SelectedValue),
-                    Gender = cmbGender.Text,
-                    Birthday = dtpBirthday.Value,
-                    Education = txtEducation.Text,
-                    DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue),
-                    LocationID = Convert.ToInt32(cmbLocation.SelectedValue),
-                    EmailAddress1 = txtEmailAddress1.Text,
-                    EmailAddress2 = txtEmailAddress2.Text,
-                    ContactNumber1 = txtContactNumber1.Text,
-                    ContactNumber2 = txtContactNumber2.Text,
-                    CivilStatusID = Convert.ToInt32(cmbCivilStatus.SelectedValue),
-                    PositionID = Convert.ToInt32(cmbPosition.SelectedValue),
-                    EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
-                    Remarks = txtRemarks.Text,
+                AddNewEmployee();
+            }
+        }
 
-                    StartDate = dtpStartDate.Value,
-                    PositionTitle = txtPositionTitle.Text,
-                    isPreviousEmployee = chkPreviousEmployee.Checked,
-                    PreviousFrom = dtpFromDate.Value,
-                    PreviousTo = dtpToDate.Value,
-                    PreviousPosition = txtPreviousPosition.Text,
-                    OtherInformation = txtOtherInformation.Text
-                };
+        private async void AddNewEmployee()
+        {
+            EmployeeService.EmployeeHistory newEmployee = new()
+            {
+                EmployeeID = txtEmployeeID.Text.ToUpper(),
+                LastName = txtLastName.Text.ToUpper(),
+                FirstName = txtFirstName.Text.ToUpper(),
+                MiddleName = txtMiddleName.Text.ToUpper(),
+                SuffixID = Convert.ToInt32(cmbSuffix.SelectedValue),
+                Gender = cmbGender.Text,
+                Birthday = dtpBirthday.Value,
+                Education = txtEducation.Text,
+                DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue),
+                LocationID = Convert.ToInt32(cmbLocation.SelectedValue),
+                EmailAddress1 = txtEmailAddress1.Text,
+                EmailAddress2 = txtEmailAddress2.Text,
+                ContactNumber1 = txtContactNumber1.Text,
+                ContactNumber2 = txtContactNumber2.Text,
+                CivilStatusID = Convert.ToInt32(cmbCivilStatus.SelectedValue),
+                PositionID = Convert.ToInt32(cmbPosition.SelectedValue),
+                EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
+                Remarks = txtRemarks.Text,
 
-                bool isAdded = await EmployeeService.AddNewEmployee(newEmployee);
+                StartDate = dtpStartDate.Value,
+                PositionTitle = txtPositionTitle.Text,
+                isPreviousEmployee = chkPreviousEmployee.Checked,
+                PreviousFrom = dtpFromDate.Value,
+                PreviousTo = dtpToDate.Value,
+                PreviousPosition = txtPreviousPosition.Text,
+                OtherInformation = txtOtherInformation.Text
+            };
 
-                if (isAdded)
-                {
-                    MessageBox.Show("You have successfully added a new employee.", "New Employee", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    ParentControl?.PopulateTable();
-                    this.Close();
-                }
+            bool isAdded = await EmployeeService.AddNewEmployee(newEmployee);
+
+            if (isAdded)
+            {
+                MessageBox.Show("You have successfully added a new employee.", "New Employee", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ParentControl?.PopulateTable();
+                this.Close();
             }
         }
 
