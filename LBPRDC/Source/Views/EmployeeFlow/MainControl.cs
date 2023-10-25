@@ -1,19 +1,10 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using LBPRDC.Source.Views.Employee;
+using LBPRDC.Source.Views.EmployeeFlow;
 using LBPRDC.Source.Views.Shared;
 using OfficeOpenXml;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Xml.Serialization;
 using static LBPRDC.Source.Views.Shared.DynamicCheckedListBoxControl;
 
 namespace LBPRDC.Source.Views
@@ -102,7 +93,7 @@ namespace LBPRDC.Source.Views
         {
             ShowLoadingProgressBar();
             preference = UserPreferenceManager.LoadPreference();
-            List<Services.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
+            List<EmployeeService.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
 
             dgvEmployees.Columns.Clear();
 
@@ -112,14 +103,16 @@ namespace LBPRDC.Source.Views
                 ApplySettingsToTable();
                 dgvEmployees.DataSource = employees;
             }
+
+            UpdateEmployeeCountLabel(employees.Count, employees.Count);
             HideLoadingProgressBar();
         }
 
-        public async void PopulateTableWithFilter(List<int> deparmentIDs, List<int> positionIDs, List<int> employmentStatusIDs)
+        public async void PopulateTableWithFilterAndSearch(List<int> departmentIDs, List<int> positionIDs, List<int> employmentStatusIDs, string searchWord)
         {
             ShowLoadingProgressBar();
             preference = UserPreferenceManager.LoadPreference();
-            List<Services.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
+            List<EmployeeService.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
 
             dgvEmployees.Columns.Clear();
 
@@ -127,46 +120,37 @@ namespace LBPRDC.Source.Views
             {
                 dgvEmployees.AutoGenerateColumns = false;
 
-                List<Services.Employee> filteredEmployees = employees;
+                List<EmployeeService.Employee> filteredEmployees = employees;
 
-                if (deparmentIDs.Count > 0)
+                if (departmentIDs != null && departmentIDs.Count > 0)
                 {
-                    filteredEmployees = filteredEmployees.Where(employee => deparmentIDs.Contains(employee.DepartmentID)).ToList();
+                    filteredEmployees = filteredEmployees.Where(employee => departmentIDs.Contains(employee.DepartmentID)).ToList();
                 }
-                if (positionIDs.Count > 0)
+                if (positionIDs != null && positionIDs.Count > 0)
                 {
                     filteredEmployees = filteredEmployees.Where(employee => positionIDs.Contains(employee.PositionID)).ToList();
                 }
-                if (employmentStatusIDs.Count > 0)
+                if (employmentStatusIDs != null && employmentStatusIDs.Count > 0)
                 {
                     filteredEmployees = filteredEmployees.Where(employee => employmentStatusIDs.Contains(employee.EmploymentStatusID)).ToList();
                 }
 
-                ApplySettingsToTable();
-                dgvEmployees.DataSource = filteredEmployees;
-            }
-            HideLoadingProgressBar();
-        }
-
-        public async void PopulateTableWithSearch(string searchword)
-        {
-            ShowLoadingProgressBar();
-            preference = UserPreferenceManager.LoadPreference();
-            List<Services.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
-
-            dgvEmployees.Columns.Clear();
-
-            if (employees.Count > 0)
-            {
-                dgvEmployees.AutoGenerateColumns = false;
-
-                List<Services.Employee> filteredEmployees = employees;
-
-                filteredEmployees = filteredEmployees.Where(emp => searchword.Contains(emp.FullName)).ToList();
+                if (!string.IsNullOrEmpty(searchWord))
+                {
+                    filteredEmployees = filteredEmployees
+                        .Where(employee =>
+                            employee.EmployeeID.ToLower().Contains(searchWord) ||
+                            employee.FirstName.ToLower().Contains(searchWord) ||
+                            employee.MiddleName.ToLower().Contains(searchWord) ||
+                            employee.LastName.ToLower().Contains(searchWord))
+                        .ToList();
+                }
 
                 ApplySettingsToTable();
+                UpdateEmployeeCountLabel(filteredEmployees.Count, employees.Count);
                 dgvEmployees.DataSource = filteredEmployees;
             }
+
             HideLoadingProgressBar();
         }
 
@@ -215,6 +199,11 @@ namespace LBPRDC.Source.Views
                 HeaderText = header,
                 DataPropertyName = property
             });
+        }
+
+        private void UpdateEmployeeCountLabel(int currentCount, int originalCount)
+        {
+            lblRowCounter.Text = $"Currently displaying {currentCount} out of {originalCount} employee(s).";
         }
 
         private void btnAddBatch_Click(object sender, EventArgs e)
@@ -271,23 +260,43 @@ namespace LBPRDC.Source.Views
         private void btnReset_Click(object sender, EventArgs e)
         {
             PopulateTable();
+            txtSearch.Text = string.Empty;
             ResetFilters();
         }
 
         private void btnFilter_Click(object sender, EventArgs e)
         {
-            List<int> deparmentIDs = dchkListFilterDepartments.GetCheckedItems().Select(s => s.ID).ToList();
-            List<int> positionIDs = dchkListFilterPositions.GetCheckedItems().Select(s => s.ID).ToList();
-            List<int> employmentStatusIDs = dchkListFilterEmploymentStatus.GetCheckedItems().Select(s => s.ID).ToList();
-            if (deparmentIDs.Count > 0 || positionIDs.Count > 0 || employmentStatusIDs.Count > 0)
+            ApplyFilterAndSearch();
+        }
+
+        private void txtSearch_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
             {
-                PopulateTableWithFilter(deparmentIDs, positionIDs, employmentStatusIDs);
+                ApplyFilterAndSearch();
             }
         }
 
-        private void btnSearch_Click(object sender, EventArgs e)
+        private void ApplyFilterAndSearch()
         {
-            PopulateTableWithSearch(txtSearch.Text.Trim());
+            List<int> deparmentIDs = dchkListFilterDepartments.GetCheckedItems().Select(s => s.ID).ToList();
+            List<int> positionIDs = dchkListFilterPositions.GetCheckedItems().Select(s => s.ID).ToList();
+            List<int> employmentStatusIDs = dchkListFilterEmploymentStatus.GetCheckedItems().Select(s => s.ID).ToList();
+            string searchWord = txtSearch.Text.Trim().ToLower();
+
+            PopulateTableWithFilterAndSearch(deparmentIDs, positionIDs, employmentStatusIDs, searchWord);
+        }
+
+        private void btnEditEmployee_Click(object sender, EventArgs e)
+        {
+            if (dgvEmployees.SelectedRows.Count == 1)
+            {
+                string employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+                EditEmployeeForm frmEditEmployee = new();
+                frmEditEmployee.ParentControl = this;
+                frmEditEmployee.EmployeeId = employeeID;
+                frmEditEmployee.ShowDialog();
+            }
         }
 
         //private void DataLoadingWorker_DoWork(object sender, DoWorkEventArgs e)

@@ -80,20 +80,53 @@ namespace LBPRDC.Source.Services
             return items;
         }
 
-        public class NewHistory
+        public class History
         {
+            public int HistoryID { get; set; }
             public string? EmployeeID { get; set; }
             public int CivilStatusID { get; set; }
             public DateTime? Timestamp { get; set; }
             public string? Remarks { get; set; }
+            public string? Status { get; set; }
         }
 
-        public static void AddToHistory(NewHistory history)
+        public class HistoryUpdate
+        {
+            public int HistoryID { get; set; }
+            public int CivilStatusID { get; set; }
+        }
+
+        public static void AddNewHistory(History history)
         {
             try
             {
-                string query = "INSERT INTO EmployeeCivilStatusHistory (EmployeeID, CivilStatusID, Timestamp, Remarks)" +
-                    "VALUES (@EmployeeID, @CivilStatusID, @Timestamp, @Remarks)";
+                string query = "SELECT HistoryID FROM EmployeeCivilStatusHistory WHERE EmployeeID = @EmployeeID AND Status = 'Active'";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(query, connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
+                    connection.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            int historyID = Convert.ToInt32(reader["HistoryID"]);
+                            UpdateStatusToInactiveByID(historyID);
+                        }
+                        AddToHistory(history);
+                    }
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static void AddToHistory(History history)
+        {
+            try
+            {
+                string query = "INSERT INTO EmployeeCivilStatusHistory (EmployeeID, CivilStatusID, Timestamp, Remarks, Status)" +
+                    "VALUES (@EmployeeID, @CivilStatusID, @Timestamp, @Remarks, @Status)";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
@@ -101,7 +134,77 @@ namespace LBPRDC.Source.Services
                     command.Parameters.AddWithValue("@CivilStatusID", history.CivilStatusID);
                     command.Parameters.AddWithValue("@Timestamp", history.Timestamp);
                     command.Parameters.AddWithValue("@Remarks", history.Remarks);
+                    command.Parameters.AddWithValue("@Status", history.Status);
 
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        private static void UpdateStatusToInactiveByID(int historyID)
+        {
+            try
+            {
+                string updateQuery = "UPDATE EmployeeCivilStatusHistory SET Status = @Status WHERE HistoryID = @HistoryID";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(updateQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@Status", "Inactive");
+                    command.Parameters.AddWithValue("@HistoryID", historyID);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static List<History> GetAllHistory()
+        {
+            List<History> items = new();
+
+            try
+            {
+                string query = "SELECT * FROM EmployeeCivilStatusHistory";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(query, connection))
+                {
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        History item = new()
+                        {
+                            HistoryID = Convert.ToInt32(reader["HistoryID"]),
+                            EmployeeID = reader["EmployeeID"].ToString(),
+                            CivilStatusID = Convert.ToInt32(reader["CivilStatusID"]),
+                            Timestamp = reader["Timestamp"] as DateTime?,
+                            Remarks = reader["Remarks"].ToString(),
+                            Status = reader["Status"].ToString()
+                        };
+
+                        items.Add(item);
+                    }
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
+        }
+
+        public static void UpdateHistory(HistoryUpdate data)
+        {
+            try
+            {
+                string updateQuery = "UPDATE EmployeeCivilStatusHistory SET " +
+                    "CivilStatusID = @CivilStatusID " +
+                    "WHERE HistoryID = @HistoryID";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(updateQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@CivilStatusID", data.CivilStatusID);
+                    command.Parameters.AddWithValue("@HistoryID", data.HistoryID);
                     connection.Open();
                     command.ExecuteNonQuery();
                 }

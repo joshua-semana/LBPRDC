@@ -16,21 +16,17 @@ namespace LBPRDC.Source.Services
             {
                 // By adding COLLATE Latin1_General_BIN, the word "admin" is not the same with "ADmin"
                 string query = "SELECT PasswordHash FROM Users WHERE Username COLLATE Latin1_General_BIN = @Username";
-
-                using (SqlConnection connection = new SqlConnection(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(query, connection))
                 {
+                    command.Parameters.AddWithValue("@Username", username);
                     connection.Open();
 
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    string? storedPasswordHash = command.ExecuteScalar() as string;
+                    if (storedPasswordHash != null)
                     {
-                        command.Parameters.AddWithValue("@Username", username);
-
-                        string? storedPasswordHash = command.ExecuteScalar() as string;
-                        if (storedPasswordHash != null)
-                        {
-                            bool passwordIsCorrect = BCrypt.Net.BCrypt.Verify(password, storedPasswordHash);
-                            return passwordIsCorrect;
-                        }
+                        bool passwordIsCorrect = BCrypt.Net.BCrypt.Verify(password, storedPasswordHash);
+                        return passwordIsCorrect;
                     }
                 }
                 return false;
