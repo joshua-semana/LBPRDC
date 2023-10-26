@@ -299,6 +299,18 @@ namespace LBPRDC.Source.Views
             }
         }
 
+        private void btnUpdatePosition_Click(object sender, EventArgs e)
+        {
+            if (dgvEmployees.SelectedRows.Count == 1)
+            {
+                string employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+                UpdatePositionForm frmUpdatePosition = new();
+                frmUpdatePosition.ParentControl = this;
+                frmUpdatePosition.EmployeeId = employeeID;
+                frmUpdatePosition.ShowDialog();
+            }
+        }
+
         //private void DataLoadingWorker_DoWork(object sender, DoWorkEventArgs e)
         //{
         //    e.Result = EmployeeService.GetAllEmployees();

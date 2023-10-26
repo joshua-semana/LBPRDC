@@ -56,7 +56,7 @@
             label12 = new Label();
             cmbEmploymentStatus = new ComboBox();
             label11 = new Label();
-            dtpStartDate = new DateTimePicker();
+            dtpEffectiveDate = new DateTimePicker();
             cmbPosition = new ComboBox();
             label7 = new Label();
             label8 = new Label();
@@ -166,7 +166,7 @@
             grpJobData.Controls.Add(label12);
             grpJobData.Controls.Add(cmbEmploymentStatus);
             grpJobData.Controls.Add(label11);
-            grpJobData.Controls.Add(dtpStartDate);
+            grpJobData.Controls.Add(dtpEffectiveDate);
             grpJobData.Controls.Add(cmbPosition);
             grpJobData.Controls.Add(label7);
             grpJobData.Controls.Add(label8);
@@ -242,7 +242,7 @@
             txtOtherInformation.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             txtOtherInformation.Location = new Point(609, 47);
             txtOtherInformation.Margin = new Padding(6, 3, 3, 16);
-            txtOtherInformation.MaxLength = 500;
+            txtOtherInformation.MaxLength = 100;
             txtOtherInformation.Name = "txtOtherInformation";
             txtOtherInformation.Size = new Size(187, 23);
             txtOtherInformation.TabIndex = 24;
@@ -349,7 +349,7 @@
             txtRemarks.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             txtRemarks.Location = new Point(10, 180);
             txtRemarks.Margin = new Padding(6, 3, 3, 16);
-            txtRemarks.MaxLength = 500;
+            txtRemarks.MaxLength = 100;
             txtRemarks.Name = "txtRemarks";
             txtRemarks.Size = new Size(806, 26);
             txtRemarks.TabIndex = 19;
@@ -443,21 +443,21 @@
             label11.Location = new Point(209, 27);
             label11.Margin = new Padding(3, 0, 3, 4);
             label11.Name = "label11";
-            label11.Size = new Size(71, 16);
+            label11.Size = new Size(95, 16);
             label11.TabIndex = 16;
-            label11.Text = "Start Date";
+            label11.Text = "Effective Date";
             // 
-            // dtpStartDate
+            // dtpEffectiveDate
             // 
-            dtpStartDate.AccessibleName = "Start Date";
-            dtpStartDate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            dtpStartDate.CustomFormat = "MM-dd-yyy";
-            dtpStartDate.Format = DateTimePickerFormat.Custom;
-            dtpStartDate.Location = new Point(213, 50);
-            dtpStartDate.Margin = new Padding(3, 3, 3, 16);
-            dtpStartDate.Name = "dtpStartDate";
-            dtpStartDate.Size = new Size(197, 26);
-            dtpStartDate.TabIndex = 13;
+            dtpEffectiveDate.AccessibleName = "Effective Date";
+            dtpEffectiveDate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            dtpEffectiveDate.CustomFormat = "MM-dd-yyy";
+            dtpEffectiveDate.Format = DateTimePickerFormat.Custom;
+            dtpEffectiveDate.Location = new Point(213, 50);
+            dtpEffectiveDate.Margin = new Padding(3, 3, 3, 16);
+            dtpEffectiveDate.Name = "dtpEffectiveDate";
+            dtpEffectiveDate.Size = new Size(197, 26);
+            dtpEffectiveDate.TabIndex = 13;
             // 
             // cmbPosition
             // 
@@ -554,7 +554,7 @@
             txtEmailAddress2.AccessibleName = "Email Address 2";
             txtEmailAddress2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             txtEmailAddress2.Location = new Point(416, 50);
-            txtEmailAddress2.MaxLength = 50;
+            txtEmailAddress2.MaxLength = 100;
             txtEmailAddress2.Name = "txtEmailAddress2";
             txtEmailAddress2.Size = new Size(400, 26);
             txtEmailAddress2.TabIndex = 9;
@@ -565,7 +565,7 @@
             txtEmailAddress1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtEmailAddress1.Location = new Point(10, 50);
             txtEmailAddress1.Margin = new Padding(6, 3, 3, 16);
-            txtEmailAddress1.MaxLength = 50;
+            txtEmailAddress1.MaxLength = 100;
             txtEmailAddress1.Name = "txtEmailAddress1";
             txtEmailAddress1.PlaceholderText = "ex: myname@example.com";
             txtEmailAddress1.Size = new Size(400, 26);
@@ -838,7 +838,7 @@
         private Label label7;
         private Label label9;
         private Label label11;
-        private DateTimePicker dtpStartDate;
+        private DateTimePicker dtpEffectiveDate;
         private Label label12;
         private ComboBox cmbEmploymentStatus;
         private TextBox txtEmployeeID;

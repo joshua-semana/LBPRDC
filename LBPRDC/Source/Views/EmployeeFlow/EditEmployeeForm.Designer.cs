@@ -111,7 +111,7 @@
             btnUpdate.Name = "btnUpdate";
             btnUpdate.Size = new Size(75, 28);
             btnUpdate.TabIndex = 25;
-            btnUpdate.Text = "Update";
+            btnUpdate.Text = "Save";
             btnUpdate.UseVisualStyleBackColor = true;
             btnUpdate.Click += btnUpdate_Click;
             // 
@@ -176,14 +176,14 @@
             grpJobData.Size = new Size(827, 359);
             grpJobData.TabIndex = 15;
             grpJobData.TabStop = false;
-            grpJobData.Text = "Work Information";
+            grpJobData.Text = "Current Work Information";
             // 
             // label20
             // 
             label20.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label20.AutoSize = true;
             label20.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label20.Location = new Point(615, 32);
+            label20.Location = new Point(615, 27);
             label20.Margin = new Padding(3, 0, 3, 4);
             label20.Name = "label20";
             label20.Size = new Size(61, 16);
@@ -196,7 +196,7 @@
             cmbLocation.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             cmbLocation.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbLocation.FormattingEnabled = true;
-            cmbLocation.Location = new Point(619, 51);
+            cmbLocation.Location = new Point(619, 50);
             cmbLocation.Name = "cmbLocation";
             cmbLocation.Size = new Size(197, 26);
             cmbLocation.TabIndex = 15;
@@ -207,7 +207,7 @@
             cmbDepartment.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             cmbDepartment.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbDepartment.FormattingEnabled = true;
-            cmbDepartment.Location = new Point(416, 51);
+            cmbDepartment.Location = new Point(416, 50);
             cmbDepartment.Margin = new Padding(3, 3, 3, 16);
             cmbDepartment.Name = "cmbDepartment";
             cmbDepartment.Size = new Size(197, 26);
@@ -226,7 +226,7 @@
             grpPreviousWork.Controls.Add(label16);
             grpPreviousWork.Enabled = false;
             grpPreviousWork.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            grpPreviousWork.Location = new Point(10, 258);
+            grpPreviousWork.Location = new Point(10, 253);
             grpPreviousWork.Margin = new Padding(0);
             grpPreviousWork.Name = "grpPreviousWork";
             grpPreviousWork.Padding = new Padding(3, 8, 3, 3);
@@ -241,7 +241,7 @@
             txtOtherInformation.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             txtOtherInformation.Location = new Point(609, 47);
             txtOtherInformation.Margin = new Padding(6, 3, 3, 16);
-            txtOtherInformation.MaxLength = 500;
+            txtOtherInformation.MaxLength = 100;
             txtOtherInformation.Name = "txtOtherInformation";
             txtOtherInformation.Size = new Size(187, 23);
             txtOtherInformation.TabIndex = 24;
@@ -321,7 +321,7 @@
             label16.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             label16.AutoSize = true;
             label16.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label16.Location = new Point(6, 29);
+            label16.Location = new Point(6, 24);
             label16.Margin = new Padding(3, 0, 3, 4);
             label16.Name = "label16";
             label16.Size = new Size(57, 16);
@@ -332,7 +332,7 @@
             // 
             chkPreviousEmployee.AutoSize = true;
             chkPreviousEmployee.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            chkPreviousEmployee.Location = new Point(10, 230);
+            chkPreviousEmployee.Location = new Point(10, 225);
             chkPreviousEmployee.Margin = new Padding(3, 3, 3, 8);
             chkPreviousEmployee.Name = "chkPreviousEmployee";
             chkPreviousEmployee.Size = new Size(317, 20);
@@ -345,9 +345,9 @@
             // 
             txtRemarks.AccessibleName = "Remarks";
             txtRemarks.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            txtRemarks.Location = new Point(10, 181);
+            txtRemarks.Location = new Point(10, 180);
             txtRemarks.Margin = new Padding(6, 3, 3, 16);
-            txtRemarks.MaxLength = 500;
+            txtRemarks.MaxLength = 100;
             txtRemarks.Name = "txtRemarks";
             txtRemarks.Size = new Size(806, 26);
             txtRemarks.TabIndex = 19;
@@ -357,7 +357,7 @@
             label15.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label15.AutoSize = true;
             label15.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label15.Location = new Point(5, 158);
+            label15.Location = new Point(6, 157);
             label15.Margin = new Padding(3, 0, 3, 4);
             label15.Name = "label15";
             label15.Size = new Size(63, 16);
@@ -368,7 +368,7 @@
             // 
             txtPositionTitle.AccessibleName = "Position Title";
             txtPositionTitle.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            txtPositionTitle.Location = new Point(416, 116);
+            txtPositionTitle.Location = new Point(416, 115);
             txtPositionTitle.Margin = new Padding(6, 3, 3, 16);
             txtPositionTitle.MaxLength = 50;
             txtPositionTitle.Name = "txtPositionTitle";
@@ -380,7 +380,7 @@
             label14.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label14.AutoSize = true;
             label14.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label14.Location = new Point(411, 93);
+            label14.Location = new Point(412, 92);
             label14.Margin = new Padding(3, 0, 3, 4);
             label14.Name = "label14";
             label14.Size = new Size(87, 16);
@@ -403,7 +403,7 @@
             label13.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             label13.AutoSize = true;
             label13.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label13.Location = new Point(6, 32);
+            label13.Location = new Point(6, 27);
             label13.Margin = new Padding(3, 0, 3, 4);
             label13.Name = "label13";
             label13.Size = new Size(86, 16);
@@ -415,7 +415,7 @@
             label12.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label12.AutoSize = true;
             label12.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label12.Location = new Point(614, 93);
+            label12.Location = new Point(615, 92);
             label12.Margin = new Padding(3, 0, 3, 4);
             label12.Name = "label12";
             label12.Size = new Size(128, 16);
@@ -428,7 +428,7 @@
             cmbEmploymentStatus.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             cmbEmploymentStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbEmploymentStatus.FormattingEnabled = true;
-            cmbEmploymentStatus.Location = new Point(619, 116);
+            cmbEmploymentStatus.Location = new Point(619, 115);
             cmbEmploymentStatus.Name = "cmbEmploymentStatus";
             cmbEmploymentStatus.Size = new Size(197, 26);
             cmbEmploymentStatus.TabIndex = 18;
@@ -438,12 +438,12 @@
             label11.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label11.AutoSize = true;
             label11.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label11.Location = new Point(209, 32);
+            label11.Location = new Point(209, 27);
             label11.Margin = new Padding(3, 0, 3, 4);
             label11.Name = "label11";
-            label11.Size = new Size(71, 16);
+            label11.Size = new Size(95, 16);
             label11.TabIndex = 16;
-            label11.Text = "Start Date";
+            label11.Text = "Effective Date";
             // 
             // dtpStartDate
             // 
@@ -451,7 +451,7 @@
             dtpStartDate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             dtpStartDate.CustomFormat = "MM-dd-yyy";
             dtpStartDate.Format = DateTimePickerFormat.Custom;
-            dtpStartDate.Location = new Point(212, 51);
+            dtpStartDate.Location = new Point(213, 50);
             dtpStartDate.Margin = new Padding(3, 3, 3, 16);
             dtpStartDate.Name = "dtpStartDate";
             dtpStartDate.Size = new Size(197, 26);
@@ -463,7 +463,7 @@
             cmbPosition.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             cmbPosition.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbPosition.FormattingEnabled = true;
-            cmbPosition.Location = new Point(10, 116);
+            cmbPosition.Location = new Point(10, 115);
             cmbPosition.Margin = new Padding(3, 3, 3, 16);
             cmbPosition.Name = "cmbPosition";
             cmbPosition.Size = new Size(400, 26);
@@ -474,7 +474,7 @@
             label7.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             label7.AutoSize = true;
             label7.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label7.Location = new Point(412, 32);
+            label7.Location = new Point(412, 27);
             label7.Margin = new Padding(3, 0, 3, 4);
             label7.Name = "label7";
             label7.Size = new Size(81, 16);
@@ -486,7 +486,7 @@
             label8.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label8.AutoSize = true;
             label8.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label8.Location = new Point(5, 93);
+            label8.Location = new Point(6, 92);
             label8.Margin = new Padding(3, 0, 3, 4);
             label8.Name = "label8";
             label8.Size = new Size(57, 16);
@@ -537,7 +537,7 @@
             label6.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             label6.AutoSize = true;
             label6.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label6.Location = new Point(6, 97);
+            label6.Location = new Point(6, 92);
             label6.Margin = new Padding(3, 0, 3, 4);
             label6.Name = "label6";
             label6.Size = new Size(116, 16);
@@ -549,7 +549,7 @@
             txtEmailAddress2.AccessibleName = "Email Address 2";
             txtEmailAddress2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             txtEmailAddress2.Location = new Point(416, 50);
-            txtEmailAddress2.MaxLength = 50;
+            txtEmailAddress2.MaxLength = 100;
             txtEmailAddress2.Name = "txtEmailAddress2";
             txtEmailAddress2.Size = new Size(400, 26);
             txtEmailAddress2.TabIndex = 9;
@@ -559,7 +559,7 @@
             txtEmailAddress1.AccessibleName = "Email Address 1";
             txtEmailAddress1.Location = new Point(10, 50);
             txtEmailAddress1.Margin = new Padding(6, 3, 3, 16);
-            txtEmailAddress1.MaxLength = 50;
+            txtEmailAddress1.MaxLength = 100;
             txtEmailAddress1.Name = "txtEmailAddress1";
             txtEmailAddress1.PlaceholderText = "ex: myname@example.com";
             txtEmailAddress1.Size = new Size(400, 26);
@@ -570,7 +570,7 @@
             label10.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             label10.AutoSize = true;
             label10.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label10.Location = new Point(6, 32);
+            label10.Location = new Point(6, 27);
             label10.Margin = new Padding(3, 0, 3, 4);
             label10.Name = "label10";
             label10.Size = new Size(111, 16);
@@ -701,7 +701,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label2.Location = new Point(6, 97);
+            label2.Location = new Point(6, 92);
             label2.Margin = new Padding(3, 0, 3, 4);
             label2.Name = "label2";
             label2.Size = new Size(55, 16);
@@ -757,7 +757,7 @@
             label1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             label1.AutoSize = true;
             label1.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(6, 32);
+            label1.Location = new Point(6, 27);
             label1.Margin = new Padding(3, 0, 3, 4);
             label1.Name = "label1";
             label1.Size = new Size(43, 16);

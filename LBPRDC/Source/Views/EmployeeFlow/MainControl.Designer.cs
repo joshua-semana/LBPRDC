@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ucEmployees));
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             flowControls = new FlowLayoutPanel();
             btnAddBatch = new Button();
             btnAddEmployee = new Button();
@@ -64,6 +64,7 @@
             btnFilter = new Button();
             btnReset = new Button();
             dgvEmployees = new DataGridView();
+            btnUpdatePosition = new Button();
             flowControls.SuspendLayout();
             pnlContainerHeader.SuspendLayout();
             panel2.SuspendLayout();
@@ -82,6 +83,7 @@
             flowControls.Controls.Add(btnAddBatch);
             flowControls.Controls.Add(btnAddEmployee);
             flowControls.Controls.Add(btnEditEmployee);
+            flowControls.Controls.Add(btnUpdatePosition);
             flowControls.Dock = DockStyle.Bottom;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
             flowControls.Location = new Point(0, 569);
@@ -466,22 +468,22 @@
             dgvEmployees.AllowUserToDeleteRows = false;
             dgvEmployees.AllowUserToOrderColumns = true;
             dgvEmployees.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.BackColor = Color.Honeydew;
-            dataGridViewCellStyle1.SelectionBackColor = Color.SeaGreen;
-            dgvEmployees.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.BackColor = Color.Honeydew;
+            dataGridViewCellStyle4.SelectionBackColor = Color.SeaGreen;
+            dgvEmployees.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
             dgvEmployees.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvEmployees.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvEmployees.BackgroundColor = SystemColors.Window;
             dgvEmployees.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.Padding = new Padding(0, 2, 0, 2);
-            dataGridViewCellStyle2.SelectionBackColor = Color.MediumSeaGreen;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            dgvEmployees.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = SystemColors.Control;
+            dataGridViewCellStyle5.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle5.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle5.Padding = new Padding(0, 2, 0, 2);
+            dataGridViewCellStyle5.SelectionBackColor = Color.MediumSeaGreen;
+            dataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.True;
+            dgvEmployees.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             dgvEmployees.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvEmployees.EditMode = DataGridViewEditMode.EditOnF2;
             dgvEmployees.GridColor = SystemColors.Window;
@@ -490,15 +492,15 @@
             dgvEmployees.MultiSelect = false;
             dgvEmployees.Name = "dgvEmployees";
             dgvEmployees.ReadOnly = true;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = SystemColors.Control;
-            dataGridViewCellStyle3.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle3.Padding = new Padding(4);
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
-            dgvEmployees.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = SystemColors.Control;
+            dataGridViewCellStyle6.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle6.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle6.Padding = new Padding(4);
+            dataGridViewCellStyle6.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.True;
+            dgvEmployees.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             dgvEmployees.RowHeadersVisible = false;
             dgvEmployees.RowTemplate.DefaultCellStyle.Padding = new Padding(4);
             dgvEmployees.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
@@ -506,6 +508,18 @@
             dgvEmployees.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvEmployees.Size = new Size(950, 486);
             dgvEmployees.TabIndex = 3;
+            // 
+            // btnUpdatePosition
+            // 
+            btnUpdatePosition.AutoSize = true;
+            btnUpdatePosition.Location = new Point(767, 16);
+            btnUpdatePosition.Margin = new Padding(0);
+            btnUpdatePosition.Name = "btnUpdatePosition";
+            btnUpdatePosition.Size = new Size(130, 28);
+            btnUpdatePosition.TabIndex = 8;
+            btnUpdatePosition.Text = "Update Position";
+            btnUpdatePosition.UseVisualStyleBackColor = true;
+            btnUpdatePosition.Click += btnUpdatePosition_Click;
             // 
             // ucEmployees
             // 
@@ -570,5 +584,6 @@
         private FlowLayoutPanel flowLayoutPanel1;
         private Button btnSettings;
         private Label lblRowCounter;
+        private Button btnUpdatePosition;
     }
 }

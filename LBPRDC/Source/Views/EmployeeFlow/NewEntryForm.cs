@@ -164,39 +164,39 @@ namespace LBPRDC.Source.Views
         {
             EmployeeService.EmployeeHistory newEmployee = new()
             {
-                EmployeeID = txtEmployeeID.Text.ToUpper(),
-                LastName = txtLastName.Text.ToUpper(),
-                FirstName = txtFirstName.Text.ToUpper(),
-                MiddleName = txtMiddleName.Text.ToUpper(),
+                EmployeeID = txtEmployeeID.Text.ToUpper().Trim(),
+                LastName = txtLastName.Text.ToUpper().Trim(),
+                FirstName = txtFirstName.Text.ToUpper().Trim(),
+                MiddleName = txtMiddleName.Text.ToUpper().Trim(),
                 SuffixID = Convert.ToInt32(cmbSuffix.SelectedValue),
                 Gender = cmbGender.Text,
                 Birthday = dtpBirthday.Value,
                 Education = txtEducation.Text,
                 DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue),
                 LocationID = Convert.ToInt32(cmbLocation.SelectedValue),
-                EmailAddress1 = txtEmailAddress1.Text,
-                EmailAddress2 = txtEmailAddress2.Text,
+                EmailAddress1 = txtEmailAddress1.Text.Trim(),
+                EmailAddress2 = txtEmailAddress2.Text.Trim(),
                 ContactNumber1 = txtContactNumber1.Text,
                 ContactNumber2 = txtContactNumber2.Text,
                 CivilStatusID = Convert.ToInt32(cmbCivilStatus.SelectedValue),
                 PositionID = Convert.ToInt32(cmbPosition.SelectedValue),
                 EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
-                Remarks = txtRemarks.Text,
+                Remarks = txtRemarks.Text.Trim(),
 
-                StartDate = dtpStartDate.Value,
-                PositionTitle = txtPositionTitle.Text,
+                EffectiveDate = dtpEffectiveDate.Value,
+                PositionTitle = txtPositionTitle.Text.ToUpper().Trim(),
                 isPreviousEmployee = chkPreviousEmployee.Checked,
                 PreviousFrom = dtpFromDate.Value,
                 PreviousTo = dtpToDate.Value,
-                PreviousPosition = txtPreviousPosition.Text,
-                OtherInformation = txtOtherInformation.Text
+                PreviousPosition = txtPreviousPosition.Text.ToUpper().Trim(),
+                OtherInformation = txtOtherInformation.Text.Trim()
             };
 
             bool isAdded = await EmployeeService.AddNewEmployee(newEmployee);
 
             if (isAdded)
             {
-                MessageBox.Show("You have successfully added a new employee.", "New Employee", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("You have successfully added a new employee.", "New Employee Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ParentControl?.PopulateTable();
                 this.Close();
             }
