@@ -1,27 +1,27 @@
-﻿using LBPRDC.Source.Services;
+﻿
+
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
-using System.Data;
 
 namespace LBPRDC.Source.Views.EmployeeFlow
 {
-    public partial class UpdatePositionForm : Form
+    public partial class UpdateCivilStatusForm : Form
     {
         public string? EmployeeId { get; set; }
         public ucEmployees? ParentControl { get; set; }
 
         private readonly List<Control> requiredFields;
-
-        public UpdatePositionForm()
+        public UpdateCivilStatusForm()
         {
             InitializeComponent();
 
             requiredFields = new List<Control>
             {
-                cmbPosition
+                cmbCivilStatus
             };
         }
 
-        private void UpdatePositionForm_Load(object sender, EventArgs e)
+        private void UpdateCivilStatusForm_Load(object sender, EventArgs e)
         {
             if (EmployeeId != null)
             {
@@ -32,49 +32,53 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void InitializePositionComboBoxItems()
         {
-            cmbPosition.DataSource = PositionService.GetAllItemsForComboBox();
-            cmbPosition.DisplayMember = "Name";
-            cmbPosition.ValueMember = "ID";
+            cmbCivilStatus.DataSource = CivilStatusService.GetAllItemsForComboBox();
+            cmbCivilStatus.DisplayMember = "Name";
+            cmbCivilStatus.ValueMember = "ID";
         }
 
         private void InitializeEmployeeInformation(string ID)
         {
             List<EmployeeService.Employee> employee = EmployeeService.GetAllEmployees();
-            List<PositionService.History> positionHistory = PositionService.GetAllHistory();
 
             employee = employee.Where(w => w.EmployeeID == ID).ToList();
             txtEmployeeID.Text = employee.First().EmployeeID;
             txtFullName.Text = $"{employee.First().LastName}, {employee.First().FirstName} {employee.First().MiddleName}";
-            txtCurrentPosition.Text = $"{employee.First().PositionCode} - {employee.First().PositionName}";
-            txtCurrentPositionTitle.Text = positionHistory.Where(w => w.EmployeeID == ID && w.Status == "Active").First().PositionTitle;
+            txtCurrentCivilStatus.Text = employee.First().CivilStatus;
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
             if (ControlUtils.AreRequiredFieldsFilled(requiredFields))
             {
+                if (txtCurrentCivilStatus.Text == cmbCivilStatus.Text)
+                {
+                    MessageBox.Show("Please select a different status. Cannot update to the same status", "Cannot Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
                 var result1 = MessageBox.Show("Are you sure you want to update this employee's position information?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (result1 == DialogResult.No) return;
 
                 UpdateEmployeeInformation();
             }
         }
+
         private async void UpdateEmployeeInformation()
         {
-            EmployeeService.EmployeePositionUpdate data = new()
+            EmployeeService.EmployeeCivilStatusUpdate data = new()
             {
                 EmployeeID = txtEmployeeID.Text,
-                PositionID = Convert.ToInt32(cmbPosition.SelectedValue),
-                PositionTitle = txtPositionTitle.Text.ToUpper().Trim(),
+                CivilStatusID = Convert.ToInt32(cmbCivilStatus.SelectedValue),
                 Remarks = txtRemarks.Text,
-                Date = dtpEffectiveDate.Value
+                Date = DateTime.Now,
             };
 
-            bool isUpdated = await EmployeeService.UpdateEmployeePosition(data);
+            bool isUpdated = await EmployeeService.UpdateEmployeeCivilStatus(data);
 
             if (isUpdated)
             {
-                MessageBox.Show("You have successfully updated this employee's position information.", "Update Employee Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("You have successfully updated this employee's civil status information.", "Update Employee Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ParentControl?.PopulateTable();
                 this.Close();
             }
