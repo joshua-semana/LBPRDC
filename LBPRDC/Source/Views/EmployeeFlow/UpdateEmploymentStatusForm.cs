@@ -1,27 +1,34 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace LBPRDC.Source.Views.EmployeeFlow
 {
-    public partial class UpdatePositionForm : Form
+    public partial class UpdateEmploymentStatusForm : Form
     {
         public string? EmployeeId { get; set; }
         public ucEmployees? ParentControl { get; set; }
 
         private readonly List<Control> requiredFields;
-
-        public UpdatePositionForm()
+        public UpdateEmploymentStatusForm()
         {
             InitializeComponent();
 
             requiredFields = new List<Control>
             {
-                cmbPosition
+                cmbEmploymentStatus
             };
         }
 
-        private void UpdatePositionForm_Load(object sender, EventArgs e)
+        private void UpdateEmploymentStatusForm_Load(object sender, EventArgs e)
         {
             if (EmployeeId != null)
             {
@@ -32,49 +39,53 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void InitializePositionComboBoxItems()
         {
-            cmbPosition.DataSource = PositionService.GetAllItemsForComboBox();
-            cmbPosition.DisplayMember = "Name";
-            cmbPosition.ValueMember = "ID";
+            cmbEmploymentStatus.DataSource = EmploymentStatusService.GetAllItemsForComboBox();
+            cmbEmploymentStatus.DisplayMember = "Name";
+            cmbEmploymentStatus.ValueMember = "ID";
         }
 
         private void InitializeEmployeeInformation(string ID)
         {
             List<EmployeeService.Employee> employee = EmployeeService.GetAllEmployees();
-            List<PositionService.History> positionHistory = PositionService.GetAllHistory();
 
             employee = employee.Where(w => w.EmployeeID == ID).ToList();
             txtEmployeeID.Text = employee.First().EmployeeID;
             txtFullName.Text = $"{employee.First().LastName}, {employee.First().FirstName} {employee.First().MiddleName}";
-            txtCurrentPosition.Text = $"{employee.First().PositionCode} - {employee.First().PositionName}";
-            txtCurrentPositionTitle.Text = positionHistory.Where(w => w.EmployeeID == ID && w.Status == "Active").First().PositionTitle;
+            txtCurrentEmploymentStatus.Text = employee.First().EmploymentStatus;
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
             if (ControlUtils.AreRequiredFieldsFilled(requiredFields))
             {
+                if (txtCurrentEmploymentStatus.Text == cmbEmploymentStatus.Text)
+                {
+                    MessageBox.Show("Please select a different status. Cannot update to the same status", "Cannot Update", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
                 var result1 = MessageBox.Show("Are you sure you want to update this employee's position information?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (result1 == DialogResult.No) return;
 
                 UpdateEmployeeInformation();
             }
         }
+
         private async void UpdateEmployeeInformation()
         {
-            EmployeeService.EmployeePositionUpdate data = new()
+            EmployeeService.EmployeeEmploymentStatusUpdate data = new()
             {
                 EmployeeID = txtEmployeeID.Text,
-                PositionID = Convert.ToInt32(cmbPosition.SelectedValue),
-                PositionTitle = txtPositionTitle.Text.ToUpper().Trim(),
+                EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
                 Remarks = txtRemarks.Text,
-                Date = dtpEffectiveDate.Value
+                Date = DateTime.Now,
             };
 
-            bool isUpdated = await EmployeeService.UpdateEmployeePosition(data);
+            bool isUpdated = await EmployeeService.UpdateEmployeeEmploymentStatus(data);
 
             if (isUpdated)
             {
-                MessageBox.Show("You have successfully updated this employee's position information.", "Update Employee Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("You have successfully updated this employee's employment status information.", "Update Employee Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ParentControl?.PopulateTable();
                 this.Close();
             }

@@ -14,7 +14,7 @@ namespace LBPRDC.Source.Views
         UserControl loadingControl = new ucLoading();
         private UserPreference preference;
         //private BackgroundWorker dataLoader;
-
+        private string employeeID;
         public ucEmployees()
         {
             InitializeComponent();
@@ -287,28 +287,72 @@ namespace LBPRDC.Source.Views
             PopulateTableWithFilterAndSearch(deparmentIDs, positionIDs, employmentStatusIDs, searchWord);
         }
 
-        private void btnEditEmployee_Click(object sender, EventArgs e)
+        private void dgvEmployees_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (dgvEmployees.SelectedRows.Count == 1)
+            if (e.Button == MouseButtons.Right)
             {
-                string employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
-                EditEmployeeForm frmEditEmployee = new();
-                frmEditEmployee.ParentControl = this;
-                frmEditEmployee.EmployeeId = employeeID;
-                frmEditEmployee.ShowDialog();
+                if (e.RowIndex >= 0)
+                {
+                    dgvEmployees.Rows[e.RowIndex].Selected = true;
+                    var location = dgvEmployees.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false).Location;
+                    cntxtEmployeeActions.Show(dgvEmployees, location);
+                }
             }
         }
 
-        private void btnUpdatePosition_Click(object sender, EventArgs e)
+        private void cntxtMenuEdit_Click(object sender, EventArgs e)
         {
-            if (dgvEmployees.SelectedRows.Count == 1)
+            employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+            EditEmployeeForm frmEditEmployee = new()
             {
-                string employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
-                UpdatePositionForm frmUpdatePosition = new();
-                frmUpdatePosition.ParentControl = this;
-                frmUpdatePosition.EmployeeId = employeeID;
-                frmUpdatePosition.ShowDialog();
-            }
+                ParentControl = this,
+                EmployeeId = employeeID
+            };
+            frmEditEmployee.ShowDialog();
+        }
+
+        private void menuUpdatePosition_Click(object sender, EventArgs e)
+        {
+            employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+            UpdatePositionForm frmUpdatePosition = new()
+            {
+                ParentControl = this,
+                EmployeeId = employeeID
+            };
+            frmUpdatePosition.ShowDialog();
+        }
+
+        private void menuUpdateCivilStatus_Click(object sender, EventArgs e)
+        {
+            employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+            UpdateCivilStatusForm frmUpdateCivilStatus = new()
+            {
+                ParentControl = this,
+                EmployeeId = employeeID
+            };
+            frmUpdateCivilStatus.ShowDialog();
+        }
+
+        private void menuUpdateEmploymentStatus_Click(object sender, EventArgs e)
+        {
+            string employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+            UpdateEmploymentStatusForm frmUpdateEmploymentStatus = new()
+            {
+                ParentControl = this,
+                EmployeeId = employeeID
+            };
+            frmUpdateEmploymentStatus.ShowDialog();
+        }
+
+        private void menuUpdateDepartmentLocation_Click(object sender, EventArgs e)
+        {
+            string employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+            UpdateDepartmentLocationForm frmUpdateDepartmentLocation = new()
+            {
+                ParentControl = this,
+                EmployeeId = employeeID
+            };
+            frmUpdateDepartmentLocation.ShowDialog();
         }
 
         //private void DataLoadingWorker_DoWork(object sender, DoWorkEventArgs e)

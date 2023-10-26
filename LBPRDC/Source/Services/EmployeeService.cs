@@ -59,13 +59,33 @@ namespace LBPRDC.Source.Services
             public string? OtherInformation { get; set; }
         }
 
-        public class EmployeePositionUpdate
+        public class EmployeeUpdateBase
         {
             public string? EmployeeID { get; set; }
-            public int PositionID { get; set; }
-            public string? PositionTitle { get; set; }
             public DateTime Date { get; set; }
             public string? Remarks { get; set; }
+        }
+
+        public class EmployeePositionUpdate : EmployeeUpdateBase
+        {
+            public int PositionID { get; set; }
+            public string? PositionTitle { get; set; }
+        }
+
+        public class EmployeeDepartmentLocationUpdate : EmployeeUpdateBase 
+        {
+            public int DepartmentID { get; set; }
+            public int LocationID { get; set; }
+        }
+
+        public class EmployeeCivilStatusUpdate : EmployeeUpdateBase
+        {
+            public int CivilStatusID { get; set; }
+        }
+
+        public class EmployeeEmploymentStatusUpdate : EmployeeUpdateBase
+        {
+            public int EmploymentStatusID { get; set; }
         }
 
         private static UserPreference preference;
@@ -381,29 +401,22 @@ namespace LBPRDC.Source.Services
                     HistoryID = employmentStatusHistoryID,
                     EmploymentStatusID = employee.EmploymentStatusID
                 };
-                
+
+                PreviousEmployeeService.PreviousEmployee updatedPreviousEmployee = new()
+                {
+                    EmployeeID = employee.EmployeeID,
+                    Position = employee.PreviousPosition,
+                    StartDate = employee.PreviousFrom,
+                    EndDate = employee.PreviousTo,
+                    Information = employee.OtherInformation
+                };
+
                 if (!hasRecord && (bool)employee.isPreviousEmployee)
                 {
-                    PreviousEmployeeService.PreviousEmployee newPreviousEmployee = new()
-                    {
-                        EmployeeID = employee.EmployeeID,
-                        Position = employee.PreviousPosition,
-                        StartDate = employee.PreviousFrom,
-                        EndDate = employee.PreviousTo,
-                        Information = employee.OtherInformation
-                    };
-                    PreviousEmployeeService.AddRecord(newPreviousEmployee);
+                    PreviousEmployeeService.AddRecord(updatedPreviousEmployee);
                 }
                 else if (hasRecord && (bool)employee.isPreviousEmployee)
                 {
-                    PreviousEmployeeService.PreviousEmployee updatedPreviousEmployee = new()
-                    {
-                        EmployeeID = employee.EmployeeID,
-                        Position = employee.PreviousPosition,
-                        StartDate = employee.PreviousFrom,
-                        EndDate = employee.PreviousTo,
-                        Information = employee.OtherInformation
-                    };
                     PreviousEmployeeService.UpdateRecord(updatedPreviousEmployee);
                 }
                 else if (hasRecord && (bool) !employee.isPreviousEmployee)
@@ -451,7 +464,7 @@ namespace LBPRDC.Source.Services
                     await command.ExecuteNonQueryAsync();
                 }
 
-                PositionService.History newPosition = new()
+                PositionService.History newHistory = new()
                 {
                     EmployeeID = data.EmployeeID,
                     PositionID = data.PositionID,
@@ -461,7 +474,7 @@ namespace LBPRDC.Source.Services
                     Status = "Active"
                 };
 
-                PositionService.AddNewHistory(newPosition);
+                PositionService.AddNewHistory(newHistory);
 
                 if (UserService.CurrentUser != null)
                 {
@@ -470,6 +483,147 @@ namespace LBPRDC.Source.Services
                         UserID = UserService.CurrentUser.UserID,
                         Type = "Promoted/Demoted Employee Position",
                         Details = $"This user has promoted/demoted the position of employee with the ID {data.EmployeeID}."
+                    };
+
+                    LoggingService.LogActivity(newLog);
+                }
+
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> UpdateEmployeeDepartmentLocation(EmployeeDepartmentLocationUpdate data)
+        {
+            try
+            {
+                string updateQuery = "UPDATE Employee SET " +
+                    "DepartmentID = @DepartmentID, " +
+                    "LocationID = @LocationID " +
+                    "WHERE EmployeeID = @EmployeeID";
+
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(updateQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@DepartmentID", data.DepartmentID);
+                    command.Parameters.AddWithValue("@LocationID", data.LocationID);
+                    command.Parameters.AddWithValue("@EmployeeID", data.EmployeeID);
+
+                    connection.Open();
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                DepartmentService.History newHistory = new()
+                {
+                    EmployeeID = data.EmployeeID,
+                    DepartmentID = data.DepartmentID,
+                    LocationID = data.LocationID,
+                    Timestamp = data.Date,
+                    Remarks = data.Remarks,
+                    Status = "Active"
+                };
+
+                DepartmentService.AddNewHistory(newHistory);
+
+                if (UserService.CurrentUser != null)
+                {
+                    LoggingService.Log newLog = new()
+                    {
+                        UserID = UserService.CurrentUser.UserID,
+                        Type = "Updated Employee Department and Location",
+                        Details = $"This user has updated the department and location of employee with the ID {data.EmployeeID}."
+                    };
+
+                    LoggingService.LogActivity(newLog);
+                }
+
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> UpdateEmployeeCivilStatus(EmployeeCivilStatusUpdate data)
+        {
+            try
+            {
+                string updateQuery = "UPDATE Employee SET " +
+                    "CivilStatusID = @CivilStatusID " +
+                    "WHERE EmployeeID = @EmployeeID";
+
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(updateQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@CivilStatusID", data.CivilStatusID);
+                    command.Parameters.AddWithValue("@EmployeeID", data.EmployeeID);
+
+                    connection.Open();
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                CivilStatusService.History newHistory = new()
+                {
+                    EmployeeID = data.EmployeeID,
+                    CivilStatusID = data.CivilStatusID,
+                    Timestamp = data.Date,
+                    Remarks = data.Remarks,
+                    Status = "Active"
+                };
+
+                CivilStatusService.AddNewHistory(newHistory);
+
+                if (UserService.CurrentUser != null)
+                {
+                    LoggingService.Log newLog = new()
+                    {
+                        UserID = UserService.CurrentUser.UserID,
+                        Type = "Updated Employee Civil Status",
+                        Details = $"This user has updated the civil status of employee with the ID {data.EmployeeID}."
+                    };
+
+                    LoggingService.LogActivity(newLog);
+                }
+
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> UpdateEmployeeEmploymentStatus(EmployeeEmploymentStatusUpdate data)
+        {
+            try
+            {
+                string updateQuery = "UPDATE Employee SET " +
+                    "EmploymentStatusID = @EmploymentStatusID " +
+                    "WHERE EmployeeID = @EmployeeID";
+
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(updateQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@EmploymentStatusID", data.EmploymentStatusID);
+                    command.Parameters.AddWithValue("@EmployeeID", data.EmployeeID);
+
+                    connection.Open();
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                EmploymentStatusService.History newHistory = new()
+                {
+                    EmployeeID = data.EmployeeID,
+                    EmploymentStatusID = data.EmploymentStatusID,
+                    Timestamp = data.Date,
+                    Remarks = data.Remarks,
+                    Status = "Active"
+                };
+
+                EmploymentStatusService.AddNewHistory(newHistory);
+
+                if (UserService.CurrentUser != null)
+                {
+                    LoggingService.Log newLog = new()
+                    {
+                        UserID = UserService.CurrentUser.UserID,
+                        Type = "Updated Employee Employment Status",
+                        Details = $"This user has updated the employment status of employee with the ID {data.EmployeeID}."
                     };
 
                     LoggingService.LogActivity(newLog);

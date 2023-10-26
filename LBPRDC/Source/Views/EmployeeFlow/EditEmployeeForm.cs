@@ -140,7 +140,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Adding of Employee", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
                 this.Close();
