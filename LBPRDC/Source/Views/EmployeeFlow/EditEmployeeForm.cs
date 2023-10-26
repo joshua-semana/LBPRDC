@@ -109,8 +109,8 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             txtContactNumber1.Text = employee.First().ContactNumber1;
             txtContactNumber2.Text = employee.First().ContactNumber2;
             txtEmployeeID.Text = employee.First().EmployeeID;
-            dtpStartDate.Value = positionHistory.Where(w => w.EmployeeID == ID && w.Remarks == "[Initial Status]").First().Timestamp.Value;
-            txtPositionTitle.Text = positionHistory.Where(w => w.EmployeeID == ID && w.Status == "Active").First().PositionTitle;
+            dtpStartDate.Value = positionHistory.Where(w => w.EmployeeID == ID && w.Status == "Active").First().Timestamp.Value;
+            txtPositionTitle.Text = Utilities.StringFormat.ToSentenceCase(positionHistory.Where(w => w.EmployeeID == ID && w.Status == "Active").First().PositionTitle);
             txtRemarks.Text = employee.First().Remarks;
             InitializeGenderComboBoxItems(employee.First().Gender);
             InitializePositionComboBoxItems(employee.First().PositionID);
@@ -187,8 +187,8 @@ namespace LBPRDC.Source.Views.EmployeeFlow
                 EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
                 Remarks = txtRemarks.Text,
 
-                StartDate = dtpStartDate.Value,
-                PositionTitle = txtPositionTitle.Text,
+                EffectiveDate = dtpStartDate.Value,
+                PositionTitle = txtPositionTitle.Text.ToUpper().Trim(),
                 isPreviousEmployee = chkPreviousEmployee.Checked,
                 PreviousFrom = dtpFromDate.Value,
                 PreviousTo = dtpToDate.Value,

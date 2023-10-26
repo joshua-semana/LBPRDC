@@ -50,13 +50,22 @@ namespace LBPRDC.Source.Services
 
         public class EmployeeHistory : Employee
         {
-            public DateTime StartDate { get; set; }
+            public DateTime EffectiveDate { get; set; }
             public string? PositionTitle { get; set; }
             public bool? isPreviousEmployee { get; set; }
             public string? PreviousPosition { get; set; }
             public DateTime PreviousFrom { get; set; }
             public DateTime PreviousTo { get; set; }
             public string? OtherInformation { get; set; }
+        }
+
+        public class EmployeePositionUpdate
+        {
+            public string? EmployeeID { get; set; }
+            public int PositionID { get; set; }
+            public string? PositionTitle { get; set; }
+            public DateTime Date { get; set; }
+            public string? Remarks { get; set; }
         }
 
         private static UserPreference preference;
@@ -79,7 +88,7 @@ namespace LBPRDC.Source.Services
                             Employee emp = new()
                             {
                                 EmployeeID = reader["EmployeeID"].ToString(),
-                                LastName = Utilities.StringFormat.ToSentenceCase((string) reader["LastName"]),
+                                LastName = Utilities.StringFormat.ToSentenceCase((string)reader["LastName"]),
                                 FirstName = Utilities.StringFormat.ToSentenceCase((string)reader["FirstName"]),
                                 MiddleName = Utilities.StringFormat.ToSentenceCase((string)reader["MiddleName"]),
                                 Gender = reader["Gender"].ToString(),
@@ -117,6 +126,7 @@ namespace LBPRDC.Source.Services
                                     NameFormat.Full1 => $"{emp.FirstName} {middleInitial} {emp.LastName} {suffix}".Trim(),
                                     NameFormat.Full2 => $"{emp.LastName}, {emp.FirstName} {middleInitial} {suffix}".Trim(),
                                     NameFormat.FirstAndLastOnly => $"{emp.FirstName} {emp.LastName}".Trim(),
+                                    NameFormat.LastNameOnly => emp.LastName,
                                     _ => "Error"
                                 };
                             }
@@ -221,7 +231,7 @@ namespace LBPRDC.Source.Services
                     EmployeeID = employee.EmployeeID,
                     PositionID = employee.PositionID,
                     PositionTitle = employee.PositionTitle,
-                    Timestamp = employee.StartDate,
+                    Timestamp = employee.EffectiveDate,
                     Remarks = "[Initial Status]",
                     Status = "Active"
                 };
@@ -230,7 +240,7 @@ namespace LBPRDC.Source.Services
                 {
                     EmployeeID = employee.EmployeeID,
                     CivilStatusID = employee.CivilStatusID,
-                    Timestamp = employee.StartDate,
+                    Timestamp = employee.EffectiveDate,
                     Remarks = "[Initial Status]",
                     Status = "Active"
                 };
@@ -240,7 +250,7 @@ namespace LBPRDC.Source.Services
                     EmployeeID = employee.EmployeeID,
                     DepartmentID = employee.DepartmentID,
                     LocationID = employee.LocationID,
-                    Timestamp = employee.StartDate,
+                    Timestamp = employee.EffectiveDate,
                     Remarks = "[Initial Status]",
                     Status = "Active"
                 };
@@ -249,7 +259,7 @@ namespace LBPRDC.Source.Services
                 {
                     EmployeeID = employee.EmployeeID,
                     EmploymentStatusID = employee.EmploymentStatusID,
-                    Timestamp = employee.StartDate,
+                    Timestamp = employee.EffectiveDate,
                     Remarks = "[Initial Status]",
                     Status = "Active"
                 };
@@ -411,8 +421,55 @@ namespace LBPRDC.Source.Services
                     LoggingService.Log newLog = new()
                     {
                         UserID = UserService.CurrentUser.UserID,
-                        Type = "Updating Employee Information",
+                        Type = "Updated Employee Information",
                         Details = $"This user has edited the information of an employee with the ID {employee.EmployeeID}."
+                    };
+
+                    LoggingService.LogActivity(newLog);
+                }
+
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> UpdateEmployeePosition(EmployeePositionUpdate data)
+        {
+            try
+            {
+                string updateQuery = "UPDATE Employee SET " +
+                    "PositionID = @PositionID " +
+                    "WHERE EmployeeID = @EmployeeID";
+
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(updateQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@PositionID", data.PositionID);
+                    command.Parameters.AddWithValue("@EmployeeID", data.EmployeeID);
+
+                    connection.Open();
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                PositionService.History newPosition = new()
+                {
+                    EmployeeID = data.EmployeeID,
+                    PositionID = data.PositionID,
+                    PositionTitle = data.PositionTitle,
+                    Timestamp = data.Date,
+                    Remarks = data.Remarks,
+                    Status = "Active"
+                };
+
+                PositionService.AddNewHistory(newPosition);
+
+                if (UserService.CurrentUser != null)
+                {
+                    LoggingService.Log newLog = new()
+                    {
+                        UserID = UserService.CurrentUser.UserID,
+                        Type = "Promoted/Demoted Employee Position",
+                        Details = $"This user has promoted/demoted the position of employee with the ID {data.EmployeeID}."
                     };
 
                     LoggingService.LogActivity(newLog);
