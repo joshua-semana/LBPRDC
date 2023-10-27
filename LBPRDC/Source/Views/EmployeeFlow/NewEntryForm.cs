@@ -197,7 +197,7 @@ namespace LBPRDC.Source.Views
             if (isAdded)
             {
                 MessageBox.Show("You have successfully added a new employee.", "New Employee Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ParentControl?.PopulateTable();
+                ParentControl?.ResetTableSearchFilter();
                 this.Close();
             }
         }

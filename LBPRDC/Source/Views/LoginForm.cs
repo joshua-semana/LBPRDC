@@ -30,6 +30,12 @@ namespace LBPRDC.Source.Views
             }
         }
 
+        private void SetTextBoxState(bool enabled)
+        {
+            txtUsername.Enabled = enabled;
+            txtPassword.Enabled = enabled;
+        }
+
         private void SetSignInButtonState(string buttonText, bool enabled)
         {
             btnSignIn.Text = buttonText;
@@ -50,8 +56,9 @@ namespace LBPRDC.Source.Views
                 string password = txtPassword.Text;
 
                 SetSignInButtonState("Signing in...", false);
+                SetTextBoxState(false);
 
-                bool isAuthenticated = AuthenticationService.ValidateCredentials(username, password);
+                bool isAuthenticated = await Task.Run(() => AuthenticationService.ValidateCredentials(username, password));
 
                 if (!isAuthenticated)
                 {
@@ -78,7 +85,7 @@ namespace LBPRDC.Source.Views
                 {
                     UserID = currentUser.UserID,
                     Type = "Sign In Log",
-                    Details = "This user signed in to the software."
+                    Details = "This user signed in."
                 };
 
                 await Task.Run(() => LoggingService.LogActivity(newLog));
@@ -96,6 +103,7 @@ namespace LBPRDC.Source.Views
             finally
             {
                 SetSignInButtonState("Sign In", true);
+                SetTextBoxState(true);
             }
         }
 

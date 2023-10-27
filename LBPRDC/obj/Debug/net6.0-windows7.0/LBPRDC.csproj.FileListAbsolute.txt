@@ -102,3 +102,11 @@ C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Sou
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.UpdateDepartmentLocationForm.resources
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.UpdateCivilStatusForm.resources
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.UpdateEmploymentStatusForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.EditEmployeeForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.UpdateCivilStatusForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.UpdateDepartmentLocationForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.UpdateEmploymentStatusForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.UpdatePositionForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Shared.DynamicCheckedListBoxControl.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.ViewEmployeeDataForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.ViewHistory.resources

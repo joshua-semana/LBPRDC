@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Xml.Serialization;
-using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Services;
 
 namespace LBPRDC.Source.Views
 {
@@ -31,6 +21,7 @@ namespace LBPRDC.Source.Views
             InitializeFeatureBasedOnUserRole();
             lblDateToday.Text = DateTime.Now.ToString("MMM. dd, yyyy (ddd)");
             lblGreetUser.Text = "Hello, " + UserService.CurrentUser?.FirstName;
+            lblPageName.Text = currentPage;
         }
 
         private void InitializeFeatureBasedOnUserRole()

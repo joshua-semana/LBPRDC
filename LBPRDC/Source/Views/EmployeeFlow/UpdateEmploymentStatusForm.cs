@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static LBPRDC.Source.Services.EmployeeService;
 
 namespace LBPRDC.Source.Views.EmployeeFlow
 {
@@ -46,12 +47,13 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void InitializeEmployeeInformation(string ID)
         {
-            List<EmployeeService.Employee> employee = EmployeeService.GetAllEmployees();
+            List<EmployeeService.Employee> employees = EmployeeService.GetAllEmployees();
 
-            employee = employee.Where(w => w.EmployeeID == ID).ToList();
-            txtEmployeeID.Text = employee.First().EmployeeID;
-            txtFullName.Text = $"{employee.First().LastName}, {employee.First().FirstName} {employee.First().MiddleName}";
-            txtCurrentEmploymentStatus.Text = employee.First().EmploymentStatus;
+            var employee = employees.First(w => w.EmployeeID == ID);
+
+            txtEmployeeID.Text = employee.EmployeeID;
+            txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
+            txtCurrentEmploymentStatus.Text = employee.EmploymentStatus;
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
@@ -86,7 +88,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             if (isUpdated)
             {
                 MessageBox.Show("You have successfully updated this employee's employment status information.", "Update Employee Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ParentControl?.PopulateTable();
+                ParentControl?.ApplyFilterAndSearchThenPopulate();
                 this.Close();
             }
         }

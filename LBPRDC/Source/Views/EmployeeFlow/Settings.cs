@@ -58,12 +58,6 @@ namespace LBPRDC.Source.Views.Employee
 
         private void btnApply_Click(object sender, EventArgs e)
         {
-            //if (chkEmployeeID.Checked == false && chkName.Checked == false)
-            //{
-            //    MessageBox.Show("Please select at least one (1) identifier to proceed.\nIdentifiers:\nEmployee ID\nEmployee Name", "Error Saving Settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //    return;
-            //}
-
             preference.ShowEmployeeID = chkEmployeeID.Checked;
             preference.ShowName = chkName.Checked;
             preference.ShowGender = chkGender.Checked;
@@ -84,8 +78,8 @@ namespace LBPRDC.Source.Views.Employee
             preference.SelectedPositionFormat = Enum.Parse<PositionFormat>(GetSelectedRadioButton(flowRadioGroupForPosition));
 
             UserPreferenceManager.SavePreferences(preference);
-            MessageBox.Show("Preferences saved.", "User Settings", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            ParentControl?.PopulateTable();
+            //MessageBox.Show("Preferences saved.", "User Settings", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            ParentControl?.ResetTableSearchFilter();
             this.Close();
         }
 

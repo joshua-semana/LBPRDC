@@ -96,6 +96,12 @@ namespace LBPRDC.Source.Services
             public int CivilStatusID { get; set; }
         }
 
+        public class HistoryView : History
+        {
+            public string? CivilStatusName { get; set; }
+            public string? EffectiveDate { get; set; }
+        }
+
         public static void AddNewHistory(History history)
         {
             try
@@ -210,6 +216,42 @@ namespace LBPRDC.Source.Services
                 }
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static List<HistoryView> GetAllHistoryByID(string employeeId)
+        {
+            List<HistoryView> items = new();
+
+            try
+            {
+                string query = "SELECT * FROM EmployeeCivilStatusHistory WHERE EmployeeID = @EmployeeID";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(query, connection))
+                {
+                    command.Parameters.AddWithValue("@EmployeeID", employeeId);
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        HistoryView item = new()
+                        {
+                            HistoryID = Convert.ToInt32(reader["HistoryID"]),
+                            EmployeeID = reader["EmployeeID"].ToString(),
+                            CivilStatusID = Convert.ToInt32(reader["CivilStatusID"]),
+                            Timestamp = reader["Timestamp"] as DateTime?,
+                            Remarks = reader["Remarks"].ToString(),
+                            Status = reader["Status"].ToString()
+                        };
+                        var civilstatus = GetAllItems().First(f => f.ID == item.CivilStatusID);
+                        item.CivilStatusName = Utilities.StringFormat.ToSentenceCase(civilstatus.Name);
+                        item.EffectiveDate = item.Timestamp.Value.ToString("MMMM dd, yyyy");
+                        items.Add(item);
+                    }
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
         }
     }
 }
