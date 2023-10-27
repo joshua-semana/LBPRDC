@@ -370,10 +370,10 @@ namespace LBPRDC.Source.Services
                     await command.ExecuteNonQueryAsync();
                 }
 
-                int positionHistoryID = PositionService.GetAllHistory().Where(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").First().HistoryID;
-                int civilStatusHistoryID = CivilStatusService.GetAllHistory().Where(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").First().HistoryID;
-                int departmentlocationHistoryID = DepartmentService.GetAllHistory().Where(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").First().HistoryID;
-                int employmentStatusHistoryID = EmploymentStatusService.GetAllHistory().Where(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").First().HistoryID;
+                int positionHistoryID = PositionService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
+                int civilStatusHistoryID = CivilStatusService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
+                int departmentlocationHistoryID = DepartmentService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
+                int employmentStatusHistoryID = EmploymentStatusService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
                 bool hasRecord = PreviousEmployeeService.RecordExists(employee.EmployeeID);
 
                 PositionService.HistoryUpdate updatedPosition = new()

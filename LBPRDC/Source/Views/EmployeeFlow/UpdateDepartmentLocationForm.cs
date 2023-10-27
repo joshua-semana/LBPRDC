@@ -1,6 +1,7 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using System.Data;
+using static LBPRDC.Source.Services.EmployeeService;
 
 namespace LBPRDC.Source.Views.EmployeeFlow
 {
@@ -56,13 +57,14 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void InitializeEmployeeInformation(string ID)
         {
-            List<EmployeeService.Employee> employee = EmployeeService.GetAllEmployees();
+            List<EmployeeService.Employee> employees = EmployeeService.GetAllEmployees();
 
-            employee = employee.Where(w => w.EmployeeID == ID).ToList();
-            txtEmployeeID.Text = employee.First().EmployeeID;
-            txtFullName.Text = $"{employee.First().LastName}, {employee.First().FirstName} {employee.First().MiddleName}";
-            txtCurrentDepartment.Text = employee.First().Department;
-            txtCurrentLocation.Text = employee.First().Location;
+            var employee = employees.First(w => w.EmployeeID == ID);
+            
+            txtEmployeeID.Text = employee.EmployeeID;
+            txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
+            txtCurrentDepartment.Text = employee.Department;
+            txtCurrentLocation.Text = employee.Location;
         }
 
         private void cmbDepartment_SelectedIndexChanged(object sender, EventArgs e)
@@ -96,7 +98,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             if (isUpdated)
             {
                 MessageBox.Show("You have successfully updated this employee's department and location information.", "Update Employee Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ParentControl?.PopulateTable();
+                ParentControl?.ApplyFilterAndSearchThenPopulate();
                 this.Close();
             }
         }

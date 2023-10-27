@@ -24,4 +24,8 @@
     <Folder Include="Source\Views\Logs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
 </Project>

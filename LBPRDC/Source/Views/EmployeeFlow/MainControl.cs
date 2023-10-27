@@ -11,35 +11,34 @@ namespace LBPRDC.Source.Views
 {
     public partial class ucEmployees : UserControl
     {
-        UserControl loadingControl = new ucLoading();
+        UserControl loadingControl = new ucLoading() { Dock = DockStyle.Fill };
+
         private UserPreference preference;
-        //private BackgroundWorker dataLoader;
-        private string employeeID;
+        private string EmployeeID;
+
         public ucEmployees()
         {
             InitializeComponent();
             this.Controls.Add(loadingControl);
-            PopulateFilters();
-            //dataLoader = new BackgroundWorker();
-            //dataLoader.DoWork += DataLoadingWorker_DoWork;
-            //dataLoader.RunWorkerCompleted += DataLoadingWorker_RunWorkerCompleted;
-            //ShowLoadingProgressBar();
-            //dataLoader.RunWorkerAsync();
-        }
-
-        private void ShowLoadingProgressBar()
-        {
-            loadingControl.Dock = DockStyle.Fill;
             loadingControl.BringToFront();
-            loadingControl.Visible = true;
-
-            dgvEmployees.Visible = false;
+            PopulateFilters();
         }
 
-        private void HideLoadingProgressBar()
+        public void ApplyFilterAndSearchThenPopulate()
         {
-            loadingControl.Visible = false;
-            dgvEmployees.Visible = true;
+            List<int> deparmentIDs = dchkListFilterDepartments.GetCheckedItems().Select(s => s.ID).ToList();
+            List<int> positionIDs = dchkListFilterPositions.GetCheckedItems().Select(s => s.ID).ToList();
+            List<int> employmentStatusIDs = dchkListFilterEmploymentStatus.GetCheckedItems().Select(s => s.ID).ToList();
+            string searchWord = txtSearch.Text.Trim().ToLower();
+
+            PopulateTableWithFilterAndSearch(deparmentIDs, positionIDs, employmentStatusIDs, searchWord);
+        }
+
+        public void ResetTableSearchFilter()
+        {
+            txtSearch.Text = string.Empty;
+            ResetFilters();
+            ApplyFilterAndSearchThenPopulate();
         }
 
         private void ucEmployees_VisibleChanged(object sender, EventArgs e)
@@ -47,7 +46,18 @@ namespace LBPRDC.Source.Views
             PopulateTable();
         }
 
-        public async void PopulateFilters()
+        private static void InitializeFilter(Label label, DynamicCheckedListBoxControl control, List<CheckedListBoxItems> items)
+        {
+            bool hasItems = items.Count > 0;
+            label.Visible = hasItems;
+            control.Visible = hasItems;
+            if (hasItems)
+            {
+                control.SetItems(items);
+            }
+        }
+
+        private async void PopulateFilters()
         {
             await Task.Run(() =>
             {
@@ -72,21 +82,11 @@ namespace LBPRDC.Source.Views
                         .Select(s => new CheckedListBoxItems(s.ID, Utilities.StringFormat.ToSentenceCase(s.Name)))
                         .ToList()
                 );
+                //Do not remove, still working, UI are just hidden
                 //InitializeFilter(lblFilterLocations, dchkListFilterLocations, LocationService.GetAllItems().Select(s => new CheckedListBoxItems(Convert.ToInt32(s.ID), s.Name)).ToList());
                 //InitializeFilter(lblFilterCivilStatus, dchkListFilterCivilStatus, CivilStatusService.GetAllItems().Select(s => new CheckedListBoxItems(s.ID, s.Name)).ToList());
                 //InitializeFilter(lblFilterGender, dchkListFilterGender, new() { new CheckedListBoxItems(1, "MALE"), new CheckedListBoxItems(2, "FEMALE") });
             });
-        }
-
-        private static void InitializeFilter(Label label, DynamicCheckedListBoxControl control, List<CheckedListBoxItems> items)
-        {
-            bool hasItems = items.Count > 0;
-            label.Visible = hasItems;
-            control.Visible = hasItems;
-            if (hasItems)
-            {
-                control.SetItems(items);
-            }
         }
 
         public async void PopulateTable()
@@ -108,7 +108,7 @@ namespace LBPRDC.Source.Views
             HideLoadingProgressBar();
         }
 
-        public async void PopulateTableWithFilterAndSearch(List<int> departmentIDs, List<int> positionIDs, List<int> employmentStatusIDs, string searchWord)
+        private async void PopulateTableWithFilterAndSearch(List<int> departmentIDs, List<int> positionIDs, List<int> employmentStatusIDs, string searchWord)
         {
             ShowLoadingProgressBar();
             preference = UserPreferenceManager.LoadPreference();
@@ -191,6 +191,18 @@ namespace LBPRDC.Source.Views
             if (preference.ShowEmploymentStatus) { AddColumn("EmploymentStatus", "Status", "EmploymentStatus"); }
         }
 
+        private void ShowLoadingProgressBar()
+        {
+            loadingControl.Visible = true;
+            //dgvEmployees.Visible = false;
+        }
+
+        private void HideLoadingProgressBar()
+        {
+            loadingControl.Visible = false;
+            //dgvEmployees.Visible = true;
+        }
+
         private void AddColumn(string name, string header, string property)
         {
             dgvEmployees.Columns.Add(new DataGridViewTextBoxColumn
@@ -204,32 +216,6 @@ namespace LBPRDC.Source.Views
         private void UpdateEmployeeCountLabel(int currentCount, int originalCount)
         {
             lblRowCounter.Text = $"Currently displaying {currentCount} out of {originalCount} employee(s).";
-        }
-
-        private void btnAddBatch_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string? selectedFile = FileManager.OpenFile();
-
-                if (selectedFile != null)
-                {
-                    ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
-
-                    if (FileManager.isFileNotEmpty(selectedFile))
-                    {
-                        if (FileManager.isFileAdheresTo(selectedFile, "Add Batch"))
-                        {
-                            frmAddBatchEmployees addBatchForm = new(selectedFile);
-                            addBatchForm.ShowDialog();
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ExceptionHandler.HandleException(ex);
-            }
         }
 
         private void btnAddEmployee_Click(object sender, EventArgs e)
@@ -259,32 +245,20 @@ namespace LBPRDC.Source.Views
 
         private void btnReset_Click(object sender, EventArgs e)
         {
-            PopulateTable();
-            txtSearch.Text = string.Empty;
-            ResetFilters();
+            ResetTableSearchFilter();
         }
 
         private void btnFilter_Click(object sender, EventArgs e)
         {
-            ApplyFilterAndSearch();
+            ApplyFilterAndSearchThenPopulate();
         }
 
         private void txtSearch_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                ApplyFilterAndSearch();
+                ApplyFilterAndSearchThenPopulate();
             }
-        }
-
-        private void ApplyFilterAndSearch()
-        {
-            List<int> deparmentIDs = dchkListFilterDepartments.GetCheckedItems().Select(s => s.ID).ToList();
-            List<int> positionIDs = dchkListFilterPositions.GetCheckedItems().Select(s => s.ID).ToList();
-            List<int> employmentStatusIDs = dchkListFilterEmploymentStatus.GetCheckedItems().Select(s => s.ID).ToList();
-            string searchWord = txtSearch.Text.Trim().ToLower();
-
-            PopulateTableWithFilterAndSearch(deparmentIDs, positionIDs, employmentStatusIDs, searchWord);
         }
 
         private void dgvEmployees_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -300,35 +274,45 @@ namespace LBPRDC.Source.Views
             }
         }
 
+        private void cntxtMenuView_Click(object sender, EventArgs e)
+        {
+            EmployeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+            ViewEmployeeDataForm frmViewEmployeeData = new()
+            {
+                EmployeeId = EmployeeID
+            };
+            frmViewEmployeeData.ShowDialog();
+        }
+
         private void cntxtMenuEdit_Click(object sender, EventArgs e)
         {
-            employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+            EmployeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
             EditEmployeeForm frmEditEmployee = new()
             {
                 ParentControl = this,
-                EmployeeId = employeeID
+                EmployeeId = EmployeeID
             };
             frmEditEmployee.ShowDialog();
         }
 
         private void menuUpdatePosition_Click(object sender, EventArgs e)
         {
-            employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+            EmployeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
             UpdatePositionForm frmUpdatePosition = new()
             {
                 ParentControl = this,
-                EmployeeId = employeeID
+                EmployeeId = EmployeeID
             };
             frmUpdatePosition.ShowDialog();
         }
 
         private void menuUpdateCivilStatus_Click(object sender, EventArgs e)
         {
-            employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+            EmployeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
             UpdateCivilStatusForm frmUpdateCivilStatus = new()
             {
                 ParentControl = this,
-                EmployeeId = employeeID
+                EmployeeId = EmployeeID
             };
             frmUpdateCivilStatus.ShowDialog();
         }
@@ -355,32 +339,61 @@ namespace LBPRDC.Source.Views
             frmUpdateDepartmentLocation.ShowDialog();
         }
 
-        //private void DataLoadingWorker_DoWork(object sender, DoWorkEventArgs e)
-        //{
-        //    e.Result = EmployeeService.GetAllEmployees();
-        //}
+        private void btnAddBatch_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string? selectedFile = FileManager.OpenFile();
 
-        //private void DataLoadingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        //{
-        //    if (e.Error == null)
-        //    {
-        //        dgvEmployees.AutoGenerateColumns = false;
+                if (selectedFile != null)
+                {
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-        //        dgvEmployees.Columns.Add(new DataGridViewTextBoxColumn
-        //        {
-        //            Name = "FullName",
-        //            HeaderText = "Full Name",
-        //            DataPropertyName = "FullName"
-        //        });
+                    if (FileManager.isFileNotEmpty(selectedFile))
+                    {
+                        if (FileManager.isFileAdheresTo(selectedFile, "Add Batch"))
+                        {
+                            frmAddBatchEmployees addBatchForm = new(selectedFile);
+                            addBatchForm.ShowDialog();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionHandler.HandleException(ex);
+            }
+        }
 
-        //        dgvEmployees.DataSource = e.Result;
+        private void ViewEmployeeHistory(string type)
+        {
+            string employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+            ViewHistory frmViewHistory = new()
+            {
+                HistoryType = type,
+                EmployeeId = employeeID
+            };
+            frmViewHistory.ShowDialog();
+        }
 
-        //        HideLoadingProgressBar();
-        //    }
-        //    else
-        //    {
-        //        MessageBox.Show("Error loading data: " + e.Error.Message);
-        //    }
-        //}
+        private void menuHistoryPosition_Click(object sender, EventArgs e)
+        {
+            ViewEmployeeHistory("Position");
+        }
+
+        private void menuHistoryCivilStatus_Click(object sender, EventArgs e)
+        {
+            ViewEmployeeHistory("Civil Status");
+        }
+
+        private void menuHistoryEmploymentStatus_Click(object sender, EventArgs e)
+        {
+            ViewEmployeeHistory("Employment Status");
+        }
+
+        private void menuHistoryDepartmentLocation_Click(object sender, EventArgs e)
+        {
+            ViewEmployeeHistory("Department and Location");
+        }
     }
 }

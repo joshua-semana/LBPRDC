@@ -25,6 +25,12 @@
     <Compile Update="Source\Views\EmployeeFlow\UpdatePositionForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Source\Views\EmployeeFlow\ViewEmployeeDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Source\Views\EmployeeFlow\ViewHistory.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Source\Views\LoadingControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

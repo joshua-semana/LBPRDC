@@ -94,31 +94,33 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void InitializeEmployeeInformation(string ID)
         {
-            List<EmployeeService.Employee> employee = EmployeeService.GetAllEmployees();
-            List<PositionService.History> positionHistory = PositionService.GetAllHistory();
+            List<EmployeeService.Employee> employees = EmployeeService.GetAllEmployees();
+            List<PositionService.History> positions = PositionService.GetAllHistory();
             PreviousEmployeeService.PreviousEmployee employeeRecord = PreviousEmployeeService.GetRecordByEmployeeID(ID);
 
-            employee = employee.Where(w => w.EmployeeID == ID).ToList();
-            txtFirstName.Text = employee.First().FirstName;
-            txtMiddleName.Text = employee.First().MiddleName;
-            txtLastName.Text = employee.First().LastName;
-            txtEducation.Text = employee.First().Education;
-            dtpBirthday.Value = employee.First().Birthday.Value;
-            txtEmailAddress1.Text = employee.First().EmailAddress1;
-            txtEmailAddress2.Text = employee.First().EmailAddress2;
-            txtContactNumber1.Text = employee.First().ContactNumber1;
-            txtContactNumber2.Text = employee.First().ContactNumber2;
-            txtEmployeeID.Text = employee.First().EmployeeID;
-            dtpStartDate.Value = positionHistory.Where(w => w.EmployeeID == ID && w.Status == "Active").First().Timestamp.Value;
-            txtPositionTitle.Text = Utilities.StringFormat.ToSentenceCase(positionHistory.Where(w => w.EmployeeID == ID && w.Status == "Active").First().PositionTitle);
-            txtRemarks.Text = employee.First().Remarks;
-            InitializeGenderComboBoxItems(employee.First().Gender);
-            InitializePositionComboBoxItems(employee.First().PositionID);
-            InitializeCivilStatusComboBoxItems(employee.First().CivilStatusID);
-            InitializeEmploymentStatusComboBoxItems(employee.First().EmploymentStatusID);
-            InitializeSuffixComboBoxItems(employee.First().SuffixID);
-            InitializeDepartmentComboBoxItems(employee.First().DepartmentID);
-            InitializeLocationComboBoxItems(employee.First().DepartmentID, employee.First().LocationID);
+            var employee = employees.First(e => e.EmployeeID == ID);
+            var currentPosition = positions.First(p => p.EmployeeID == ID && p.Status == "Active");
+
+            txtFirstName.Text = employee.FirstName;
+            txtMiddleName.Text = employee.MiddleName;
+            txtLastName.Text = employee.LastName;
+            txtEducation.Text = employee.Education;
+            dtpBirthday.Value = employee.Birthday.Value;
+            txtEmailAddress1.Text = employee.EmailAddress1;
+            txtEmailAddress2.Text = employee.EmailAddress2;
+            txtContactNumber1.Text = employee.ContactNumber1;
+            txtContactNumber2.Text = employee.ContactNumber2;
+            txtEmployeeID.Text = employee.EmployeeID;
+            dtpStartDate.Value = currentPosition.Timestamp.Value;
+            txtPositionTitle.Text = Utilities.StringFormat.ToSentenceCase(currentPosition.PositionTitle);
+            txtRemarks.Text = employee.Remarks;
+            InitializeGenderComboBoxItems(employee.Gender);
+            InitializePositionComboBoxItems(employee.PositionID);
+            InitializeCivilStatusComboBoxItems(employee.CivilStatusID);
+            InitializeEmploymentStatusComboBoxItems(employee.EmploymentStatusID);
+            InitializeSuffixComboBoxItems(employee.SuffixID);
+            InitializeDepartmentComboBoxItems(employee.DepartmentID);
+            InitializeLocationComboBoxItems(employee.DepartmentID, employee.LocationID);
 
             employeeHasRecord = employeeRecord.HasRecord;
 
@@ -136,6 +138,14 @@ namespace LBPRDC.Source.Views.EmployeeFlow
         private void chkPreviousEmployee_CheckedChanged(object sender, EventArgs e)
         {
             grpPreviousWork.Enabled = chkPreviousEmployee.Checked;
+            if (chkPreviousEmployee.Checked)
+            {
+                requiredFields.Add(txtPreviousPosition);
+            }
+            else if (requiredFields.Contains(txtPreviousPosition))
+            {
+                requiredFields.Remove(txtPreviousPosition);
+            }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -201,7 +211,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             if (isUpdated)
             {
                 MessageBox.Show("You have successfully updated this employee's information.", "Update Employee Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ParentControl?.PopulateTable();
+                ParentControl?.ApplyFilterAndSearchThenPopulate();
                 this.Close();
             }
         }

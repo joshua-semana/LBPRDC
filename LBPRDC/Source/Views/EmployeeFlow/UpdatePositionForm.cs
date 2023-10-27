@@ -1,6 +1,7 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using System.Data;
+using static LBPRDC.Source.Services.EmployeeService;
 
 namespace LBPRDC.Source.Views.EmployeeFlow
 {
@@ -39,14 +40,16 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void InitializeEmployeeInformation(string ID)
         {
-            List<EmployeeService.Employee> employee = EmployeeService.GetAllEmployees();
-            List<PositionService.History> positionHistory = PositionService.GetAllHistory();
+            List<EmployeeService.Employee> employees = EmployeeService.GetAllEmployees();
+            List<PositionService.History> positions = PositionService.GetAllHistory();
 
-            employee = employee.Where(w => w.EmployeeID == ID).ToList();
-            txtEmployeeID.Text = employee.First().EmployeeID;
-            txtFullName.Text = $"{employee.First().LastName}, {employee.First().FirstName} {employee.First().MiddleName}";
-            txtCurrentPosition.Text = $"{employee.First().PositionCode} - {employee.First().PositionName}";
-            txtCurrentPositionTitle.Text = positionHistory.Where(w => w.EmployeeID == ID && w.Status == "Active").First().PositionTitle;
+            var employee = employees.First(w => w.EmployeeID == ID);
+            var currentPosition = positions.First(w => w.EmployeeID == ID && w.Status == "Active");
+
+            txtEmployeeID.Text = employee.EmployeeID;
+            txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
+            txtCurrentPosition.Text = $"{employee.PositionCode} - {employee.PositionName}";
+            txtCurrentPositionTitle.Text = currentPosition.PositionTitle;
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
@@ -75,7 +78,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             if (isUpdated)
             {
                 MessageBox.Show("You have successfully updated this employee's position information.", "Update Employee Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ParentControl?.PopulateTable();
+                ParentControl?.ApplyFilterAndSearchThenPopulate();
                 this.Close();
             }
         }
