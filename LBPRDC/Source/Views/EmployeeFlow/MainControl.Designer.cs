@@ -30,9 +30,9 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ucEmployees));
-            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             flowControls = new FlowLayoutPanel();
             btnAddBatch = new Button();
             btnAddEmployee = new Button();
@@ -469,46 +469,47 @@
             dgvEmployees.AllowUserToDeleteRows = false;
             dgvEmployees.AllowUserToOrderColumns = true;
             dgvEmployees.AllowUserToResizeRows = false;
-            dataGridViewCellStyle7.BackColor = Color.Honeydew;
-            dataGridViewCellStyle7.SelectionBackColor = Color.SeaGreen;
-            dgvEmployees.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle1.SelectionBackColor = Color.SeaGreen;
+            dgvEmployees.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             dgvEmployees.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvEmployees.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvEmployees.BackgroundColor = SystemColors.Window;
+            dgvEmployees.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvEmployees.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = SystemColors.Control;
-            dataGridViewCellStyle8.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle8.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle8.Padding = new Padding(0, 2, 0, 2);
-            dataGridViewCellStyle8.SelectionBackColor = Color.MediumSeaGreen;
-            dataGridViewCellStyle8.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = DataGridViewTriState.True;
-            dgvEmployees.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.Padding = new Padding(0, 2, 0, 2);
+            dataGridViewCellStyle2.SelectionBackColor = Color.MediumSeaGreen;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            dgvEmployees.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dgvEmployees.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvEmployees.EditMode = DataGridViewEditMode.EditOnF2;
-            dgvEmployees.GridColor = SystemColors.Window;
+            dgvEmployees.GridColor = SystemColors.Control;
             dgvEmployees.Location = new Point(247, 67);
             dgvEmployees.Margin = new Padding(0);
             dgvEmployees.MultiSelect = false;
             dgvEmployees.Name = "dgvEmployees";
             dgvEmployees.ReadOnly = true;
-            dataGridViewCellStyle9.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = SystemColors.Control;
-            dataGridViewCellStyle9.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle9.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle9.Padding = new Padding(4);
-            dataGridViewCellStyle9.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = DataGridViewTriState.True;
-            dgvEmployees.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Control;
+            dataGridViewCellStyle3.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle3.Padding = new Padding(4);
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            dgvEmployees.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             dgvEmployees.RowHeadersVisible = false;
-            dgvEmployees.RowTemplate.DefaultCellStyle.Padding = new Padding(4);
+            dgvEmployees.RowTemplate.DefaultCellStyle.Padding = new Padding(4, 8, 4, 8);
             dgvEmployees.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
-            dgvEmployees.RowTemplate.Height = 37;
+            dgvEmployees.RowTemplate.Height = 41;
             dgvEmployees.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvEmployees.Size = new Size(950, 486);
             dgvEmployees.TabIndex = 3;
+            dgvEmployees.VirtualMode = true;
             dgvEmployees.CellMouseClick += dgvEmployees_CellMouseClick;
             // 
             // cntxtEmployeeActions
@@ -516,25 +517,25 @@
             cntxtEmployeeActions.Font = new Font("Arial", 9F, FontStyle.Regular, GraphicsUnit.Point);
             cntxtEmployeeActions.Items.AddRange(new ToolStripItem[] { cntxtMenuView, toolStripSeparator1, cntxtMenuEdit, cntxtMenuUpdate, toolStripSeparator2, cntxtMenuHistory });
             cntxtEmployeeActions.Name = "cntxtEmployeeActions";
-            cntxtEmployeeActions.Size = new Size(181, 126);
+            cntxtEmployeeActions.Size = new Size(143, 104);
             // 
             // cntxtMenuView
             // 
             cntxtMenuView.DisplayStyle = ToolStripItemDisplayStyle.Text;
             cntxtMenuView.Name = "cntxtMenuView";
-            cntxtMenuView.Size = new Size(180, 22);
+            cntxtMenuView.Size = new Size(142, 22);
             cntxtMenuView.Text = "View Details";
             cntxtMenuView.Click += cntxtMenuView_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(177, 6);
+            toolStripSeparator1.Size = new Size(139, 6);
             // 
             // cntxtMenuEdit
             // 
             cntxtMenuEdit.Name = "cntxtMenuEdit";
-            cntxtMenuEdit.Size = new Size(180, 22);
+            cntxtMenuEdit.Size = new Size(142, 22);
             cntxtMenuEdit.Text = "Edit";
             cntxtMenuEdit.Click += cntxtMenuEdit_Click;
             // 
@@ -542,7 +543,7 @@
             // 
             cntxtMenuUpdate.DropDownItems.AddRange(new ToolStripItem[] { menuUpdatePosition, menuUpdateCivilStatus, menuUpdateEmploymentStatus, menuUpdateDepartmentLocation });
             cntxtMenuUpdate.Name = "cntxtMenuUpdate";
-            cntxtMenuUpdate.Size = new Size(180, 22);
+            cntxtMenuUpdate.Size = new Size(142, 22);
             cntxtMenuUpdate.Text = "Update";
             // 
             // menuUpdatePosition
@@ -576,33 +577,33 @@
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(177, 6);
+            toolStripSeparator2.Size = new Size(139, 6);
             // 
             // cntxtMenuHistory
             // 
             cntxtMenuHistory.DropDownItems.AddRange(new ToolStripItem[] { menuHistoryPosition, menuHistoryCivilStatus, menuHistoryEmploymentStatus, menuHistoryDepartmentLocation });
             cntxtMenuHistory.Name = "cntxtMenuHistory";
-            cntxtMenuHistory.Size = new Size(180, 22);
+            cntxtMenuHistory.Size = new Size(142, 22);
             cntxtMenuHistory.Text = "History";
             // 
             // menuHistoryPosition
             // 
             menuHistoryPosition.Name = "menuHistoryPosition";
-            menuHistoryPosition.Size = new Size(192, 22);
+            menuHistoryPosition.Size = new Size(213, 22);
             menuHistoryPosition.Text = "Position";
             menuHistoryPosition.Click += menuHistoryPosition_Click;
             // 
             // menuHistoryCivilStatus
             // 
             menuHistoryCivilStatus.Name = "menuHistoryCivilStatus";
-            menuHistoryCivilStatus.Size = new Size(192, 22);
+            menuHistoryCivilStatus.Size = new Size(213, 22);
             menuHistoryCivilStatus.Text = "Civil Status";
             menuHistoryCivilStatus.Click += menuHistoryCivilStatus_Click;
             // 
             // menuHistoryEmploymentStatus
             // 
             menuHistoryEmploymentStatus.Name = "menuHistoryEmploymentStatus";
-            menuHistoryEmploymentStatus.Size = new Size(192, 22);
+            menuHistoryEmploymentStatus.Size = new Size(213, 22);
             menuHistoryEmploymentStatus.Text = "Employment Status";
             menuHistoryEmploymentStatus.Click += menuHistoryEmploymentStatus_Click;
             // 
@@ -620,7 +621,6 @@
             Controls.Add(pnlContainerHeader);
             Controls.Add(flowControls);
             Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            MinimumSize = new Size(733, 509);
             Name = "ucEmployees";
             Size = new Size(1213, 629);
             VisibleChanged += ucEmployees_VisibleChanged;
@@ -650,25 +650,6 @@
         private DataGridView dgvEmployees;
         private Button btnAddBatch;
         private Button btnAddEmployee;
-        private Shared.DynamicCheckedListBoxControl dchkListFilterDepartments;
-        private Label lblFilterDepartments;
-        private FlowLayoutPanel flowFilters;
-        private Label lblFilterLocations;
-        private Shared.DynamicCheckedListBoxControl dchkListFilterLocations;
-        private Label lblFilterPositions;
-        private Shared.DynamicCheckedListBoxControl dchkListFilterPositions;
-        private Label lblFilterCivilStatus;
-        private Shared.DynamicCheckedListBoxControl dchkListFilterCivilStatus;
-        private Label lblFilterGender;
-        private Shared.DynamicCheckedListBoxControl dchkListFilterGender;
-        private Label lblFilterEmploymentStatus;
-        private Shared.DynamicCheckedListBoxControl dchkListFilterEmploymentStatus;
-        private Panel pnlFilterContent;
-        private FlowLayoutPanel flowFilterControls;
-        private Button btnFilter;
-        private Button btnReset;
-        private Panel pnlContainerFilter;
-        private Panel pnlLine1;
         private Panel pnlContainerSearch;
         private TextBox txtSearch;
         private Label label1;
@@ -691,5 +672,24 @@
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem cntxtMenuView;
         private ToolStripSeparator toolStripSeparator2;
+        private Panel pnlContainerFilter;
+        private Panel pnlFilterContent;
+        private FlowLayoutPanel flowFilters;
+        private Label lblFilterDepartments;
+        private Shared.DynamicCheckedListBoxControl dchkListFilterDepartments;
+        private Label lblFilterLocations;
+        private Shared.DynamicCheckedListBoxControl dchkListFilterLocations;
+        private Label lblFilterPositions;
+        private Shared.DynamicCheckedListBoxControl dchkListFilterPositions;
+        private Label lblFilterCivilStatus;
+        private Shared.DynamicCheckedListBoxControl dchkListFilterCivilStatus;
+        private Label lblFilterGender;
+        private Shared.DynamicCheckedListBoxControl dchkListFilterGender;
+        private Label lblFilterEmploymentStatus;
+        private Shared.DynamicCheckedListBoxControl dchkListFilterEmploymentStatus;
+        private Panel pnlLine1;
+        private FlowLayoutPanel flowFilterControls;
+        private Button btnFilter;
+        private Button btnReset;
     }
 }

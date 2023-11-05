@@ -96,10 +96,12 @@ namespace LBPRDC.Source.Views.EmployeeFlow
         {
             List<EmployeeService.Employee> employees = EmployeeService.GetAllEmployees();
             List<PositionService.History> positions = PositionService.GetAllHistory();
+            List<EmploymentStatusService.History> employmentStatus = EmploymentStatusService.GetAllHistory();
             PreviousEmployeeService.PreviousEmployee employeeRecord = PreviousEmployeeService.GetRecordByEmployeeID(ID);
 
             var employee = employees.First(e => e.EmployeeID == ID);
             var currentPosition = positions.First(p => p.EmployeeID == ID && p.Status == "Active");
+            var curerntStatus = employmentStatus.First(f => f.EmployeeID == ID && f.Status == "Active");
 
             txtFirstName.Text = employee.FirstName;
             txtMiddleName.Text = employee.MiddleName;
@@ -111,7 +113,8 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             txtContactNumber1.Text = employee.ContactNumber1;
             txtContactNumber2.Text = employee.ContactNumber2;
             txtEmployeeID.Text = employee.EmployeeID;
-            dtpStartDate.Value = currentPosition.Timestamp.Value;
+            dtpPositionEffectiveDate.Value = currentPosition.Timestamp.Value;
+            dtpStatusEffectiveDate.Value = curerntStatus.Timestamp.Value;
             txtPositionTitle.Text = Utilities.StringFormat.ToSentenceCase(currentPosition.PositionTitle);
             txtRemarks.Text = employee.Remarks;
             InitializeGenderComboBoxItems(employee.Gender);
@@ -197,7 +200,8 @@ namespace LBPRDC.Source.Views.EmployeeFlow
                 EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
                 Remarks = txtRemarks.Text,
 
-                EffectiveDate = dtpStartDate.Value,
+                PositionEffectiveDate = dtpPositionEffectiveDate.Value,
+                StatusEffectiveDate = dtpStatusEffectiveDate.Value,
                 PositionTitle = txtPositionTitle.Text.ToUpper().Trim(),
                 isPreviousEmployee = chkPreviousEmployee.Checked,
                 PreviousFrom = dtpFromDate.Value,

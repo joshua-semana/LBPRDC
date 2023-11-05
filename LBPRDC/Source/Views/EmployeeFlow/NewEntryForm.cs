@@ -1,15 +1,4 @@
 ﻿using LBPRDC.Source.Services;
-using OfficeOpenXml.Drawing.Slicer.Style;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Xml.Serialization;
 
 namespace LBPRDC.Source.Views
 {
@@ -183,7 +172,7 @@ namespace LBPRDC.Source.Views
                 EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
                 Remarks = txtRemarks.Text.Trim(),
 
-                EffectiveDate = dtpEffectiveDate.Value,
+                StartDate = dtpStartDate.Value,
                 PositionTitle = txtPositionTitle.Text.ToUpper().Trim(),
                 isPreviousEmployee = chkPreviousEmployee.Checked,
                 PreviousFrom = dtpFromDate.Value,

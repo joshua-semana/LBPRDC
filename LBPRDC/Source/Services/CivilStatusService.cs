@@ -100,6 +100,7 @@ namespace LBPRDC.Source.Services
         {
             public string? CivilStatusName { get; set; }
             public string? EffectiveDate { get; set; }
+            public string? StatusName { get; set; }
         }
 
         public static void AddNewHistory(History history)
@@ -245,6 +246,7 @@ namespace LBPRDC.Source.Services
                         var civilstatus = GetAllItems().First(f => f.ID == item.CivilStatusID);
                         item.CivilStatusName = Utilities.StringFormat.ToSentenceCase(civilstatus.Name);
                         item.EffectiveDate = item.Timestamp.Value.ToString("MMMM dd, yyyy");
+                        item.StatusName = (item.Status == "Active") ? "Current" : "Old";
                         items.Add(item);
                     }
                 }

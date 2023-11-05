@@ -48,6 +48,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
             txtEmployeeID.Text = employee.EmployeeID;
             txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
+            txtCurrentPosition.Tag = employee.PositionID;
             txtCurrentPosition.Text = $"{employee.PositionCode} - {employee.PositionName}";
             txtCurrentPositionTitle.Text = currentPosition.PositionTitle;
         }
@@ -67,6 +68,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             EmployeeService.EmployeePositionUpdate data = new()
             {
                 EmployeeID = txtEmployeeID.Text,
+                OldPositionID = Convert.ToInt32(txtCurrentPosition.Tag),
                 PositionID = Convert.ToInt32(cmbPosition.SelectedValue),
                 PositionTitle = txtPositionTitle.Text.ToUpper().Trim(),
                 Remarks = txtRemarks.Text,

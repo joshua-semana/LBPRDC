@@ -110,3 +110,5 @@ C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Sou
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Shared.DynamicCheckedListBoxControl.resources
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.ViewEmployeeDataForm.resources
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.ViewHistory.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Logs.LogsControl.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Accounts.AccountsControl.resources

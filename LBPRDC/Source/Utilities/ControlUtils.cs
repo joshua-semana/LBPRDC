@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LBPRDC.Source.Views.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -65,6 +66,27 @@ namespace LBPRDC.Source.Utilities
             }
 
             return true;
+        }
+
+        public static void ResetFilters(Control container)
+        {
+            foreach (Control control in container.Controls)
+            {
+                if (control is DynamicCheckedListBoxControl dynamicCheckbox)
+                {
+                    dynamicCheckbox.ClearCheckedItems();
+                }
+            }
+        }
+
+        public static void AddColumn(DataGridView dgvTable, string name, string header, string property)
+        {
+            dgvTable.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                Name = name,
+                HeaderText = header,
+                DataPropertyName = property
+            });
         }
     }
 }

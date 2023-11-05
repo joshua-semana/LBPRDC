@@ -50,7 +50,9 @@ namespace LBPRDC.Source.Services
 
         public class EmployeeHistory : Employee
         {
-            public DateTime EffectiveDate { get; set; }
+            public DateTime StartDate { get; set; }
+            public DateTime PositionEffectiveDate { get; set; }
+            public DateTime StatusEffectiveDate { get; set; }
             public string? PositionTitle { get; set; }
             public bool? isPreviousEmployee { get; set; }
             public string? PreviousPosition { get; set; }
@@ -68,6 +70,7 @@ namespace LBPRDC.Source.Services
 
         public class EmployeePositionUpdate : EmployeeUpdateBase
         {
+            public int OldPositionID { get; set; }
             public int PositionID { get; set; }
             public string? PositionTitle { get; set; }
         }
@@ -107,40 +110,41 @@ namespace LBPRDC.Source.Services
                         {
                             Employee emp = new()
                             {
-                                EmployeeID = reader["EmployeeID"].ToString(),
-                                LastName = Utilities.StringFormat.ToSentenceCase((string)reader["LastName"]),
-                                FirstName = Utilities.StringFormat.ToSentenceCase((string)reader["FirstName"]),
-                                MiddleName = Utilities.StringFormat.ToSentenceCase((string)reader["MiddleName"]),
-                                Gender = reader["Gender"].ToString(),
-                                Birthday = reader["Birthday"] as DateTime?,
-                                Education = reader["Education"].ToString(),
+                                EmployeeID = Convert.ToString(reader["EmployeeID"]),
+                                LastName = Utilities.StringFormat.ToSentenceCase(Convert.ToString(reader["LastName"])),
+                                FirstName = Utilities.StringFormat.ToSentenceCase(Convert.ToString(reader["FirstName"])),
+                                MiddleName = Utilities.StringFormat.ToSentenceCase(Convert.ToString(reader["MiddleName"])),
+                                Gender = Convert.ToString(reader["Gender"]),
+                                Birthday = Convert.ToDateTime(reader["Birthday"]),
+                                Education = Convert.ToString(reader["Education"]),
                                 DepartmentID = Convert.ToInt32(reader["DepartmentID"]),
                                 LocationID = Convert.ToInt32(reader["LocationID"]),
-                                EmailAddress1 = reader["EmailAddress1"].ToString(),
-                                EmailAddress2 = reader["EmailAddress2"].ToString(),
-                                ContactNumber1 = reader["ContactNumber1"].ToString(),
-                                ContactNumber2 = reader["ContactNumber2"].ToString(),
+                                EmailAddress1 = Convert.ToString(reader["EmailAddress1"]),
+                                EmailAddress2 = Convert.ToString(reader["EmailAddress2"]),
+                                ContactNumber1 = Convert.ToString(reader["ContactNumber1"]),
+                                ContactNumber2 = Convert.ToString(reader["ContactNumber2"]),
                                 CivilStatusID = Convert.ToInt32(reader["CivilStatusID"]),
                                 PositionID = Convert.ToInt32(reader["PositionID"]),
                                 EmploymentStatusID = Convert.ToInt32(reader["EmploymentStatusID"]),
                                 SuffixID = Convert.ToInt32(reader["SuffixID"]),
-                                Remarks = reader["Remarks"].ToString()
+                                Remarks = Convert.ToString(reader["Remarks"])
                             };
 
-                            emp.CivilStatus = CivilStatusService.GetAllItems().Where(w => w.ID == emp.CivilStatusID).Select(s => s.Name).FirstOrDefault()?.ToString();
-                            emp.EmploymentStatus = EmploymentStatusService.GetAllItems().Where(w => w.ID == emp.EmploymentStatusID).Select(s => s.Name).FirstOrDefault()?.ToString();
-                            emp.Suffix = SuffixService.GetAllItems().Where(w => w.ID == emp.SuffixID).Select(s => s.Name).FirstOrDefault()?.ToString();
-                            emp.PositionName = PositionService.GetAllItems().Where(w => w.ID == emp.PositionID).Select(s => s.Name).FirstOrDefault()?.ToString();
-                            emp.PositionCode = PositionService.GetAllItems().Where(w => w.ID == emp.PositionID).Select(s => s.Code).FirstOrDefault()?.ToString();
-                            emp.BillingRate = Convert.ToDecimal(PositionService.GetAllItems().Where(w => w.ID == emp.PositionID).Select(s => s.BillingRate).FirstOrDefault());
-                            emp.SalaryRate = Convert.ToDecimal(PositionService.GetAllItems().Where(w => w.ID == emp.PositionID).Select(s => s.SalaryRate).FirstOrDefault());
-                            emp.Department = DepartmentService.GetAllItems().Where(w => w.ID == emp.DepartmentID).Select(s => s.Name).FirstOrDefault()?.ToString();
-                            emp.Location = LocationService.GetAllItems().Where(w => w.ID == emp.LocationID).Select(s => s.Name).FirstOrDefault()?.ToString();
+                            var position = PositionService.GetAllItems().First(f => f.ID == emp.PositionID);
+                            emp.PositionName = position.Name;
+                            emp.PositionCode = position.Code;
+                            emp.BillingRate = Convert.ToDecimal(position.BillingRate);
+                            emp.SalaryRate = Convert.ToDecimal(position.SalaryRate);
+                            emp.CivilStatus = CivilStatusService.GetAllItems().First(f => f.ID == emp.CivilStatusID).Name;
+                            emp.EmploymentStatus = EmploymentStatusService.GetAllItems().First(f => f.ID == emp.EmploymentStatusID).Name;
+                            emp.Suffix = SuffixService.GetAllItems().First(f => f.ID == emp.SuffixID).Name;
+                            emp.Department = DepartmentService.GetAllItems().First(f => f.ID == emp.DepartmentID).Name;
+                            emp.Location = LocationService.GetAllItems().First(f => f.ID == emp.LocationID).Name;
 
                             if (preference.ShowName)
                             {
                                 string middleInitial = string.IsNullOrWhiteSpace(emp.MiddleName) ? "" : $"{emp.MiddleName[0]}.";
-                                string suffix = emp.Suffix == "None" ? "" : emp.Suffix;
+                                string? suffix = emp.Suffix == "None" ? "" : emp.Suffix;
                                 emp.FullName = preference.SelectedNameFormat switch
                                 {
                                     NameFormat.Full1 => $"{emp.FirstName} {middleInitial} {emp.LastName} {suffix}".Trim(),
@@ -153,7 +157,7 @@ namespace LBPRDC.Source.Services
 
                             if (preference.ShowEmailAddress)
                             {
-                                string[] emailAddresses = new[] { emp.EmailAddress1, emp.EmailAddress2 };
+                                string?[] emailAddresses = new[] { emp.EmailAddress1, emp.EmailAddress2 };
                                 emp.EmailAddress = preference.SelectedEmailFormat switch
                                 {
                                     EmailFormat.FirstOnly => emp.EmailAddress1,
@@ -164,7 +168,7 @@ namespace LBPRDC.Source.Services
 
                             if (preference.ShowContactNumber)
                             {
-                                string[] contactNumbers = new[] { emp.ContactNumber1, emp.ContactNumber2 };
+                                string?[] contactNumbers = new[] { emp.ContactNumber1, emp.ContactNumber2 };
                                 emp.ContactNumber = preference.SelectedContactFormat switch
                                 {
                                     ContactFormat.FirstOnly => emp.ContactNumber1,
@@ -193,8 +197,6 @@ namespace LBPRDC.Source.Services
 
             return employees;
         }
-
-       
 
         public static bool IDExists(string ID)
         {
@@ -251,8 +253,10 @@ namespace LBPRDC.Source.Services
                     EmployeeID = employee.EmployeeID,
                     PositionID = employee.PositionID,
                     PositionTitle = employee.PositionTitle,
-                    Timestamp = employee.EffectiveDate,
-                    Remarks = "[Initial Status]",
+                    SalaryRate = 0,
+                    BillingRate = 0,
+                    Timestamp = employee.StartDate,
+                    Remarks = "Initial Status",
                     Status = "Active"
                 };
 
@@ -260,8 +264,8 @@ namespace LBPRDC.Source.Services
                 {
                     EmployeeID = employee.EmployeeID,
                     CivilStatusID = employee.CivilStatusID,
-                    Timestamp = employee.EffectiveDate,
-                    Remarks = "[Initial Status]",
+                    Timestamp = employee.StartDate,
+                    Remarks = "Initial Status",
                     Status = "Active"
                 };
 
@@ -270,8 +274,8 @@ namespace LBPRDC.Source.Services
                     EmployeeID = employee.EmployeeID,
                     DepartmentID = employee.DepartmentID,
                     LocationID = employee.LocationID,
-                    Timestamp = employee.EffectiveDate,
-                    Remarks = "[Initial Status]",
+                    Timestamp = employee.StartDate,
+                    Remarks = "Initial Status",
                     Status = "Active"
                 };
 
@@ -279,8 +283,8 @@ namespace LBPRDC.Source.Services
                 {
                     EmployeeID = employee.EmployeeID,
                     EmploymentStatusID = employee.EmploymentStatusID,
-                    Timestamp = employee.EffectiveDate,
-                    Remarks = "[Initial Status]",
+                    Timestamp = employee.StartDate,
+                    Remarks = "Initial Status",
                     Status = "Active"
                 };
 
@@ -289,7 +293,7 @@ namespace LBPRDC.Source.Services
                 DepartmentService.AddNewHistory(newDepartmentLocation);
                 EmploymentStatusService.AddNewHistory(newEmploymentStatus);
 
-                if ((bool)employee.isPreviousEmployee)
+                if (Convert.ToBoolean(employee.isPreviousEmployee))
                 {
                     PreviousEmployeeService.PreviousEmployee entry = new()
                     {
@@ -308,8 +312,8 @@ namespace LBPRDC.Source.Services
                     LoggingService.Log newLog = new()
                     { 
                         UserID = UserService.CurrentUser.UserID,
-                        Type = "Added New Employee",
-                        Details = $"This user added a new employee with ID of {employee.EmployeeID}."
+                        ActivityType = "Add",
+                        ActivityDetails = $"This user added a new employee with ID of {employee.EmployeeID}."
                     };
 
                     LoggingService.LogActivity(newLog);
@@ -380,7 +384,8 @@ namespace LBPRDC.Source.Services
                 {
                     HistoryID = positionHistoryID,
                     PositionID = employee.PositionID,
-                    PositionTitle = employee.PositionTitle
+                    PositionTitle = employee.PositionTitle,
+                    Timestamp = employee.PositionEffectiveDate,
                 };
 
                 CivilStatusService.HistoryUpdate updatedCivilStatus = new()
@@ -399,7 +404,8 @@ namespace LBPRDC.Source.Services
                 EmploymentStatusService.HistoryUpdate updatedEmploymentStatus = new()
                 {
                     HistoryID = employmentStatusHistoryID,
-                    EmploymentStatusID = employee.EmploymentStatusID
+                    EmploymentStatusID = employee.EmploymentStatusID,
+                    Timestamp = employee.StatusEffectiveDate
                 };
 
                 PreviousEmployeeService.PreviousEmployee updatedPreviousEmployee = new()
@@ -411,15 +417,15 @@ namespace LBPRDC.Source.Services
                     Information = employee.OtherInformation
                 };
 
-                if (!hasRecord && (bool)employee.isPreviousEmployee)
+                if (!hasRecord && Convert.ToBoolean(employee.isPreviousEmployee))
                 {
                     PreviousEmployeeService.AddRecord(updatedPreviousEmployee);
                 }
-                else if (hasRecord && (bool)employee.isPreviousEmployee)
+                else if (hasRecord && Convert.ToBoolean(employee.isPreviousEmployee))
                 {
                     PreviousEmployeeService.UpdateRecord(updatedPreviousEmployee);
                 }
-                else if (hasRecord && (bool) !employee.isPreviousEmployee)
+                else if (hasRecord && Convert.ToBoolean(!employee.isPreviousEmployee))
                 {
                     PreviousEmployeeService.DeleteRecord(employee.EmployeeID);
                 }
@@ -434,8 +440,8 @@ namespace LBPRDC.Source.Services
                     LoggingService.Log newLog = new()
                     {
                         UserID = UserService.CurrentUser.UserID,
-                        Type = "Updated Employee Information",
-                        Details = $"This user has edited the information of an employee with the ID {employee.EmployeeID}."
+                        ActivityType = "Edit",
+                        ActivityDetails = $"This user has edited the information of an employee with the ID {employee.EmployeeID}."
                     };
 
                     LoggingService.LogActivity(newLog);
@@ -467,8 +473,11 @@ namespace LBPRDC.Source.Services
                 PositionService.History newHistory = new()
                 {
                     EmployeeID = data.EmployeeID,
+                    OldPositionID = data.OldPositionID,
                     PositionID = data.PositionID,
                     PositionTitle = data.PositionTitle,
+                    SalaryRate = 0,
+                    BillingRate = 0,
                     Timestamp = data.Date,
                     Remarks = data.Remarks,
                     Status = "Active"
@@ -481,8 +490,8 @@ namespace LBPRDC.Source.Services
                     LoggingService.Log newLog = new()
                     {
                         UserID = UserService.CurrentUser.UserID,
-                        Type = "Promoted/Demoted Employee Position",
-                        Details = $"This user has promoted/demoted the position of employee with the ID {data.EmployeeID}."
+                        ActivityType = "Update",
+                        ActivityDetails = $"This user has promoted/demoted the position of employee with the ID {data.EmployeeID}."
                     };
 
                     LoggingService.LogActivity(newLog);
@@ -530,8 +539,8 @@ namespace LBPRDC.Source.Services
                     LoggingService.Log newLog = new()
                     {
                         UserID = UserService.CurrentUser.UserID,
-                        Type = "Updated Employee Department and Location",
-                        Details = $"This user has updated the department and location of employee with the ID {data.EmployeeID}."
+                        ActivityType = "Update",
+                        ActivityDetails = $"This user has updated the department and location of employee with the ID {data.EmployeeID}."
                     };
 
                     LoggingService.LogActivity(newLog);
@@ -576,8 +585,8 @@ namespace LBPRDC.Source.Services
                     LoggingService.Log newLog = new()
                     {
                         UserID = UserService.CurrentUser.UserID,
-                        Type = "Updated Employee Civil Status",
-                        Details = $"This user has updated the civil status of employee with the ID {data.EmployeeID}."
+                        ActivityType = "Update",
+                        ActivityDetails = $"This user has updated the civil status of employee with the ID {data.EmployeeID}."
                     };
 
                     LoggingService.LogActivity(newLog);
@@ -622,8 +631,8 @@ namespace LBPRDC.Source.Services
                     LoggingService.Log newLog = new()
                     {
                         UserID = UserService.CurrentUser.UserID,
-                        Type = "Updated Employee Employment Status",
-                        Details = $"This user has updated the employment status of employee with the ID {data.EmployeeID}."
+                        ActivityType = "Update",
+                        ActivityDetails = $"This user has updated the employment status of employee with the ID {data.EmployeeID}."
                     };
 
                     LoggingService.LogActivity(newLog);
