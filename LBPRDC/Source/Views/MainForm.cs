@@ -1,13 +1,17 @@
 ﻿using LBPRDC.Source.Services;
+using LBPRDC.Source.Views.Logs;
+using LBPRDC.Source.Views.Accounts;
 
 namespace LBPRDC.Source.Views
 {
     public partial class frmMain : Form
     {
-        private List<Button> pageSwitchButtons = new List<Button>();
+        private List<Button> pageSwitchButtons = new();
         private string currentPage = "Home";
 
         UserControl employeesMainControl = new ucEmployees();
+        UserControl logsControl = new LogsControl();
+        UserControl accountsControl = new AccountsControl();
 
         public frmMain()
         {
@@ -31,6 +35,7 @@ namespace LBPRDC.Source.Views
             if (userRole != "Admin")
             {
                 btnAccounts.Visible = false;
+                btnLogs.Visible = false;
             }
         }
 
@@ -74,8 +79,8 @@ namespace LBPRDC.Source.Views
         {
             //homeControl.Hide();
             employeesMainControl.Hide();
-            //accountsControl.Hide();
-            //logsControl.Hide();
+            accountsControl.Hide();
+            logsControl.Hide();
 
             lblPageName.Text = pageName;
 
@@ -83,7 +88,7 @@ namespace LBPRDC.Source.Views
             {
                 case "Home":
                     //homeControl.Dock = DockStyle.Fill;
-                    //pnlMainContent.Controls.Add(homeControl);
+                    //pnlContent.Controls.Add(homeControl);
                     //homeControl.Show();
                     break;
                 case "Employees":
@@ -93,15 +98,15 @@ namespace LBPRDC.Source.Views
                     break;
 
                 case "Accounts":
-                    //accountsControl.Dock = DockStyle.Fill;
-                    //pnlMainContent.Controls.Add(accountsControl);
-                    //accountsControl.Show();
+                    accountsControl.Dock = DockStyle.Fill;
+                    pnlContent.Controls.Add(accountsControl);
+                    accountsControl.Show();
                     break;
 
                 case "Logs":
-                    //logsControl.Dock = DockStyle.Fill;
-                    //pnlMainContent.Controls.Add(logsControl);
-                    //logsControl.Show();
+                    logsControl.Dock = DockStyle.Fill;
+                    pnlContent.Controls.Add(logsControl);
+                    logsControl.Show();
                     break;
             }
         }
@@ -124,7 +129,7 @@ namespace LBPRDC.Source.Views
             {
                 UserService.ClearCurrentUser();
                 this.Hide();
-                frmLogin loginForm = new frmLogin();
+                frmLogin loginForm = new();
                 loginForm.ShowDialog();
                 this.Close();
             }

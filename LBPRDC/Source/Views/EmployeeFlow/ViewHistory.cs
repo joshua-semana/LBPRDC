@@ -41,7 +41,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void InitializeEmployeeInformation()
         {
-            List<EmployeeService.Employee> employees = EmployeeService.GetAllEmployees();
+            var employees = EmployeeService.GetAllEmployees();
             var employee = employees.First(e => e.EmployeeID == EmployeeId);
             txtEmployeeID.Text = EmployeeId;
             txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
@@ -49,12 +49,15 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void PopulateTableWithPositions()
         {
-            List<PositionService.HistoryView> records = await Task.Run(() => PositionService.GetAllHistoryByID(EmployeeId));
+            var records = await Task.Run(() => PositionService.GetAllHistoryByID(EmployeeId));
+            records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;
-            AddColumn("Status", "Status", "Status");
+            AddColumn("StatusName", "", "StatusName");
             AddColumn("PositionName", "Position", "PositionName");
             AddColumn("PositionTitle", "Title", "PositionTitle");
+            AddColumn("SalaryRate", "Salary Rate", "SalaryRate");
+            AddColumn("BillingRate", "Billing Rate", "BillingRate");
             AddColumn("EffectiveDate", "Effective Date", "EffectiveDate");
             AddColumn("Remarks", "Remarks", "Remarks");
             dgvHistory.DataSource = records;
@@ -62,10 +65,11 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void PopulateTableWithCivilStatus()
         {
-            List<CivilStatusService.HistoryView> records = await Task.Run(() => CivilStatusService.GetAllHistoryByID(EmployeeId));
+            var records = await Task.Run(() => CivilStatusService.GetAllHistoryByID(EmployeeId));
+            records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;
-            AddColumn("Status", "Status", "Status");
+            AddColumn("StatusName", "", "StatusName");
             AddColumn("CivilStatusName", "Civil Status", "CivilStatusName");
             AddColumn("EffectiveDate", "Effective Date", "EffectiveDate");
             AddColumn("Remarks", "Remarks", "Remarks");
@@ -74,10 +78,11 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void PopulateTableWithEmploymentStatus()
         {
-            List<EmploymentStatusService.HistoryView> records = await Task.Run(() => EmploymentStatusService.GetAllHistoryByID(EmployeeId));
+            var records = await Task.Run(() => EmploymentStatusService.GetAllHistoryByID(EmployeeId));
+            records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;
-            AddColumn("Status", "Status", "Status");
+            AddColumn("StatusName", "", "StatusName");
             AddColumn("Name", "Status Name", "Name");
             AddColumn("EffectiveDate", "Effective Date", "EffectiveDate");
             AddColumn("Remarks", "Remarks", "Remarks");
@@ -86,10 +91,11 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void PopulateTableWithDepartmentLocation()
         {
-            List<DepartmentService.HistoryView> records = await Task.Run(() => DepartmentService.GetAllHistoryByID(EmployeeId));
+            var records = await Task.Run(() => DepartmentService.GetAllHistoryByID(EmployeeId));
+            records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;
-            AddColumn("Status", "Status", "Status");
+            AddColumn("StatusName", "", "StatusName");
             AddColumn("DepartmentName", "Department", "DepartmentName");
             AddColumn("LocationName", "Location", "LocationName");
             AddColumn("EffectiveDate", "Effective Date", "EffectiveDate");

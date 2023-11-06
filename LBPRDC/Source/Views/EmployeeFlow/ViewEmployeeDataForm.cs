@@ -26,7 +26,8 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             PreviousEmployeeService.PreviousEmployee record = PreviousEmployeeService.GetRecordByEmployeeID(employeeId);
 
             var employee = employees.First(e => e.EmployeeID == employeeId);
-            var initialPosition = positions.First(p => p.EmployeeID == employeeId && p.Remarks == "[Initial Status]");
+            var initialPosition = positions.First(p => p.EmployeeID == employeeId && p.Remarks == "Initial Status");
+            var currentPosition = positions.First(f => f.EmployeeID == employeeId && f.Status == "Active");
             string noContent = "-";
 
             lblFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
@@ -41,6 +42,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             lblIdentificationCode.Text = employeeId.ToString();
             lblStartDate.Text = initialPosition.Timestamp?.ToString("MMMM dd, yyyy") ?? noContent;
             lblPosition.Text = $"{employee.PositionCode} - {Utilities.StringFormat.ToSentenceCase(employee.PositionName)}";
+            lblEffectiveDate.Text = currentPosition.Timestamp?.ToString("MMMM dd, yyyy") ?? noContent;
             lblDepartment.Text = employee.Department;
             lblLocation.Text = employee.Location;
             lblStatus.Text = Utilities.StringFormat.ToSentenceCase(employee.EmploymentStatus);
@@ -53,6 +55,17 @@ namespace LBPRDC.Source.Views.EmployeeFlow
         private void btnDone_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void btnViewPositionHistory_Click(object sender, EventArgs e)
+        {
+            string employeeID = lblIdentificationCode.Text;
+            ViewHistory frmViewHistory = new()
+            {
+                HistoryType = "Position",
+                EmployeeId = employeeID
+            };
+            frmViewHistory.ShowDialog();
         }
     }
 }

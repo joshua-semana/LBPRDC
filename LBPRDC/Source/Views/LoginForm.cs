@@ -66,7 +66,8 @@ namespace LBPRDC.Source.Views
                     return;
                 }
 
-                UserService.GetUserByUsername(username);
+                var userDetails = UserService.GetAllUsers().First(f => f.Username == username);
+                UserService.SetCurrentUser(userDetails);
                 var currentUser = UserService.CurrentUser;
 
                 if (currentUser == null)
@@ -84,8 +85,8 @@ namespace LBPRDC.Source.Views
                 LoggingService.Log newLog = new()
                 {
                     UserID = currentUser.UserID,
-                    Type = "Sign In Log",
-                    Details = "This user signed in."
+                    ActivityType = "Sign In",
+                    ActivityDetails = "This user signed in."
                 };
 
                 await Task.Run(() => LoggingService.LogActivity(newLog));

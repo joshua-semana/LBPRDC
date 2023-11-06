@@ -53,7 +53,7 @@
             pnlLine1.Dock = DockStyle.Top;
             pnlLine1.Location = new Point(0, 0);
             pnlLine1.Name = "pnlLine1";
-            pnlLine1.Size = new Size(584, 1);
+            pnlLine1.Size = new Size(834, 1);
             pnlLine1.TabIndex = 0;
             // 
             // flowControls
@@ -65,13 +65,13 @@
             flowControls.Location = new Point(0, 401);
             flowControls.Name = "flowControls";
             flowControls.Padding = new Padding(15, 16, 0, 16);
-            flowControls.Size = new Size(584, 60);
+            flowControls.Size = new Size(834, 60);
             flowControls.TabIndex = 5;
             // 
             // btnClose
             // 
             btnClose.AutoSize = true;
-            btnClose.Location = new Point(494, 16);
+            btnClose.Location = new Point(744, 16);
             btnClose.Margin = new Padding(8, 0, 0, 0);
             btnClose.Name = "btnClose";
             btnClose.Size = new Size(75, 28);
@@ -82,13 +82,14 @@
             // 
             // panel1
             // 
+            panel1.AutoSize = true;
             panel1.Controls.Add(dgvHistory);
             panel1.Controls.Add(grpPersonalData);
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(0, 1);
             panel1.Name = "panel1";
             panel1.Padding = new Padding(16);
-            panel1.Size = new Size(584, 400);
+            panel1.Size = new Size(834, 400);
             panel1.TabIndex = 6;
             // 
             // dgvHistory
@@ -97,12 +98,13 @@
             dgvHistory.AllowUserToDeleteRows = false;
             dgvHistory.AllowUserToOrderColumns = true;
             dgvHistory.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.BackColor = Color.Honeydew;
+            dataGridViewCellStyle1.BackColor = Color.Empty;
             dataGridViewCellStyle1.SelectionBackColor = Color.SeaGreen;
             dgvHistory.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             dgvHistory.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvHistory.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvHistory.BackgroundColor = SystemColors.Window;
+            dgvHistory.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvHistory.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
             dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = SystemColors.Control;
@@ -115,7 +117,7 @@
             dgvHistory.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dgvHistory.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvHistory.EditMode = DataGridViewEditMode.EditOnF2;
-            dgvHistory.GridColor = SystemColors.Window;
+            dgvHistory.GridColor = SystemColors.Control;
             dgvHistory.Location = new Point(16, 129);
             dgvHistory.Margin = new Padding(0);
             dgvHistory.MultiSelect = false;
@@ -131,11 +133,11 @@
             dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
             dgvHistory.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             dgvHistory.RowHeadersVisible = false;
-            dgvHistory.RowTemplate.DefaultCellStyle.Padding = new Padding(4);
+            dgvHistory.RowTemplate.DefaultCellStyle.Padding = new Padding(4, 8, 4, 8);
             dgvHistory.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
-            dgvHistory.RowTemplate.Height = 37;
+            dgvHistory.RowTemplate.Height = 41;
             dgvHistory.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvHistory.Size = new Size(552, 255);
+            dgvHistory.Size = new Size(802, 255);
             dgvHistory.TabIndex = 5;
             // 
             // grpPersonalData
@@ -149,7 +151,7 @@
             grpPersonalData.Margin = new Padding(0, 0, 0, 16);
             grpPersonalData.Name = "grpPersonalData";
             grpPersonalData.Padding = new Padding(3, 8, 3, 3);
-            grpPersonalData.Size = new Size(552, 97);
+            grpPersonalData.Size = new Size(802, 97);
             grpPersonalData.TabIndex = 4;
             grpPersonalData.TabStop = false;
             grpPersonalData.Text = "Employee Information";
@@ -163,7 +165,7 @@
             txtFullName.MaxLength = 50;
             txtFullName.Name = "txtFullName";
             txtFullName.ReadOnly = true;
-            txtFullName.Size = new Size(329, 26);
+            txtFullName.Size = new Size(579, 26);
             txtFullName.TabIndex = 10;
             // 
             // label10
@@ -205,7 +207,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(584, 461);
+            ClientSize = new Size(834, 461);
             Controls.Add(panel1);
             Controls.Add(flowControls);
             Controls.Add(pnlLine1);
@@ -213,7 +215,7 @@
             Margin = new Padding(4);
             MaximizeBox = false;
             MinimizeBox = false;
-            MinimumSize = new Size(600, 500);
+            MinimumSize = new Size(500, 500);
             Name = "ViewHistory";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
@@ -226,6 +228,7 @@
             grpPersonalData.ResumeLayout(false);
             grpPersonalData.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

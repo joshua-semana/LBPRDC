@@ -37,42 +37,43 @@ namespace LBPRDC.Source.Services
             CurrentUser = null;
         }
 
-        public static void GetUserByUsername(string username)
+        public static List<User> GetAllUsers()
         {
+            List<User> users = new();
             try
             {
-                string query = "SELECT * FROM Users WHERE Username = @Username";
+                string query = "SELECT * FROM Users";
 
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Username", username);
-
                     connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        if (reader.Read())
+                        while (reader.Read())
                         {
                             User user = new()
                             {
                                 UserID = Convert.ToInt32(reader["UserID"]),
-                                Username = reader["Username"].ToString(),
-                                FirstName = reader["FirstName"].ToString(),
-                                LastName = reader["LastName"].ToString(),
-                                Email = reader["Email"].ToString(),
-                                Role = reader["Role"].ToString(),
-                                Status = reader["Status"].ToString(),
-                                RegistrationDate = reader["RegistrationDate"] as DateTime?,
-                                LastLoginDate = reader["LastLoginDate"] as DateTime?
+                                Username = Convert.ToString(reader["Username"]),
+                                FirstName = Convert.ToString(reader["FirstName"]),
+                                LastName = Convert.ToString(reader["LastName"]),
+                                Email = Convert.ToString(reader["Email"]),
+                                Role = Convert.ToString(reader["Role"]),
+                                Status = Convert.ToString(reader["Status"]),
+                                RegistrationDate = Convert.ToDateTime(reader["RegistrationDate"]),
+                                LastLoginDate = Convert.ToDateTime(reader["LastLoginDate"])
                             };
 
-                            SetCurrentUser(user);
+                            users.Add(user);
                         }
                     }
                 }
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return users;
         }
 
         public static bool Add(User newUser)

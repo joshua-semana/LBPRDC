@@ -67,6 +67,8 @@
             label11 = new Label();
             panel1 = new Panel();
             groupBox2 = new GroupBox();
+            lblEffectiveDate = new Label();
+            label19 = new Label();
             lblInformation = new Label();
             label22 = new Label();
             label21 = new Label();
@@ -74,6 +76,7 @@
             label18 = new Label();
             flowControls = new FlowLayoutPanel();
             btnClose = new Button();
+            btnViewPositionHistory = new Button();
             groupBox1.SuspendLayout();
             panel1.SuspendLayout();
             groupBox2.SuspendLayout();
@@ -91,6 +94,7 @@
             // 
             // groupBox1
             // 
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             groupBox1.Controls.Add(lblRemarks);
             groupBox1.Controls.Add(label31);
             groupBox1.Controls.Add(lblContactNumber2);
@@ -116,7 +120,7 @@
             groupBox1.Margin = new Padding(0, 0, 16, 0);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new Padding(16, 8, 16, 16);
-            groupBox1.Size = new Size(375, 422);
+            groupBox1.Size = new Size(375, 449);
             groupBox1.TabIndex = 1;
             groupBox1.TabStop = false;
             // 
@@ -161,7 +165,7 @@
             lblEmailAddress2.AutoEllipsis = true;
             lblEmailAddress2.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblEmailAddress2.ForeColor = SystemColors.ControlText;
-            lblEmailAddress2.Location = new Point(159, 238);
+            lblEmailAddress2.Location = new Point(159, 214);
             lblEmailAddress2.Margin = new Padding(0, 0, 0, 8);
             lblEmailAddress2.Name = "lblEmailAddress2";
             lblEmailAddress2.Size = new Size(200, 16);
@@ -173,7 +177,7 @@
             lblContactNumber1.AutoEllipsis = true;
             lblContactNumber1.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblContactNumber1.ForeColor = SystemColors.ControlText;
-            lblContactNumber1.Location = new Point(159, 214);
+            lblContactNumber1.Location = new Point(159, 238);
             lblContactNumber1.Margin = new Padding(0, 0, 0, 8);
             lblContactNumber1.Name = "lblContactNumber1";
             lblContactNumber1.Size = new Size(200, 16);
@@ -375,7 +379,7 @@
             // 
             label17.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label17.ForeColor = SystemColors.ControlDarkDark;
-            label17.Location = new Point(16, 214);
+            label17.Location = new Point(16, 238);
             label17.Margin = new Padding(0, 0, 0, 8);
             label17.Name = "label17";
             label17.Size = new Size(125, 33);
@@ -388,7 +392,7 @@
             lblPreviousEmployee.AutoEllipsis = true;
             lblPreviousEmployee.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblPreviousEmployee.ForeColor = SystemColors.ControlText;
-            lblPreviousEmployee.Location = new Point(159, 214);
+            lblPreviousEmployee.Location = new Point(159, 238);
             lblPreviousEmployee.Margin = new Padding(0, 0, 0, 8);
             lblPreviousEmployee.Name = "lblPreviousEmployee";
             lblPreviousEmployee.Size = new Size(200, 16);
@@ -424,7 +428,7 @@
             lblStatus.AutoEllipsis = true;
             lblStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblStatus.ForeColor = SystemColors.ControlText;
-            lblStatus.Location = new Point(159, 182);
+            lblStatus.Location = new Point(159, 206);
             lblStatus.Margin = new Padding(0, 0, 0, 16);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(200, 16);
@@ -436,7 +440,7 @@
             lblLocation.AutoEllipsis = true;
             lblLocation.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblLocation.ForeColor = SystemColors.ControlText;
-            lblLocation.Location = new Point(159, 158);
+            lblLocation.Location = new Point(159, 182);
             lblLocation.Margin = new Padding(0, 0, 0, 8);
             lblLocation.Name = "lblLocation";
             lblLocation.Size = new Size(200, 16);
@@ -448,7 +452,7 @@
             lblDepartment.AutoEllipsis = true;
             lblDepartment.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblDepartment.ForeColor = SystemColors.ControlText;
-            lblDepartment.Location = new Point(159, 134);
+            lblDepartment.Location = new Point(159, 158);
             lblDepartment.Margin = new Padding(0, 0, 0, 8);
             lblDepartment.Name = "lblDepartment";
             lblDepartment.Size = new Size(200, 16);
@@ -483,7 +487,7 @@
             // 
             label15.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label15.ForeColor = SystemColors.ControlDarkDark;
-            label15.Location = new Point(16, 182);
+            label15.Location = new Point(16, 206);
             label15.Margin = new Padding(0, 0, 0, 16);
             label15.Name = "label15";
             label15.Size = new Size(125, 16);
@@ -495,7 +499,7 @@
             // 
             label14.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label14.ForeColor = SystemColors.ControlDarkDark;
-            label14.Location = new Point(16, 158);
+            label14.Location = new Point(16, 182);
             label14.Margin = new Padding(0, 0, 0, 8);
             label14.Name = "label14";
             label14.Size = new Size(125, 16);
@@ -507,7 +511,7 @@
             // 
             label13.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label13.ForeColor = SystemColors.ControlDarkDark;
-            label13.Location = new Point(16, 134);
+            label13.Location = new Point(16, 158);
             label13.Margin = new Padding(0, 0, 0, 8);
             label13.Name = "label13";
             label13.Size = new Size(125, 16);
@@ -524,7 +528,7 @@
             label12.Name = "label12";
             label12.Size = new Size(125, 16);
             label12.TabIndex = 12;
-            label12.Text = "Position";
+            label12.Text = "Current Position";
             label12.TextAlign = ContentAlignment.MiddleRight;
             // 
             // label11
@@ -547,11 +551,14 @@
             panel1.Location = new Point(0, 1);
             panel1.Name = "panel1";
             panel1.Padding = new Padding(16, 8, 16, 16);
-            panel1.Size = new Size(798, 446);
+            panel1.Size = new Size(798, 473);
             panel1.TabIndex = 2;
             // 
             // groupBox2
             // 
+            groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox2.Controls.Add(lblEffectiveDate);
+            groupBox2.Controls.Add(label19);
             groupBox2.Controls.Add(lblInformation);
             groupBox2.Controls.Add(label22);
             groupBox2.Controls.Add(label21);
@@ -575,16 +582,40 @@
             groupBox2.Margin = new Padding(0);
             groupBox2.Name = "groupBox2";
             groupBox2.Padding = new Padding(16, 8, 16, 16);
-            groupBox2.Size = new Size(375, 422);
+            groupBox2.Size = new Size(375, 449);
             groupBox2.TabIndex = 2;
             groupBox2.TabStop = false;
+            // 
+            // lblEffectiveDate
+            // 
+            lblEffectiveDate.AutoEllipsis = true;
+            lblEffectiveDate.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            lblEffectiveDate.ForeColor = SystemColors.ControlText;
+            lblEffectiveDate.Location = new Point(159, 134);
+            lblEffectiveDate.Margin = new Padding(0, 0, 0, 8);
+            lblEffectiveDate.Name = "lblEffectiveDate";
+            lblEffectiveDate.Size = new Size(200, 16);
+            lblEffectiveDate.TabIndex = 41;
+            lblEffectiveDate.Text = "Effective Date";
+            // 
+            // label19
+            // 
+            label19.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label19.ForeColor = SystemColors.ControlDarkDark;
+            label19.Location = new Point(16, 134);
+            label19.Margin = new Padding(0, 0, 0, 8);
+            label19.Name = "label19";
+            label19.Size = new Size(125, 16);
+            label19.TabIndex = 40;
+            label19.Text = "Effective Date";
+            label19.TextAlign = ContentAlignment.MiddleRight;
             // 
             // lblInformation
             // 
             lblInformation.AutoEllipsis = true;
             lblInformation.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblInformation.ForeColor = SystemColors.ControlText;
-            lblInformation.Location = new Point(159, 294);
+            lblInformation.Location = new Point(159, 320);
             lblInformation.Margin = new Padding(0, 0, 0, 8);
             lblInformation.Name = "lblInformation";
             lblInformation.Size = new Size(200, 109);
@@ -606,7 +637,7 @@
             // 
             label21.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label21.ForeColor = SystemColors.ControlDarkDark;
-            label21.Location = new Point(16, 294);
+            label21.Location = new Point(16, 320);
             label21.Margin = new Padding(0, 0, 0, 8);
             label21.Name = "label21";
             label21.Size = new Size(125, 33);
@@ -619,7 +650,7 @@
             lblPeriod.AutoEllipsis = true;
             lblPeriod.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblPeriod.ForeColor = SystemColors.ControlText;
-            lblPeriod.Location = new Point(159, 254);
+            lblPeriod.Location = new Point(159, 279);
             lblPeriod.Margin = new Padding(0, 0, 0, 8);
             lblPeriod.Name = "lblPeriod";
             lblPeriod.Size = new Size(200, 33);
@@ -630,7 +661,7 @@
             // 
             label18.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label18.ForeColor = SystemColors.ControlDarkDark;
-            label18.Location = new Point(16, 254);
+            label18.Location = new Point(16, 279);
             label18.Margin = new Padding(0, 0, 0, 8);
             label18.Name = "label18";
             label18.Size = new Size(125, 33);
@@ -642,9 +673,10 @@
             // 
             flowControls.BackColor = SystemColors.Menu;
             flowControls.Controls.Add(btnClose);
+            flowControls.Controls.Add(btnViewPositionHistory);
             flowControls.Dock = DockStyle.Bottom;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
-            flowControls.Location = new Point(0, 447);
+            flowControls.Location = new Point(0, 474);
             flowControls.Name = "flowControls";
             flowControls.Padding = new Padding(16, 16, 0, 16);
             flowControls.Size = new Size(798, 60);
@@ -662,11 +694,23 @@
             btnClose.UseVisualStyleBackColor = true;
             btnClose.Click += btnDone_Click;
             // 
+            // btnViewPositionHistory
+            // 
+            btnViewPositionHistory.AutoSize = true;
+            btnViewPositionHistory.Location = new Point(566, 16);
+            btnViewPositionHistory.Margin = new Padding(8, 0, 0, 0);
+            btnViewPositionHistory.Name = "btnViewPositionHistory";
+            btnViewPositionHistory.Size = new Size(133, 28);
+            btnViewPositionHistory.TabIndex = 26;
+            btnViewPositionHistory.Text = "Position History";
+            btnViewPositionHistory.UseVisualStyleBackColor = true;
+            btnViewPositionHistory.Click += btnViewPositionHistory_Click;
+            // 
             // ViewEmployeeDataForm
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(798, 507);
+            ClientSize = new Size(798, 534);
             Controls.Add(panel1);
             Controls.Add(flowControls);
             Controls.Add(pnlLine1);
@@ -738,5 +782,8 @@
         private Label label18;
         private GroupBox groupBox2;
         private Label label22;
+        private Button btnViewPositionHistory;
+        private Label lblEffectiveDate;
+        private Label label19;
     }
 }

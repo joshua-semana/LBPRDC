@@ -105,6 +105,7 @@ namespace LBPRDC.Source.Services
             public string? DepartmentName { get; set; }
             public string? LocationName { get; set; }
             public string? EffectiveDate { get; set; }
+            public string? StatusName { get; internal set; }
         }
 
         public static void AddNewHistory(History history)
@@ -257,6 +258,7 @@ namespace LBPRDC.Source.Services
                         item.DepartmentName = department.Name;
                         item.LocationName = location.Name;
                         item.EffectiveDate = item.Timestamp.Value.ToString("MMMM dd, yyyy");
+                        item.StatusName = (item.Status == "Active") ? "Current" : "Old";
                         items.Add(item);
                     }
                 }

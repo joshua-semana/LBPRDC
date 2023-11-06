@@ -47,8 +47,9 @@
             flowSideNavTop = new FlowLayoutPanel();
             btnNavHome = new Button();
             btnNavEmployees = new Button();
-            btnAccounts = new Button();
+            btnCategories = new Button();
             btnLogs = new Button();
+            btnAccounts = new Button();
             pnlLine3 = new Panel();
             pnlHeader.SuspendLayout();
             flowHeaderLeft.SuspendLayout();
@@ -234,8 +235,9 @@
             // 
             flowSideNavTop.Controls.Add(btnNavHome);
             flowSideNavTop.Controls.Add(btnNavEmployees);
-            flowSideNavTop.Controls.Add(btnAccounts);
+            flowSideNavTop.Controls.Add(btnCategories);
             flowSideNavTop.Controls.Add(btnLogs);
+            flowSideNavTop.Controls.Add(btnAccounts);
             flowSideNavTop.Dock = DockStyle.Fill;
             flowSideNavTop.FlowDirection = FlowDirection.TopDown;
             flowSideNavTop.Location = new Point(0, 0);
@@ -273,20 +275,19 @@
             btnNavEmployees.Tag = "Employees";
             btnNavEmployees.UseVisualStyleBackColor = true;
             // 
-            // btnAccounts
+            // btnCategories
             // 
-            btnAccounts.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnAccounts.Cursor = Cursors.Hand;
-            btnAccounts.FlatAppearance.BorderSize = 0;
-            btnAccounts.FlatStyle = FlatStyle.Flat;
-            btnAccounts.Image = (Image)resources.GetObject("btnAccounts.Image");
-            btnAccounts.Location = new Point(0, 100);
-            btnAccounts.Margin = new Padding(0);
-            btnAccounts.Name = "btnAccounts";
-            btnAccounts.Size = new Size(50, 50);
-            btnAccounts.TabIndex = 10;
-            btnAccounts.Tag = "Accounts";
-            btnAccounts.UseVisualStyleBackColor = true;
+            btnCategories.Cursor = Cursors.Hand;
+            btnCategories.FlatAppearance.BorderSize = 0;
+            btnCategories.FlatStyle = FlatStyle.Flat;
+            btnCategories.Image = (Image)resources.GetObject("btnCategories.Image");
+            btnCategories.Location = new Point(0, 100);
+            btnCategories.Margin = new Padding(0);
+            btnCategories.Name = "btnCategories";
+            btnCategories.Size = new Size(50, 50);
+            btnCategories.TabIndex = 12;
+            btnCategories.Tag = "Categories";
+            btnCategories.UseVisualStyleBackColor = true;
             // 
             // btnLogs
             // 
@@ -301,6 +302,21 @@
             btnLogs.TabIndex = 11;
             btnLogs.Tag = "Logs";
             btnLogs.UseVisualStyleBackColor = true;
+            // 
+            // btnAccounts
+            // 
+            btnAccounts.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnAccounts.Cursor = Cursors.Hand;
+            btnAccounts.FlatAppearance.BorderSize = 0;
+            btnAccounts.FlatStyle = FlatStyle.Flat;
+            btnAccounts.Image = (Image)resources.GetObject("btnAccounts.Image");
+            btnAccounts.Location = new Point(0, 200);
+            btnAccounts.Margin = new Padding(0);
+            btnAccounts.Name = "btnAccounts";
+            btnAccounts.Size = new Size(50, 50);
+            btnAccounts.TabIndex = 10;
+            btnAccounts.Tag = "Accounts";
+            btnAccounts.UseVisualStyleBackColor = true;
             // 
             // pnlLine3
             // 
@@ -364,5 +380,6 @@
         private FlowLayoutPanel flowSideNavBottom;
         private Panel pnlContent;
         private Label lblPageName;
+        private Button btnCategories;
     }
 }

@@ -100,12 +100,14 @@ namespace LBPRDC.Source.Services
         {
             public int HistoryID { get; set; }
             public int EmploymentStatusID { get; set; }
+            public DateTime? Timestamp { get; set; }
         }
 
         public class HistoryView : History
         {
             public string? Name { get; set; }
             public string? EffectiveDate { get; set; }
+            public string? StatusName { get; set; }
         }
 
         public static void AddNewHistory(History history)
@@ -210,12 +212,14 @@ namespace LBPRDC.Source.Services
             try
             {
                 string updateQuery = "UPDATE EmployeeEmploymentHistory SET " +
-                    "EmploymentStatusID = @EmploymentStatusID " +
+                    "EmploymentStatusID = @EmploymentStatusID, " +
+                    "Timestamp = @Timestamp " +
                     "WHERE HistoryID = @HistoryID";
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(updateQuery, connection))
                 {
                     command.Parameters.AddWithValue("@EmploymentStatusID", data.EmploymentStatusID);
+                    command.Parameters.AddWithValue("@Timestamp", data.Timestamp);
                     command.Parameters.AddWithValue("@HistoryID", data.HistoryID);
                     connection.Open();
                     command.ExecuteNonQuery();
@@ -251,6 +255,7 @@ namespace LBPRDC.Source.Services
                         var employmentStatus = GetAllItems().First(f => f.ID == item.EmploymentStatusID);
                         item.Name = Utilities.StringFormat.ToSentenceCase(employmentStatus.Name);
                         item.EffectiveDate = item.Timestamp.Value.ToString("MMMM dd, yyyy");
+                        item.StatusName = (item.Status == "Active") ? "Current" : "Old";
                         items.Add(item);
                     }
                 }

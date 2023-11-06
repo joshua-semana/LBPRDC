@@ -37,13 +37,13 @@ namespace LBPRDC.Source.Views
         public void ResetTableSearchFilter()
         {
             txtSearch.Text = string.Empty;
-            ResetFilters();
+            ControlUtils.ResetFilters(flowFilters);
             ApplyFilterAndSearchThenPopulate();
         }
 
         private void ucEmployees_VisibleChanged(object sender, EventArgs e)
         {
-            PopulateTable();
+            if (this.Visible == true) PopulateTable();
         }
 
         private static void InitializeFilter(Label label, DynamicCheckedListBoxControl control, List<CheckedListBoxItems> items)
@@ -104,7 +104,7 @@ namespace LBPRDC.Source.Views
                 dgvEmployees.DataSource = employees;
             }
 
-            UpdateEmployeeCountLabel(employees.Count, employees.Count);
+            UpdateTableRowCount(employees.Count, employees.Count);
             HideLoadingProgressBar();
         }
 
@@ -147,7 +147,7 @@ namespace LBPRDC.Source.Views
                 }
 
                 ApplySettingsToTable();
-                UpdateEmployeeCountLabel(filteredEmployees.Count, employees.Count);
+                UpdateTableRowCount(filteredEmployees.Count, employees.Count);
                 dgvEmployees.DataSource = filteredEmployees;
             }
 
@@ -156,39 +156,39 @@ namespace LBPRDC.Source.Views
 
         private void ApplySettingsToTable()
         {
-            if (preference.ShowEmployeeID) { AddColumn("EmployeeID", "ID", "EmployeeID"); }
+            if (preference.ShowEmployeeID) { ControlUtils.AddColumn(dgvEmployees, "EmployeeID", "ID", "EmployeeID"); }
             if (preference.ShowName)
             {
                 if (preference.SelectedNameFormat == NameFormat.Full1 ||
                     preference.SelectedNameFormat == NameFormat.Full2 ||
                     preference.SelectedNameFormat == NameFormat.FirstAndLastOnly)
                 {
-                    AddColumn("FullName", "Full Name", "FullName");
+                    ControlUtils.AddColumn(dgvEmployees, "FullName", "Full Name", "FullName");
                 }
                 else if (preference.SelectedNameFormat == NameFormat.LastNameOnly)
                 {
-                    AddColumn("LastName", "Last Name", "LastName");
+                    ControlUtils.AddColumn(dgvEmployees, "LastName", "Last Name", "LastName");
                 }
                 else if (preference.SelectedNameFormat == NameFormat.Separated)
                 {
-                    AddColumn("FirstName", "First Name", "FirstName");
-                    AddColumn("MiddleName", "Middle Name", "MiddleName");
-                    AddColumn("LastName", "Last Name", "LastName");
-                    AddColumn("Suffix", "Suffix", "Suffix");
+                    ControlUtils.AddColumn(dgvEmployees, "FirstName", "First Name", "FirstName");
+                    ControlUtils.AddColumn(dgvEmployees, "MiddleName", "Middle Name", "MiddleName");
+                    ControlUtils.AddColumn(dgvEmployees, "LastName", "Last Name", "LastName");
+                    ControlUtils.AddColumn(dgvEmployees, "Suffix", "Suffix", "Suffix");
                 }
             }
-            if (preference.ShowGender) { AddColumn("Gender", "Gender", "Gender"); }
-            if (preference.ShowBirthday) { AddColumn("Birthday", "Birthday", "Birthday"); }
-            if (preference.ShowEducation) { AddColumn("Education", "Education", "Education"); }
-            if (preference.ShowCivilStatus) { AddColumn("CivilStatus", "Civil Status", "CivilStatus"); }
-            if (preference.ShowEmailAddress) { AddColumn("EmailAddress", "Email Address", "EmailAddress"); }
-            if (preference.ShowContactNumber) { AddColumn("ContactNumber", "Contact Number", "ContactNumber"); }
-            if (preference.ShowDepartment) { AddColumn("Department", "Department", "Department"); }
-            if (preference.ShowLocation) { AddColumn("Location", "Location", "Location"); }
-            if (preference.ShowPosition) { AddColumn("Position", "Position", "Position"); }
-            if (preference.ShowSalaryRate) { AddColumn("SalaryRate", "Salary Rate", "SalaryRate"); }
-            if (preference.ShowBillingRate) { AddColumn("BillingRate", "Billing Rate", "BillingRate"); }
-            if (preference.ShowEmploymentStatus) { AddColumn("EmploymentStatus", "Status", "EmploymentStatus"); }
+            if (preference.ShowGender) { ControlUtils.AddColumn(dgvEmployees, "Gender", "Gender", "Gender"); }
+            if (preference.ShowBirthday) { ControlUtils.AddColumn(dgvEmployees, "Birthday", "Birthday", "Birthday"); }
+            if (preference.ShowEducation) { ControlUtils.AddColumn(dgvEmployees, "Education", "Education", "Education"); }
+            if (preference.ShowCivilStatus) { ControlUtils.AddColumn(dgvEmployees, "CivilStatus", "Civil Status", "CivilStatus"); }
+            if (preference.ShowEmailAddress) { ControlUtils.AddColumn(dgvEmployees, "EmailAddress", "Email Address", "EmailAddress"); }
+            if (preference.ShowContactNumber) { ControlUtils.AddColumn(dgvEmployees, "ContactNumber", "Contact Number", "ContactNumber"); }
+            if (preference.ShowDepartment) { ControlUtils.AddColumn(dgvEmployees, "Department", "Department", "Department"); }
+            if (preference.ShowLocation) { ControlUtils.AddColumn(dgvEmployees, "Location", "Location", "Location"); }
+            if (preference.ShowPosition) { ControlUtils.AddColumn(dgvEmployees, "Position", "Position", "Position"); }
+            if (preference.ShowSalaryRate) { ControlUtils.AddColumn(dgvEmployees, "SalaryRate", "Salary Rate", "SalaryRate"); }
+            if (preference.ShowBillingRate) { ControlUtils.AddColumn(dgvEmployees, "BillingRate", "Billing Rate", "BillingRate"); }
+            if (preference.ShowEmploymentStatus) { ControlUtils.AddColumn(dgvEmployees, "EmploymentStatus", "Status", "EmploymentStatus"); }
         }
 
         private void ShowLoadingProgressBar()
@@ -203,17 +203,7 @@ namespace LBPRDC.Source.Views
             //dgvEmployees.Visible = true;
         }
 
-        private void AddColumn(string name, string header, string property)
-        {
-            dgvEmployees.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                Name = name,
-                HeaderText = header,
-                DataPropertyName = property
-            });
-        }
-
-        private void UpdateEmployeeCountLabel(int currentCount, int originalCount)
+        private void UpdateTableRowCount(int currentCount, int originalCount)
         {
             lblRowCounter.Text = $"Currently displaying {currentCount} out of {originalCount} employee(s).";
         }
@@ -230,17 +220,6 @@ namespace LBPRDC.Source.Views
             frmSettingsEmployee settingEmployeeForm = new();
             settingEmployeeForm.ParentControl = this;
             settingEmployeeForm.ShowDialog();
-        }
-
-        private void ResetFilters()
-        {
-            foreach (Control control in flowFilters.Controls)
-            {
-                if (control is DynamicCheckedListBoxControl dynamicCheckbox)
-                {
-                    dynamicCheckbox.ClearCheckedItems();
-                }
-            }
         }
 
         private void btnReset_Click(object sender, EventArgs e)
