@@ -1,4 +1,5 @@
 ﻿using LBPRDC.Source.Services;
+using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views
 {
@@ -91,41 +92,9 @@ namespace LBPRDC.Source.Views
             cmbGender.SelectedIndex = 0;
         }
 
-        private bool AreRequiredFieldsFilled()
-        {
-            List<string> emptyField = new List<string>();
-
-            foreach (Control control in requiredFields)
-            {
-                if (control is TextBox)
-                {
-                    if (string.IsNullOrWhiteSpace(control.Text))
-                    {
-                        emptyField.Add(control.AccessibleName);
-                    }
-                }
-                else if (control is ComboBox comboBox)
-                {
-                    if (comboBox.SelectedIndex == 0)
-                    {
-                        emptyField.Add(control.AccessibleName);
-                    }
-                }
-            }
-
-            if (emptyField.Count > 0)
-            {
-                string emptyFields = string.Join("\n", emptyField);
-                MessageBox.Show($"The following fields are required:\n{emptyFields}", "Required Fields", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            return true;
-        }
-
         private void btnConfirm_Click(object sender, EventArgs e)
         {
-            if (AreRequiredFieldsFilled())
+            if (ControlUtils.AreRequiredFieldsFilled(requiredFields))
             {
                 if (EmployeeService.IDExists(txtEmployeeID.Text))
                 {

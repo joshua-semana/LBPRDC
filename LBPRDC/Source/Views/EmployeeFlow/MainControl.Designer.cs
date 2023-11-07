@@ -108,6 +108,7 @@
             // btnAddBatch
             // 
             btnAddBatch.AutoSize = true;
+            btnAddBatch.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnAddBatch.Location = new Point(1097, 16);
             btnAddBatch.Margin = new Padding(0);
             btnAddBatch.Name = "btnAddBatch";
@@ -121,6 +122,7 @@
             // btnAddEmployee
             // 
             btnAddEmployee.AutoSize = true;
+            btnAddEmployee.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnAddEmployee.Location = new Point(997, 16);
             btnAddEmployee.Margin = new Padding(0);
             btnAddEmployee.Name = "btnAddEmployee";
@@ -293,7 +295,7 @@
             dchkListFilterDepartments.Location = new Point(16, 30);
             dchkListFilterDepartments.Margin = new Padding(12, 0, 0, 2);
             dchkListFilterDepartments.Name = "dchkListFilterDepartments";
-            dchkListFilterDepartments.Size = new Size(180, 0);
+            dchkListFilterDepartments.Size = new Size(180, 18);
             dchkListFilterDepartments.TabIndex = 6;
             // 
             // lblFilterLocations
@@ -301,7 +303,7 @@
             lblFilterLocations.AutoSize = true;
             lblFilterLocations.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblFilterLocations.ForeColor = SystemColors.ControlDarkDark;
-            lblFilterLocations.Location = new Point(5, 40);
+            lblFilterLocations.Location = new Point(5, 58);
             lblFilterLocations.Margin = new Padding(1, 8, 0, 6);
             lblFilterLocations.Name = "lblFilterLocations";
             lblFilterLocations.Size = new Size(68, 16);
@@ -314,10 +316,10 @@
             dchkListFilterLocations.AutoSize = true;
             dchkListFilterLocations.BackColor = Color.White;
             dchkListFilterLocations.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dchkListFilterLocations.Location = new Point(16, 62);
+            dchkListFilterLocations.Location = new Point(16, 80);
             dchkListFilterLocations.Margin = new Padding(12, 0, 0, 2);
             dchkListFilterLocations.Name = "dchkListFilterLocations";
-            dchkListFilterLocations.Size = new Size(180, 0);
+            dchkListFilterLocations.Size = new Size(180, 18);
             dchkListFilterLocations.TabIndex = 8;
             dchkListFilterLocations.Visible = false;
             // 
@@ -326,7 +328,7 @@
             lblFilterPositions.AutoSize = true;
             lblFilterPositions.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblFilterPositions.ForeColor = SystemColors.ControlDarkDark;
-            lblFilterPositions.Location = new Point(5, 72);
+            lblFilterPositions.Location = new Point(5, 108);
             lblFilterPositions.Margin = new Padding(1, 8, 0, 6);
             lblFilterPositions.Name = "lblFilterPositions";
             lblFilterPositions.Size = new Size(64, 16);
@@ -338,10 +340,10 @@
             dchkListFilterPositions.AutoSize = true;
             dchkListFilterPositions.BackColor = Color.White;
             dchkListFilterPositions.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dchkListFilterPositions.Location = new Point(16, 94);
+            dchkListFilterPositions.Location = new Point(16, 130);
             dchkListFilterPositions.Margin = new Padding(12, 0, 0, 2);
             dchkListFilterPositions.Name = "dchkListFilterPositions";
-            dchkListFilterPositions.Size = new Size(180, 0);
+            dchkListFilterPositions.Size = new Size(180, 18);
             dchkListFilterPositions.TabIndex = 10;
             // 
             // lblFilterCivilStatus
@@ -349,7 +351,7 @@
             lblFilterCivilStatus.AutoSize = true;
             lblFilterCivilStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblFilterCivilStatus.ForeColor = SystemColors.ControlDarkDark;
-            lblFilterCivilStatus.Location = new Point(5, 104);
+            lblFilterCivilStatus.Location = new Point(5, 158);
             lblFilterCivilStatus.Margin = new Padding(1, 8, 0, 6);
             lblFilterCivilStatus.Name = "lblFilterCivilStatus";
             lblFilterCivilStatus.Size = new Size(77, 16);
@@ -362,10 +364,10 @@
             dchkListFilterCivilStatus.AutoSize = true;
             dchkListFilterCivilStatus.BackColor = Color.White;
             dchkListFilterCivilStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dchkListFilterCivilStatus.Location = new Point(16, 126);
+            dchkListFilterCivilStatus.Location = new Point(16, 180);
             dchkListFilterCivilStatus.Margin = new Padding(12, 0, 0, 2);
             dchkListFilterCivilStatus.Name = "dchkListFilterCivilStatus";
-            dchkListFilterCivilStatus.Size = new Size(180, 0);
+            dchkListFilterCivilStatus.Size = new Size(180, 18);
             dchkListFilterCivilStatus.TabIndex = 12;
             dchkListFilterCivilStatus.Visible = false;
             // 
@@ -374,7 +376,7 @@
             lblFilterGender.AutoSize = true;
             lblFilterGender.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblFilterGender.ForeColor = SystemColors.ControlDarkDark;
-            lblFilterGender.Location = new Point(5, 136);
+            lblFilterGender.Location = new Point(5, 208);
             lblFilterGender.Margin = new Padding(1, 8, 0, 6);
             lblFilterGender.Name = "lblFilterGender";
             lblFilterGender.Size = new Size(55, 16);
@@ -387,10 +389,10 @@
             dchkListFilterGender.AutoSize = true;
             dchkListFilterGender.BackColor = Color.White;
             dchkListFilterGender.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dchkListFilterGender.Location = new Point(16, 158);
+            dchkListFilterGender.Location = new Point(16, 230);
             dchkListFilterGender.Margin = new Padding(12, 0, 0, 2);
             dchkListFilterGender.Name = "dchkListFilterGender";
-            dchkListFilterGender.Size = new Size(180, 0);
+            dchkListFilterGender.Size = new Size(180, 18);
             dchkListFilterGender.TabIndex = 14;
             dchkListFilterGender.Visible = false;
             // 
@@ -399,7 +401,7 @@
             lblFilterEmploymentStatus.AutoSize = true;
             lblFilterEmploymentStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblFilterEmploymentStatus.ForeColor = SystemColors.ControlDarkDark;
-            lblFilterEmploymentStatus.Location = new Point(5, 168);
+            lblFilterEmploymentStatus.Location = new Point(5, 258);
             lblFilterEmploymentStatus.Margin = new Padding(1, 8, 0, 6);
             lblFilterEmploymentStatus.Name = "lblFilterEmploymentStatus";
             lblFilterEmploymentStatus.Size = new Size(128, 16);
@@ -411,10 +413,10 @@
             dchkListFilterEmploymentStatus.AutoSize = true;
             dchkListFilterEmploymentStatus.BackColor = Color.White;
             dchkListFilterEmploymentStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dchkListFilterEmploymentStatus.Location = new Point(16, 190);
+            dchkListFilterEmploymentStatus.Location = new Point(16, 280);
             dchkListFilterEmploymentStatus.Margin = new Padding(12, 0, 0, 8);
             dchkListFilterEmploymentStatus.Name = "dchkListFilterEmploymentStatus";
-            dchkListFilterEmploymentStatus.Size = new Size(180, 0);
+            dchkListFilterEmploymentStatus.Size = new Size(180, 18);
             dchkListFilterEmploymentStatus.TabIndex = 16;
             // 
             // pnlLine1
@@ -442,6 +444,7 @@
             // btnFilter
             // 
             btnFilter.AutoSize = true;
+            btnFilter.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnFilter.Location = new Point(135, 6);
             btnFilter.Margin = new Padding(4, 0, 0, 0);
             btnFilter.Name = "btnFilter";
@@ -454,6 +457,7 @@
             // btnReset
             // 
             btnReset.AutoSize = true;
+            btnReset.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnReset.Location = new Point(61, 6);
             btnReset.Margin = new Padding(0);
             btnReset.Name = "btnReset";

@@ -60,7 +60,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             List<EmployeeService.Employee> employees = EmployeeService.GetAllEmployees();
 
             var employee = employees.First(w => w.EmployeeID == ID);
-            
+
             txtEmployeeID.Text = employee.EmployeeID;
             txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
             txtCurrentDepartment.Text = employee.Department;

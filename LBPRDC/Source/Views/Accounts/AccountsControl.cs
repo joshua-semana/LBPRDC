@@ -14,14 +14,20 @@ namespace LBPRDC.Source.Views.Accounts
             loadingControl.BringToFront();
         }
 
+        public void ResetTableSearch()
+        {
+            txtSearch.Text = string.Empty;
+            PopulateTableWithSearch("");
+        }
+
         private void AccountsControl_VisibleChanged(object sender, EventArgs e)
         {
-            PopulateTableWithSearch(txtSearch.Text);
+            if (this.Visible == true) PopulateTableWithSearch(txtSearch.Text.Trim().ToLower());
         }
 
         private async void PopulateTableWithSearch(string searchWord)
         {
-            ShowLoadingProgressBar();
+            ShowLoadingProgressBar(true);
             var users = await Task.Run(() => UserService.GetAllUsers());
 
             dgvUsers.Columns.Clear();
@@ -43,11 +49,11 @@ namespace LBPRDC.Source.Views.Accounts
                 }
 
                 ApplySettingsToTable();
-                UpdateTableRowCount(filteredUsers.Count, users.Count);
+                lblRowCounter.Text = ControlUtils.GetTableRowCount(filteredUsers.Count, users.Count);
                 dgvUsers.DataSource = filteredUsers;
             }
 
-            HideLoadingProgressBar();
+            ShowLoadingProgressBar(false);
         }
 
         private void ApplySettingsToTable()
@@ -62,27 +68,24 @@ namespace LBPRDC.Source.Views.Accounts
             ControlUtils.AddColumn(dgvUsers, "LastLoginDate", "Last Login Date", "LastLoginDate");
         }
 
-        private void ShowLoadingProgressBar()
+        private void ShowLoadingProgressBar(bool state)
         {
-            loadingControl.Visible = true;
-        }
-
-        private void HideLoadingProgressBar()
-        {
-            loadingControl.Visible = false;
-        }
-
-        private void UpdateTableRowCount(int currentCount, int originalCount)
-        {
-            lblRowCounter.Text = $"Currently displaying {currentCount} out of {originalCount} log(s).";
+            loadingControl.Visible = state;
         }
 
         private void txtSearch_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                PopulateTableWithSearch(txtSearch.Text);
+                PopulateTableWithSearch(txtSearch.Text.Trim().ToLower());
             }
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            AddNewUser addNewUser = new();
+            addNewUser.ParentControl = this;
+            addNewUser.ShowDialog();
         }
     }
 }

@@ -76,7 +76,7 @@ namespace LBPRDC.Source.Services
             return users;
         }
 
-        public static bool Add(User newUser)
+        public static async Task<bool> Add(User newUser)
         {
             try
             {
@@ -93,16 +93,15 @@ namespace LBPRDC.Source.Services
                     command.Parameters.AddWithValue("@Email", newUser.Email);
                     command.Parameters.AddWithValue("@FirstName", newUser.FirstName);
                     command.Parameters.AddWithValue("@LastName", newUser.LastName);
-                    command.Parameters.AddWithValue("@Role", newUser.Role);
+                    command.Parameters.AddWithValue("@Role", "Normal");
                     command.Parameters.AddWithValue("@Status", "Active");
                     command.Parameters.AddWithValue("@RegistrationDate", DateTime.Now);
                     command.Parameters.AddWithValue("@LastLoginDate", DateTime.Now);
 
                     connection.Open();
-
-                    return ((int) command.ExecuteNonQuery()) > 0;
+                    await command.ExecuteNonQueryAsync();
                 }
-                
+                return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }

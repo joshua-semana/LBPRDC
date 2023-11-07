@@ -33,6 +33,7 @@
             btnConfirm = new Button();
             btnCancel = new Button();
             pnlMain = new Panel();
+            label33 = new Label();
             grpJobData = new GroupBox();
             label31 = new Label();
             dtpStartDate = new DateTimePicker();
@@ -44,6 +45,7 @@
             cmbLocation = new ComboBox();
             cmbDepartment = new ComboBox();
             grpPreviousWork = new GroupBox();
+            label11 = new Label();
             txtOtherInformation = new TextBox();
             label19 = new Label();
             label18 = new Label();
@@ -92,17 +94,16 @@
             txtLastName = new TextBox();
             txtFirstName = new TextBox();
             label1 = new Label();
-            panel1 = new Panel();
+            pnlFooter = new Panel();
             panel2 = new Panel();
             label32 = new Label();
-            label11 = new Label();
             flowControls.SuspendLayout();
             pnlMain.SuspendLayout();
             grpJobData.SuspendLayout();
             grpPreviousWork.SuspendLayout();
             grpContactData.SuspendLayout();
             grpPersonalData.SuspendLayout();
-            panel1.SuspendLayout();
+            pnlFooter.SuspendLayout();
             panel2.SuspendLayout();
             SuspendLayout();
             // 
@@ -155,6 +156,7 @@
             // pnlMain
             // 
             pnlMain.AutoScroll = true;
+            pnlMain.Controls.Add(label33);
             pnlMain.Controls.Add(grpJobData);
             pnlMain.Controls.Add(grpContactData);
             pnlMain.Controls.Add(grpPersonalData);
@@ -162,12 +164,23 @@
             pnlMain.Location = new Point(0, 1);
             pnlMain.Name = "pnlMain";
             pnlMain.Padding = new Padding(16);
-            pnlMain.Size = new Size(860, 763);
+            pnlMain.Size = new Size(860, 789);
             pnlMain.TabIndex = 2;
+            // 
+            // label33
+            // 
+            label33.AutoSize = true;
+            label33.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            label33.Location = new Point(341, 16);
+            label33.Margin = new Padding(0, 0, 0, 16);
+            label33.Name = "label33";
+            label33.Size = new Size(179, 19);
+            label33.TabIndex = 23;
+            label33.Text = "ADD NEW EMPLOYEE";
             // 
             // grpJobData
             // 
-            grpJobData.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpJobData.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             grpJobData.Controls.Add(label31);
             grpJobData.Controls.Add(dtpStartDate);
             grpJobData.Controls.Add(label30);
@@ -190,7 +203,7 @@
             grpJobData.Controls.Add(cmbPosition);
             grpJobData.Controls.Add(label7);
             grpJobData.Controls.Add(label8);
-            grpJobData.Location = new Point(16, 380);
+            grpJobData.Location = new Point(16, 406);
             grpJobData.Margin = new Padding(0);
             grpJobData.Name = "grpJobData";
             grpJobData.Padding = new Padding(3, 8, 3, 3);
@@ -332,6 +345,19 @@
             grpPreviousWork.TabIndex = 25;
             grpPreviousWork.TabStop = false;
             grpPreviousWork.Text = "Previous Work Information";
+            // 
+            // label11
+            // 
+            label11.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label11.AutoSize = true;
+            label11.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label11.ForeColor = Color.Red;
+            label11.Location = new Point(59, 24);
+            label11.Margin = new Padding(0, 0, 0, 4);
+            label11.Name = "label11";
+            label11.Size = new Size(12, 16);
+            label11.TabIndex = 34;
+            label11.Text = "*";
             // 
             // txtOtherInformation
             // 
@@ -570,14 +596,14 @@
             // 
             // grpContactData
             // 
-            grpContactData.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpContactData.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             grpContactData.Controls.Add(txtContactNumber2);
             grpContactData.Controls.Add(txtContactNumber1);
             grpContactData.Controls.Add(label6);
             grpContactData.Controls.Add(txtEmailAddress2);
             grpContactData.Controls.Add(txtEmailAddress1);
             grpContactData.Controls.Add(label10);
-            grpContactData.Location = new Point(16, 198);
+            grpContactData.Location = new Point(16, 224);
             grpContactData.Margin = new Padding(0, 0, 0, 16);
             grpContactData.Name = "grpContactData";
             grpContactData.Padding = new Padding(3, 8, 3, 3);
@@ -658,7 +684,7 @@
             // 
             // grpPersonalData
             // 
-            grpPersonalData.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpPersonalData.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             grpPersonalData.Controls.Add(label26);
             grpPersonalData.Controls.Add(label25);
             grpPersonalData.Controls.Add(label24);
@@ -679,7 +705,7 @@
             grpPersonalData.Controls.Add(txtLastName);
             grpPersonalData.Controls.Add(txtFirstName);
             grpPersonalData.Controls.Add(label1);
-            grpPersonalData.Location = new Point(16, 16);
+            grpPersonalData.Location = new Point(16, 42);
             grpPersonalData.Margin = new Padding(0, 0, 0, 16);
             grpPersonalData.Name = "grpPersonalData";
             grpPersonalData.Padding = new Padding(3, 8, 3, 3);
@@ -690,7 +716,6 @@
             // 
             // label26
             // 
-            label26.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             label26.AutoSize = true;
             label26.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             label26.ForeColor = Color.Red;
@@ -716,7 +741,6 @@
             // 
             // label24
             // 
-            label24.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             label24.AutoSize = true;
             label24.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             label24.ForeColor = Color.Red;
@@ -742,7 +766,6 @@
             // 
             // label22
             // 
-            label22.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             label22.AutoSize = true;
             label22.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label22.Location = new Point(412, 27);
@@ -754,7 +777,6 @@
             // 
             // label21
             // 
-            label21.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             label21.AutoSize = true;
             label21.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label21.Location = new Point(209, 27);
@@ -766,7 +788,6 @@
             // 
             // label9
             // 
-            label9.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label9.AutoSize = true;
             label9.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label9.Location = new Point(615, 27);
@@ -778,7 +799,6 @@
             // 
             // label5
             // 
-            label5.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label5.AutoSize = true;
             label5.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label5.Location = new Point(615, 92);
@@ -791,7 +811,6 @@
             // cmbCivilStatus
             // 
             cmbCivilStatus.AccessibleName = "Civil Status";
-            cmbCivilStatus.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             cmbCivilStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbCivilStatus.FormattingEnabled = true;
             cmbCivilStatus.Location = new Point(619, 115);
@@ -802,7 +821,6 @@
             // txtEducation
             // 
             txtEducation.AccessibleName = "Education";
-            txtEducation.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             txtEducation.Location = new Point(213, 115);
             txtEducation.Margin = new Padding(6, 3, 3, 16);
             txtEducation.MaxLength = 50;
@@ -812,7 +830,6 @@
             // 
             // label4
             // 
-            label4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label4.AutoSize = true;
             label4.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label4.Location = new Point(209, 92);
@@ -824,7 +841,6 @@
             // 
             // label3
             // 
-            label3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label3.AutoSize = true;
             label3.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label3.Location = new Point(412, 92);
@@ -837,7 +853,6 @@
             // dtpBirthday
             // 
             dtpBirthday.AccessibleName = "Birthday";
-            dtpBirthday.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             dtpBirthday.Checked = false;
             dtpBirthday.CustomFormat = "MM-dd-yyy";
             dtpBirthday.Format = DateTimePickerFormat.Custom;
@@ -849,7 +864,6 @@
             // cmbGender
             // 
             cmbGender.AccessibleName = "Gender";
-            cmbGender.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             cmbGender.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbGender.FormattingEnabled = true;
             cmbGender.Items.AddRange(new object[] { "(Choose Gender)", "MALE", "FEMALE" });
@@ -872,7 +886,6 @@
             // cmbSuffix
             // 
             cmbSuffix.AccessibleName = "Suffix";
-            cmbSuffix.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             cmbSuffix.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbSuffix.FormattingEnabled = true;
             cmbSuffix.Location = new Point(619, 50);
@@ -883,7 +896,6 @@
             // txtMiddleName
             // 
             txtMiddleName.AccessibleName = "Middle Name";
-            txtMiddleName.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             txtMiddleName.Location = new Point(213, 50);
             txtMiddleName.MaxLength = 50;
             txtMiddleName.Name = "txtMiddleName";
@@ -893,7 +905,6 @@
             // txtLastName
             // 
             txtLastName.AccessibleName = "Last Name";
-            txtLastName.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             txtLastName.Location = new Point(416, 50);
             txtLastName.MaxLength = 50;
             txtLastName.Name = "txtLastName";
@@ -903,7 +914,6 @@
             // txtFirstName
             // 
             txtFirstName.AccessibleName = "First Name";
-            txtFirstName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtFirstName.Location = new Point(10, 50);
             txtFirstName.Margin = new Padding(7, 3, 3, 16);
             txtFirstName.MaxLength = 50;
@@ -923,15 +933,15 @@
             label1.TabIndex = 0;
             label1.Text = "First Name";
             // 
-            // panel1
+            // pnlFooter
             // 
-            panel1.Controls.Add(panel2);
-            panel1.Controls.Add(flowControls);
-            panel1.Dock = DockStyle.Bottom;
-            panel1.Location = new Point(0, 764);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(860, 60);
-            panel1.TabIndex = 3;
+            pnlFooter.Controls.Add(panel2);
+            pnlFooter.Controls.Add(flowControls);
+            pnlFooter.Dock = DockStyle.Bottom;
+            pnlFooter.Location = new Point(0, 790);
+            pnlFooter.Name = "pnlFooter";
+            pnlFooter.Size = new Size(860, 60);
+            pnlFooter.TabIndex = 3;
             // 
             // panel2
             // 
@@ -947,48 +957,35 @@
             // 
             label32.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             label32.AutoSize = true;
-            label32.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label32.Location = new Point(12, 21);
+            label32.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label32.Location = new Point(12, 22);
             label32.Margin = new Padding(3, 0, 3, 4);
             label32.Name = "label32";
-            label32.Size = new Size(394, 18);
+            label32.Size = new Size(359, 16);
             label32.TabIndex = 15;
             label32.Text = "All text fields marked with a red asterisk (*) are required.";
-            // 
-            // label11
-            // 
-            label11.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            label11.AutoSize = true;
-            label11.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label11.ForeColor = Color.Red;
-            label11.Location = new Point(59, 24);
-            label11.Margin = new Padding(0, 0, 0, 4);
-            label11.Name = "label11";
-            label11.Size = new Size(12, 16);
-            label11.TabIndex = 34;
-            label11.Text = "*";
             // 
             // frmNewEntryEmployee
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = SystemColors.Window;
-            ClientSize = new Size(860, 824);
+            ClientSize = new Size(860, 850);
             Controls.Add(pnlMain);
-            Controls.Add(panel1);
+            Controls.Add(pnlFooter);
             Controls.Add(pnlLine1);
             Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Margin = new Padding(4);
             MaximizeBox = false;
-            MinimumSize = new Size(876, 672);
+            MinimumSize = new Size(876, 889);
             Name = "frmNewEntryEmployee";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Add Employee";
             Load += frmEmployeeDataEntry_Load;
             flowControls.ResumeLayout(false);
             flowControls.PerformLayout();
             pnlMain.ResumeLayout(false);
+            pnlMain.PerformLayout();
             grpJobData.ResumeLayout(false);
             grpJobData.PerformLayout();
             grpPreviousWork.ResumeLayout(false);
@@ -997,7 +994,7 @@
             grpContactData.PerformLayout();
             grpPersonalData.ResumeLayout(false);
             grpPersonalData.PerformLayout();
-            panel1.ResumeLayout(false);
+            pnlFooter.ResumeLayout(false);
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
             ResumeLayout(false);
@@ -1067,11 +1064,12 @@
         private Label label21;
         private Label label30;
         private Label label29;
-        private Panel panel1;
+        private Panel pnlFooter;
         private Panel panel2;
         private Label label32;
         private Label label31;
         private DateTimePicker dtpStartDate;
         private Label label11;
+        private Label label33;
     }
 }

@@ -88,5 +88,10 @@ namespace LBPRDC.Source.Utilities
                 DataPropertyName = property
             });
         }
+
+        public static string GetTableRowCount(int currentCount, int originalCount)
+        {
+            return $"Currently displaying {currentCount} out of {originalCount} log(s).";
+        }
     }
 }
