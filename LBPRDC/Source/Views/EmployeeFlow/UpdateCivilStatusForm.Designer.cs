@@ -33,7 +33,9 @@
             btnUpdate = new Button();
             btnCancel = new Button();
             panel1 = new Panel();
+            label2 = new Label();
             groupBox1 = new GroupBox();
+            label27 = new Label();
             txtRemarks = new TextBox();
             cmbCivilStatus = new ComboBox();
             label15 = new Label();
@@ -67,7 +69,7 @@
             flowControls.Controls.Add(btnCancel);
             flowControls.Dock = DockStyle.Bottom;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
-            flowControls.Location = new Point(0, 251);
+            flowControls.Location = new Point(0, 277);
             flowControls.Name = "flowControls";
             flowControls.Padding = new Padding(15, 16, 0, 16);
             flowControls.Size = new Size(655, 60);
@@ -99,22 +101,36 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(label2);
             panel1.Controls.Add(groupBox1);
             panel1.Controls.Add(grpPersonalData);
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(0, 1);
             panel1.Name = "panel1";
             panel1.Padding = new Padding(16);
-            panel1.Size = new Size(655, 250);
+            panel1.Size = new Size(655, 276);
             panel1.TabIndex = 5;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            label2.Location = new Point(269, 16);
+            label2.Margin = new Padding(0, 0, 0, 16);
+            label2.Name = "label2";
+            label2.Size = new Size(117, 19);
+            label2.TabIndex = 23;
+            label2.Text = "CIVIL STATUS";
             // 
             // groupBox1
             // 
+            groupBox1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            groupBox1.Controls.Add(label27);
             groupBox1.Controls.Add(txtRemarks);
             groupBox1.Controls.Add(cmbCivilStatus);
             groupBox1.Controls.Add(label15);
             groupBox1.Controls.Add(label3);
-            groupBox1.Location = new Point(16, 129);
+            groupBox1.Location = new Point(16, 155);
             groupBox1.Margin = new Padding(0, 0, 0, 16);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new Padding(3, 8, 3, 3);
@@ -122,6 +138,19 @@
             groupBox1.TabIndex = 15;
             groupBox1.TabStop = false;
             groupBox1.Text = "New Information";
+            // 
+            // label27
+            // 
+            label27.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label27.AutoSize = true;
+            label27.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label27.ForeColor = Color.Red;
+            label27.Location = new Point(79, 25);
+            label27.Margin = new Padding(0, 0, 0, 4);
+            label27.Name = "label27";
+            label27.Size = new Size(14, 18);
+            label27.TabIndex = 32;
+            label27.Text = "*";
             // 
             // txtRemarks
             // 
@@ -160,7 +189,7 @@
             label3.AutoSize = true;
             label3.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label3.Location = new Point(6, 27);
-            label3.Margin = new Padding(3, 0, 3, 4);
+            label3.Margin = new Padding(3, 0, 0, 4);
             label3.Name = "label3";
             label3.Size = new Size(77, 16);
             label3.TabIndex = 28;
@@ -168,13 +197,14 @@
             // 
             // grpPersonalData
             // 
+            grpPersonalData.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             grpPersonalData.Controls.Add(txtCurrentCivilStatus);
             grpPersonalData.Controls.Add(label4);
             grpPersonalData.Controls.Add(txtFullName);
             grpPersonalData.Controls.Add(label10);
             grpPersonalData.Controls.Add(txtEmployeeID);
             grpPersonalData.Controls.Add(label1);
-            grpPersonalData.Location = new Point(16, 16);
+            grpPersonalData.Location = new Point(16, 42);
             grpPersonalData.Margin = new Padding(0, 0, 0, 16);
             grpPersonalData.Name = "grpPersonalData";
             grpPersonalData.Padding = new Padding(3, 8, 3, 3);
@@ -257,7 +287,7 @@
             AutoScaleDimensions = new SizeF(9F, 18F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(655, 311);
+            ClientSize = new Size(655, 337);
             Controls.Add(panel1);
             Controls.Add(flowControls);
             Controls.Add(pnlLine1);
@@ -270,11 +300,12 @@
             Name = "UpdateCivilStatusForm";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Update Civil Status";
+            Text = "Update";
             Load += UpdateCivilStatusForm_Load;
             flowControls.ResumeLayout(false);
             flowControls.PerformLayout();
             panel1.ResumeLayout(false);
+            panel1.PerformLayout();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             grpPersonalData.ResumeLayout(false);
@@ -301,5 +332,7 @@
         private ComboBox cmbCivilStatus;
         private Label label15;
         private Label label3;
+        private Label label27;
+        private Label label2;
     }
 }

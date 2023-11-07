@@ -44,6 +44,7 @@
             cmbLocation = new ComboBox();
             cmbDepartment = new ComboBox();
             grpPreviousWork = new GroupBox();
+            label32 = new Label();
             txtOtherInformation = new TextBox();
             label19 = new Label();
             label18 = new Label();
@@ -94,7 +95,7 @@
             txtMiddleName = new TextBox();
             txtLastName = new TextBox();
             txtFirstName = new TextBox();
-            label32 = new Label();
+            label33 = new Label();
             flowControls.SuspendLayout();
             panel1.SuspendLayout();
             grpJobData.SuspendLayout();
@@ -110,7 +111,7 @@
             flowControls.Controls.Add(btnCancel);
             flowControls.Dock = DockStyle.Bottom;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
-            flowControls.Location = new Point(0, 764);
+            flowControls.Location = new Point(0, 790);
             flowControls.Name = "flowControls";
             flowControls.Padding = new Padding(16, 16, 0, 16);
             flowControls.Size = new Size(860, 60);
@@ -151,6 +152,7 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(label33);
             panel1.Controls.Add(grpJobData);
             panel1.Controls.Add(grpContactData);
             panel1.Controls.Add(grpPersonalData);
@@ -158,12 +160,13 @@
             panel1.Location = new Point(0, 1);
             panel1.Margin = new Padding(16);
             panel1.Name = "panel1";
-            panel1.Size = new Size(860, 763);
+            panel1.Padding = new Padding(16);
+            panel1.Size = new Size(860, 789);
             panel1.TabIndex = 4;
             // 
             // grpJobData
             // 
-            grpJobData.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpJobData.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             grpJobData.Controls.Add(label30);
             grpJobData.Controls.Add(label29);
             grpJobData.Controls.Add(label28);
@@ -188,7 +191,7 @@
             grpJobData.Controls.Add(cmbPosition);
             grpJobData.Controls.Add(label7);
             grpJobData.Controls.Add(label8);
-            grpJobData.Location = new Point(16, 380);
+            grpJobData.Location = new Point(16, 406);
             grpJobData.Margin = new Padding(0);
             grpJobData.Name = "grpJobData";
             grpJobData.Padding = new Padding(3, 8, 3, 3);
@@ -330,6 +333,19 @@
             grpPreviousWork.TabIndex = 25;
             grpPreviousWork.TabStop = false;
             grpPreviousWork.Text = "Previous Work Information";
+            // 
+            // label32
+            // 
+            label32.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label32.AutoSize = true;
+            label32.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label32.ForeColor = Color.Red;
+            label32.Location = new Point(59, 24);
+            label32.Margin = new Padding(0, 0, 0, 4);
+            label32.Name = "label32";
+            label32.Size = new Size(12, 16);
+            label32.TabIndex = 35;
+            label32.Text = "*";
             // 
             // txtOtherInformation
             // 
@@ -591,14 +607,14 @@
             // 
             // grpContactData
             // 
-            grpContactData.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpContactData.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             grpContactData.Controls.Add(txtContactNumber2);
             grpContactData.Controls.Add(txtContactNumber1);
             grpContactData.Controls.Add(label6);
             grpContactData.Controls.Add(txtEmailAddress2);
             grpContactData.Controls.Add(txtEmailAddress1);
             grpContactData.Controls.Add(label10);
-            grpContactData.Location = new Point(16, 198);
+            grpContactData.Location = new Point(16, 224);
             grpContactData.Margin = new Padding(0, 0, 0, 16);
             grpContactData.Name = "grpContactData";
             grpContactData.Padding = new Padding(3, 8, 3, 3);
@@ -675,7 +691,7 @@
             // 
             // grpPersonalData
             // 
-            grpPersonalData.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpPersonalData.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             grpPersonalData.Controls.Add(label26);
             grpPersonalData.Controls.Add(label25);
             grpPersonalData.Controls.Add(label24);
@@ -696,7 +712,7 @@
             grpPersonalData.Controls.Add(txtMiddleName);
             grpPersonalData.Controls.Add(txtLastName);
             grpPersonalData.Controls.Add(txtFirstName);
-            grpPersonalData.Location = new Point(16, 16);
+            grpPersonalData.Location = new Point(16, 42);
             grpPersonalData.Margin = new Padding(0, 0, 0, 16);
             grpPersonalData.Name = "grpPersonalData";
             grpPersonalData.Padding = new Padding(3, 8, 3, 3);
@@ -938,25 +954,23 @@
             txtFirstName.Size = new Size(197, 26);
             txtFirstName.TabIndex = 0;
             // 
-            // label32
+            // label33
             // 
-            label32.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            label32.AutoSize = true;
-            label32.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label32.ForeColor = Color.Red;
-            label32.Location = new Point(59, 24);
-            label32.Margin = new Padding(0, 0, 0, 4);
-            label32.Name = "label32";
-            label32.Size = new Size(12, 16);
-            label32.TabIndex = 35;
-            label32.Text = "*";
+            label33.AutoSize = true;
+            label33.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            label33.Location = new Point(350, 16);
+            label33.Margin = new Padding(0, 0, 0, 16);
+            label33.Name = "label33";
+            label33.Size = new Size(161, 19);
+            label33.TabIndex = 24;
+            label33.Text = "EDIT INFORMATION";
             // 
             // EditEmployeeForm
             // 
             AutoScaleDimensions = new SizeF(9F, 18F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(860, 824);
+            ClientSize = new Size(860, 850);
             Controls.Add(panel1);
             Controls.Add(pnlLine1);
             Controls.Add(flowControls);
@@ -967,11 +981,11 @@
             Name = "EditEmployeeForm";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Employee Information";
             Load += EditEmployeeForm_Load;
             flowControls.ResumeLayout(false);
             flowControls.PerformLayout();
             panel1.ResumeLayout(false);
+            panel1.PerformLayout();
             grpJobData.ResumeLayout(false);
             grpJobData.PerformLayout();
             grpPreviousWork.ResumeLayout(false);
@@ -1052,5 +1066,6 @@
         private Label label28;
         private Label label31;
         private Label label32;
+        private Label label33;
     }
 }

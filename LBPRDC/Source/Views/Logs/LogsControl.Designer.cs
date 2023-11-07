@@ -186,12 +186,12 @@
             dchkListFilterType.Location = new Point(16, 30);
             dchkListFilterType.Margin = new Padding(12, 0, 0, 2);
             dchkListFilterType.Name = "dchkListFilterType";
-            dchkListFilterType.Size = new Size(180, 0);
+            dchkListFilterType.Size = new Size(180, 18);
             dchkListFilterType.TabIndex = 6;
             // 
             // flowFilterControls
             // 
-            flowFilterControls.BackColor = Color.White;
+            flowFilterControls.BackColor = SystemColors.Control;
             flowFilterControls.Controls.Add(btnFilter);
             flowFilterControls.Controls.Add(btnReset);
             flowFilterControls.Dock = DockStyle.Bottom;
@@ -205,6 +205,7 @@
             // btnFilter
             // 
             btnFilter.AutoSize = true;
+            btnFilter.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnFilter.Location = new Point(135, 6);
             btnFilter.Margin = new Padding(4, 0, 0, 0);
             btnFilter.Name = "btnFilter";
@@ -217,6 +218,7 @@
             // btnReset
             // 
             btnReset.AutoSize = true;
+            btnReset.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnReset.Location = new Point(61, 6);
             btnReset.Margin = new Padding(0);
             btnReset.Name = "btnReset";

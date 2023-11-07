@@ -26,26 +26,21 @@ namespace LBPRDC.Source.Views.Shared
         }
         private void DynamicCheckedListBoxControl_Load(object sender, EventArgs e)
         {
-            DisplayItems();
+            //DisplayItems();
         }
 
         public void SetItems(List<CheckedListBoxItems> itemsToSet)
         {
+            items.Clear();
             items.AddRange(itemsToSet);
         }
 
-        private void DisplayItems()
+        public void DisplayItems()
         {
-            //chkListItems.Items.Clear();
             lblAction.Visible = items.Count > 4;
 
             chkListItems.DataSource = (isCollapsed) ? items.Take(4).ToList() : items;
             chkListItems.DisplayMember = "Name";
-
-            //foreach (var item in (isCollapsed) ? items.Take(4) : items)
-            //{
-            //    chkListItems.Items.Add(item.Name);
-            //}
 
             UpdateCheckedListBoxHeight();
         }

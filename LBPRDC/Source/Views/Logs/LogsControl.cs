@@ -15,7 +15,6 @@ namespace LBPRDC.Source.Views.Logs
             InitializeComponent();
             this.Controls.Add(loadingControl);
             loadingControl.BringToFront();
-            PopulateFilters();
         }
 
         public void ApplyFilterAndSearchThenPopulate()
@@ -35,57 +34,36 @@ namespace LBPRDC.Source.Views.Logs
 
         private void LogsControl_VisibleChanged(object sender, EventArgs e)
         {
-            PopulateTable();
-        }
-
-        private async void PopulateFilters()
-        {
-            await Task.Run(() =>
+            if (this.Visible == true)
             {
-                InitializeFilter(
-                    lblFilterType,
-                    dchkListFilterType,
-                    LoggingService.GetAllItems()
-                        .DistinctBy(d => d.ActivityType)
-                        .Select(s => new CheckedListBoxItems(0, s.ActivityType))
-                        .ToList()
-                );
-            });
+                ApplyFilterAndSearchThenPopulate();
+                PopulateFilters();
+            }
         }
 
-        private static void InitializeFilter(Label label, DynamicCheckedListBoxControl control, List<CheckedListBoxItems> items)
+        private void PopulateFilters()
         {
-            bool hasItems = items.Count > 0;
-            label.Visible = hasItems;
-            control.Visible = hasItems;
-            if (hasItems)
+            InitializeFilter(
+                dchkListFilterType,
+                LoggingService.GetAllItems()
+                    .DistinctBy(d => d.ActivityType)
+                    .Select(s => new CheckedListBoxItems(0, s.ActivityType))
+                    .ToList()
+            );
+        }
+
+        private void InitializeFilter(DynamicCheckedListBoxControl control, List<CheckedListBoxItems> items)
+        {
+            if (items.Count > 0)
             {
                 control.SetItems(items);
+                control.DisplayItems();
             }
-        }
-
-        private async void PopulateTable()
-        {
-            ShowLoadingProgressBar();
-            var logs = await Task.Run(() => LoggingService.GetAllItems());
-            logs = logs.OrderByDescending(o => o.Timestamp).ToList();
-
-            dgvLogs.Columns.Clear();
-
-            if (logs.Count > 0)
-            {
-                dgvLogs.AutoGenerateColumns = false;
-                ApplySettingsToTable();
-                dgvLogs.DataSource = logs;
-            }
-
-            UpdateTableRowCount(logs.Count, logs.Count);
-            HideLoadingProgressBar();
         }
 
         private async void PopulateTableWithFilterAndSearch(List<string> types, string searchWord)
         {
-            ShowLoadingProgressBar();
+            ShowLoadingProgressBar(true);
             var logs = await Task.Run(() => LoggingService.GetAllItems());
             logs = logs.OrderByDescending(o => o.Timestamp).ToList();
 
@@ -112,11 +90,11 @@ namespace LBPRDC.Source.Views.Logs
                 }
 
                 ApplySettingsToTable();
-                UpdateTableRowCount(filteredLogs.Count, logs.Count);
+                lblRowCounter.Text = ControlUtils.GetTableRowCount(filteredLogs.Count, logs.Count, "log");
                 dgvLogs.DataSource = filteredLogs;
             }
 
-            HideLoadingProgressBar();
+            ShowLoadingProgressBar(false);
         }
 
         private void ApplySettingsToTable()
@@ -127,19 +105,9 @@ namespace LBPRDC.Source.Views.Logs
             ControlUtils.AddColumn(dgvLogs, "ActivityDetails", "Details", "ActivityDetails");
         }
 
-        private void ShowLoadingProgressBar()
+        private void ShowLoadingProgressBar(bool state)
         {
-            loadingControl.Visible = true;
-        }
-
-        private void HideLoadingProgressBar()
-        {
-            loadingControl.Visible = false;
-        }
-
-        private void UpdateTableRowCount(int currentCount, int originalCount)
-        {
-            lblRowCounter.Text = $"Currently displaying {currentCount} out of {originalCount} log(s).";
+            loadingControl.Visible = state;
         }
 
         private void btnReset_Click(object sender, EventArgs e)

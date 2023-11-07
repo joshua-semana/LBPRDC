@@ -21,7 +21,6 @@ namespace LBPRDC.Source.Views
             InitializeComponent();
             this.Controls.Add(loadingControl);
             loadingControl.BringToFront();
-            PopulateFilters();
         }
 
         public void ApplyFilterAndSearchThenPopulate()
@@ -43,74 +42,54 @@ namespace LBPRDC.Source.Views
 
         private void ucEmployees_VisibleChanged(object sender, EventArgs e)
         {
-            if (this.Visible == true) PopulateTable();
+            if (this.Visible == true)
+            {
+                ApplyFilterAndSearchThenPopulate();
+                PopulateFilters();
+            }
+        }
+
+        private void PopulateFilters()
+        {
+            InitializeFilter(
+                lblFilterDepartments,
+                dchkListFilterDepartments,
+                DepartmentService.GetAllItems()
+                    .Select(s => new CheckedListBoxItems(s.ID, s.Name))
+                    .ToList()
+            );
+            InitializeFilter(
+                lblFilterPositions,
+                dchkListFilterPositions,
+                PositionService.GetAllItems()
+                    .Select(s => new CheckedListBoxItems(s.ID, Utilities.StringFormat.ToSentenceCase(s.Name)))
+                    .ToList()
+            );
+            InitializeFilter(
+                lblFilterEmploymentStatus,
+                dchkListFilterEmploymentStatus,
+                EmploymentStatusService.GetAllItems()
+                    .Select(s => new CheckedListBoxItems(s.ID, Utilities.StringFormat.ToSentenceCase(s.Name)))
+                    .ToList()
+            );
+            //Do not remove, still working, UI are just hidden
+            //InitializeFilter(lblFilterLocations, dchkListFilterLocations, LocationService.GetAllItems().Select(s => new CheckedListBoxItems(Convert.ToInt32(s.ID), s.Name)).ToList());
+            //InitializeFilter(lblFilterCivilStatus, dchkListFilterCivilStatus, CivilStatusService.GetAllItems().Select(s => new CheckedListBoxItems(s.ID, s.Name)).ToList());
+            //InitializeFilter(lblFilterGender, dchkListFilterGender, new() { new CheckedListBoxItems(1, "MALE"), new CheckedListBoxItems(2, "FEMALE") });
         }
 
         private static void InitializeFilter(Label label, DynamicCheckedListBoxControl control, List<CheckedListBoxItems> items)
         {
-            bool hasItems = items.Count > 0;
-            label.Visible = hasItems;
-            control.Visible = hasItems;
-            if (hasItems)
+            if (items.Count > 0)
             {
                 control.SetItems(items);
+                control.DisplayItems();
             }
-        }
-
-        private async void PopulateFilters()
-        {
-            await Task.Run(() =>
-            {
-                InitializeFilter(
-                    lblFilterDepartments,
-                    dchkListFilterDepartments,
-                    DepartmentService.GetAllItems()
-                        .Select(s => new CheckedListBoxItems(s.ID, s.Name))
-                        .ToList()
-                );
-                InitializeFilter(
-                    lblFilterPositions,
-                    dchkListFilterPositions,
-                    PositionService.GetAllItems()
-                        .Select(s => new CheckedListBoxItems(s.ID, Utilities.StringFormat.ToSentenceCase(s.Name)))
-                        .ToList()
-                );
-                InitializeFilter(
-                    lblFilterEmploymentStatus,
-                    dchkListFilterEmploymentStatus,
-                    EmploymentStatusService.GetAllItems()
-                        .Select(s => new CheckedListBoxItems(s.ID, Utilities.StringFormat.ToSentenceCase(s.Name)))
-                        .ToList()
-                );
-                //Do not remove, still working, UI are just hidden
-                //InitializeFilter(lblFilterLocations, dchkListFilterLocations, LocationService.GetAllItems().Select(s => new CheckedListBoxItems(Convert.ToInt32(s.ID), s.Name)).ToList());
-                //InitializeFilter(lblFilterCivilStatus, dchkListFilterCivilStatus, CivilStatusService.GetAllItems().Select(s => new CheckedListBoxItems(s.ID, s.Name)).ToList());
-                //InitializeFilter(lblFilterGender, dchkListFilterGender, new() { new CheckedListBoxItems(1, "MALE"), new CheckedListBoxItems(2, "FEMALE") });
-            });
-        }
-
-        public async void PopulateTable()
-        {
-            ShowLoadingProgressBar();
-            preference = UserPreferenceManager.LoadPreference();
-            List<EmployeeService.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
-
-            dgvEmployees.Columns.Clear();
-
-            if (employees.Count > 0)
-            {
-                dgvEmployees.AutoGenerateColumns = false;
-                ApplySettingsToTable();
-                dgvEmployees.DataSource = employees;
-            }
-
-            UpdateTableRowCount(employees.Count, employees.Count);
-            HideLoadingProgressBar();
         }
 
         private async void PopulateTableWithFilterAndSearch(List<int> departmentIDs, List<int> positionIDs, List<int> employmentStatusIDs, string searchWord)
         {
-            ShowLoadingProgressBar();
+            ShowLoadingProgressBar(true);
             preference = UserPreferenceManager.LoadPreference();
             List<EmployeeService.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
 
@@ -147,11 +126,11 @@ namespace LBPRDC.Source.Views
                 }
 
                 ApplySettingsToTable();
-                UpdateTableRowCount(filteredEmployees.Count, employees.Count);
+                lblRowCounter.Text = ControlUtils.GetTableRowCount(filteredEmployees.Count, employees.Count, "employee");
                 dgvEmployees.DataSource = filteredEmployees;
             }
 
-            HideLoadingProgressBar();
+            ShowLoadingProgressBar(false);
         }
 
         private void ApplySettingsToTable()
@@ -191,21 +170,9 @@ namespace LBPRDC.Source.Views
             if (preference.ShowEmploymentStatus) { ControlUtils.AddColumn(dgvEmployees, "EmploymentStatus", "Status", "EmploymentStatus"); }
         }
 
-        private void ShowLoadingProgressBar()
+        private void ShowLoadingProgressBar(bool state)
         {
-            loadingControl.Visible = true;
-            //dgvEmployees.Visible = false;
-        }
-
-        private void HideLoadingProgressBar()
-        {
-            loadingControl.Visible = false;
-            //dgvEmployees.Visible = true;
-        }
-
-        private void UpdateTableRowCount(int currentCount, int originalCount)
-        {
-            lblRowCounter.Text = $"Currently displaying {currentCount} out of {originalCount} employee(s).";
+            loadingControl.Visible = state;
         }
 
         private void btnAddEmployee_Click(object sender, EventArgs e)

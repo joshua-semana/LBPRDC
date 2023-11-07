@@ -14,14 +14,23 @@ namespace LBPRDC.Source.Views.Accounts
             loadingControl.BringToFront();
         }
 
+        public void ResetTableSearch()
+        {
+            txtSearch.Text = string.Empty;
+            PopulateTableWithSearch("");
+        }
+
         private void AccountsControl_VisibleChanged(object sender, EventArgs e)
         {
-            PopulateTableWithSearch(txtSearch.Text);
+            if (this.Visible == true)
+            {
+                ResetTableSearch();
+            }
         }
 
         private async void PopulateTableWithSearch(string searchWord)
         {
-            ShowLoadingProgressBar();
+            ShowLoadingProgressBar(true);
             var users = await Task.Run(() => UserService.GetAllUsers());
 
             dgvUsers.Columns.Clear();
@@ -30,7 +39,7 @@ namespace LBPRDC.Source.Views.Accounts
             {
                 dgvUsers.AutoGenerateColumns = false;
 
-                var filteredUsers = users;
+                var filteredUsers = users.Where(w => w.UserID != UserService.CurrentUser?.UserID).ToList();
 
                 if (!string.IsNullOrEmpty(searchWord))
                 {
@@ -43,45 +52,90 @@ namespace LBPRDC.Source.Views.Accounts
                 }
 
                 ApplySettingsToTable();
-                UpdateTableRowCount(filteredUsers.Count, users.Count);
+                lblRowCounter.Text = ControlUtils.GetTableRowCount(filteredUsers.Count, users.Count, "user");
                 dgvUsers.DataSource = filteredUsers;
             }
 
-            HideLoadingProgressBar();
+            ShowLoadingProgressBar(false);
         }
 
         private void ApplySettingsToTable()
         {
+            ControlUtils.AddColumn(dgvUsers, "UserID", "ID", "UserID");
             ControlUtils.AddColumn(dgvUsers, "Role", "Role", "Role");
             ControlUtils.AddColumn(dgvUsers, "Username", "Username", "Username");
             ControlUtils.AddColumn(dgvUsers, "Email", "Email", "Email");
             ControlUtils.AddColumn(dgvUsers, "FirstName", "First Name", "FirstName");
             ControlUtils.AddColumn(dgvUsers, "LastName", "Last Name", "LastName");
-            ControlUtils.AddColumn(dgvUsers, "Status", "Status", "Status");
             ControlUtils.AddColumn(dgvUsers, "RegistrationDate", "Registration Date", "RegistrationDate");
             ControlUtils.AddColumn(dgvUsers, "LastLoginDate", "Last Login Date", "LastLoginDate");
+            ControlUtils.AddColumn(dgvUsers, "Status", "Status", "Status");
         }
 
-        private void ShowLoadingProgressBar()
+        private void ShowLoadingProgressBar(bool state)
         {
-            loadingControl.Visible = true;
-        }
-
-        private void HideLoadingProgressBar()
-        {
-            loadingControl.Visible = false;
-        }
-
-        private void UpdateTableRowCount(int currentCount, int originalCount)
-        {
-            lblRowCounter.Text = $"Currently displaying {currentCount} out of {originalCount} log(s).";
+            loadingControl.Visible = state;
         }
 
         private void txtSearch_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                PopulateTableWithSearch(txtSearch.Text);
+                PopulateTableWithSearch(txtSearch.Text.Trim().ToLower());
+            }
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            AddNewUser addNewUser = new();
+            addNewUser.ParentControl = this;
+            addNewUser.ShowDialog();
+        }
+
+        private void btnEdit_Click(object sender, EventArgs e)
+        {
+            if (dgvUsers.Rows.Count > 0)
+            {
+                EditUserForAdminForm editUserForAdminForm = new()
+                {
+                    UserID = Convert.ToInt32(dgvUsers.SelectedRows[0].Cells[0].Value),
+                    ParentControl = this
+                };
+                editUserForAdminForm.ShowDialog();
+            }
+        }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to reset the password of this user?", "Reser Password Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result == DialogResult.Yes)
+            {
+                ResetUserPasswordAsync();
+            }
+        }
+
+        private async void ResetUserPasswordAsync()
+        {
+            if (dgvUsers.Rows.Count > 0)
+            {
+                string newPassword = Generator.GeneratePassword(12);
+
+                UserService.User user = new()
+                {
+                    UserID = Convert.ToInt32(dgvUsers.SelectedRows[0].Cells[0].Value),
+                    Password = newPassword
+                };
+
+                bool isReset = await UserService.ResetPassword(user);
+
+                if (isReset)
+                {
+                    ViewGeneratedPassword viewGeneratedPassword = new()
+                    {
+                        Password = newPassword
+                    };
+                    viewGeneratedPassword.ShowDialog();
+                }
             }
         }
     }

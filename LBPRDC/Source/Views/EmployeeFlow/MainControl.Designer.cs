@@ -30,9 +30,9 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ucEmployees));
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             flowControls = new FlowLayoutPanel();
             btnAddBatch = new Button();
             btnAddEmployee = new Button();
@@ -59,7 +59,6 @@
             dchkListFilterGender = new Shared.DynamicCheckedListBoxControl();
             lblFilterEmploymentStatus = new Label();
             dchkListFilterEmploymentStatus = new Shared.DynamicCheckedListBoxControl();
-            pnlLine1 = new Panel();
             flowFilterControls = new FlowLayoutPanel();
             btnFilter = new Button();
             btnReset = new Button();
@@ -108,6 +107,7 @@
             // btnAddBatch
             // 
             btnAddBatch.AutoSize = true;
+            btnAddBatch.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnAddBatch.Location = new Point(1097, 16);
             btnAddBatch.Margin = new Padding(0);
             btnAddBatch.Name = "btnAddBatch";
@@ -121,6 +121,7 @@
             // btnAddEmployee
             // 
             btnAddEmployee.AutoSize = true;
+            btnAddEmployee.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnAddEmployee.Location = new Point(997, 16);
             btnAddEmployee.Margin = new Padding(0);
             btnAddEmployee.Name = "btnAddEmployee";
@@ -232,7 +233,6 @@
             pnlContainerFilter.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             pnlContainerFilter.BorderStyle = BorderStyle.FixedSingle;
             pnlContainerFilter.Controls.Add(pnlFilterContent);
-            pnlContainerFilter.Controls.Add(pnlLine1);
             pnlContainerFilter.Controls.Add(flowFilterControls);
             pnlContainerFilter.Location = new Point(16, 100);
             pnlContainerFilter.Margin = new Padding(0, 0, 16, 0);
@@ -248,7 +248,7 @@
             pnlFilterContent.Location = new Point(0, 0);
             pnlFilterContent.Margin = new Padding(0);
             pnlFilterContent.Name = "pnlFilterContent";
-            pnlFilterContent.Size = new Size(213, 410);
+            pnlFilterContent.Size = new Size(213, 411);
             pnlFilterContent.TabIndex = 6;
             // 
             // flowFilters
@@ -293,7 +293,7 @@
             dchkListFilterDepartments.Location = new Point(16, 30);
             dchkListFilterDepartments.Margin = new Padding(12, 0, 0, 2);
             dchkListFilterDepartments.Name = "dchkListFilterDepartments";
-            dchkListFilterDepartments.Size = new Size(180, 0);
+            dchkListFilterDepartments.Size = new Size(180, 18);
             dchkListFilterDepartments.TabIndex = 6;
             // 
             // lblFilterLocations
@@ -301,7 +301,7 @@
             lblFilterLocations.AutoSize = true;
             lblFilterLocations.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblFilterLocations.ForeColor = SystemColors.ControlDarkDark;
-            lblFilterLocations.Location = new Point(5, 40);
+            lblFilterLocations.Location = new Point(5, 58);
             lblFilterLocations.Margin = new Padding(1, 8, 0, 6);
             lblFilterLocations.Name = "lblFilterLocations";
             lblFilterLocations.Size = new Size(68, 16);
@@ -314,10 +314,10 @@
             dchkListFilterLocations.AutoSize = true;
             dchkListFilterLocations.BackColor = Color.White;
             dchkListFilterLocations.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dchkListFilterLocations.Location = new Point(16, 62);
+            dchkListFilterLocations.Location = new Point(16, 80);
             dchkListFilterLocations.Margin = new Padding(12, 0, 0, 2);
             dchkListFilterLocations.Name = "dchkListFilterLocations";
-            dchkListFilterLocations.Size = new Size(180, 0);
+            dchkListFilterLocations.Size = new Size(180, 18);
             dchkListFilterLocations.TabIndex = 8;
             dchkListFilterLocations.Visible = false;
             // 
@@ -326,7 +326,7 @@
             lblFilterPositions.AutoSize = true;
             lblFilterPositions.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblFilterPositions.ForeColor = SystemColors.ControlDarkDark;
-            lblFilterPositions.Location = new Point(5, 72);
+            lblFilterPositions.Location = new Point(5, 108);
             lblFilterPositions.Margin = new Padding(1, 8, 0, 6);
             lblFilterPositions.Name = "lblFilterPositions";
             lblFilterPositions.Size = new Size(64, 16);
@@ -338,10 +338,10 @@
             dchkListFilterPositions.AutoSize = true;
             dchkListFilterPositions.BackColor = Color.White;
             dchkListFilterPositions.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dchkListFilterPositions.Location = new Point(16, 94);
+            dchkListFilterPositions.Location = new Point(16, 130);
             dchkListFilterPositions.Margin = new Padding(12, 0, 0, 2);
             dchkListFilterPositions.Name = "dchkListFilterPositions";
-            dchkListFilterPositions.Size = new Size(180, 0);
+            dchkListFilterPositions.Size = new Size(180, 18);
             dchkListFilterPositions.TabIndex = 10;
             // 
             // lblFilterCivilStatus
@@ -349,7 +349,7 @@
             lblFilterCivilStatus.AutoSize = true;
             lblFilterCivilStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblFilterCivilStatus.ForeColor = SystemColors.ControlDarkDark;
-            lblFilterCivilStatus.Location = new Point(5, 104);
+            lblFilterCivilStatus.Location = new Point(5, 158);
             lblFilterCivilStatus.Margin = new Padding(1, 8, 0, 6);
             lblFilterCivilStatus.Name = "lblFilterCivilStatus";
             lblFilterCivilStatus.Size = new Size(77, 16);
@@ -362,10 +362,10 @@
             dchkListFilterCivilStatus.AutoSize = true;
             dchkListFilterCivilStatus.BackColor = Color.White;
             dchkListFilterCivilStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dchkListFilterCivilStatus.Location = new Point(16, 126);
+            dchkListFilterCivilStatus.Location = new Point(16, 180);
             dchkListFilterCivilStatus.Margin = new Padding(12, 0, 0, 2);
             dchkListFilterCivilStatus.Name = "dchkListFilterCivilStatus";
-            dchkListFilterCivilStatus.Size = new Size(180, 0);
+            dchkListFilterCivilStatus.Size = new Size(180, 18);
             dchkListFilterCivilStatus.TabIndex = 12;
             dchkListFilterCivilStatus.Visible = false;
             // 
@@ -374,7 +374,7 @@
             lblFilterGender.AutoSize = true;
             lblFilterGender.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblFilterGender.ForeColor = SystemColors.ControlDarkDark;
-            lblFilterGender.Location = new Point(5, 136);
+            lblFilterGender.Location = new Point(5, 208);
             lblFilterGender.Margin = new Padding(1, 8, 0, 6);
             lblFilterGender.Name = "lblFilterGender";
             lblFilterGender.Size = new Size(55, 16);
@@ -387,10 +387,10 @@
             dchkListFilterGender.AutoSize = true;
             dchkListFilterGender.BackColor = Color.White;
             dchkListFilterGender.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dchkListFilterGender.Location = new Point(16, 158);
+            dchkListFilterGender.Location = new Point(16, 230);
             dchkListFilterGender.Margin = new Padding(12, 0, 0, 2);
             dchkListFilterGender.Name = "dchkListFilterGender";
-            dchkListFilterGender.Size = new Size(180, 0);
+            dchkListFilterGender.Size = new Size(180, 18);
             dchkListFilterGender.TabIndex = 14;
             dchkListFilterGender.Visible = false;
             // 
@@ -399,7 +399,7 @@
             lblFilterEmploymentStatus.AutoSize = true;
             lblFilterEmploymentStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblFilterEmploymentStatus.ForeColor = SystemColors.ControlDarkDark;
-            lblFilterEmploymentStatus.Location = new Point(5, 168);
+            lblFilterEmploymentStatus.Location = new Point(5, 258);
             lblFilterEmploymentStatus.Margin = new Padding(1, 8, 0, 6);
             lblFilterEmploymentStatus.Name = "lblFilterEmploymentStatus";
             lblFilterEmploymentStatus.Size = new Size(128, 16);
@@ -411,24 +411,15 @@
             dchkListFilterEmploymentStatus.AutoSize = true;
             dchkListFilterEmploymentStatus.BackColor = Color.White;
             dchkListFilterEmploymentStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dchkListFilterEmploymentStatus.Location = new Point(16, 190);
+            dchkListFilterEmploymentStatus.Location = new Point(16, 280);
             dchkListFilterEmploymentStatus.Margin = new Padding(12, 0, 0, 8);
             dchkListFilterEmploymentStatus.Name = "dchkListFilterEmploymentStatus";
-            dchkListFilterEmploymentStatus.Size = new Size(180, 0);
+            dchkListFilterEmploymentStatus.Size = new Size(180, 18);
             dchkListFilterEmploymentStatus.TabIndex = 16;
-            // 
-            // pnlLine1
-            // 
-            pnlLine1.BorderStyle = BorderStyle.FixedSingle;
-            pnlLine1.Dock = DockStyle.Bottom;
-            pnlLine1.Location = new Point(0, 410);
-            pnlLine1.Name = "pnlLine1";
-            pnlLine1.Size = new Size(213, 1);
-            pnlLine1.TabIndex = 7;
             // 
             // flowFilterControls
             // 
-            flowFilterControls.BackColor = Color.White;
+            flowFilterControls.BackColor = SystemColors.Control;
             flowFilterControls.Controls.Add(btnFilter);
             flowFilterControls.Controls.Add(btnReset);
             flowFilterControls.Dock = DockStyle.Bottom;
@@ -442,6 +433,7 @@
             // btnFilter
             // 
             btnFilter.AutoSize = true;
+            btnFilter.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnFilter.Location = new Point(135, 6);
             btnFilter.Margin = new Padding(4, 0, 0, 0);
             btnFilter.Name = "btnFilter";
@@ -454,6 +446,7 @@
             // btnReset
             // 
             btnReset.AutoSize = true;
+            btnReset.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnReset.Location = new Point(61, 6);
             btnReset.Margin = new Padding(0);
             btnReset.Name = "btnReset";
@@ -469,22 +462,22 @@
             dgvEmployees.AllowUserToDeleteRows = false;
             dgvEmployees.AllowUserToOrderColumns = true;
             dgvEmployees.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.SelectionBackColor = Color.SeaGreen;
-            dgvEmployees.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.SelectionBackColor = Color.SeaGreen;
+            dgvEmployees.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
             dgvEmployees.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvEmployees.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvEmployees.BackgroundColor = SystemColors.Window;
             dgvEmployees.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvEmployees.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.Padding = new Padding(0, 2, 0, 2);
-            dataGridViewCellStyle2.SelectionBackColor = Color.MediumSeaGreen;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            dgvEmployees.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = SystemColors.Control;
+            dataGridViewCellStyle5.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle5.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle5.Padding = new Padding(0, 2, 0, 2);
+            dataGridViewCellStyle5.SelectionBackColor = Color.MediumSeaGreen;
+            dataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.True;
+            dgvEmployees.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             dgvEmployees.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvEmployees.EditMode = DataGridViewEditMode.EditOnF2;
             dgvEmployees.GridColor = SystemColors.Control;
@@ -493,15 +486,15 @@
             dgvEmployees.MultiSelect = false;
             dgvEmployees.Name = "dgvEmployees";
             dgvEmployees.ReadOnly = true;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = SystemColors.Control;
-            dataGridViewCellStyle3.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle3.Padding = new Padding(4);
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
-            dgvEmployees.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = SystemColors.Control;
+            dataGridViewCellStyle6.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle6.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle6.Padding = new Padding(4);
+            dataGridViewCellStyle6.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.True;
+            dgvEmployees.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             dgvEmployees.RowHeadersVisible = false;
             dgvEmployees.RowTemplate.DefaultCellStyle.Padding = new Padding(4, 8, 4, 8);
             dgvEmployees.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;

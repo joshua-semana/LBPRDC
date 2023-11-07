@@ -33,6 +33,9 @@
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             pnlFooter = new Panel();
             flowControls = new FlowLayoutPanel();
+            btnAdd = new Button();
+            btnEdit = new Button();
+            btnReset = new Button();
             panel1 = new Panel();
             pnlContainerSearch = new Panel();
             label1 = new Label();
@@ -41,6 +44,7 @@
             lblRowCounter = new Label();
             dgvUsers = new DataGridView();
             pnlFooter.SuspendLayout();
+            flowControls.SuspendLayout();
             panel1.SuspendLayout();
             pnlContainerSearch.SuspendLayout();
             panel2.SuspendLayout();
@@ -59,11 +63,56 @@
             // 
             // flowControls
             // 
+            flowControls.BackColor = SystemColors.Menu;
+            flowControls.Controls.Add(btnAdd);
+            flowControls.Controls.Add(btnEdit);
+            flowControls.Controls.Add(btnReset);
             flowControls.Dock = DockStyle.Right;
-            flowControls.Location = new Point(562, 0);
+            flowControls.FlowDirection = FlowDirection.RightToLeft;
+            flowControls.Location = new Point(585, 0);
             flowControls.Name = "flowControls";
-            flowControls.Size = new Size(651, 60);
+            flowControls.Padding = new Padding(16, 16, 0, 16);
+            flowControls.Size = new Size(628, 60);
             flowControls.TabIndex = 2;
+            // 
+            // btnAdd
+            // 
+            btnAdd.AutoSize = true;
+            btnAdd.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnAdd.Location = new Point(512, 16);
+            btnAdd.Margin = new Padding(8, 0, 0, 0);
+            btnAdd.Name = "btnAdd";
+            btnAdd.Size = new Size(100, 28);
+            btnAdd.TabIndex = 6;
+            btnAdd.Text = "Add";
+            btnAdd.UseVisualStyleBackColor = true;
+            btnAdd.Click += btnAdd_Click;
+            // 
+            // btnEdit
+            // 
+            btnEdit.AutoSize = true;
+            btnEdit.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnEdit.Location = new Point(404, 16);
+            btnEdit.Margin = new Padding(8, 0, 0, 0);
+            btnEdit.Name = "btnEdit";
+            btnEdit.Size = new Size(100, 28);
+            btnEdit.TabIndex = 7;
+            btnEdit.Text = "Edit";
+            btnEdit.UseVisualStyleBackColor = true;
+            btnEdit.Click += btnEdit_Click;
+            // 
+            // btnReset
+            // 
+            btnReset.AutoSize = true;
+            btnReset.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnReset.Location = new Point(296, 16);
+            btnReset.Margin = new Padding(0);
+            btnReset.Name = "btnReset";
+            btnReset.Size = new Size(100, 28);
+            btnReset.TabIndex = 8;
+            btnReset.Text = "Reset";
+            btnReset.UseVisualStyleBackColor = true;
+            btnReset.Click += btnReset_Click;
             // 
             // panel1
             // 
@@ -109,6 +158,7 @@
             txtSearch.Name = "txtSearch";
             txtSearch.Size = new Size(197, 26);
             txtSearch.TabIndex = 1;
+            txtSearch.KeyUp += txtSearch_KeyUp;
             // 
             // panel2
             // 
@@ -187,10 +237,13 @@
             BackColor = Color.White;
             Controls.Add(panel1);
             Controls.Add(pnlFooter);
+            Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             Name = "AccountsControl";
             Size = new Size(1213, 629);
             VisibleChanged += AccountsControl_VisibleChanged;
             pnlFooter.ResumeLayout(false);
+            flowControls.ResumeLayout(false);
+            flowControls.PerformLayout();
             panel1.ResumeLayout(false);
             pnlContainerSearch.ResumeLayout(false);
             pnlContainerSearch.PerformLayout();
@@ -203,7 +256,6 @@
         #endregion
 
         private Panel pnlFooter;
-        private FlowLayoutPanel flowControls;
         private Panel panel1;
         private DataGridView dgvUsers;
         private Panel panel2;
@@ -211,5 +263,9 @@
         private Panel pnlContainerSearch;
         private TextBox txtSearch;
         private Label label1;
+        private FlowLayoutPanel flowControls;
+        private Button btnAdd;
+        private Button btnEdit;
+        private Button btnReset;
     }
 }

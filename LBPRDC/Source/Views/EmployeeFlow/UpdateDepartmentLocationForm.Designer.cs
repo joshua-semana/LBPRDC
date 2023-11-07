@@ -34,6 +34,7 @@
             btnCancel = new Button();
             panel2 = new Panel();
             grpNewPositionData = new GroupBox();
+            label27 = new Label();
             cmbLocation = new ComboBox();
             txtRemarks = new TextBox();
             label15 = new Label();
@@ -49,6 +50,7 @@
             label10 = new Label();
             txtEmployeeID = new TextBox();
             label1 = new Label();
+            label5 = new Label();
             flowControls.SuspendLayout();
             panel2.SuspendLayout();
             grpNewPositionData.SuspendLayout();
@@ -71,7 +73,7 @@
             flowControls.Controls.Add(btnCancel);
             flowControls.Dock = DockStyle.Bottom;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
-            flowControls.Location = new Point(0, 385);
+            flowControls.Location = new Point(0, 411);
             flowControls.Name = "flowControls";
             flowControls.Padding = new Padding(15, 16, 0, 16);
             flowControls.Size = new Size(655, 60);
@@ -103,24 +105,27 @@
             // 
             // panel2
             // 
+            panel2.Controls.Add(label5);
             panel2.Controls.Add(grpNewPositionData);
             panel2.Controls.Add(grpPersonalData);
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(0, 1);
             panel2.Name = "panel2";
             panel2.Padding = new Padding(16);
-            panel2.Size = new Size(655, 384);
+            panel2.Size = new Size(655, 410);
             panel2.TabIndex = 5;
             // 
             // grpNewPositionData
             // 
+            grpNewPositionData.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            grpNewPositionData.Controls.Add(label27);
             grpNewPositionData.Controls.Add(cmbLocation);
             grpNewPositionData.Controls.Add(txtRemarks);
             grpNewPositionData.Controls.Add(label15);
             grpNewPositionData.Controls.Add(label14);
             grpNewPositionData.Controls.Add(cmbDepartment);
             grpNewPositionData.Controls.Add(label3);
-            grpNewPositionData.Location = new Point(16, 194);
+            grpNewPositionData.Location = new Point(16, 220);
             grpNewPositionData.Margin = new Padding(0, 0, 0, 16);
             grpNewPositionData.Name = "grpNewPositionData";
             grpNewPositionData.Padding = new Padding(3, 8, 3, 3);
@@ -128,6 +133,19 @@
             grpNewPositionData.TabIndex = 12;
             grpNewPositionData.TabStop = false;
             grpNewPositionData.Text = "New Information";
+            // 
+            // label27
+            // 
+            label27.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label27.AutoSize = true;
+            label27.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label27.ForeColor = Color.Red;
+            label27.Location = new Point(79, 25);
+            label27.Margin = new Padding(0, 0, 0, 4);
+            label27.Name = "label27";
+            label27.Size = new Size(14, 18);
+            label27.TabIndex = 29;
+            label27.Text = "*";
             // 
             // cmbLocation
             // 
@@ -189,7 +207,7 @@
             label3.AutoSize = true;
             label3.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label3.Location = new Point(6, 27);
-            label3.Margin = new Padding(3, 0, 3, 4);
+            label3.Margin = new Padding(3, 0, 0, 4);
             label3.Name = "label3";
             label3.Size = new Size(77, 16);
             label3.TabIndex = 0;
@@ -197,6 +215,7 @@
             // 
             // grpPersonalData
             // 
+            grpPersonalData.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             grpPersonalData.Controls.Add(txtCurrentLocation);
             grpPersonalData.Controls.Add(txtCurrentDepartment);
             grpPersonalData.Controls.Add(label4);
@@ -205,7 +224,7 @@
             grpPersonalData.Controls.Add(label10);
             grpPersonalData.Controls.Add(txtEmployeeID);
             grpPersonalData.Controls.Add(label1);
-            grpPersonalData.Location = new Point(16, 16);
+            grpPersonalData.Location = new Point(16, 42);
             grpPersonalData.Margin = new Padding(0, 0, 0, 16);
             grpPersonalData.Name = "grpPersonalData";
             grpPersonalData.Padding = new Padding(3, 8, 3, 3);
@@ -306,12 +325,23 @@
             label1.TabIndex = 0;
             label1.Text = "ID";
             // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            label5.Location = new Point(205, 16);
+            label5.Margin = new Padding(0, 0, 0, 16);
+            label5.Name = "label5";
+            label5.Size = new Size(245, 19);
+            label5.TabIndex = 23;
+            label5.Text = "DEPARTMENT AND LOCATION";
+            // 
             // UpdateDepartmentLocationForm
             // 
             AutoScaleDimensions = new SizeF(9F, 18F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(655, 445);
+            ClientSize = new Size(655, 471);
             Controls.Add(panel2);
             Controls.Add(flowControls);
             Controls.Add(pnlLine1);
@@ -323,11 +353,12 @@
             Name = "UpdateDepartmentLocationForm";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Update Department and Location";
+            Text = "Update";
             Load += UpdateDepartmentLocationForm_Load;
             flowControls.ResumeLayout(false);
             flowControls.PerformLayout();
             panel2.ResumeLayout(false);
+            panel2.PerformLayout();
             grpNewPositionData.ResumeLayout(false);
             grpNewPositionData.PerformLayout();
             grpPersonalData.ResumeLayout(false);
@@ -358,5 +389,7 @@
         private Label label14;
         private ComboBox cmbDepartment;
         private Label label3;
+        private Label label27;
+        private Label label5;
     }
 }
