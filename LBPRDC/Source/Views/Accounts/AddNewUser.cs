@@ -1,5 +1,4 @@
-﻿
-using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views.Accounts

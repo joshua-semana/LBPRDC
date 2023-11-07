@@ -36,7 +36,6 @@
             btnAdd = new Button();
             btnCancel = new Button();
             pnlMain = new Panel();
-            label10 = new Label();
             grpAccountData = new GroupBox();
             label6 = new Label();
             txtConfirmPassword = new TextBox();
@@ -57,12 +56,15 @@
             txtLastName = new TextBox();
             txtFirstName = new TextBox();
             label1 = new Label();
+            label10 = new Label();
+            pnlHeader = new Panel();
             pnlFooter.SuspendLayout();
             panel2.SuspendLayout();
             flowControls.SuspendLayout();
             pnlMain.SuspendLayout();
             grpAccountData.SuspendLayout();
             grpPersonalData.SuspendLayout();
+            pnlHeader.SuspendLayout();
             SuspendLayout();
             // 
             // pnlLine1
@@ -79,7 +81,7 @@
             pnlFooter.Controls.Add(panel2);
             pnlFooter.Controls.Add(flowControls);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 472);
+            pnlFooter.Location = new Point(0, 494);
             pnlFooter.Name = "pnlFooter";
             pnlFooter.Size = new Size(452, 60);
             pnlFooter.TabIndex = 4;
@@ -145,26 +147,14 @@
             // 
             // pnlMain
             // 
-            pnlMain.Controls.Add(label10);
             pnlMain.Controls.Add(grpAccountData);
             pnlMain.Controls.Add(grpPersonalData);
             pnlMain.Dock = DockStyle.Fill;
-            pnlMain.Location = new Point(0, 1);
+            pnlMain.Location = new Point(0, 41);
             pnlMain.Name = "pnlMain";
             pnlMain.Padding = new Padding(16);
-            pnlMain.Size = new Size(452, 471);
+            pnlMain.Size = new Size(452, 453);
             pnlMain.TabIndex = 5;
-            // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label10.Location = new Point(138, 16);
-            label10.Margin = new Padding(0, 0, 0, 16);
-            label10.Name = "label10";
-            label10.Size = new Size(177, 19);
-            label10.TabIndex = 22;
-            label10.Text = "ACCOUNT CREATION";
             // 
             // grpAccountData
             // 
@@ -177,7 +167,7 @@
             grpAccountData.Controls.Add(label5);
             grpAccountData.Controls.Add(txtUsername);
             grpAccountData.Controls.Add(label7);
-            grpAccountData.Location = new Point(16, 223);
+            grpAccountData.Location = new Point(16, 198);
             grpAccountData.Margin = new Padding(0, 0, 0, 16);
             grpAccountData.Name = "grpAccountData";
             grpAccountData.Padding = new Padding(3, 8, 3, 3);
@@ -304,7 +294,7 @@
             grpPersonalData.Controls.Add(txtLastName);
             grpPersonalData.Controls.Add(txtFirstName);
             grpPersonalData.Controls.Add(label1);
-            grpPersonalData.Location = new Point(16, 41);
+            grpPersonalData.Location = new Point(16, 16);
             grpPersonalData.Margin = new Padding(0, 0, 0, 16);
             grpPersonalData.Name = "grpPersonalData";
             grpPersonalData.Padding = new Padding(3, 8, 3, 3);
@@ -413,12 +403,34 @@
             label1.TabIndex = 0;
             label1.Text = "First Name";
             // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            label10.Location = new Point(138, 11);
+            label10.Margin = new Padding(0, 0, 0, 16);
+            label10.Name = "label10";
+            label10.Size = new Size(177, 19);
+            label10.TabIndex = 22;
+            label10.Text = "ACCOUNT CREATION";
+            // 
+            // pnlHeader
+            // 
+            pnlHeader.BackColor = SystemColors.Control;
+            pnlHeader.Controls.Add(label10);
+            pnlHeader.Dock = DockStyle.Top;
+            pnlHeader.Location = new Point(0, 1);
+            pnlHeader.Name = "pnlHeader";
+            pnlHeader.Size = new Size(452, 40);
+            pnlHeader.TabIndex = 6;
+            // 
             // AddNewUser
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(452, 532);
+            ClientSize = new Size(452, 554);
             Controls.Add(pnlMain);
+            Controls.Add(pnlHeader);
             Controls.Add(pnlFooter);
             Controls.Add(pnlLine1);
             Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
@@ -433,11 +445,12 @@
             flowControls.ResumeLayout(false);
             flowControls.PerformLayout();
             pnlMain.ResumeLayout(false);
-            pnlMain.PerformLayout();
             grpAccountData.ResumeLayout(false);
             grpAccountData.PerformLayout();
             grpPersonalData.ResumeLayout(false);
             grpPersonalData.PerformLayout();
+            pnlHeader.ResumeLayout(false);
+            pnlHeader.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -472,5 +485,6 @@
         private Label label9;
         private Label label10;
         private Label label32;
+        private Panel pnlHeader;
     }
 }

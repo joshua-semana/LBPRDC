@@ -28,12 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             pnlFooter = new Panel();
             flowControls = new FlowLayoutPanel();
             btnAdd = new Button();
+            btnEdit = new Button();
+            btnReset = new Button();
             panel1 = new Panel();
             pnlContainerSearch = new Panel();
             label1 = new Label();
@@ -63,6 +65,8 @@
             // 
             flowControls.BackColor = SystemColors.Menu;
             flowControls.Controls.Add(btnAdd);
+            flowControls.Controls.Add(btnEdit);
+            flowControls.Controls.Add(btnReset);
             flowControls.Dock = DockStyle.Right;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
             flowControls.Location = new Point(585, 0);
@@ -76,13 +80,39 @@
             btnAdd.AutoSize = true;
             btnAdd.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnAdd.Location = new Point(512, 16);
-            btnAdd.Margin = new Padding(0);
+            btnAdd.Margin = new Padding(8, 0, 0, 0);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(100, 28);
             btnAdd.TabIndex = 6;
             btnAdd.Text = "Add";
             btnAdd.UseVisualStyleBackColor = true;
             btnAdd.Click += btnAdd_Click;
+            // 
+            // btnEdit
+            // 
+            btnEdit.AutoSize = true;
+            btnEdit.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnEdit.Location = new Point(404, 16);
+            btnEdit.Margin = new Padding(8, 0, 0, 0);
+            btnEdit.Name = "btnEdit";
+            btnEdit.Size = new Size(100, 28);
+            btnEdit.TabIndex = 7;
+            btnEdit.Text = "Edit";
+            btnEdit.UseVisualStyleBackColor = true;
+            btnEdit.Click += btnEdit_Click;
+            // 
+            // btnReset
+            // 
+            btnReset.AutoSize = true;
+            btnReset.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnReset.Location = new Point(296, 16);
+            btnReset.Margin = new Padding(0);
+            btnReset.Name = "btnReset";
+            btnReset.Size = new Size(100, 28);
+            btnReset.TabIndex = 8;
+            btnReset.Text = "Reset";
+            btnReset.UseVisualStyleBackColor = true;
+            btnReset.Click += btnReset_Click;
             // 
             // panel1
             // 
@@ -159,22 +189,22 @@
             dgvUsers.AllowUserToDeleteRows = false;
             dgvUsers.AllowUserToOrderColumns = true;
             dgvUsers.AllowUserToResizeRows = false;
-            dataGridViewCellStyle4.SelectionBackColor = Color.SeaGreen;
-            dgvUsers.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.SelectionBackColor = Color.SeaGreen;
+            dgvUsers.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             dgvUsers.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvUsers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvUsers.BackgroundColor = SystemColors.Window;
             dgvUsers.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvUsers.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = SystemColors.Control;
-            dataGridViewCellStyle5.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle5.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle5.Padding = new Padding(0, 2, 0, 2);
-            dataGridViewCellStyle5.SelectionBackColor = Color.MediumSeaGreen;
-            dataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.True;
-            dgvUsers.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.Padding = new Padding(0, 2, 0, 2);
+            dataGridViewCellStyle2.SelectionBackColor = Color.MediumSeaGreen;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            dgvUsers.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dgvUsers.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvUsers.EditMode = DataGridViewEditMode.EditOnF2;
             dgvUsers.GridColor = SystemColors.Control;
@@ -183,15 +213,15 @@
             dgvUsers.MultiSelect = false;
             dgvUsers.Name = "dgvUsers";
             dgvUsers.ReadOnly = true;
-            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = SystemColors.Control;
-            dataGridViewCellStyle6.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle6.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle6.Padding = new Padding(4);
-            dataGridViewCellStyle6.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.True;
-            dgvUsers.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Control;
+            dataGridViewCellStyle3.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle3.Padding = new Padding(4);
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            dgvUsers.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             dgvUsers.RowHeadersVisible = false;
             dgvUsers.RowTemplate.DefaultCellStyle.Padding = new Padding(4, 8, 4, 8);
             dgvUsers.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
@@ -235,5 +265,7 @@
         private Label label1;
         private FlowLayoutPanel flowControls;
         private Button btnAdd;
+        private Button btnEdit;
+        private Button btnReset;
     }
 }

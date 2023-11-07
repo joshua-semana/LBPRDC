@@ -117,3 +117,6 @@ C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Sou
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.EmployeeFlow.ViewHistory.resources
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Logs.LogsControl.resources
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Accounts.AddNewUser.resources
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Accounts.EditUserForm.resources
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Accounts.EditUserForAdminForm.resources
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Accounts.ViewGeneratedPassword.resources

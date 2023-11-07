@@ -7,6 +7,15 @@
     <Compile Update="Source\Views\Accounts\AddNewUser.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Source\Views\Accounts\EditUserForAdminForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Source\Views\Accounts\EditUserForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Source\Views\Accounts\ViewGeneratedPassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Source\Views\EmployeeFlow\EditEmployeeForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -191,7 +191,7 @@
             // 
             // flowFilterControls
             // 
-            flowFilterControls.BackColor = Color.White;
+            flowFilterControls.BackColor = SystemColors.Control;
             flowFilterControls.Controls.Add(btnFilter);
             flowFilterControls.Controls.Add(btnReset);
             flowFilterControls.Dock = DockStyle.Bottom;

@@ -22,7 +22,10 @@ namespace LBPRDC.Source.Views.Accounts
 
         private void AccountsControl_VisibleChanged(object sender, EventArgs e)
         {
-            if (this.Visible == true) PopulateTableWithSearch(txtSearch.Text.Trim().ToLower());
+            if (this.Visible == true)
+            {
+                ResetTableSearch();
+            }
         }
 
         private async void PopulateTableWithSearch(string searchWord)
@@ -36,7 +39,7 @@ namespace LBPRDC.Source.Views.Accounts
             {
                 dgvUsers.AutoGenerateColumns = false;
 
-                var filteredUsers = users;
+                var filteredUsers = users.Where(w => w.UserID != UserService.CurrentUser?.UserID).ToList();
 
                 if (!string.IsNullOrEmpty(searchWord))
                 {
@@ -49,7 +52,7 @@ namespace LBPRDC.Source.Views.Accounts
                 }
 
                 ApplySettingsToTable();
-                lblRowCounter.Text = ControlUtils.GetTableRowCount(filteredUsers.Count, users.Count);
+                lblRowCounter.Text = ControlUtils.GetTableRowCount(filteredUsers.Count, users.Count, "user");
                 dgvUsers.DataSource = filteredUsers;
             }
 
@@ -58,14 +61,15 @@ namespace LBPRDC.Source.Views.Accounts
 
         private void ApplySettingsToTable()
         {
+            ControlUtils.AddColumn(dgvUsers, "UserID", "ID", "UserID");
             ControlUtils.AddColumn(dgvUsers, "Role", "Role", "Role");
             ControlUtils.AddColumn(dgvUsers, "Username", "Username", "Username");
             ControlUtils.AddColumn(dgvUsers, "Email", "Email", "Email");
             ControlUtils.AddColumn(dgvUsers, "FirstName", "First Name", "FirstName");
             ControlUtils.AddColumn(dgvUsers, "LastName", "Last Name", "LastName");
-            ControlUtils.AddColumn(dgvUsers, "Status", "Status", "Status");
             ControlUtils.AddColumn(dgvUsers, "RegistrationDate", "Registration Date", "RegistrationDate");
             ControlUtils.AddColumn(dgvUsers, "LastLoginDate", "Last Login Date", "LastLoginDate");
+            ControlUtils.AddColumn(dgvUsers, "Status", "Status", "Status");
         }
 
         private void ShowLoadingProgressBar(bool state)
@@ -86,6 +90,53 @@ namespace LBPRDC.Source.Views.Accounts
             AddNewUser addNewUser = new();
             addNewUser.ParentControl = this;
             addNewUser.ShowDialog();
+        }
+
+        private void btnEdit_Click(object sender, EventArgs e)
+        {
+            if (dgvUsers.Rows.Count > 0)
+            {
+                EditUserForAdminForm editUserForAdminForm = new()
+                {
+                    UserID = Convert.ToInt32(dgvUsers.SelectedRows[0].Cells[0].Value),
+                    ParentControl = this
+                };
+                editUserForAdminForm.ShowDialog();
+            }
+        }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to reset the password of this user?", "Reser Password Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result == DialogResult.Yes)
+            {
+                ResetUserPasswordAsync();
+            }
+        }
+
+        private async void ResetUserPasswordAsync()
+        {
+            if (dgvUsers.Rows.Count > 0)
+            {
+                string newPassword = Generator.GeneratePassword(12);
+
+                UserService.User user = new()
+                {
+                    UserID = Convert.ToInt32(dgvUsers.SelectedRows[0].Cells[0].Value),
+                    Password = newPassword
+                };
+
+                bool isReset = await UserService.ResetPassword(user);
+
+                if (isReset)
+                {
+                    ViewGeneratedPassword viewGeneratedPassword = new()
+                    {
+                        Password = newPassword
+                    };
+                    viewGeneratedPassword.ShowDialog();
+                }
+            }
         }
     }
 }

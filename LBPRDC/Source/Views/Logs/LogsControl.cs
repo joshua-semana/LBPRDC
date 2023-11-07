@@ -90,7 +90,7 @@ namespace LBPRDC.Source.Views.Logs
                 }
 
                 ApplySettingsToTable();
-                lblRowCounter.Text = ControlUtils.GetTableRowCount(filteredLogs.Count, logs.Count);
+                lblRowCounter.Text = ControlUtils.GetTableRowCount(filteredLogs.Count, logs.Count, "log");
                 dgvLogs.DataSource = filteredLogs;
             }
 

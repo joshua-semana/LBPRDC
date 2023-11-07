@@ -126,7 +126,7 @@ namespace LBPRDC.Source.Views
                 }
 
                 ApplySettingsToTable();
-                lblRowCounter.Text = ControlUtils.GetTableRowCount(filteredEmployees.Count, employees.Count);
+                lblRowCounter.Text = ControlUtils.GetTableRowCount(filteredEmployees.Count, employees.Count, "employee");
                 dgvEmployees.DataSource = filteredEmployees;
             }
 
