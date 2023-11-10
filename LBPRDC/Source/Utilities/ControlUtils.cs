@@ -36,6 +36,17 @@ namespace LBPRDC.Source.Utilities
             }
         }
 
+        public static void ClearInputs(Control container)
+        {
+            foreach (Control control in container.Controls)
+            {
+                if (control is TextBox textBox)
+                {
+                    textBox.Text = "";
+                }
+            }
+        }
+
         public static bool AreRequiredFieldsFilled(List<Control> fields)
         {
             List<string> emptyField = new();

@@ -34,6 +34,7 @@
             picLogo = new PictureBox();
             lblPageName = new Label();
             flowHeaderRight = new FlowLayoutPanel();
+            btnProfile = new Button();
             lblDateToday = new Label();
             lblLine1 = new Label();
             lblGreetUser = new Label();
@@ -81,7 +82,7 @@
             flowHeaderLeft.Location = new Point(0, 0);
             flowHeaderLeft.Name = "flowHeaderLeft";
             flowHeaderLeft.Padding = new Padding(10, 0, 0, 0);
-            flowHeaderLeft.Size = new Size(976, 50);
+            flowHeaderLeft.Size = new Size(726, 50);
             flowHeaderLeft.TabIndex = 2;
             // 
             // picLogo
@@ -108,23 +109,39 @@
             // flowHeaderRight
             // 
             flowHeaderRight.BackColor = SystemColors.Window;
+            flowHeaderRight.Controls.Add(btnProfile);
             flowHeaderRight.Controls.Add(lblDateToday);
             flowHeaderRight.Controls.Add(lblLine1);
             flowHeaderRight.Controls.Add(lblGreetUser);
             flowHeaderRight.Dock = DockStyle.Right;
             flowHeaderRight.FlowDirection = FlowDirection.RightToLeft;
-            flowHeaderRight.Location = new Point(976, 0);
+            flowHeaderRight.Location = new Point(726, 0);
             flowHeaderRight.Name = "flowHeaderRight";
-            flowHeaderRight.Padding = new Padding(8, 0, 8, 0);
-            flowHeaderRight.Size = new Size(288, 50);
+            flowHeaderRight.Size = new Size(538, 50);
             flowHeaderRight.TabIndex = 4;
+            // 
+            // btnProfile
+            // 
+            btnProfile.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnProfile.Cursor = Cursors.Hand;
+            btnProfile.FlatAppearance.BorderSize = 0;
+            btnProfile.FlatStyle = FlatStyle.Flat;
+            btnProfile.Image = (Image)resources.GetObject("btnProfile.Image");
+            btnProfile.Location = new Point(488, 0);
+            btnProfile.Margin = new Padding(0);
+            btnProfile.Name = "btnProfile";
+            btnProfile.Size = new Size(50, 50);
+            btnProfile.TabIndex = 10;
+            btnProfile.Tag = "Home";
+            btnProfile.UseVisualStyleBackColor = true;
+            btnProfile.Click += btnProfile_Click;
             // 
             // lblDateToday
             // 
             lblDateToday.AutoEllipsis = true;
             lblDateToday.AutoSize = true;
             lblDateToday.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            lblDateToday.Location = new Point(193, 17);
+            lblDateToday.Location = new Point(409, 17);
             lblDateToday.Margin = new Padding(0, 17, 0, 0);
             lblDateToday.Name = "lblDateToday";
             lblDateToday.Size = new Size(79, 16);
@@ -136,7 +153,7 @@
             // 
             lblLine1.AutoSize = true;
             lblLine1.Font = new Font("Arial", 14F, FontStyle.Regular, GraphicsUnit.Point);
-            lblLine1.Location = new Point(177, 12);
+            lblLine1.Location = new Point(393, 12);
             lblLine1.Margin = new Padding(3, 12, 0, 0);
             lblLine1.Name = "lblLine1";
             lblLine1.Size = new Size(16, 22);
@@ -149,7 +166,7 @@
             lblGreetUser.AutoEllipsis = true;
             lblGreetUser.AutoSize = true;
             lblGreetUser.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            lblGreetUser.Location = new Point(98, 17);
+            lblGreetUser.Location = new Point(314, 17);
             lblGreetUser.Margin = new Padding(0, 17, 0, 0);
             lblGreetUser.Name = "lblGreetUser";
             lblGreetUser.Size = new Size(76, 16);
@@ -211,9 +228,9 @@
             flowSideNavBottom.Controls.Add(btnSignOut);
             flowSideNavBottom.Dock = DockStyle.Bottom;
             flowSideNavBottom.FlowDirection = FlowDirection.BottomUp;
-            flowSideNavBottom.Location = new Point(0, 656);
+            flowSideNavBottom.Location = new Point(0, 554);
             flowSideNavBottom.Name = "flowSideNavBottom";
-            flowSideNavBottom.Size = new Size(50, 53);
+            flowSideNavBottom.Size = new Size(50, 155);
             flowSideNavBottom.TabIndex = 5;
             // 
             // btnSignOut
@@ -222,7 +239,7 @@
             btnSignOut.FlatAppearance.BorderSize = 0;
             btnSignOut.FlatStyle = FlatStyle.Flat;
             btnSignOut.Image = (Image)resources.GetObject("btnSignOut.Image");
-            btnSignOut.Location = new Point(0, 3);
+            btnSignOut.Location = new Point(0, 105);
             btnSignOut.Margin = new Padding(0);
             btnSignOut.Name = "btnSignOut";
             btnSignOut.Size = new Size(50, 50);
@@ -381,5 +398,6 @@
         private Panel pnlContent;
         private Label lblPageName;
         private Button btnCategories;
+        private Button btnProfile;
     }
 }

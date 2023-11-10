@@ -33,6 +33,7 @@
             btnUpdate = new Button();
             btnCancel = new Button();
             panel1 = new Panel();
+            label2 = new Label();
             groupBox1 = new GroupBox();
             label27 = new Label();
             txtRemarks = new TextBox();
@@ -46,7 +47,6 @@
             label10 = new Label();
             txtEmployeeID = new TextBox();
             label1 = new Label();
-            label2 = new Label();
             flowControls.SuspendLayout();
             panel1.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -78,6 +78,7 @@
             // btnUpdate
             // 
             btnUpdate.AutoSize = true;
+            btnUpdate.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnUpdate.Location = new Point(565, 16);
             btnUpdate.Margin = new Padding(8, 0, 0, 0);
             btnUpdate.Name = "btnUpdate";
@@ -90,6 +91,7 @@
             // btnCancel
             // 
             btnCancel.AutoSize = true;
+            btnCancel.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnCancel.Location = new Point(482, 16);
             btnCancel.Margin = new Padding(0);
             btnCancel.Name = "btnCancel";
@@ -110,6 +112,17 @@
             panel1.Padding = new Padding(16);
             panel1.Size = new Size(655, 276);
             panel1.TabIndex = 6;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            label2.Location = new Point(233, 16);
+            label2.Margin = new Padding(0, 0, 0, 16);
+            label2.Name = "label2";
+            label2.Size = new Size(189, 19);
+            label2.TabIndex = 23;
+            label2.Text = "EMPLOYMENT STATUS";
             // 
             // groupBox1
             // 
@@ -270,17 +283,6 @@
             label1.Size = new Size(20, 16);
             label1.TabIndex = 0;
             label1.Text = "ID";
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label2.Location = new Point(233, 16);
-            label2.Margin = new Padding(0, 0, 0, 16);
-            label2.Name = "label2";
-            label2.Size = new Size(189, 19);
-            label2.TabIndex = 23;
-            label2.Text = "EMPLOYMENT STATUS";
             // 
             // UpdateEmploymentStatusForm
             // 

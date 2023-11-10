@@ -94,6 +94,7 @@
             // btnDone
             // 
             btnDone.AutoSize = true;
+            btnDone.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnDone.Location = new Point(156, 16);
             btnDone.Margin = new Padding(8, 0, 0, 0);
             btnDone.Name = "btnDone";
@@ -106,6 +107,7 @@
             // btnCopyPassword
             // 
             btnCopyPassword.AutoSize = true;
+            btnCopyPassword.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnCopyPassword.Location = new Point(19, 16);
             btnCopyPassword.Margin = new Padding(0);
             btnCopyPassword.Name = "btnCopyPassword";

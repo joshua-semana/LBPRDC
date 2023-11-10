@@ -78,6 +78,7 @@
             // btnUpdate
             // 
             btnUpdate.AutoSize = true;
+            btnUpdate.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnUpdate.Location = new Point(565, 16);
             btnUpdate.Margin = new Padding(8, 0, 0, 0);
             btnUpdate.Name = "btnUpdate";
@@ -90,6 +91,7 @@
             // btnCancel
             // 
             btnCancel.AutoSize = true;
+            btnCancel.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnCancel.Location = new Point(482, 16);
             btnCancel.Margin = new Padding(0);
             btnCancel.Name = "btnCancel";
