@@ -19,17 +19,6 @@ namespace LBPRDC.Source.Views
             InitializeComponent();
         }
 
-        private void ClearInputs(Control container)
-        {
-            foreach (Control c in container.Controls)
-            {
-                if (c is TextBox textBox)
-                {
-                    textBox.Text = string.Empty;
-                }
-            }
-        }
-
         private void SetTextBoxState(bool enabled)
         {
             txtUsername.Enabled = enabled;
@@ -93,7 +82,7 @@ namespace LBPRDC.Source.Views
                 await Task.Run(() => UserService.UpdateLastLoginDate(username));
 
                 this.Hide();
-                frmMain mainForm = new frmMain();
+                frmMain mainForm = new();
                 mainForm.ShowDialog();
                 this.Close();
             }

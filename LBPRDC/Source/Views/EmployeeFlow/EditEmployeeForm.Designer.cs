@@ -645,6 +645,7 @@
             txtContactNumber2.Name = "txtContactNumber2";
             txtContactNumber2.Size = new Size(400, 26);
             txtContactNumber2.TabIndex = 11;
+            txtContactNumber2.KeyPress += ValidateInputIfNumber_KeyPress;
             // 
             // txtContactNumber1
             // 
@@ -656,6 +657,7 @@
             txtContactNumber1.PlaceholderText = "09xxxxxxxxx";
             txtContactNumber1.Size = new Size(400, 26);
             txtContactNumber1.TabIndex = 10;
+            txtContactNumber1.KeyPress += ValidateInputIfNumber_KeyPress;
             // 
             // label6
             // 

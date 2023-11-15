@@ -15,8 +15,8 @@ namespace LBPRDC.Source.Services
             public string? Name { get; set; }
             public decimal SalaryRate { get; set; }
             public decimal BillingRate { get; set; }
-            public string? Description { get; set; }
             public string? Status { get; set; }
+            public string? Description { get; set; }
         }
 
         public static List<Position> GetAllItems()

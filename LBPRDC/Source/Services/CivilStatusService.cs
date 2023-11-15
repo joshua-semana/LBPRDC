@@ -8,8 +8,8 @@ namespace LBPRDC.Source.Services
         {
             public int ID { get; set; }
             public string? Name { get; set; }
-            public string? Description { get; set; }
             public string? Status { get; set; }
+            public string? Description { get; set; }
         }
 
         public static List<CivilStatus> GetAllItems()

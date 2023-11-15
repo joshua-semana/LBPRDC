@@ -104,5 +104,21 @@ namespace LBPRDC.Source.Utilities
         {
             return $"Currently displaying {currentCount} out of {originalCount} {name}(s).";
         }
+
+        public static void ToggleControlVisibility(List<Control> controls, bool state)
+        {
+            foreach (var control in controls)
+            {
+                control.Visible = state;
+            }
+        }
+
+        public static void ToggleControlsVisibilityInContainer(Control container, bool state)
+        {
+            foreach (Control control in container.Controls)
+            {
+                control.Visible = state;
+            }
+        }
     }
 }
