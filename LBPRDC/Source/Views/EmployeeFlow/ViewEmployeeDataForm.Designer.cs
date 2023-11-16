@@ -146,7 +146,7 @@
             label31.Size = new Size(125, 16);
             label31.TabIndex = 30;
             label31.Text = "Remarks";
-            label31.TextAlign = ContentAlignment.MiddleRight;
+            label31.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblContactNumber2
             // 
@@ -266,7 +266,7 @@
             label10.Size = new Size(125, 16);
             label10.TabIndex = 10;
             label10.Text = "Contact Number 2";
-            label10.TextAlign = ContentAlignment.MiddleRight;
+            label10.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label8
             // 
@@ -278,7 +278,7 @@
             label8.Size = new Size(125, 16);
             label8.TabIndex = 9;
             label8.Text = "Email Address 2";
-            label8.TextAlign = ContentAlignment.MiddleRight;
+            label8.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label9
             // 
@@ -290,7 +290,7 @@
             label9.Size = new Size(125, 16);
             label9.TabIndex = 8;
             label9.Text = "Contact Number 1";
-            label9.TextAlign = ContentAlignment.MiddleRight;
+            label9.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label7
             // 
@@ -302,7 +302,7 @@
             label7.Size = new Size(125, 16);
             label7.TabIndex = 6;
             label7.Text = "Email Address 1";
-            label7.TextAlign = ContentAlignment.MiddleRight;
+            label7.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label6
             // 
@@ -314,7 +314,7 @@
             label6.Size = new Size(125, 16);
             label6.TabIndex = 5;
             label6.Text = "Civil Status";
-            label6.TextAlign = ContentAlignment.MiddleRight;
+            label6.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label5
             // 
@@ -326,7 +326,7 @@
             label5.Size = new Size(125, 16);
             label5.TabIndex = 4;
             label5.Text = "Education";
-            label5.TextAlign = ContentAlignment.MiddleRight;
+            label5.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label4
             // 
@@ -338,7 +338,7 @@
             label4.Size = new Size(125, 16);
             label4.TabIndex = 3;
             label4.Text = "Birthday";
-            label4.TextAlign = ContentAlignment.MiddleRight;
+            label4.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label3
             // 
@@ -350,7 +350,7 @@
             label3.Size = new Size(125, 16);
             label3.TabIndex = 2;
             label3.Text = "Gender";
-            label3.TextAlign = ContentAlignment.MiddleRight;
+            label3.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label2
             // 
@@ -362,7 +362,7 @@
             label2.Size = new Size(125, 16);
             label2.TabIndex = 1;
             label2.Text = "Full Name";
-            label2.TextAlign = ContentAlignment.MiddleRight;
+            label2.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label1
             // 
@@ -385,7 +385,7 @@
             label17.Size = new Size(125, 33);
             label17.TabIndex = 35;
             label17.Text = "Previous LBRDC Employee?";
-            label17.TextAlign = ContentAlignment.MiddleRight;
+            label17.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblPreviousEmployee
             // 
@@ -421,7 +421,7 @@
             label33.Size = new Size(125, 16);
             label33.TabIndex = 32;
             label33.Text = "Start Date";
-            label33.TextAlign = ContentAlignment.MiddleRight;
+            label33.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblStatus
             // 
@@ -493,7 +493,7 @@
             label15.Size = new Size(125, 16);
             label15.TabIndex = 15;
             label15.Text = "Status";
-            label15.TextAlign = ContentAlignment.MiddleRight;
+            label15.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label14
             // 
@@ -505,7 +505,7 @@
             label14.Size = new Size(125, 16);
             label14.TabIndex = 14;
             label14.Text = "Location";
-            label14.TextAlign = ContentAlignment.MiddleRight;
+            label14.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label13
             // 
@@ -517,7 +517,7 @@
             label13.Size = new Size(125, 16);
             label13.TabIndex = 13;
             label13.Text = "Department";
-            label13.TextAlign = ContentAlignment.MiddleRight;
+            label13.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label12
             // 
@@ -529,7 +529,7 @@
             label12.Size = new Size(125, 16);
             label12.TabIndex = 12;
             label12.Text = "Current Position";
-            label12.TextAlign = ContentAlignment.MiddleRight;
+            label12.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label11
             // 
@@ -541,7 +541,7 @@
             label11.Size = new Size(125, 16);
             label11.TabIndex = 11;
             label11.Text = "Identification Code";
-            label11.TextAlign = ContentAlignment.MiddleRight;
+            label11.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // panel1
             // 
@@ -608,7 +608,7 @@
             label19.Size = new Size(125, 16);
             label19.TabIndex = 40;
             label19.Text = "Effective Date";
-            label19.TextAlign = ContentAlignment.MiddleRight;
+            label19.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblInformation
             // 
@@ -643,7 +643,7 @@
             label21.Size = new Size(125, 33);
             label21.TabIndex = 38;
             label21.Text = "Previous Work Information";
-            label21.TextAlign = ContentAlignment.MiddleRight;
+            label21.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblPeriod
             // 
@@ -667,7 +667,7 @@
             label18.Size = new Size(125, 33);
             label18.TabIndex = 36;
             label18.Text = "Employment Period";
-            label18.TextAlign = ContentAlignment.MiddleRight;
+            label18.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // flowControls
             // 
@@ -685,6 +685,7 @@
             // btnClose
             // 
             btnClose.AutoSize = true;
+            btnClose.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnClose.Location = new Point(707, 16);
             btnClose.Margin = new Padding(8, 0, 0, 0);
             btnClose.Name = "btnClose";
@@ -697,6 +698,7 @@
             // btnViewPositionHistory
             // 
             btnViewPositionHistory.AutoSize = true;
+            btnViewPositionHistory.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnViewPositionHistory.Location = new Point(566, 16);
             btnViewPositionHistory.Margin = new Padding(8, 0, 0, 0);
             btnViewPositionHistory.Name = "btnViewPositionHistory";

@@ -36,6 +36,17 @@ namespace LBPRDC.Source.Utilities
             }
         }
 
+        public static void ClearInputs(Control container)
+        {
+            foreach (Control control in container.Controls)
+            {
+                if (control is TextBox textBox)
+                {
+                    textBox.Text = "";
+                }
+            }
+        }
+
         public static bool AreRequiredFieldsFilled(List<Control> fields)
         {
             List<string> emptyField = new();
@@ -92,6 +103,35 @@ namespace LBPRDC.Source.Utilities
         public static string GetTableRowCount(int currentCount, int originalCount, string name)
         {
             return $"Currently displaying {currentCount} out of {originalCount} {name}(s).";
+        }
+
+        public static void ToggleControlVisibility(List<Control> controls, bool state)
+        {
+            foreach (var control in controls)
+            {
+                control.Visible = state;
+            }
+        }
+
+        public static void ToggleControlsVisibilityInContainer(Control container, bool state)
+        {
+            foreach (Control control in container.Controls)
+            {
+                control.Visible = state;
+            }
+        }
+
+        public static List<Control> GetVisibleControls(Control container)
+        {
+            List<Control> controls = new();
+            foreach (Control control in container.Controls)
+            {
+                if (control.Visible == true)
+                {
+                    controls.Add(control);
+                }
+            }
+            return controls;
         }
     }
 }

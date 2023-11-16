@@ -33,6 +33,7 @@
             btnUpdate = new Button();
             btnCancel = new Button();
             panel2 = new Panel();
+            label5 = new Label();
             grpNewPositionData = new GroupBox();
             label27 = new Label();
             cmbLocation = new ComboBox();
@@ -50,7 +51,6 @@
             label10 = new Label();
             txtEmployeeID = new TextBox();
             label1 = new Label();
-            label5 = new Label();
             flowControls.SuspendLayout();
             panel2.SuspendLayout();
             grpNewPositionData.SuspendLayout();
@@ -82,6 +82,7 @@
             // btnUpdate
             // 
             btnUpdate.AutoSize = true;
+            btnUpdate.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnUpdate.Location = new Point(565, 16);
             btnUpdate.Margin = new Padding(8, 0, 0, 0);
             btnUpdate.Name = "btnUpdate";
@@ -94,6 +95,7 @@
             // btnCancel
             // 
             btnCancel.AutoSize = true;
+            btnCancel.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnCancel.Location = new Point(482, 16);
             btnCancel.Margin = new Padding(0);
             btnCancel.Name = "btnCancel";
@@ -114,6 +116,17 @@
             panel2.Padding = new Padding(16);
             panel2.Size = new Size(655, 410);
             panel2.TabIndex = 5;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            label5.Location = new Point(205, 16);
+            label5.Margin = new Padding(0, 0, 0, 16);
+            label5.Name = "label5";
+            label5.Size = new Size(245, 19);
+            label5.TabIndex = 23;
+            label5.Text = "DEPARTMENT AND LOCATION";
             // 
             // grpNewPositionData
             // 
@@ -324,17 +337,6 @@
             label1.Size = new Size(20, 16);
             label1.TabIndex = 0;
             label1.Text = "ID";
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label5.Location = new Point(205, 16);
-            label5.Margin = new Padding(0, 0, 0, 16);
-            label5.Name = "label5";
-            label5.Size = new Size(245, 19);
-            label5.TabIndex = 23;
-            label5.Text = "DEPARTMENT AND LOCATION";
             // 
             // UpdateDepartmentLocationForm
             // 

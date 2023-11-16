@@ -16,6 +16,12 @@
     <Compile Update="Source\Views\Accounts\ViewGeneratedPassword.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Source\Views\Categories\AddCategoryItemForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Source\Views\Categories\CategoriesControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Update="Source\Views\EmployeeFlow\EditEmployeeForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -59,6 +65,9 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Source\Views\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Source\Views\Profile\ViewAndEditProfileForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Source\Views\ServerSetupForm.cs">

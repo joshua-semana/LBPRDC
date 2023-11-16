@@ -1,6 +1,9 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Views.Logs;
 using LBPRDC.Source.Views.Accounts;
+using LBPRDC.Source.Views.Profile;
+using LBPRDC.Source.Views.Categories;
+
 
 namespace LBPRDC.Source.Views
 {
@@ -9,9 +12,10 @@ namespace LBPRDC.Source.Views
         private List<Button> pageSwitchButtons = new();
         private string currentPage = "Home";
 
-        UserControl employeesMainControl = new ucEmployees();
-        UserControl logsControl = new LogsControl();
-        UserControl accountsControl = new AccountsControl();
+        UserControl employeesMainControl = new ucEmployees() { Dock = DockStyle.Fill };
+        UserControl logsControl = new LogsControl() { Dock = DockStyle.Fill };
+        UserControl accountsControl = new AccountsControl() { Dock = DockStyle.Fill };
+        UserControl categoriesControl = new CategoriesControl() { Dock = DockStyle.Fill};
 
         public frmMain()
         {
@@ -81,6 +85,7 @@ namespace LBPRDC.Source.Views
             employeesMainControl.Hide();
             accountsControl.Hide();
             logsControl.Hide();
+            categoriesControl.Hide();
 
             lblPageName.Text = pageName;
 
@@ -92,21 +97,23 @@ namespace LBPRDC.Source.Views
                     //homeControl.Show();
                     break;
                 case "Employees":
-                    employeesMainControl.Dock = DockStyle.Fill;
                     pnlContent.Controls.Add(employeesMainControl);
                     employeesMainControl.Show();
                     break;
 
                 case "Accounts":
-                    accountsControl.Dock = DockStyle.Fill;
                     pnlContent.Controls.Add(accountsControl);
                     accountsControl.Show();
                     break;
 
                 case "Logs":
-                    logsControl.Dock = DockStyle.Fill;
                     pnlContent.Controls.Add(logsControl);
                     logsControl.Show();
+                    break;
+
+                case "Categories":
+                    pnlContent.Controls.Add(categoriesControl);
+                    categoriesControl.Show();
                     break;
             }
         }
@@ -132,6 +139,18 @@ namespace LBPRDC.Source.Views
                 frmLogin loginForm = new();
                 loginForm.ShowDialog();
                 this.Close();
+            }
+        }
+
+        private void btnProfile_Click(object sender, EventArgs e)
+        {
+            if (UserService.CurrentUser != null)
+            {
+                ViewAndEditProfileForm viewAndEditProfileForm = new()
+                {
+                    UserID = UserService.CurrentUser.UserID
+                };
+                viewAndEditProfileForm.ShowDialog();
             }
         }
     }

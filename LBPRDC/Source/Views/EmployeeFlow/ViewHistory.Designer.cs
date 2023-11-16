@@ -71,6 +71,7 @@
             // btnClose
             // 
             btnClose.AutoSize = true;
+            btnClose.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnClose.Location = new Point(744, 16);
             btnClose.Margin = new Padding(8, 0, 0, 0);
             btnClose.Name = "btnClose";
@@ -98,7 +99,6 @@
             dgvHistory.AllowUserToDeleteRows = false;
             dgvHistory.AllowUserToOrderColumns = true;
             dgvHistory.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.BackColor = Color.Empty;
             dataGridViewCellStyle1.SelectionBackColor = Color.SeaGreen;
             dgvHistory.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             dgvHistory.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;

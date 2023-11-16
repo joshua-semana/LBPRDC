@@ -209,5 +209,55 @@ namespace LBPRDC.Source.Services
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
+
+        public static async Task<bool> UpdateUserBasicInformation(User user)
+        {
+            try
+            {
+                string updateQuery = "UPDATE Users SET " +
+                    "FirstName = @FirstName, " +
+                    "LastName = @LastName, " +
+                    "Email = @Email " +
+                    "WHERE UserID = @UserID";
+
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(updateQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@FirstName", user.FirstName);
+                    command.Parameters.AddWithValue("@LastName", user.LastName);
+                    command.Parameters.AddWithValue("@Email", user.Email);
+                    command.Parameters.AddWithValue("@UserID", user.UserID);
+
+                    connection.Open();
+                    await command.ExecuteNonQueryAsync();
+                }
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> UpdatePassword(User user)
+        {
+            try
+            {
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
+
+                string updateQuery = "UPDATE Users SET " +
+                    "PasswordHash = @PasswordHash " +
+                    "WHERE UserID = @UserID";
+
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(updateQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
+                    command.Parameters.AddWithValue("@UserID", user.UserID);
+
+                    connection.Open();
+                    await command.ExecuteNonQueryAsync();
+                }
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
     }
 }

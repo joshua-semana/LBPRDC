@@ -107,35 +107,35 @@ namespace LBPRDC.Source.Views.Accounts
 
         private void btnReset_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to reset the password of this user?", "Reser Password Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (result == DialogResult.Yes)
+            if (dgvUsers.Rows.Count > 0)
             {
-                ResetUserPasswordAsync();
+                var result = MessageBox.Show("Are you sure you want to reset the password of this user?", "Reser Password Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (result == DialogResult.Yes)
+                {
+                    ResetUserPasswordAsync();
+                }
             }
         }
 
         private async void ResetUserPasswordAsync()
         {
-            if (dgvUsers.Rows.Count > 0)
-            {
-                string newPassword = Generator.GeneratePassword(12);
+            string newPassword = Generator.GeneratePassword(12);
 
-                UserService.User user = new()
+            UserService.User user = new()
+            {
+                UserID = Convert.ToInt32(dgvUsers.SelectedRows[0].Cells[0].Value),
+                Password = newPassword
+            };
+
+            bool isReset = await UserService.ResetPassword(user);
+
+            if (isReset)
+            {
+                ViewGeneratedPassword viewGeneratedPassword = new()
                 {
-                    UserID = Convert.ToInt32(dgvUsers.SelectedRows[0].Cells[0].Value),
                     Password = newPassword
                 };
-
-                bool isReset = await UserService.ResetPassword(user);
-
-                if (isReset)
-                {
-                    ViewGeneratedPassword viewGeneratedPassword = new()
-                    {
-                        Password = newPassword
-                    };
-                    viewGeneratedPassword.ShowDialog();
-                }
+                viewGeneratedPassword.ShowDialog();
             }
         }
     }

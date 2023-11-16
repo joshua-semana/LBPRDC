@@ -33,6 +33,7 @@
             btnCancel = new Button();
             pnlLine1 = new Panel();
             panel1 = new Panel();
+            label33 = new Label();
             grpJobData = new GroupBox();
             label30 = new Label();
             label29 = new Label();
@@ -95,7 +96,6 @@
             txtMiddleName = new TextBox();
             txtLastName = new TextBox();
             txtFirstName = new TextBox();
-            label33 = new Label();
             flowControls.SuspendLayout();
             panel1.SuspendLayout();
             grpJobData.SuspendLayout();
@@ -120,6 +120,7 @@
             // btnUpdate
             // 
             btnUpdate.AutoSize = true;
+            btnUpdate.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnUpdate.Location = new Point(769, 16);
             btnUpdate.Margin = new Padding(8, 0, 0, 0);
             btnUpdate.Name = "btnUpdate";
@@ -132,6 +133,7 @@
             // btnCancel
             // 
             btnCancel.AutoSize = true;
+            btnCancel.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnCancel.Location = new Point(686, 16);
             btnCancel.Margin = new Padding(0);
             btnCancel.Name = "btnCancel";
@@ -163,6 +165,17 @@
             panel1.Padding = new Padding(16);
             panel1.Size = new Size(860, 789);
             panel1.TabIndex = 4;
+            // 
+            // label33
+            // 
+            label33.AutoSize = true;
+            label33.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            label33.Location = new Point(350, 16);
+            label33.Margin = new Padding(0, 0, 0, 16);
+            label33.Name = "label33";
+            label33.Size = new Size(161, 19);
+            label33.TabIndex = 24;
+            label33.Text = "EDIT INFORMATION";
             // 
             // grpJobData
             // 
@@ -632,6 +645,7 @@
             txtContactNumber2.Name = "txtContactNumber2";
             txtContactNumber2.Size = new Size(400, 26);
             txtContactNumber2.TabIndex = 11;
+            txtContactNumber2.KeyPress += ValidateInputIfNumber_KeyPress;
             // 
             // txtContactNumber1
             // 
@@ -643,6 +657,7 @@
             txtContactNumber1.PlaceholderText = "09xxxxxxxxx";
             txtContactNumber1.Size = new Size(400, 26);
             txtContactNumber1.TabIndex = 10;
+            txtContactNumber1.KeyPress += ValidateInputIfNumber_KeyPress;
             // 
             // label6
             // 
@@ -953,17 +968,6 @@
             txtFirstName.Name = "txtFirstName";
             txtFirstName.Size = new Size(197, 26);
             txtFirstName.TabIndex = 0;
-            // 
-            // label33
-            // 
-            label33.AutoSize = true;
-            label33.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label33.Location = new Point(350, 16);
-            label33.Margin = new Padding(0, 0, 0, 16);
-            label33.Name = "label33";
-            label33.Size = new Size(161, 19);
-            label33.TabIndex = 24;
-            label33.Text = "EDIT INFORMATION";
             // 
             // EditEmployeeForm
             // 

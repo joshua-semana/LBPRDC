@@ -132,6 +132,7 @@
             // btnConfirm
             // 
             btnConfirm.AutoSize = true;
+            btnConfirm.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnConfirm.Location = new Point(296, 16);
             btnConfirm.Margin = new Padding(8, 0, 0, 0);
             btnConfirm.Name = "btnConfirm";
@@ -144,6 +145,7 @@
             // btnCancel
             // 
             btnCancel.AutoSize = true;
+            btnCancel.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             btnCancel.Location = new Point(213, 16);
             btnCancel.Margin = new Padding(0);
             btnCancel.Name = "btnCancel";

@@ -76,7 +76,7 @@ namespace LBPRDC.Source.Views
             {
                 cmbLocation.Enabled = true;
                 int DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue);
-                cmbLocation.DataSource = LocationService.GetAllItemsForComboBox(DepartmentID);
+                cmbLocation.DataSource = LocationService.GetAllItemsForComboBoxByID(DepartmentID);
                 cmbLocation.DisplayMember = "Name";
                 cmbLocation.ValueMember = "ID";
             }

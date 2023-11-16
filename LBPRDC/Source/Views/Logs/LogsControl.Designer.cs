@@ -32,9 +32,13 @@
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             pnlFooter = new Panel();
             flowControls = new FlowLayoutPanel();
             panel1 = new Panel();
+            panel3 = new Panel();
+            label2 = new Label();
+            dtpDate = new DateTimePicker();
             pnlContainerSearch = new Panel();
             label1 = new Label();
             txtSearch = new TextBox();
@@ -53,6 +57,7 @@
             dgvLogs = new DataGridView();
             pnlFooter.SuspendLayout();
             panel1.SuspendLayout();
+            panel3.SuspendLayout();
             pnlContainerSearch.SuspendLayout();
             pnlContainerFilter.SuspendLayout();
             pnlFilterContent.SuspendLayout();
@@ -84,6 +89,7 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(panel3);
             panel1.Controls.Add(pnlContainerSearch);
             panel1.Controls.Add(pnlContainerFilter);
             panel1.Controls.Add(panel2);
@@ -94,6 +100,45 @@
             panel1.Padding = new Padding(16);
             panel1.Size = new Size(1213, 569);
             panel1.TabIndex = 2;
+            // 
+            // panel3
+            // 
+            panel3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            panel3.BorderStyle = BorderStyle.FixedSingle;
+            panel3.Controls.Add(label2);
+            panel3.Controls.Add(dtpDate);
+            panel3.Location = new Point(997, 16);
+            panel3.Margin = new Padding(0);
+            panel3.Name = "panel3";
+            panel3.Size = new Size(200, 35);
+            panel3.TabIndex = 11;
+            // 
+            // label2
+            // 
+            label2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label2.AutoSize = true;
+            label2.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label2.ForeColor = SystemColors.WindowText;
+            label2.Location = new Point(5, 8);
+            label2.Margin = new Padding(0, 0, 0, 6);
+            label2.Name = "label2";
+            label2.Size = new Size(37, 16);
+            label2.TabIndex = 8;
+            label2.Text = "Date";
+            // 
+            // dtpDate
+            // 
+            dtpDate.AccessibleName = "Date";
+            dtpDate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            dtpDate.CustomFormat = "MM-dd-yyy";
+            dtpDate.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dtpDate.Format = DateTimePickerFormat.Custom;
+            dtpDate.Location = new Point(45, 5);
+            dtpDate.Margin = new Padding(4);
+            dtpDate.Name = "dtpDate";
+            dtpDate.Size = new Size(149, 23);
+            dtpDate.TabIndex = 25;
+            dtpDate.ValueChanged += dtpDate_ValueChanged;
             // 
             // pnlContainerSearch
             // 
@@ -235,9 +280,9 @@
             panel2.Controls.Add(lblRowCounter);
             panel2.Controls.Add(flowLayoutPanel1);
             panel2.Location = new Point(247, 16);
-            panel2.Margin = new Padding(0, 0, 0, 16);
+            panel2.Margin = new Padding(0, 0, 16, 16);
             panel2.Name = "panel2";
-            panel2.Size = new Size(950, 35);
+            panel2.Size = new Size(734, 35);
             panel2.TabIndex = 8;
             // 
             // lblRowCounter
@@ -257,9 +302,9 @@
             flowLayoutPanel1.Controls.Add(btnSettings);
             flowLayoutPanel1.Dock = DockStyle.Right;
             flowLayoutPanel1.FlowDirection = FlowDirection.RightToLeft;
-            flowLayoutPanel1.Location = new Point(685, 0);
+            flowLayoutPanel1.Location = new Point(690, 0);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(263, 33);
+            flowLayoutPanel1.Size = new Size(42, 33);
             flowLayoutPanel1.TabIndex = 0;
             // 
             // btnSettings
@@ -269,7 +314,7 @@
             btnSettings.FlatAppearance.BorderSize = 0;
             btnSettings.FlatStyle = FlatStyle.Flat;
             btnSettings.Image = (Image)resources.GetObject("btnSettings.Image");
-            btnSettings.Location = new Point(230, 0);
+            btnSettings.Location = new Point(9, 0);
             btnSettings.Margin = new Padding(0);
             btnSettings.Name = "btnSettings";
             btnSettings.Size = new Size(33, 33);
@@ -301,6 +346,14 @@
             dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
             dgvLogs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dgvLogs.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Window;
+            dataGridViewCellStyle3.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle3.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
+            dgvLogs.DefaultCellStyle = dataGridViewCellStyle3;
             dgvLogs.EditMode = DataGridViewEditMode.EditOnF2;
             dgvLogs.GridColor = SystemColors.Control;
             dgvLogs.Location = new Point(247, 67);
@@ -308,15 +361,15 @@
             dgvLogs.MultiSelect = false;
             dgvLogs.Name = "dgvLogs";
             dgvLogs.ReadOnly = true;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = SystemColors.Control;
-            dataGridViewCellStyle3.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle3.Padding = new Padding(4);
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
-            dgvLogs.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = SystemColors.Control;
+            dataGridViewCellStyle4.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle4.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle4.Padding = new Padding(4);
+            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.True;
+            dgvLogs.RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
             dgvLogs.RowHeadersVisible = false;
             dgvLogs.RowTemplate.DefaultCellStyle.Padding = new Padding(4, 8, 4, 8);
             dgvLogs.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
@@ -339,6 +392,8 @@
             VisibleChanged += LogsControl_VisibleChanged;
             pnlFooter.ResumeLayout(false);
             panel1.ResumeLayout(false);
+            panel3.ResumeLayout(false);
+            panel3.PerformLayout();
             pnlContainerSearch.ResumeLayout(false);
             pnlContainerSearch.PerformLayout();
             pnlContainerFilter.ResumeLayout(false);
@@ -378,5 +433,8 @@
         private Label label1;
         private TextBox txtSearch;
         private Panel pnlFooter;
+        private Panel panel3;
+        private DateTimePicker dtpDate;
+        private Label label2;
     }
 }
