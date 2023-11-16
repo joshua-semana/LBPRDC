@@ -82,5 +82,77 @@ namespace LBPRDC.Source.Services
 
             return items;
         }
+
+        public static (List<Log> Items, int TotalCount) GetFilteredItems(List<string> activityTypes, string searchWord, DateTime? filterDate)
+        {
+            List<Log> items = new();
+            int totalCount = 0;
+
+            try
+            {
+                string query = "SELECT AuditLogs.*, Users.FirstName, Users.LastName " +
+                               "FROM AuditLogs " +
+                               "INNER JOIN Users " +
+                               "ON AuditLogs.UserID = Users.UserID " +
+                               "WHERE 1 = 1";
+                string queryCount = "SELECT COUNT(*) FROM AuditLogs";
+
+                if (activityTypes != null && activityTypes.Count > 0)
+                {
+                    string activityTypeFilter = string.Join(",", activityTypes.Select(type => $"'{type}'"));
+                    query += $" AND AuditLogs.ActivityType IN ({activityTypeFilter})";
+                }
+
+                if (!string.IsNullOrEmpty(searchWord))
+                {
+                    query += $" AND (AuditLogs.ActivityDetails LIKE '%{searchWord}%'" +
+                             $" OR Users.FirstName + ' ' + Users.LastName LIKE '%{searchWord}%')";
+                }
+
+                if (filterDate.HasValue)
+                {
+                    query += $" AND FORMAT(AuditLogs.Timestamp, 'yyyy-MM-dd') = @Date";
+                }
+
+                query += " ORDER BY Timestamp DESC";
+
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                {
+                    connection.Open();
+
+                    using (SqlCommand commandCount = new(queryCount, connection))
+                    {
+                        totalCount = (int)commandCount.ExecuteScalar();
+                    }
+
+                    using (SqlCommand command = new(query, connection))
+                    {
+                        if (filterDate.HasValue)
+                        {
+                            command.Parameters.AddWithValue("@Date", filterDate.Value.Date);
+                        }
+
+                        SqlDataReader reader = command.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            Log item = new()
+                            {
+                                LogID = reader["LogID"] as int? ?? 0,
+                                UserID = reader["UserID"] as int? ?? 0,
+                                ActivityType = reader["ActivityType"] as string,
+                                ActivityDetails = reader["ActivityDetails"] as string,
+                                Timestamp = reader["Timestamp"] as DateTime?,
+                                FullName = $"{reader["FirstName"]} {reader["LastName"]}"
+                            };
+
+                            items.Add(item);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return (items, totalCount);
+        }
     }
 }

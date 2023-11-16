@@ -63,27 +63,7 @@ namespace LBPRDC.Source.Views.Categories
             InitializeCategoriesComboBoxItems();
         }
 
-        private void CategoriesControl_VisibleChanged(object sender, EventArgs e)
-        {
-            if (this.Visible == true)
-            {
-                PopulateTexfieldsByCategory();
-            }
-        }
-
-        private void InitializeCategoriesComboBoxItems()
-        {
-            cmbCategories.DataSource = Categories;
-        }
-
-        private void InitializeDepartmentComboBoxItems()
-        {
-            cmbDepartment.DataSource = DepartmentService.GetAllItemsForComboBox();
-            cmbDepartment.DisplayMember = "Name";
-            cmbDepartment.ValueMember = "ID";
-        }
-
-        private void PopulateTexfieldsByCategory()
+        public void PopulateTableAndFields()
         {
             CurrentCategory = cmbCategories.SelectedItem.ToString();
 
@@ -102,7 +82,6 @@ namespace LBPRDC.Source.Views.Categories
                 case "Location":
                     dgvCategory.DataSource = LocationService.GetAllItemsForCategories()
                         .Where(w => w.ID != 1 && w.DepartmentName != NoneDepartmentName).ToList();
-                    InitializeDepartmentComboBoxItems();
                     ControlUtils.ToggleControlVisibility(LocationSpecificFields, true);
                     break;
 
@@ -122,21 +101,34 @@ namespace LBPRDC.Source.Views.Categories
             UpdateRequiredFields();
         }
 
+        private void CategoriesControl_VisibleChanged(object sender, EventArgs e)
+        {
+            if (this.Visible == true)
+            {
+                PopulateTableAndFields();
+            }
+        }
+
+        private void InitializeCategoriesComboBoxItems()
+        {
+            cmbCategories.DataSource = Categories;
+        }
+
+        private void btnSelect_Click(object sender, EventArgs e)
+        {
+            PopulateTableAndFields();
+        }
+
         private void UpdateRequiredFields()
         {
             RequiredFields.Clear();
             foreach (Control control in flowRightContent.Controls)
             {
-                if (control is TextBox || control is ComboBox && control.AccessibleName != "Description")
+                if ((control is TextBox && control.AccessibleName != "Description") || control is ComboBox)
                 {
                     RequiredFields.Add(control);
                 }
             }
-        }
-
-        private void btnSelect_Click(object sender, EventArgs e)
-        {
-            PopulateTexfieldsByCategory();
         }
 
         private void dgvCategory_SelectionChanged(object sender, EventArgs e)
@@ -147,7 +139,7 @@ namespace LBPRDC.Source.Views.Categories
 
                 foreach (var kv in OriginalValues)
                 {
-                    kv.Key.TextChanged -= ControlData_Changed;
+                    kv.Key.TextChanged -= ControlValue_Changed;
                 }
 
                 var selectedRow = dgvCategory.SelectedRows[0];
@@ -185,7 +177,15 @@ namespace LBPRDC.Source.Views.Categories
 
         private void PopulateLocationSpecificTextFieldData(DataGridViewRow data)
         {
-            cmbDepartment.SelectedIndex = Convert.ToInt32(data.Cells["DepartmentID"].Value);
+            GetDeparmentComboBoxValue(Convert.ToInt32(data.Cells["DepartmentID"].Value));
+        }
+
+        private void GetDeparmentComboBoxValue(int value)
+        {
+            cmbDepartment.DataSource = DepartmentService.GetAllItemsForComboBox();
+            cmbDepartment.DisplayMember = "Name";
+            cmbDepartment.ValueMember = "ID";
+            cmbDepartment.SelectedValue = value;
         }
 
         private void UpdateOriginalValues()
@@ -201,11 +201,11 @@ namespace LBPRDC.Source.Views.Categories
 
             foreach (var kv in OriginalValues)
             {
-                kv.Key.TextChanged += ControlData_Changed;
+                kv.Key.TextChanged += ControlValue_Changed;
             }
         }
 
-        private void ControlData_Changed(object sender, EventArgs e)
+        private void ControlValue_Changed(object sender, EventArgs e)
         {
             bool anyControlValueChanged = OriginalValues.Any(kv =>
             {
@@ -229,6 +229,95 @@ namespace LBPRDC.Source.Views.Categories
             {
                 e.Handled = true;
             }
+        }
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            var output = MessageBox.Show("Are you sure you want to update this item under this category?", "Update Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (output == DialogResult.No) return;
+
+            if (ControlUtils.AreRequiredFieldsFilled(RequiredFields))
+            {
+                switch (CurrentCategory)
+                {
+                    case "Civil Status":
+
+                        CivilStatusService.CivilStatus UpdateForCivilStatus = new()
+                        {
+                            ID = Convert.ToInt32(txtID.Text),
+                            Name = txtName.Text.ToUpper().Trim(),
+                            Description = txtDescription.Text.ToUpper().Trim(),
+                            Status = cmbStatus.Text
+                        };
+                        CivilStatusService.Update(UpdateForCivilStatus);
+                        break;
+
+                    case "Department":
+                        DepartmentService.Department UpdateForDepartment = new()
+                        {
+                            ID = Convert.ToInt32(txtID.Text),
+                            Name = txtName.Text.Trim(),
+                            Description = txtDescription.Text.ToUpper().Trim(),
+                            Status = cmbStatus.Text
+                        };
+                        DepartmentService.Update(UpdateForDepartment);
+                        break;
+
+                    case "Employment Status":
+                        EmploymentStatusService.EmploymentStatus UpdateForEmploymentStatus = new()
+                        {
+                            ID = Convert.ToInt32(txtID.Text),
+                            Name = txtName.Text.ToUpper().Trim(),
+                            Description = txtDescription.Text.ToUpper().Trim(),
+                            Status = cmbStatus.Text
+                        };
+                        EmploymentStatusService.Update(UpdateForEmploymentStatus);
+                        break;
+
+                    case "Location":
+                        LocationService.Location UpdateForLocation = new()
+                        {
+                            ID = Convert.ToInt32(txtID.Text),
+                            Name = txtName.Text.Trim(),
+                            Description = txtDescription.Text.ToUpper().Trim(),
+                            Status = cmbStatus.Text,
+                            DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue)
+                        };
+                        LocationService.Update(UpdateForLocation);
+                        break;
+
+                    case "Position":
+                        PositionService.Position UpdateForPosition = new()
+                        {
+                            ID = Convert.ToInt32(txtID.Text),
+                            Name = txtName.Text.Trim(),
+                            Description = txtDescription.Text.ToUpper().Trim(),
+                            Status = cmbStatus.Text,
+                            Code = txtCode.Text.ToUpper().Trim(),
+                            SalaryRate = Convert.ToDecimal(txtSalaryRate.Text),
+                            BillingRate = Convert.ToDecimal(txtBillingRate.Text)
+                        };
+                        PositionService.Update(UpdateForPosition);
+                        break;
+
+                    default:
+                        MessageBox.Show("Please make sure that the text in the category combo box matches in the codebase swith case for update.", "Developer Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                }
+
+                PopulateTableAndFields();
+            }
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            var CurrentVisibleControls = ControlUtils.GetVisibleControls(flowRightContent);
+            AddCategoryItemForm addCategoryItemForm = new()
+            {
+                ParentControl = this,
+                CategoryName = CurrentCategory
+            };
+            addCategoryItemForm.ShowDialog();
         }
     }
 }

@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             pnlBody = new Panel();
             dgvCategory = new DataGridView();
             pnlContainerSearch = new Panel();
@@ -63,6 +63,8 @@
             label2 = new Label();
             pnlFooter = new Panel();
             pnlVLine1 = new Panel();
+            btnAdd = new Button();
+            lblLine1 = new Label();
             pnlBody.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvCategory).BeginInit();
             pnlContainerSearch.SuspendLayout();
@@ -91,22 +93,22 @@
             dgvCategory.AllowUserToDeleteRows = false;
             dgvCategory.AllowUserToOrderColumns = true;
             dgvCategory.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.SelectionBackColor = Color.SeaGreen;
-            dgvCategory.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.SelectionBackColor = Color.SeaGreen;
+            dgvCategory.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
             dgvCategory.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvCategory.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvCategory.BackgroundColor = SystemColors.Window;
             dgvCategory.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvCategory.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.Padding = new Padding(0, 2, 0, 2);
-            dataGridViewCellStyle2.SelectionBackColor = Color.MediumSeaGreen;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            dgvCategory.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = SystemColors.Control;
+            dataGridViewCellStyle5.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle5.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle5.Padding = new Padding(0, 2, 0, 2);
+            dataGridViewCellStyle5.SelectionBackColor = Color.MediumSeaGreen;
+            dataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.True;
+            dgvCategory.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             dgvCategory.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvCategory.EditMode = DataGridViewEditMode.EditOnF2;
             dgvCategory.GridColor = SystemColors.Control;
@@ -115,15 +117,15 @@
             dgvCategory.MultiSelect = false;
             dgvCategory.Name = "dgvCategory";
             dgvCategory.ReadOnly = true;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = SystemColors.Control;
-            dataGridViewCellStyle3.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle3.Padding = new Padding(4);
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
-            dgvCategory.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = SystemColors.Control;
+            dataGridViewCellStyle6.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle6.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle6.Padding = new Padding(4);
+            dataGridViewCellStyle6.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.True;
+            dgvCategory.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             dgvCategory.RowHeadersVisible = false;
             dgvCategory.RowTemplate.DefaultCellStyle.Padding = new Padding(4, 8, 4, 8);
             dgvCategory.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
@@ -137,6 +139,8 @@
             // pnlContainerSearch
             // 
             pnlContainerSearch.BorderStyle = BorderStyle.FixedSingle;
+            pnlContainerSearch.Controls.Add(lblLine1);
+            pnlContainerSearch.Controls.Add(btnAdd);
             pnlContainerSearch.Controls.Add(btnSelect);
             pnlContainerSearch.Controls.Add(label1);
             pnlContainerSearch.Controls.Add(cmbCategories);
@@ -144,7 +148,7 @@
             pnlContainerSearch.Margin = new Padding(0, 0, 16, 16);
             pnlContainerSearch.Name = "pnlContainerSearch";
             pnlContainerSearch.Padding = new Padding(8);
-            pnlContainerSearch.Size = new Size(368, 45);
+            pnlContainerSearch.Size = new Size(461, 45);
             pnlContainerSearch.TabIndex = 12;
             // 
             // btnSelect
@@ -419,7 +423,7 @@
             cmbStatus.AccessibleName = "Status";
             cmbStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbStatus.FormattingEnabled = true;
-            cmbStatus.Items.AddRange(new object[] { "Active", "Inactive" });
+            cmbStatus.Items.AddRange(new object[] { "(Choose Status)", "Active", "Inactive" });
             cmbStatus.Location = new Point(22, 418);
             cmbStatus.Margin = new Padding(6, 3, 3, 8);
             cmbStatus.Name = "cmbStatus";
@@ -460,6 +464,7 @@
             btnUpdate.TabIndex = 8;
             btnUpdate.Text = "Update";
             btnUpdate.UseVisualStyleBackColor = true;
+            btnUpdate.Click += btnUpdate_Click;
             // 
             // pnlRightHeader
             // 
@@ -500,6 +505,31 @@
             pnlVLine1.Name = "pnlVLine1";
             pnlVLine1.Size = new Size(1, 628);
             pnlVLine1.TabIndex = 3;
+            // 
+            // btnAdd
+            // 
+            btnAdd.AutoSize = true;
+            btnAdd.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnAdd.Location = new Point(376, 8);
+            btnAdd.Margin = new Padding(0);
+            btnAdd.Name = "btnAdd";
+            btnAdd.Size = new Size(75, 26);
+            btnAdd.TabIndex = 27;
+            btnAdd.Text = "Add";
+            btnAdd.UseVisualStyleBackColor = true;
+            btnAdd.Click += btnAdd_Click;
+            // 
+            // lblLine1
+            // 
+            lblLine1.AutoSize = true;
+            lblLine1.Font = new Font("Arial", 14F, FontStyle.Regular, GraphicsUnit.Point);
+            lblLine1.Location = new Point(359, 9);
+            lblLine1.Margin = new Padding(3, 12, 0, 0);
+            lblLine1.Name = "lblLine1";
+            lblLine1.Size = new Size(16, 22);
+            lblLine1.TabIndex = 28;
+            lblLine1.Text = "|";
+            lblLine1.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // CategoriesControl
             // 
@@ -563,5 +593,7 @@
         private Label label2;
         private FlowLayoutPanel flowFooterActions;
         private Button btnUpdate;
+        private Button btnAdd;
+        private Label lblLine1;
     }
 }

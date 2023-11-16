@@ -120,5 +120,18 @@ namespace LBPRDC.Source.Utilities
                 control.Visible = state;
             }
         }
+
+        public static List<Control> GetVisibleControls(Control container)
+        {
+            List<Control> controls = new();
+            foreach (Control control in container.Controls)
+            {
+                if (control.Visible == true)
+                {
+                    controls.Add(control);
+                }
+            }
+            return controls;
+        }
     }
 }

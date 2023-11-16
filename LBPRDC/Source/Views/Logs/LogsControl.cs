@@ -64,35 +64,13 @@ namespace LBPRDC.Source.Views.Logs
         private async void PopulateTableWithFilterAndSearch(List<string> types, string searchWord)
         {
             ShowLoadingProgressBar(true);
-            var logs = await Task.Run(() => LoggingService.GetAllItems());
-            logs = logs.OrderByDescending(o => o.Timestamp).ToList();
+            var (Items, TotalCount) = await Task.Run(() => LoggingService.GetFilteredItems(types, searchWord, dtpDate.Value));
 
             dgvLogs.Columns.Clear();
-
-            if (logs.Count > 0)
-            {
-                dgvLogs.AutoGenerateColumns = false;
-
-                var filteredLogs = logs;
-
-                if (types != null && types.Count > 0)
-                {
-                    filteredLogs = filteredLogs.Where(log => types.Contains(log.ActivityType)).ToList();
-                }
-
-                if (!string.IsNullOrEmpty(searchWord))
-                {
-                    filteredLogs = filteredLogs
-                        .Where(log =>
-                            log.ActivityDetails.ToLower().Contains(searchWord) ||
-                            log.FullName.ToLower().Contains(searchWord))
-                        .ToList();
-                }
-
-                ApplySettingsToTable();
-                lblRowCounter.Text = ControlUtils.GetTableRowCount(filteredLogs.Count, logs.Count, "log");
-                dgvLogs.DataSource = filteredLogs;
-            }
+            dgvLogs.AutoGenerateColumns = false;
+            ApplySettingsToTable();
+            lblRowCounter.Text = ControlUtils.GetTableRowCount(Items.Count, TotalCount, "log");
+            dgvLogs.DataSource = Items;
 
             ShowLoadingProgressBar(false);
         }
@@ -126,6 +104,11 @@ namespace LBPRDC.Source.Views.Logs
             {
                 ApplyFilterAndSearchThenPopulate();
             }
+        }
+
+        private void dtpDate_ValueChanged(object sender, EventArgs e)
+        {
+            ApplyFilterAndSearchThenPopulate();
         }
     }
 }

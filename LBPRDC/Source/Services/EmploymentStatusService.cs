@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static LBPRDC.Source.Services.CivilStatusService;
+﻿using System.Data.SqlClient;
+using static LBPRDC.Source.Services.DepartmentService;
 
 namespace LBPRDC.Source.Services
 {
@@ -84,6 +79,76 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
+        }
+
+        public static async Task <bool> Add(EmploymentStatus data)
+        {
+            try
+            {
+                string QueryUpdate = "INSERT INTO EmploymentStatus (Name, Description, Status) " +
+                    "VALUES (@Name, @Description, @Status)";
+
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(QueryUpdate, connection))
+                {
+                    command.Parameters.AddWithValue("@Name", data.Name);
+                    command.Parameters.AddWithValue("@Description", data.Description);
+                    command.Parameters.AddWithValue("@Status", data.Status);
+                    connection.Open();
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                if (UserService.CurrentUser != null)
+                {
+                    LoggingService.Log newLog = new()
+                    {
+                        UserID = UserService.CurrentUser.UserID,
+                        ActivityType = "Add",
+                        ActivityDetails = $"This user added a new item for the employment status category with a name of {data.Name}."
+                    };
+
+                    LoggingService.LogActivity(newLog);
+                }
+
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static void Update(EmploymentStatus data)
+        {
+            try
+            {
+                string QueryUpdate = "UPDATE EmploymentStatus SET " +
+                    "Name = @Name, " +
+                    "Description = @Description, " +
+                    "Status = @Status " +
+                    "WHERE ID = @ID";
+
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(QueryUpdate, connection))
+                {
+                    command.Parameters.AddWithValue("@Name", data.Name);
+                    command.Parameters.AddWithValue("@Description", data.Description);
+                    command.Parameters.AddWithValue("@Status", data.Status);
+                    command.Parameters.AddWithValue("@ID", data.ID);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+
+                if (UserService.CurrentUser != null)
+                {
+                    LoggingService.Log newLog = new()
+                    {
+                        UserID = UserService.CurrentUser.UserID,
+                        ActivityType = "Update",
+                        ActivityDetails = $"This user updated an item under the employment status category with an ID of {data.ID}."
+                    };
+
+                    LoggingService.LogActivity(newLog);
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
         public class History
