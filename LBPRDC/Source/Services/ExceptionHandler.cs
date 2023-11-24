@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
 
 namespace LBPRDC.Source.Services
 {
     internal class ExceptionHandler
     {
-        public static bool HandleException(Exception ex)
+        public static bool HandleException(Exception ex, [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
         {
-            MessageBox.Show("An error occurred: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
+            string errorMessage = $"An error occurred in {filePath} at line {lineNumber}: {ex.Message}\n\nIf the error persists, please restart the application.";
+            MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return false;
         }
     }

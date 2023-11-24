@@ -123,3 +123,7 @@ C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Sou
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Profile.ViewAndEditProfileForm.resources
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Categories.CategoriesControl.resources
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Categories.AddCategoryItemForm.resources
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Categories.PositionRatesHistory.resources
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.BillingControl.resources
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.NewBillingForm.resources
+C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.UploadFileForm.resources

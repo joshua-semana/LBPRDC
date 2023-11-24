@@ -1,7 +1,4 @@
-﻿
-using LBPRDC.Source.Services;
-using LBPRDC.Source.Utilities;
-using System.Security.Cryptography.Xml;
+﻿using LBPRDC.Source.Services;
 
 namespace LBPRDC.Source.Views.EmployeeFlow
 {
@@ -36,6 +33,11 @@ namespace LBPRDC.Source.Views.EmployeeFlow
                 }
                 this.Text = $"Employee {HistoryType} History";
                 InitializeEmployeeInformation();
+            }
+            else
+            {
+                MessageBox.Show("There seems to be a problem loading the data. Please try again.", "Error Loading Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.Close();
             }
         }
 

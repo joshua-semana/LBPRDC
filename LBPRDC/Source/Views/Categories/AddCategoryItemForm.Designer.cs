@@ -97,16 +97,17 @@
             flowBody.Location = new Point(0, 40);
             flowBody.Name = "flowBody";
             flowBody.Padding = new Padding(16);
-            flowBody.Size = new Size(363, 414);
+            flowBody.Size = new Size(363, 426);
             flowBody.TabIndex = 4;
             // 
             // lblCode
             // 
             lblCode.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             lblCode.AutoSize = true;
-            lblCode.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            lblCode.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblCode.ForeColor = SystemColors.GrayText;
             lblCode.Location = new Point(19, 16);
-            lblCode.Margin = new Padding(3, 0, 3, 4);
+            lblCode.Margin = new Padding(3, 0, 3, 2);
             lblCode.Name = "lblCode";
             lblCode.Size = new Size(322, 16);
             lblCode.TabIndex = 10;
@@ -116,21 +117,23 @@
             // txtCode
             // 
             txtCode.AccessibleName = "Code";
-            txtCode.Location = new Point(22, 39);
-            txtCode.Margin = new Padding(6, 3, 3, 8);
+            txtCode.Location = new Point(22, 37);
+            txtCode.Margin = new Padding(6, 3, 3, 12);
             txtCode.MaxLength = 100;
             txtCode.Name = "txtCode";
             txtCode.Size = new Size(319, 23);
             txtCode.TabIndex = 11;
             txtCode.Visible = false;
+            txtCode.KeyPress += ToUpperCase_KeyPress;
             // 
             // lblName
             // 
             lblName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             lblName.AutoSize = true;
-            lblName.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            lblName.Location = new Point(19, 70);
-            lblName.Margin = new Padding(3, 0, 3, 4);
+            lblName.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblName.ForeColor = SystemColors.GrayText;
+            lblName.Location = new Point(19, 72);
+            lblName.Margin = new Padding(3, 0, 3, 2);
             lblName.Name = "lblName";
             lblName.Size = new Size(322, 16);
             lblName.TabIndex = 12;
@@ -141,7 +144,7 @@
             // 
             txtName.AccessibleName = "Name";
             txtName.Location = new Point(22, 93);
-            txtName.Margin = new Padding(6, 3, 3, 8);
+            txtName.Margin = new Padding(6, 3, 3, 12);
             txtName.MaxLength = 100;
             txtName.Name = "txtName";
             txtName.Size = new Size(319, 23);
@@ -152,9 +155,10 @@
             // 
             lblDepartment.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             lblDepartment.AutoSize = true;
-            lblDepartment.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            lblDepartment.Location = new Point(19, 124);
-            lblDepartment.Margin = new Padding(3, 0, 3, 4);
+            lblDepartment.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblDepartment.ForeColor = SystemColors.GrayText;
+            lblDepartment.Location = new Point(19, 128);
+            lblDepartment.Margin = new Padding(3, 0, 3, 2);
             lblDepartment.Name = "lblDepartment";
             lblDepartment.Size = new Size(322, 16);
             lblDepartment.TabIndex = 22;
@@ -166,8 +170,8 @@
             cmbDepartment.AccessibleName = "Department";
             cmbDepartment.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbDepartment.FormattingEnabled = true;
-            cmbDepartment.Location = new Point(22, 147);
-            cmbDepartment.Margin = new Padding(6, 3, 3, 8);
+            cmbDepartment.Location = new Point(22, 149);
+            cmbDepartment.Margin = new Padding(6, 3, 3, 12);
             cmbDepartment.Name = "cmbDepartment";
             cmbDepartment.Size = new Size(319, 24);
             cmbDepartment.TabIndex = 23;
@@ -177,9 +181,10 @@
             // 
             lblSalaryRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             lblSalaryRate.AutoSize = true;
-            lblSalaryRate.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            lblSalaryRate.Location = new Point(19, 179);
-            lblSalaryRate.Margin = new Padding(3, 0, 3, 4);
+            lblSalaryRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblSalaryRate.ForeColor = SystemColors.GrayText;
+            lblSalaryRate.Location = new Point(19, 185);
+            lblSalaryRate.Margin = new Padding(3, 0, 3, 2);
             lblSalaryRate.Name = "lblSalaryRate";
             lblSalaryRate.Size = new Size(322, 16);
             lblSalaryRate.TabIndex = 14;
@@ -189,8 +194,8 @@
             // txtSalaryRate
             // 
             txtSalaryRate.AccessibleName = "Salary Rate";
-            txtSalaryRate.Location = new Point(22, 202);
-            txtSalaryRate.Margin = new Padding(6, 3, 3, 8);
+            txtSalaryRate.Location = new Point(22, 206);
+            txtSalaryRate.Margin = new Padding(6, 3, 3, 12);
             txtSalaryRate.MaxLength = 100;
             txtSalaryRate.Name = "txtSalaryRate";
             txtSalaryRate.Size = new Size(319, 23);
@@ -202,9 +207,10 @@
             // 
             lblBillingRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             lblBillingRate.AutoSize = true;
-            lblBillingRate.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            lblBillingRate.Location = new Point(19, 233);
-            lblBillingRate.Margin = new Padding(3, 0, 3, 4);
+            lblBillingRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblBillingRate.ForeColor = SystemColors.GrayText;
+            lblBillingRate.Location = new Point(19, 241);
+            lblBillingRate.Margin = new Padding(3, 0, 3, 2);
             lblBillingRate.Name = "lblBillingRate";
             lblBillingRate.Size = new Size(322, 16);
             lblBillingRate.TabIndex = 16;
@@ -214,8 +220,8 @@
             // txtBillingRate
             // 
             txtBillingRate.AccessibleName = "Billing Rate";
-            txtBillingRate.Location = new Point(22, 256);
-            txtBillingRate.Margin = new Padding(6, 3, 3, 8);
+            txtBillingRate.Location = new Point(22, 262);
+            txtBillingRate.Margin = new Padding(6, 3, 3, 12);
             txtBillingRate.MaxLength = 100;
             txtBillingRate.Name = "txtBillingRate";
             txtBillingRate.Size = new Size(319, 23);
@@ -227,9 +233,10 @@
             // 
             lblDescription.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             lblDescription.AutoSize = true;
-            lblDescription.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            lblDescription.Location = new Point(19, 287);
-            lblDescription.Margin = new Padding(3, 0, 3, 4);
+            lblDescription.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblDescription.ForeColor = SystemColors.GrayText;
+            lblDescription.Location = new Point(19, 297);
+            lblDescription.Margin = new Padding(3, 0, 3, 2);
             lblDescription.Name = "lblDescription";
             lblDescription.Size = new Size(322, 16);
             lblDescription.TabIndex = 18;
@@ -239,8 +246,8 @@
             // txtDescription
             // 
             txtDescription.AccessibleName = "Description";
-            txtDescription.Location = new Point(22, 310);
-            txtDescription.Margin = new Padding(6, 3, 3, 8);
+            txtDescription.Location = new Point(22, 318);
+            txtDescription.Margin = new Padding(6, 3, 3, 12);
             txtDescription.MaxLength = 100;
             txtDescription.Name = "txtDescription";
             txtDescription.Size = new Size(319, 23);
@@ -251,9 +258,10 @@
             // 
             lblStatus.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             lblStatus.AutoSize = true;
-            lblStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            lblStatus.Location = new Point(19, 341);
-            lblStatus.Margin = new Padding(3, 0, 3, 4);
+            lblStatus.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblStatus.ForeColor = SystemColors.GrayText;
+            lblStatus.Location = new Point(19, 353);
+            lblStatus.Margin = new Padding(3, 0, 3, 2);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(322, 16);
             lblStatus.TabIndex = 20;
@@ -266,8 +274,8 @@
             cmbStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbStatus.FormattingEnabled = true;
             cmbStatus.Items.AddRange(new object[] { "(Choose Status)", "Active", "Inactive" });
-            cmbStatus.Location = new Point(22, 364);
-            cmbStatus.Margin = new Padding(6, 3, 3, 8);
+            cmbStatus.Location = new Point(22, 374);
+            cmbStatus.Margin = new Padding(6, 3, 3, 12);
             cmbStatus.Name = "cmbStatus";
             cmbStatus.Size = new Size(319, 24);
             cmbStatus.TabIndex = 21;
@@ -278,7 +286,7 @@
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Controls.Add(flowFooterActions);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 454);
+            pnlFooter.Location = new Point(0, 466);
             pnlFooter.Name = "pnlFooter";
             pnlFooter.Size = new Size(363, 60);
             pnlFooter.TabIndex = 5;
@@ -325,7 +333,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(363, 514);
+            ClientSize = new Size(363, 526);
             Controls.Add(flowBody);
             Controls.Add(pnlHeader);
             Controls.Add(pnlFooter);

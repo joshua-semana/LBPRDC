@@ -110,5 +110,10 @@ namespace LBPRDC.Source.Views.Logs
         {
             ApplyFilterAndSearchThenPopulate();
         }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            ApplyFilterAndSearchThenPopulate();
+        }
     }
 }

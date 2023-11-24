@@ -28,173 +28,58 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LogsControl));
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
-            pnlFooter = new Panel();
-            flowControls = new FlowLayoutPanel();
-            panel1 = new Panel();
-            panel3 = new Panel();
-            label2 = new Label();
-            dtpDate = new DateTimePicker();
-            pnlContainerSearch = new Panel();
-            label1 = new Label();
-            txtSearch = new TextBox();
-            pnlContainerFilter = new Panel();
+            pnlBody = new Panel();
             pnlFilterContent = new Panel();
             flowFilters = new FlowLayoutPanel();
             lblFilterType = new Label();
             dchkListFilterType = new Shared.DynamicCheckedListBoxControl();
-            flowFilterControls = new FlowLayoutPanel();
-            btnFilter = new Button();
+            pnlLine2 = new Panel();
             btnReset = new Button();
-            panel2 = new Panel();
+            btnFilter = new Button();
+            label1 = new Label();
+            dtpDate = new DateTimePicker();
+            txtSearch = new TextBox();
+            btnSearch = new Button();
             lblRowCounter = new Label();
-            flowLayoutPanel1 = new FlowLayoutPanel();
-            btnSettings = new Button();
+            pnlLine1 = new Panel();
             dgvLogs = new DataGridView();
-            pnlFooter.SuspendLayout();
-            panel1.SuspendLayout();
-            panel3.SuspendLayout();
-            pnlContainerSearch.SuspendLayout();
-            pnlContainerFilter.SuspendLayout();
+            pnlBody.SuspendLayout();
             pnlFilterContent.SuspendLayout();
             flowFilters.SuspendLayout();
-            flowFilterControls.SuspendLayout();
-            panel2.SuspendLayout();
-            flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvLogs).BeginInit();
             SuspendLayout();
             // 
-            // pnlFooter
+            // pnlBody
             // 
-            pnlFooter.BackColor = SystemColors.Menu;
-            pnlFooter.Controls.Add(flowControls);
-            pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 569);
-            pnlFooter.Name = "pnlFooter";
-            pnlFooter.Size = new Size(1213, 60);
-            pnlFooter.TabIndex = 1;
-            pnlFooter.Visible = false;
-            // 
-            // flowControls
-            // 
-            flowControls.Dock = DockStyle.Right;
-            flowControls.Location = new Point(562, 0);
-            flowControls.Name = "flowControls";
-            flowControls.Size = new Size(651, 60);
-            flowControls.TabIndex = 2;
-            // 
-            // panel1
-            // 
-            panel1.Controls.Add(panel3);
-            panel1.Controls.Add(pnlContainerSearch);
-            panel1.Controls.Add(pnlContainerFilter);
-            panel1.Controls.Add(panel2);
-            panel1.Controls.Add(dgvLogs);
-            panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(0, 0);
-            panel1.Name = "panel1";
-            panel1.Padding = new Padding(16);
-            panel1.Size = new Size(1213, 569);
-            panel1.TabIndex = 2;
-            // 
-            // panel3
-            // 
-            panel3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            panel3.BorderStyle = BorderStyle.FixedSingle;
-            panel3.Controls.Add(label2);
-            panel3.Controls.Add(dtpDate);
-            panel3.Location = new Point(997, 16);
-            panel3.Margin = new Padding(0);
-            panel3.Name = "panel3";
-            panel3.Size = new Size(200, 35);
-            panel3.TabIndex = 11;
-            // 
-            // label2
-            // 
-            label2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            label2.AutoSize = true;
-            label2.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label2.ForeColor = SystemColors.WindowText;
-            label2.Location = new Point(5, 8);
-            label2.Margin = new Padding(0, 0, 0, 6);
-            label2.Name = "label2";
-            label2.Size = new Size(37, 16);
-            label2.TabIndex = 8;
-            label2.Text = "Date";
-            // 
-            // dtpDate
-            // 
-            dtpDate.AccessibleName = "Date";
-            dtpDate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            dtpDate.CustomFormat = "MM-dd-yyy";
-            dtpDate.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dtpDate.Format = DateTimePickerFormat.Custom;
-            dtpDate.Location = new Point(45, 5);
-            dtpDate.Margin = new Padding(4);
-            dtpDate.Name = "dtpDate";
-            dtpDate.Size = new Size(149, 23);
-            dtpDate.TabIndex = 25;
-            dtpDate.ValueChanged += dtpDate_ValueChanged;
-            // 
-            // pnlContainerSearch
-            // 
-            pnlContainerSearch.BorderStyle = BorderStyle.FixedSingle;
-            pnlContainerSearch.Controls.Add(label1);
-            pnlContainerSearch.Controls.Add(txtSearch);
-            pnlContainerSearch.Location = new Point(16, 16);
-            pnlContainerSearch.Margin = new Padding(0, 0, 0, 16);
-            pnlContainerSearch.Name = "pnlContainerSearch";
-            pnlContainerSearch.Padding = new Padding(8);
-            pnlContainerSearch.Size = new Size(215, 68);
-            pnlContainerSearch.TabIndex = 10;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.ForeColor = SystemColors.WindowText;
-            label1.Location = new Point(5, 8);
-            label1.Margin = new Padding(0, 0, 0, 6);
-            label1.Name = "label1";
-            label1.Size = new Size(116, 16);
-            label1.TabIndex = 7;
-            label1.Text = "Search and Filter";
-            // 
-            // txtSearch
-            // 
-            txtSearch.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            txtSearch.Location = new Point(8, 30);
-            txtSearch.Margin = new Padding(0, 0, 0, 4);
-            txtSearch.Name = "txtSearch";
-            txtSearch.Size = new Size(197, 26);
-            txtSearch.TabIndex = 1;
-            txtSearch.KeyUp += txtSearch_KeyUp;
-            // 
-            // pnlContainerFilter
-            // 
-            pnlContainerFilter.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
-            pnlContainerFilter.BorderStyle = BorderStyle.FixedSingle;
-            pnlContainerFilter.Controls.Add(pnlFilterContent);
-            pnlContainerFilter.Controls.Add(flowFilterControls);
-            pnlContainerFilter.Location = new Point(16, 100);
-            pnlContainerFilter.Margin = new Padding(0, 0, 16, 0);
-            pnlContainerFilter.Name = "pnlContainerFilter";
-            pnlContainerFilter.Size = new Size(215, 453);
-            pnlContainerFilter.TabIndex = 9;
+            pnlBody.Controls.Add(pnlFilterContent);
+            pnlBody.Controls.Add(pnlLine2);
+            pnlBody.Controls.Add(btnReset);
+            pnlBody.Controls.Add(btnFilter);
+            pnlBody.Controls.Add(label1);
+            pnlBody.Controls.Add(dtpDate);
+            pnlBody.Controls.Add(txtSearch);
+            pnlBody.Controls.Add(btnSearch);
+            pnlBody.Controls.Add(lblRowCounter);
+            pnlBody.Controls.Add(pnlLine1);
+            pnlBody.Controls.Add(dgvLogs);
+            pnlBody.Dock = DockStyle.Fill;
+            pnlBody.Location = new Point(0, 0);
+            pnlBody.Name = "pnlBody";
+            pnlBody.Padding = new Padding(24, 24, 24, 10);
+            pnlBody.Size = new Size(1213, 629);
+            pnlBody.TabIndex = 2;
             // 
             // pnlFilterContent
             // 
             pnlFilterContent.AutoScroll = true;
             pnlFilterContent.Controls.Add(flowFilters);
-            pnlFilterContent.Dock = DockStyle.Fill;
-            pnlFilterContent.Location = new Point(0, 0);
+            pnlFilterContent.Location = new Point(24, 113);
             pnlFilterContent.Margin = new Padding(0);
             pnlFilterContent.Name = "pnlFilterContent";
-            pnlFilterContent.Size = new Size(213, 411);
+            pnlFilterContent.Size = new Size(215, 482);
             pnlFilterContent.TabIndex = 6;
             // 
             // flowFilters
@@ -207,7 +92,7 @@
             flowFilters.Location = new Point(0, 0);
             flowFilters.Name = "flowFilters";
             flowFilters.Padding = new Padding(4, 0, 0, 0);
-            flowFilters.Size = new Size(196, 306);
+            flowFilters.Size = new Size(198, 306);
             flowFilters.TabIndex = 6;
             // 
             // lblFilterType
@@ -234,94 +119,112 @@
             dchkListFilterType.Size = new Size(180, 18);
             dchkListFilterType.TabIndex = 6;
             // 
-            // flowFilterControls
+            // pnlLine2
             // 
-            flowFilterControls.BackColor = SystemColors.Control;
-            flowFilterControls.Controls.Add(btnFilter);
-            flowFilterControls.Controls.Add(btnReset);
-            flowFilterControls.Dock = DockStyle.Bottom;
-            flowFilterControls.FlowDirection = FlowDirection.RightToLeft;
-            flowFilterControls.Location = new Point(0, 411);
-            flowFilterControls.Name = "flowFilterControls";
-            flowFilterControls.Padding = new Padding(8, 6, 0, 0);
-            flowFilterControls.Size = new Size(213, 40);
-            flowFilterControls.TabIndex = 6;
-            // 
-            // btnFilter
-            // 
-            btnFilter.AutoSize = true;
-            btnFilter.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnFilter.Location = new Point(135, 6);
-            btnFilter.Margin = new Padding(4, 0, 0, 0);
-            btnFilter.Name = "btnFilter";
-            btnFilter.Size = new Size(70, 28);
-            btnFilter.TabIndex = 6;
-            btnFilter.Text = "Filter";
-            btnFilter.UseVisualStyleBackColor = true;
-            btnFilter.Click += btnFilter_Click;
+            pnlLine2.BorderStyle = BorderStyle.FixedSingle;
+            pnlLine2.Location = new Point(24, 112);
+            pnlLine2.Margin = new Padding(0);
+            pnlLine2.Name = "pnlLine2";
+            pnlLine2.Size = new Size(215, 1);
+            pnlLine2.TabIndex = 27;
             // 
             // btnReset
             // 
             btnReset.AutoSize = true;
-            btnReset.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnReset.Location = new Point(61, 6);
+            btnReset.Font = new Font("Arial", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            btnReset.Location = new Point(134, 83);
             btnReset.Margin = new Padding(0);
             btnReset.Name = "btnReset";
-            btnReset.Size = new Size(70, 28);
+            btnReset.Size = new Size(51, 25);
             btnReset.TabIndex = 7;
             btnReset.Text = "Reset";
             btnReset.UseVisualStyleBackColor = true;
             btnReset.Click += btnReset_Click;
             // 
-            // panel2
+            // btnFilter
             // 
-            panel2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            panel2.BorderStyle = BorderStyle.FixedSingle;
-            panel2.Controls.Add(lblRowCounter);
-            panel2.Controls.Add(flowLayoutPanel1);
-            panel2.Location = new Point(247, 16);
-            panel2.Margin = new Padding(0, 0, 16, 16);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(734, 35);
-            panel2.TabIndex = 8;
+            btnFilter.AutoSize = true;
+            btnFilter.Font = new Font("Arial", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            btnFilter.Location = new Point(189, 83);
+            btnFilter.Margin = new Padding(4, 0, 0, 4);
+            btnFilter.Name = "btnFilter";
+            btnFilter.Size = new Size(51, 25);
+            btnFilter.TabIndex = 6;
+            btnFilter.Text = "Apply";
+            btnFilter.UseVisualStyleBackColor = true;
+            btnFilter.Click += btnFilter_Click;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            label1.ForeColor = SystemColors.ControlText;
+            label1.Location = new Point(20, 87);
+            label1.Margin = new Padding(0, 0, 0, 8);
+            label1.Name = "label1";
+            label1.Size = new Size(52, 16);
+            label1.TabIndex = 26;
+            label1.Text = "Filters";
+            // 
+            // dtpDate
+            // 
+            dtpDate.AccessibleName = "Date";
+            dtpDate.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            dtpDate.CustomFormat = "MMMM dd, yyy";
+            dtpDate.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dtpDate.Format = DateTimePickerFormat.Custom;
+            dtpDate.Location = new Point(992, 24);
+            dtpDate.Margin = new Padding(0);
+            dtpDate.Name = "dtpDate";
+            dtpDate.Size = new Size(197, 26);
+            dtpDate.TabIndex = 25;
+            dtpDate.ValueChanged += dtpDate_ValueChanged;
+            // 
+            // txtSearch
+            // 
+            txtSearch.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            txtSearch.Location = new Point(24, 24);
+            txtSearch.Margin = new Padding(0, 0, 4, 16);
+            txtSearch.Name = "txtSearch";
+            txtSearch.Size = new Size(215, 26);
+            txtSearch.TabIndex = 1;
+            txtSearch.KeyUp += txtSearch_KeyUp;
+            // 
+            // btnSearch
+            // 
+            btnSearch.AutoSize = true;
+            btnSearch.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnSearch.Location = new Point(247, 23);
+            btnSearch.Margin = new Padding(4, 0, 8, 0);
+            btnSearch.Name = "btnSearch";
+            btnSearch.Size = new Size(75, 28);
+            btnSearch.TabIndex = 12;
+            btnSearch.Text = "Search";
+            btnSearch.UseVisualStyleBackColor = true;
+            btnSearch.Click += btnSearch_Click;
             // 
             // lblRowCounter
             // 
+            lblRowCounter.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lblRowCounter.AutoSize = true;
             lblRowCounter.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            lblRowCounter.ForeColor = SystemColors.ControlDarkDark;
-            lblRowCounter.Location = new Point(4, 8);
-            lblRowCounter.Margin = new Padding(0);
+            lblRowCounter.ForeColor = SystemColors.GrayText;
+            lblRowCounter.Location = new Point(251, 603);
+            lblRowCounter.Margin = new Padding(0, 8, 0, 0);
             lblRowCounter.Name = "lblRowCounter";
-            lblRowCounter.Size = new Size(77, 16);
+            lblRowCounter.Size = new Size(45, 16);
             lblRowCounter.TabIndex = 1;
-            lblRowCounter.Text = "Logs count";
+            lblRowCounter.Text = "Count";
             // 
-            // flowLayoutPanel1
+            // pnlLine1
             // 
-            flowLayoutPanel1.Controls.Add(btnSettings);
-            flowLayoutPanel1.Dock = DockStyle.Right;
-            flowLayoutPanel1.FlowDirection = FlowDirection.RightToLeft;
-            flowLayoutPanel1.Location = new Point(690, 0);
-            flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(42, 33);
-            flowLayoutPanel1.TabIndex = 0;
-            // 
-            // btnSettings
-            // 
-            btnSettings.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnSettings.Cursor = Cursors.Hand;
-            btnSettings.FlatAppearance.BorderSize = 0;
-            btnSettings.FlatStyle = FlatStyle.Flat;
-            btnSettings.Image = (Image)resources.GetObject("btnSettings.Image");
-            btnSettings.Location = new Point(9, 0);
-            btnSettings.Margin = new Padding(0);
-            btnSettings.Name = "btnSettings";
-            btnSettings.Size = new Size(33, 33);
-            btnSettings.TabIndex = 9;
-            btnSettings.Tag = "Home";
-            btnSettings.UseVisualStyleBackColor = true;
-            btnSettings.Visible = false;
+            pnlLine1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            pnlLine1.BorderStyle = BorderStyle.FixedSingle;
+            pnlLine1.Location = new Point(24, 66);
+            pnlLine1.Margin = new Padding(0, 0, 0, 16);
+            pnlLine1.Name = "pnlLine1";
+            pnlLine1.Size = new Size(1165, 1);
+            pnlLine1.TabIndex = 8;
             // 
             // dgvLogs
             // 
@@ -334,6 +237,7 @@
             dgvLogs.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvLogs.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvLogs.BackgroundColor = SystemColors.Window;
+            dgvLogs.BorderStyle = BorderStyle.Fixed3D;
             dgvLogs.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvLogs.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
             dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
@@ -346,36 +250,28 @@
             dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
             dgvLogs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dgvLogs.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = SystemColors.Window;
-            dataGridViewCellStyle3.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle3.ForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
-            dgvLogs.DefaultCellStyle = dataGridViewCellStyle3;
             dgvLogs.EditMode = DataGridViewEditMode.EditOnF2;
             dgvLogs.GridColor = SystemColors.Control;
-            dgvLogs.Location = new Point(247, 67);
+            dgvLogs.Location = new Point(255, 83);
             dgvLogs.Margin = new Padding(0);
             dgvLogs.MultiSelect = false;
             dgvLogs.Name = "dgvLogs";
             dgvLogs.ReadOnly = true;
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = SystemColors.Control;
-            dataGridViewCellStyle4.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle4.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle4.Padding = new Padding(4);
-            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.True;
-            dgvLogs.RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Control;
+            dataGridViewCellStyle3.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle3.Padding = new Padding(4);
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            dgvLogs.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             dgvLogs.RowHeadersVisible = false;
             dgvLogs.RowTemplate.DefaultCellStyle.Padding = new Padding(4, 8, 4, 8);
             dgvLogs.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
             dgvLogs.RowTemplate.Height = 41;
             dgvLogs.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvLogs.Size = new Size(950, 486);
+            dgvLogs.Size = new Size(934, 512);
             dgvLogs.TabIndex = 4;
             dgvLogs.VirtualMode = true;
             // 
@@ -383,29 +279,18 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            Controls.Add(panel1);
-            Controls.Add(pnlFooter);
+            Controls.Add(pnlBody);
             Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             Margin = new Padding(4);
             Name = "LogsControl";
             Size = new Size(1213, 629);
             VisibleChanged += LogsControl_VisibleChanged;
-            pnlFooter.ResumeLayout(false);
-            panel1.ResumeLayout(false);
-            panel3.ResumeLayout(false);
-            panel3.PerformLayout();
-            pnlContainerSearch.ResumeLayout(false);
-            pnlContainerSearch.PerformLayout();
-            pnlContainerFilter.ResumeLayout(false);
+            pnlBody.ResumeLayout(false);
+            pnlBody.PerformLayout();
             pnlFilterContent.ResumeLayout(false);
             pnlFilterContent.PerformLayout();
             flowFilters.ResumeLayout(false);
             flowFilters.PerformLayout();
-            flowFilterControls.ResumeLayout(false);
-            flowFilterControls.PerformLayout();
-            panel2.ResumeLayout(false);
-            panel2.PerformLayout();
-            flowLayoutPanel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvLogs).EndInit();
             ResumeLayout(false);
         }
@@ -414,27 +299,20 @@
 
         private Panel pnlLine1;
         private Panel pllFooter;
-        private FlowLayoutPanel flowControls;
-        private Panel panel1;
+        private Panel pnlBody;
         private DataGridView dgvLogs;
         private Panel panel2;
         private Label lblRowCounter;
-        private FlowLayoutPanel flowLayoutPanel1;
-        private Button btnSettings;
-        private Panel pnlContainerFilter;
         private Panel pnlFilterContent;
         private FlowLayoutPanel flowFilters;
         private Label lblFilterType;
         private Shared.DynamicCheckedListBoxControl dchkListFilterType;
-        private FlowLayoutPanel flowFilterControls;
         private Button btnFilter;
         private Button btnReset;
-        private Panel pnlContainerSearch;
-        private Label label1;
         private TextBox txtSearch;
-        private Panel pnlFooter;
-        private Panel panel3;
         private DateTimePicker dtpDate;
-        private Label label2;
+        private Button btnSearch;
+        private Label label1;
+        private Panel pnlLine2;
     }
 }

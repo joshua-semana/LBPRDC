@@ -33,9 +33,7 @@
             flowFooterActions = new FlowLayoutPanel();
             btnClose = new Button();
             btnUndoChanges = new Button();
-            pnlHeader = new Panel();
             lblHiddenUserID = new Label();
-            label2 = new Label();
             pnlBody = new Panel();
             chkChangePassword = new CheckBox();
             grpPasswordData = new GroupBox();
@@ -47,6 +45,10 @@
             txtOldPassword = new TextBox();
             label17 = new Label();
             grpPersonalData = new GroupBox();
+            txtPositionTitle = new TextBox();
+            label5 = new Label();
+            label1 = new Label();
+            txtMiddleName = new TextBox();
             btnUpdateBasicInformation = new Button();
             txtEmailAddress = new TextBox();
             label3 = new Label();
@@ -54,9 +56,10 @@
             txtLastName = new TextBox();
             txtFirstName = new TextBox();
             label4 = new Label();
+            label2 = new Label();
+            pnlLine2 = new Panel();
             pnlFooter.SuspendLayout();
             flowFooterActions.SuspendLayout();
-            pnlHeader.SuspendLayout();
             pnlBody.SuspendLayout();
             grpPasswordData.SuspendLayout();
             grpPersonalData.SuspendLayout();
@@ -74,9 +77,10 @@
             // pnlFooter
             // 
             pnlFooter.BackColor = SystemColors.Control;
+            pnlFooter.Controls.Add(lblHiddenUserID);
             pnlFooter.Controls.Add(flowFooterActions);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 565);
+            pnlFooter.Location = new Point(0, 546);
             pnlFooter.Name = "pnlFooter";
             pnlFooter.Size = new Size(452, 60);
             pnlFooter.TabIndex = 1;
@@ -101,7 +105,7 @@
             btnClose.Margin = new Padding(8, 0, 0, 0);
             btnClose.Name = "btnClose";
             btnClose.Size = new Size(75, 28);
-            btnClose.TabIndex = 8;
+            btnClose.TabIndex = 12;
             btnClose.Text = "Close";
             btnClose.UseVisualStyleBackColor = true;
             btnClose.Click += btnClose_Click;
@@ -114,28 +118,17 @@
             btnUndoChanges.Margin = new Padding(8, 0, 0, 0);
             btnUndoChanges.Name = "btnUndoChanges";
             btnUndoChanges.Size = new Size(75, 28);
-            btnUndoChanges.TabIndex = 9;
+            btnUndoChanges.TabIndex = 11;
             btnUndoChanges.Text = "Undo";
             btnUndoChanges.UseVisualStyleBackColor = true;
             btnUndoChanges.Visible = false;
-            // 
-            // pnlHeader
-            // 
-            pnlHeader.BackColor = SystemColors.Control;
-            pnlHeader.Controls.Add(lblHiddenUserID);
-            pnlHeader.Controls.Add(label2);
-            pnlHeader.Dock = DockStyle.Top;
-            pnlHeader.Location = new Point(0, 1);
-            pnlHeader.Name = "pnlHeader";
-            pnlHeader.Size = new Size(452, 40);
-            pnlHeader.TabIndex = 2;
             // 
             // lblHiddenUserID
             // 
             lblHiddenUserID.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             lblHiddenUserID.AutoSize = true;
             lblHiddenUserID.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            lblHiddenUserID.Location = new Point(12, 13);
+            lblHiddenUserID.Location = new Point(16, 22);
             lblHiddenUserID.Margin = new Padding(3, 0, 0, 4);
             lblHiddenUserID.Name = "lblHiddenUserID";
             lblHiddenUserID.Size = new Size(49, 16);
@@ -143,37 +136,28 @@
             lblHiddenUserID.Text = "UserID";
             lblHiddenUserID.Visible = false;
             // 
-            // label2
-            // 
-            label2.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label2.Location = new Point(54, 11);
-            label2.Margin = new Padding(0, 0, 0, 16);
-            label2.Name = "label2";
-            label2.Size = new Size(345, 19);
-            label2.TabIndex = 26;
-            label2.Text = "MY PROFILE";
-            label2.TextAlign = ContentAlignment.MiddleCenter;
-            // 
             // pnlBody
             // 
+            pnlBody.Controls.Add(pnlLine2);
+            pnlBody.Controls.Add(label2);
             pnlBody.Controls.Add(chkChangePassword);
             pnlBody.Controls.Add(grpPasswordData);
             pnlBody.Controls.Add(grpPersonalData);
             pnlBody.Dock = DockStyle.Fill;
-            pnlBody.Location = new Point(0, 41);
+            pnlBody.Location = new Point(0, 1);
             pnlBody.Name = "pnlBody";
             pnlBody.Padding = new Padding(16);
-            pnlBody.Size = new Size(452, 524);
+            pnlBody.Size = new Size(452, 545);
             pnlBody.TabIndex = 3;
             // 
             // chkChangePassword
             // 
             chkChangePassword.AutoSize = true;
             chkChangePassword.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            chkChangePassword.Location = new Point(26, 228);
+            chkChangePassword.Location = new Point(26, 258);
             chkChangePassword.Name = "chkChangePassword";
             chkChangePassword.Size = new Size(141, 20);
-            chkChangePassword.TabIndex = 22;
+            chkChangePassword.TabIndex = 6;
             chkChangePassword.Text = "Change Password";
             chkChangePassword.UseVisualStyleBackColor = true;
             chkChangePassword.CheckedChanged += chkChangePassword_CheckedChanged;
@@ -188,7 +172,7 @@
             grpPasswordData.Controls.Add(txtOldPassword);
             grpPasswordData.Controls.Add(label17);
             grpPasswordData.Enabled = false;
-            grpPasswordData.Location = new Point(16, 228);
+            grpPasswordData.Location = new Point(16, 258);
             grpPasswordData.Margin = new Padding(0, 0, 0, 16);
             grpPasswordData.Name = "grpPasswordData";
             grpPasswordData.Padding = new Padding(3, 8, 3, 3);
@@ -204,7 +188,7 @@
             btnUpdatePassword.Margin = new Padding(8, 0, 0, 0);
             btnUpdatePassword.Name = "btnUpdatePassword";
             btnUpdatePassword.Size = new Size(75, 28);
-            btnUpdatePassword.TabIndex = 22;
+            btnUpdatePassword.TabIndex = 10;
             btnUpdatePassword.Text = "Update";
             btnUpdatePassword.UseVisualStyleBackColor = true;
             btnUpdatePassword.Click += btnUpdatePassword_Click;
@@ -217,7 +201,7 @@
             txtConfirmPassword.MaxLength = 50;
             txtConfirmPassword.Name = "txtConfirmPassword";
             txtConfirmPassword.Size = new Size(400, 26);
-            txtConfirmPassword.TabIndex = 5;
+            txtConfirmPassword.TabIndex = 9;
             txtConfirmPassword.UseSystemPasswordChar = true;
             // 
             // label13
@@ -240,7 +224,7 @@
             txtNewPassword.MaxLength = 50;
             txtNewPassword.Name = "txtNewPassword";
             txtNewPassword.Size = new Size(400, 26);
-            txtNewPassword.TabIndex = 4;
+            txtNewPassword.TabIndex = 8;
             txtNewPassword.UseSystemPasswordChar = true;
             // 
             // label15
@@ -263,7 +247,7 @@
             txtOldPassword.MaxLength = 50;
             txtOldPassword.Name = "txtOldPassword";
             txtOldPassword.Size = new Size(400, 26);
-            txtOldPassword.TabIndex = 3;
+            txtOldPassword.TabIndex = 7;
             txtOldPassword.UseSystemPasswordChar = true;
             // 
             // label17
@@ -280,6 +264,10 @@
             // 
             // grpPersonalData
             // 
+            grpPersonalData.Controls.Add(txtPositionTitle);
+            grpPersonalData.Controls.Add(label5);
+            grpPersonalData.Controls.Add(label1);
+            grpPersonalData.Controls.Add(txtMiddleName);
             grpPersonalData.Controls.Add(btnUpdateBasicInformation);
             grpPersonalData.Controls.Add(txtEmailAddress);
             grpPersonalData.Controls.Add(label3);
@@ -287,13 +275,54 @@
             grpPersonalData.Controls.Add(txtLastName);
             grpPersonalData.Controls.Add(txtFirstName);
             grpPersonalData.Controls.Add(label4);
-            grpPersonalData.Location = new Point(16, 16);
+            grpPersonalData.Location = new Point(16, 49);
             grpPersonalData.Margin = new Padding(0, 0, 0, 6);
             grpPersonalData.Name = "grpPersonalData";
             grpPersonalData.Padding = new Padding(3, 8, 3, 3);
             grpPersonalData.Size = new Size(420, 203);
             grpPersonalData.TabIndex = 25;
             grpPersonalData.TabStop = false;
+            // 
+            // txtPositionTitle
+            // 
+            txtPositionTitle.AccessibleName = "Email Address";
+            txtPositionTitle.Location = new Point(213, 115);
+            txtPositionTitle.Margin = new Padding(0, 0, 0, 16);
+            txtPositionTitle.MaxLength = 100;
+            txtPositionTitle.Name = "txtPositionTitle";
+            txtPositionTitle.Size = new Size(197, 26);
+            txtPositionTitle.TabIndex = 4;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label5.Location = new Point(209, 92);
+            label5.Margin = new Padding(3, 0, 0, 4);
+            label5.Name = "label5";
+            label5.Size = new Size(87, 16);
+            label5.TabIndex = 24;
+            label5.Text = "Position Title";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label1.Location = new Point(142, 27);
+            label1.Margin = new Padding(3, 0, 0, 4);
+            label1.Name = "label1";
+            label1.Size = new Size(88, 16);
+            label1.TabIndex = 22;
+            label1.Text = "Middle Name";
+            // 
+            // txtMiddleName
+            // 
+            txtMiddleName.AccessibleName = "Middle Name";
+            txtMiddleName.Location = new Point(146, 50);
+            txtMiddleName.MaxLength = 50;
+            txtMiddleName.Name = "txtMiddleName";
+            txtMiddleName.Size = new Size(129, 26);
+            txtMiddleName.TabIndex = 1;
             // 
             // btnUpdateBasicInformation
             // 
@@ -304,7 +333,7 @@
             btnUpdateBasicInformation.Margin = new Padding(8, 0, 0, 0);
             btnUpdateBasicInformation.Name = "btnUpdateBasicInformation";
             btnUpdateBasicInformation.Size = new Size(75, 28);
-            btnUpdateBasicInformation.TabIndex = 20;
+            btnUpdateBasicInformation.TabIndex = 5;
             btnUpdateBasicInformation.Text = "Update";
             btnUpdateBasicInformation.UseVisualStyleBackColor = true;
             btnUpdateBasicInformation.Click += btnUpdateBasicInformation_Click;
@@ -316,8 +345,8 @@
             txtEmailAddress.Margin = new Padding(0, 0, 0, 16);
             txtEmailAddress.MaxLength = 100;
             txtEmailAddress.Name = "txtEmailAddress";
-            txtEmailAddress.Size = new Size(400, 26);
-            txtEmailAddress.TabIndex = 2;
+            txtEmailAddress.Size = new Size(197, 26);
+            txtEmailAddress.TabIndex = 3;
             // 
             // label3
             // 
@@ -334,7 +363,7 @@
             // 
             label22.AutoSize = true;
             label22.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label22.Location = new Point(209, 27);
+            label22.Location = new Point(277, 27);
             label22.Margin = new Padding(3, 0, 0, 4);
             label22.Name = "label22";
             label22.Size = new Size(74, 16);
@@ -344,11 +373,11 @@
             // txtLastName
             // 
             txtLastName.AccessibleName = "Last Name";
-            txtLastName.Location = new Point(213, 50);
+            txtLastName.Location = new Point(281, 50);
             txtLastName.MaxLength = 50;
             txtLastName.Name = "txtLastName";
-            txtLastName.Size = new Size(197, 26);
-            txtLastName.TabIndex = 1;
+            txtLastName.Size = new Size(129, 26);
+            txtLastName.TabIndex = 2;
             // 
             // txtFirstName
             // 
@@ -357,7 +386,7 @@
             txtFirstName.Margin = new Padding(7, 3, 3, 16);
             txtFirstName.MaxLength = 50;
             txtFirstName.Name = "txtFirstName";
-            txtFirstName.Size = new Size(197, 26);
+            txtFirstName.Size = new Size(129, 26);
             txtFirstName.TabIndex = 0;
             // 
             // label4
@@ -372,13 +401,33 @@
             label4.TabIndex = 0;
             label4.Text = "First Name";
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            label2.Location = new Point(16, 16);
+            label2.Margin = new Padding(0, 0, 0, 8);
+            label2.Name = "label2";
+            label2.Size = new Size(77, 16);
+            label2.TabIndex = 29;
+            label2.Text = "My Profile";
+            // 
+            // pnlLine2
+            // 
+            pnlLine2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            pnlLine2.BorderStyle = BorderStyle.FixedSingle;
+            pnlLine2.Location = new Point(16, 40);
+            pnlLine2.Margin = new Padding(0, 0, 0, 8);
+            pnlLine2.Name = "pnlLine2";
+            pnlLine2.Size = new Size(420, 1);
+            pnlLine2.TabIndex = 30;
+            // 
             // ViewAndEditProfileForm
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(452, 625);
+            ClientSize = new Size(452, 606);
             Controls.Add(pnlBody);
-            Controls.Add(pnlHeader);
             Controls.Add(pnlFooter);
             Controls.Add(pnlLine1);
             Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
@@ -389,10 +438,9 @@
             StartPosition = FormStartPosition.CenterParent;
             Load += ViewAndEditProfileForm_Load;
             pnlFooter.ResumeLayout(false);
+            pnlFooter.PerformLayout();
             flowFooterActions.ResumeLayout(false);
             flowFooterActions.PerformLayout();
-            pnlHeader.ResumeLayout(false);
-            pnlHeader.PerformLayout();
             pnlBody.ResumeLayout(false);
             pnlBody.PerformLayout();
             grpPasswordData.ResumeLayout(false);
@@ -406,7 +454,6 @@
 
         private Panel pnlLine1;
         private Panel pnlFooter;
-        private Panel pnlHeader;
         private Panel pnlBody;
         private GroupBox grpPersonalData;
         private TextBox txtEmailAddress;
@@ -415,7 +462,6 @@
         private TextBox txtLastName;
         private TextBox txtFirstName;
         private Label label4;
-        private Label label2;
         private GroupBox grpPasswordData;
         private TextBox txtConfirmPassword;
         private Label label13;
@@ -431,5 +477,11 @@
         private Button btnUpdateBasicInformation;
         private Button btnUpdatePassword;
         private Button btnClose;
+        private TextBox txtPositionTitle;
+        private Label label5;
+        private Label label1;
+        private TextBox txtMiddleName;
+        private Panel pnlLine2;
+        private Label label2;
     }
 }

@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.SqlClient;
-using BCrypt.Net;
-using static LBPRDC.Source.Services.EmployeeService;
-using System.DirectoryServices;
-using OfficeOpenXml.ConditionalFormatting;
+﻿using System.Data.SqlClient;
 
 namespace LBPRDC.Source.Services
 {
@@ -26,6 +17,9 @@ namespace LBPRDC.Source.Services
             public string? Status { get; set; }
             public DateTime? RegistrationDate { get; set; }
             public DateTime? LastLoginDate { get; set; }
+            public string? MiddleName { get; set; }
+            public string? PositionTitle { get; set; }
+
         }
 
         public static User? CurrentUser { get; set; }
@@ -66,7 +60,9 @@ namespace LBPRDC.Source.Services
                                 Role = Convert.ToString(reader["Role"]),
                                 Status = Convert.ToString(reader["Status"]),
                                 RegistrationDate = Convert.ToDateTime(reader["RegistrationDate"]),
-                                LastLoginDate = Convert.ToDateTime(reader["LastLoginDate"])
+                                LastLoginDate = Convert.ToDateTime(reader["LastLoginDate"]),
+                                MiddleName = Convert.ToString(reader["MiddleName"]),
+                                PositionTitle = Convert.ToString(reader["PositionTitle"])
                             };
 
                             users.Add(user);
@@ -85,8 +81,8 @@ namespace LBPRDC.Source.Services
             {
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newUser.Password);
 
-                string query = "INSERT INTO Users (Username, PasswordHash, Email, FirstName, LastName, Role, Status, RegistrationDate, LastLoginDate) " +
-                               "VALUES (@Username, @PasswordHash, @Email, @FirstName, @LastName, @Role, @Status, @RegistrationDate, @LastLoginDate)";
+                string query = "INSERT INTO Users (Username, PasswordHash, Email, FirstName, LastName, Role, Status, RegistrationDate, LastLoginDate, MiddleName, PositionTitle) " +
+                               "VALUES (@Username, @PasswordHash, @Email, @FirstName, @LastName, @Role, @Status, @RegistrationDate, @LastLoginDate, @MiddleName, @PositionTitle)";
 
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(query, connection))
@@ -100,6 +96,8 @@ namespace LBPRDC.Source.Services
                     command.Parameters.AddWithValue("@Status", "Active");
                     command.Parameters.AddWithValue("@RegistrationDate", DateTime.Now);
                     command.Parameters.AddWithValue("@LastLoginDate", DateTime.Now);
+                    command.Parameters.AddWithValue("@MiddleName", newUser.MiddleName);
+                    command.Parameters.AddWithValue("@PositionTitle", newUser.PositionTitle);
 
                     connection.Open();
                     await command.ExecuteNonQueryAsync();
@@ -217,7 +215,9 @@ namespace LBPRDC.Source.Services
                 string updateQuery = "UPDATE Users SET " +
                     "FirstName = @FirstName, " +
                     "LastName = @LastName, " +
-                    "Email = @Email " +
+                    "Email = @Email," +
+                    "MiddleName = @MiddleName," +
+                    "PositionTitle = @PositionTitle " +
                     "WHERE UserID = @UserID";
 
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
@@ -226,6 +226,8 @@ namespace LBPRDC.Source.Services
                     command.Parameters.AddWithValue("@FirstName", user.FirstName);
                     command.Parameters.AddWithValue("@LastName", user.LastName);
                     command.Parameters.AddWithValue("@Email", user.Email);
+                    command.Parameters.AddWithValue("@MiddleName", user.MiddleName);
+                    command.Parameters.AddWithValue("@PositionTitle", user.PositionTitle);
                     command.Parameters.AddWithValue("@UserID", user.UserID);
 
                     connection.Open();

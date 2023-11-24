@@ -341,5 +341,10 @@ namespace LBPRDC.Source.Views
         {
             ViewEmployeeHistory("Department and Location");
         }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            ApplyFilterAndSearchThenPopulate();
+        }
     }
 }

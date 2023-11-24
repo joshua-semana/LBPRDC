@@ -19,8 +19,10 @@ namespace LBPRDC.Source.Views.Profile
             requiredTextboxes = new()
             {
                 txtFirstName,
+                txtMiddleName,
                 txtLastName,
-                txtEmailAddress
+                txtEmailAddress,
+                txtPositionTitle
             };
 
             requiredPasswords = new()
@@ -43,10 +45,14 @@ namespace LBPRDC.Source.Views.Profile
             txtFirstName.Text = user.FirstName;
             txtLastName.Text = user.LastName;
             txtEmailAddress.Text = user.Email;
+            txtMiddleName.Text = user.MiddleName;
+            txtPositionTitle.Text = user.PositionTitle;
 
             originalTextBoxValues.Add(txtFirstName, user.FirstName);
             originalTextBoxValues.Add(txtLastName, user.LastName);
             originalTextBoxValues.Add(txtEmailAddress, user.Email);
+            originalTextBoxValues.Add(txtMiddleName, user.MiddleName);
+            originalTextBoxValues.Add(txtPositionTitle, user.PositionTitle);
 
             foreach (var kv in originalTextBoxValues)
             {
@@ -104,7 +110,9 @@ namespace LBPRDC.Source.Views.Profile
                 UserID = userId,
                 FirstName = txtFirstName.Text,
                 LastName = txtLastName.Text,
-                Email = txtEmailAddress.Text
+                Email = txtEmailAddress.Text,
+                MiddleName = txtMiddleName.Text,
+                PositionTitle = txtPositionTitle.Text,
             };
 
             var isUpdated = await UserService.UpdateUserBasicInformation(userUpdate);

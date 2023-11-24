@@ -15,11 +15,13 @@ namespace LBPRDC.Source.Views.Accounts
             requiredFields = new List<Control>
             {
                 txtFirstName,
+                txtMiddleName,
                 txtLastName,
                 txtEmailAddress,
+                txtPositionTitle,
                 txtUsername,
                 txtPassword,
-                txtConfirmPassword
+                txtConfirmPassword,
             };
         }
 
@@ -52,7 +54,9 @@ namespace LBPRDC.Source.Views.Accounts
                 Password = txtConfirmPassword.Text,
                 Email = txtEmailAddress.Text,
                 FirstName = txtFirstName.Text,
-                LastName = txtLastName.Text
+                LastName = txtLastName.Text,
+                MiddleName = txtMiddleName.Text,
+                PositionTitle = txtPositionTitle.Text
             };
 
             bool isAdded = await UserService.Add(newUser);

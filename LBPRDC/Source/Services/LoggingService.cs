@@ -60,7 +60,6 @@ namespace LBPRDC.Source.Services
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-
                         Log item = new()
                         {
                             LogID = reader["LogID"] as int? ?? 0,

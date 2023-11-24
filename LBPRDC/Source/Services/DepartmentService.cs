@@ -7,6 +7,7 @@ namespace LBPRDC.Source.Services
         public class Department
         {
             public int ID { get; set; }
+            public string? Code { get; set; }
             public string? Name { get; set; }
             public string? Status { get; set; }
             public string? Description { get; set; }
@@ -29,11 +30,11 @@ namespace LBPRDC.Source.Services
                         Department item = new()
                         {
                             ID = Convert.ToInt32(reader["ID"]),
-                            Name = reader["Name"].ToString(),
-                            Description = reader["Description"].ToString(),
-                            Status = reader["Status"].ToString()
+                            Code = Convert.ToString(reader["Code"]),
+                            Name = Convert.ToString(reader["Name"]),
+                            Description = Convert.ToString(reader["Description"]),
+                            Status = Convert.ToString(reader["Status"])
                         };
-
                         items.Add(item);
                     }
                 }
@@ -84,12 +85,13 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string QueryUpdate = "INSERT INTO Departments (Name, Description, Status) " +
-                    "VALUES (@Name, @Description, @Status)";
+                string QueryUpdate = "INSERT INTO Departments (Code, Name, Description, Status) " +
+                    "VALUES (@Code, @Name, @Description, @Status)";
 
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(QueryUpdate, connection))
                 {
+                    command.Parameters.AddWithValue("@Cond", data.Code);
                     command.Parameters.AddWithValue("@Name", data.Name);
                     command.Parameters.AddWithValue("@Description", data.Description);
                     command.Parameters.AddWithValue("@Status", data.Status);
@@ -119,6 +121,7 @@ namespace LBPRDC.Source.Services
             try
             {
                 string QueryUpdate = "UPDATE Departments SET " +
+                    "Code = @Code, " +
                     "Name = @Name, " +
                     "Description = @Description, " +
                     "Status = @Status " +
@@ -127,6 +130,7 @@ namespace LBPRDC.Source.Services
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(QueryUpdate, connection))
                 {
+                    command.Parameters.AddWithValue("@Cond", data.Code);
                     command.Parameters.AddWithValue("@Name", data.Name);
                     command.Parameters.AddWithValue("@Description", data.Description);
                     command.Parameters.AddWithValue("@Status", data.Status);
