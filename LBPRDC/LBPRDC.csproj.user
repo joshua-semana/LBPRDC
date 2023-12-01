@@ -19,7 +19,13 @@
     <Compile Update="Source\Views\Billing\BillingControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Update="Source\Views\Billing\EmployeeTimekeepReviewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Source\Views\Billing\NewBillingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Source\Views\Billing\UnrecognizedEmployeeForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Source\Views\Billing\UploadFileForm.cs">

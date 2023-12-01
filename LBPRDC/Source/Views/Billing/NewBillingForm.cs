@@ -6,9 +6,11 @@ namespace LBPRDC.Source.Views.Billing
 {
     public partial class NewBillingForm : Form
     {
-        public UserControl? ParentControl { get; set; }
+        public BillingControl? ParentControl { get; set; }
 
         private List<Control> RequiredFields;
+
+        DateTime startDate, endDate;
 
         public NewBillingForm()
         {
@@ -21,7 +23,6 @@ namespace LBPRDC.Source.Views.Billing
                 txtBillingName
             };
         }
-
 
         private void InitializeMonthsComboBox()
         {
@@ -46,8 +47,6 @@ namespace LBPRDC.Source.Views.Billing
         {
             int selectedMonth = cmbMonth.SelectedIndex + 1;
             int selectedYear = Convert.ToInt32(cmbYear.SelectedItem);
-
-            DateTime startDate, endDate;
 
             if (radFirst.Checked)
             {
@@ -93,8 +92,8 @@ namespace LBPRDC.Source.Views.Billing
                 Month = cmbMonth.SelectedIndex + 1,
                 Year = Convert.ToInt32(cmbYear.SelectedItem),
                 Quarter = (radFirst.Checked) ? 1 : 2,
-                StartDate = Convert.ToDateTime(txtFromDatePreview.Text),
-                EndDate = Convert.ToDateTime(txtToDatePreview.Text),
+                StartDate = startDate,
+                EndDate = endDate,
                 Description = txtDescription.Text
             };
 
@@ -102,7 +101,7 @@ namespace LBPRDC.Source.Views.Billing
             if (isAdded == true)
             {
                 MessageBox.Show("You have successfully added a new billing.", "New Billing Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //ParentControl?.ResetTableSearch();
+                ParentControl?.ResetTableSearch();
                 this.Close();
             }
         }
@@ -114,6 +113,16 @@ namespace LBPRDC.Source.Views.Billing
             {
                 this.Close();
             }
+        }
+
+        private void UpdateDateRange_ControlChanged(object sender, EventArgs e)
+        {
+            btnPreviewDateRange.PerformClick();
+        }
+
+        private void NewBillingForm_Load(object sender, EventArgs e)
+        {
+            btnPreviewDateRange.PerformClick();
         }
     }
 }

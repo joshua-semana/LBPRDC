@@ -1,23 +1,24 @@
 ﻿using LBPRDC.Source.Utilities;
-using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LBPRDC.Source.Services
 {
-    
+    public class EmployeeBase
+    {
+        public string? EmployeeID { get; set; }
+        public string? LastName { get; set; }
+        public string? FirstName { get; set; }
+        public string? MiddleName { get; set; }
+        public string? FullName { get; set; }
+        public string? Department { get; set; }
+        public string? Position { get; set; }
+        public string? Location { get; set; }
+    }
+
     internal class EmployeeService
     {
-        public class Employee
+        public class Employee : EmployeeBase
         {
-            public string? EmployeeID { get; set; }
-            public string? LastName { get; set; }
-            public string? FirstName { get; set; }
-            public string? MiddleName { get; set; }
             public string? Gender { get; set; }
             public DateTime? Birthday { get; set; }
             public string? Education { get; set; }
@@ -33,19 +34,15 @@ namespace LBPRDC.Source.Services
             public int SuffixID { get; set; }
             public string? Remarks { get; set; }
 
-            public string? FullName { get; set; }
             public string? EmailAddress { get; set; }
             public string? ContactNumber { get; set; }
             public string? CivilStatus { get; set; }
             public string? PositionCode { get; set; }
             public string? PositionName { get; set; }
-            public string? Position { get; set; }
             public string? EmploymentStatus { get; set; }
             public string? Suffix { get; set; }
             public decimal SalaryRate { get; set; }
             public decimal BillingRate { get; set; }
-            public string? Department { get; set; }
-            public string? Location { get; set; }
         }
 
         public class EmployeeHistory : Employee
@@ -91,6 +88,43 @@ namespace LBPRDC.Source.Services
             public int EmploymentStatusID { get; set; }
         }
 
+        public static List<EmployeeBase> GetAllEmployeesBase()
+        {
+            List<EmployeeBase> employees = new();
+
+            try
+            {
+                string querySelect = "SELECT EmployeeID, LastName, FirstName, MiddleName, DepartmentID, PositionID, LocationID FROM Employee";
+                using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
+                using SqlCommand command = new(querySelect, connection);
+                connection.Open();
+                using SqlDataReader reader = command.ExecuteReader();
+
+                var Department = DepartmentService.GetAllItems();
+                var Location = LocationService.GetAllItems();
+                var Position = PositionService.GetAllItems();
+
+                while (reader.Read())
+                {
+                    EmployeeBase employee = new()
+                    {
+                        EmployeeID = Convert.ToString(reader["EmployeeID"]),
+                        LastName = Convert.ToString(reader["LastName"]),
+                        FirstName = Convert.ToString(reader["FirstName"]),
+                        MiddleName = Convert.ToString(reader["MiddleName"]),
+                        Department = Department.First(f => f.ID == Convert.ToInt32(reader["DepartmentID"])).Name,
+                        Location = Location.First(f => f.ID == Convert.ToInt32(reader["LocationID"])).Name,
+                        Position = Position.First(f => f.ID == Convert.ToInt32(reader["PositionID"])).Name,
+                    };
+
+                    employees.Add(employee);
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return employees;
+        }
+
         private static UserPreference preference;
         public static List<Employee> GetAllEmployees()
         {
@@ -106,6 +140,13 @@ namespace LBPRDC.Source.Services
                     connection.Open();
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
+                        var CivilStatus = CivilStatusService.GetAllItems();
+                        var EmploymentStatus = EmploymentStatusService.GetAllItems();
+                        var Suffix = SuffixService.GetAllItems();
+                        var Department = DepartmentService.GetAllItems();
+                        var Location = LocationService.GetAllItems();
+                        var Position = PositionService.GetAllItems();
+
                         while (reader.Read())
                         {
                             Employee emp = new()
@@ -130,16 +171,16 @@ namespace LBPRDC.Source.Services
                                 Remarks = Convert.ToString(reader["Remarks"])
                             };
 
-                            var position = PositionService.GetAllItems().First(f => f.ID == emp.PositionID);
+                            var position = Position.First(f => f.ID == emp.PositionID);
                             emp.PositionName = position.Name;
                             emp.PositionCode = position.Code;
                             emp.BillingRate = Convert.ToDecimal(position.BillingRate);
                             emp.SalaryRate = Convert.ToDecimal(position.SalaryRate);
-                            emp.CivilStatus = CivilStatusService.GetAllItems().First(f => f.ID == emp.CivilStatusID).Name;
-                            emp.EmploymentStatus = EmploymentStatusService.GetAllItems().First(f => f.ID == emp.EmploymentStatusID).Name;
-                            emp.Suffix = SuffixService.GetAllItems().First(f => f.ID == emp.SuffixID).Name;
-                            emp.Department = DepartmentService.GetAllItems().First(f => f.ID == emp.DepartmentID).Name;
-                            emp.Location = LocationService.GetAllItems().First(f => f.ID == emp.LocationID).Name;
+                            emp.CivilStatus = CivilStatus.First(f => f.ID == emp.CivilStatusID).Name;
+                            emp.EmploymentStatus = EmploymentStatus.First(f => f.ID == emp.EmploymentStatusID).Name;
+                            emp.Suffix = Suffix.First(f => f.ID == emp.SuffixID).Name;
+                            emp.Department = Department.First(f => f.ID == emp.DepartmentID).Name;
+                            emp.Location = Location.First(f => f.ID == emp.LocationID).Name;
 
                             if (preference.ShowName)
                             {

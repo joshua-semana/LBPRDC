@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LBPRDC.Source.Utilities
+﻿namespace LBPRDC.Source.Utilities
 {
     internal class FileFormatConstants
     {
-        public static readonly List<string> addBatchFormat = new List<string>
+        public static readonly List<string> addBatchFormat = new()
         {
             "EMPLOYEE ID",
             "LAST NAME",
@@ -31,6 +25,36 @@ namespace LBPRDC.Source.Utilities
             "NEW POSITION TITLE",
             "EFFECTIVE DATE",
             "EMPLOYMENT STATUS"
+        };
+
+        public static readonly List<string> ExcelWorksheetFormat = new()
+        {
+            "Scanning Number",
+            "Name",
+            "Date",
+            "PAYROLL DOCS FILE NAME",
+            "PAYROLL DOCS FILE NAME",
+            "Regular Hours",
+            "Legal Holiday -UNWORKED",
+            "Reg OT",
+            "Rest Day OT",
+            "RDOT Excess",
+            "Special Holiday OT",
+            "Special Holiday Excess OT",
+            "Legal Holiday OT",
+            "Legal Holiday OT",
+            "Rest Day OT",
+            "Reg Holiday OT",
+            "TOTAL OT",
+            "Night Differential",
+            "Night Differential",
+            "Night Differential",
+            "Night Differential",
+            "Night Differential",
+            "Night Differential",
+            "TOTAL NDOT",
+            "UT",
+            "Absent"
         };
     }
 }

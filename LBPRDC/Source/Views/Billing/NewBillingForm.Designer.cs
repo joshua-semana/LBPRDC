@@ -33,6 +33,7 @@
             flowLayoutPanel2 = new FlowLayoutPanel();
             btnConfirm = new Button();
             btnCancel = new Button();
+            btnPreviewDateRange = new Button();
             pnlBody = new Panel();
             pnlLine2 = new Panel();
             label5 = new Label();
@@ -50,7 +51,6 @@
             radSecond = new RadioButton();
             radFirst = new RadioButton();
             groupBox1 = new GroupBox();
-            btnPreviewDateRange = new Button();
             txtToDatePreview = new TextBox();
             txtFromDatePreview = new TextBox();
             label7 = new Label();
@@ -83,7 +83,7 @@
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Controls.Add(flowLayoutPanel2);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 483);
+            pnlFooter.Location = new Point(0, 445);
             pnlFooter.Name = "pnlFooter";
             pnlFooter.Size = new Size(434, 46);
             pnlFooter.TabIndex = 2;
@@ -121,21 +121,35 @@
             btnCancel.Margin = new Padding(8, 0, 0, 0);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(75, 28);
-            btnCancel.TabIndex = 9;
+            btnCancel.TabIndex = 7;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
+            // 
+            // btnPreviewDateRange
+            // 
+            btnPreviewDateRange.AutoSize = true;
+            btnPreviewDateRange.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnPreviewDateRange.Location = new Point(16, 350);
+            btnPreviewDateRange.Margin = new Padding(0);
+            btnPreviewDateRange.Name = "btnPreviewDateRange";
+            btnPreviewDateRange.Size = new Size(71, 28);
+            btnPreviewDateRange.TabIndex = 23;
+            btnPreviewDateRange.Text = "Preview";
+            btnPreviewDateRange.UseVisualStyleBackColor = true;
+            btnPreviewDateRange.Click += btnPreviewDateRange_Click;
             // 
             // pnlBody
             // 
             pnlBody.Controls.Add(pnlLine2);
             pnlBody.Controls.Add(label5);
             pnlBody.Controls.Add(flowLayoutPanel1);
+            pnlBody.Controls.Add(btnPreviewDateRange);
             pnlBody.Dock = DockStyle.Fill;
             pnlBody.Location = new Point(0, 1);
             pnlBody.Name = "pnlBody";
             pnlBody.Padding = new Padding(16);
-            pnlBody.Size = new Size(434, 482);
+            pnlBody.Size = new Size(434, 444);
             pnlBody.TabIndex = 3;
             // 
             // pnlLine2
@@ -171,7 +185,7 @@
             flowLayoutPanel1.Location = new Point(16, 60);
             flowLayoutPanel1.Margin = new Padding(0);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(403, 398);
+            flowLayoutPanel1.Size = new Size(403, 360);
             flowLayoutPanel1.TabIndex = 0;
             // 
             // pnlGroup1
@@ -206,7 +220,7 @@
             txtBillingName.MaxLength = 100;
             txtBillingName.Name = "txtBillingName";
             txtBillingName.Size = new Size(402, 26);
-            txtBillingName.TabIndex = 13;
+            txtBillingName.TabIndex = 1;
             // 
             // label4
             // 
@@ -243,7 +257,8 @@
             cmbYear.Margin = new Padding(0);
             cmbYear.Name = "cmbYear";
             cmbYear.Size = new Size(99, 26);
-            cmbYear.TabIndex = 17;
+            cmbYear.TabIndex = 3;
+            cmbYear.SelectedIndexChanged += UpdateDateRange_ControlChanged;
             // 
             // label1
             // 
@@ -265,7 +280,8 @@
             cmbMonth.Margin = new Padding(0, 0, 8, 0);
             cmbMonth.Name = "cmbMonth";
             cmbMonth.Size = new Size(295, 26);
-            cmbMonth.TabIndex = 15;
+            cmbMonth.TabIndex = 2;
+            cmbMonth.SelectedIndexChanged += UpdateDateRange_ControlChanged;
             // 
             // label2
             // 
@@ -298,10 +314,11 @@
             radSecond.Margin = new Padding(0, 0, 16, 0);
             radSecond.Name = "radSecond";
             radSecond.Size = new Size(126, 20);
-            radSecond.TabIndex = 22;
+            radSecond.TabIndex = 5;
             radSecond.TabStop = true;
             radSecond.Text = "Second Quarter";
             radSecond.UseVisualStyleBackColor = true;
+            radSecond.CheckedChanged += UpdateDateRange_ControlChanged;
             // 
             // radFirst
             // 
@@ -311,14 +328,15 @@
             radFirst.Margin = new Padding(0, 0, 16, 0);
             radFirst.Name = "radFirst";
             radFirst.Size = new Size(106, 20);
-            radFirst.TabIndex = 21;
+            radFirst.TabIndex = 4;
             radFirst.TabStop = true;
             radFirst.Text = "First Quarter";
             radFirst.UseVisualStyleBackColor = true;
+            radFirst.CheckedChanged += UpdateDateRange_ControlChanged;
             // 
             // groupBox1
             // 
-            groupBox1.Controls.Add(btnPreviewDateRange);
+            groupBox1.AutoSize = true;
             groupBox1.Controls.Add(txtToDatePreview);
             groupBox1.Controls.Add(txtFromDatePreview);
             groupBox1.Controls.Add(label7);
@@ -326,36 +344,24 @@
             groupBox1.Location = new Point(0, 193);
             groupBox1.Margin = new Padding(0, 0, 0, 16);
             groupBox1.Name = "groupBox1";
-            groupBox1.Padding = new Padding(16, 8, 8, 8);
-            groupBox1.Size = new Size(402, 132);
+            groupBox1.Padding = new Padding(16, 8, 8, 0);
+            groupBox1.Size = new Size(402, 97);
             groupBox1.TabIndex = 20;
             groupBox1.TabStop = false;
             groupBox1.Text = "Selected Date Preview";
-            // 
-            // btnPreviewDateRange
-            // 
-            btnPreviewDateRange.AutoSize = true;
-            btnPreviewDateRange.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnPreviewDateRange.Location = new Point(323, 94);
-            btnPreviewDateRange.Margin = new Padding(0);
-            btnPreviewDateRange.Name = "btnPreviewDateRange";
-            btnPreviewDateRange.Size = new Size(71, 28);
-            btnPreviewDateRange.TabIndex = 23;
-            btnPreviewDateRange.Text = "Preview";
-            btnPreviewDateRange.UseVisualStyleBackColor = true;
-            btnPreviewDateRange.Click += btnPreviewDateRange_Click;
             // 
             // txtToDatePreview
             // 
             txtToDatePreview.AccessibleName = "Code";
             txtToDatePreview.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtToDatePreview.Location = new Point(68, 55);
-            txtToDatePreview.Margin = new Padding(0, 0, 0, 16);
+            txtToDatePreview.Margin = new Padding(0);
             txtToDatePreview.MaxLength = 100;
             txtToDatePreview.Name = "txtToDatePreview";
             txtToDatePreview.ReadOnly = true;
             txtToDatePreview.Size = new Size(326, 26);
             txtToDatePreview.TabIndex = 24;
+            txtToDatePreview.TabStop = false;
             // 
             // txtFromDatePreview
             // 
@@ -368,6 +374,7 @@
             txtFromDatePreview.ReadOnly = true;
             txtFromDatePreview.Size = new Size(326, 26);
             txtFromDatePreview.TabIndex = 23;
+            txtFromDatePreview.TabStop = false;
             // 
             // label7
             // 
@@ -396,7 +403,7 @@
             pnlGroup5.AutoSize = true;
             pnlGroup5.Controls.Add(txtDescription);
             pnlGroup5.Controls.Add(label9);
-            pnlGroup5.Location = new Point(0, 341);
+            pnlGroup5.Location = new Point(0, 306);
             pnlGroup5.Margin = new Padding(0, 0, 0, 8);
             pnlGroup5.Name = "pnlGroup5";
             pnlGroup5.Size = new Size(402, 46);
@@ -411,7 +418,7 @@
             txtDescription.MaxLength = 100;
             txtDescription.Name = "txtDescription";
             txtDescription.Size = new Size(402, 26);
-            txtDescription.TabIndex = 22;
+            txtDescription.TabIndex = 6;
             // 
             // label9
             // 
@@ -428,7 +435,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(434, 529);
+            ClientSize = new Size(434, 491);
             Controls.Add(pnlBody);
             Controls.Add(pnlFooter);
             Controls.Add(pnlLine1);
@@ -439,6 +446,7 @@
             Name = "NewBillingForm";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
+            Load += NewBillingForm_Load;
             pnlFooter.ResumeLayout(false);
             flowLayoutPanel2.ResumeLayout(false);
             flowLayoutPanel2.PerformLayout();

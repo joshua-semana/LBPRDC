@@ -51,7 +51,10 @@ namespace LBPRDC.Source.Views.Billing
             ControlUtils.AddColumn(dgvBillings, "QuarterName", "Quarter", "QuarterName");
             ControlUtils.AddColumn(dgvBillings, "FormattedStartDate", "Start Date", "FormattedStartDate");
             ControlUtils.AddColumn(dgvBillings, "FormattedEndDate", "End Date", "FormattedEndDate");
-            ControlUtils.AddColumn(dgvBillings, "FullName", "Created By", "FullName");
+            ControlUtils.AddColumn(dgvBillings, "IsFileUploaded", "Upload", "IsFileUploaded");
+            ControlUtils.AddColumn(dgvBillings, "VerificationStatus", "Verified", "VerificationStatus");
+            //dgvBillings.Columns[dgvBillings.Columns["VerificationStatus"].Index].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
         }
 
         private void btnNew_Click(object sender, EventArgs e)
@@ -73,13 +76,46 @@ namespace LBPRDC.Source.Views.Billing
 
         private void btnUpload_Click(object sender, EventArgs e)
         {
-            UploadFileForm uploadFileForm = new();
-            uploadFileForm.ShowDialog();
+            if (dgvBillings.Rows.Count > 0)
+            {
+                if (dgvBillings.SelectedRows[0].Cells[4].Value.ToString() == "Yes")
+                {
+                    var output = MessageBox.Show("Are you sure you want to overwrite new file to this billing? All your saved or current progress in this billing will be remove and overwritten.", "File Upload Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (output == DialogResult.No)
+                    {
+                        return;
+                    }
+                }
+
+                UploadFileForm uploadFileForm = new()
+                {
+                    billingName = Convert.ToString(dgvBillings.SelectedRows[0].Cells[0].Value),
+                    ParentControl = this,
+                };
+                uploadFileForm.ShowDialog();
+            }
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
             ApplySearchThenPopulate();
+        }
+
+        private void btnVerify_Click(object sender, EventArgs e)
+        {
+            if (dgvBillings.SelectedRows[0].Cells[4].Value.ToString() != "")
+            {
+                var loadEntries = ExcelService.LoadEntries(dgvBillings.SelectedRows[0].Cells[0].Value.ToString());
+
+                if (loadEntries.Count == 0) return;
+
+                EmployeeTimekeepReviewForm form = new()
+                {
+                    Entries = loadEntries,
+                    ParentControl = this,
+                };
+                form.ShowDialog();
+            }
         }
     }
 }

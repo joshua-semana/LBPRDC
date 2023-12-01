@@ -34,18 +34,18 @@
             btnConfirm = new Button();
             btnCancel = new Button();
             pnlBody = new Panel();
-            lblVerificationResult = new Label();
-            btnVerify = new Button();
             label3 = new Label();
             cmbWorkSheet = new ComboBox();
             btnSelect = new Button();
             label2 = new Label();
             txtFilePath = new TextBox();
             pnlLine2 = new Panel();
+            panel1 = new Panel();
             label1 = new Label();
             pnlFooter.SuspendLayout();
             flowLayoutPanel1.SuspendLayout();
             pnlBody.SuspendLayout();
+            pnlLine2.SuspendLayout();
             SuspendLayout();
             // 
             // pnlLine1
@@ -62,7 +62,7 @@
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Controls.Add(flowLayoutPanel1);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 210);
+            pnlFooter.Location = new Point(0, 192);
             pnlFooter.Name = "pnlFooter";
             pnlFooter.Size = new Size(484, 46);
             pnlFooter.TabIndex = 1;
@@ -90,6 +90,7 @@
             btnConfirm.TabIndex = 8;
             btnConfirm.Text = "Confirm";
             btnConfirm.UseVisualStyleBackColor = true;
+            btnConfirm.Click += btnConfirm_Click;
             // 
             // btnCancel
             // 
@@ -106,8 +107,6 @@
             // 
             // pnlBody
             // 
-            pnlBody.Controls.Add(lblVerificationResult);
-            pnlBody.Controls.Add(btnVerify);
             pnlBody.Controls.Add(label3);
             pnlBody.Controls.Add(cmbWorkSheet);
             pnlBody.Controls.Add(btnSelect);
@@ -119,34 +118,8 @@
             pnlBody.Location = new Point(0, 1);
             pnlBody.Name = "pnlBody";
             pnlBody.Padding = new Padding(16);
-            pnlBody.Size = new Size(484, 209);
+            pnlBody.Size = new Size(484, 191);
             pnlBody.TabIndex = 2;
-            // 
-            // lblVerificationResult
-            // 
-            lblVerificationResult.AutoSize = true;
-            lblVerificationResult.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            lblVerificationResult.ForeColor = SystemColors.GrayText;
-            lblVerificationResult.Location = new Point(16, 176);
-            lblVerificationResult.Margin = new Padding(0, 0, 0, 4);
-            lblVerificationResult.Name = "lblVerificationResult";
-            lblVerificationResult.Size = new Size(287, 16);
-            lblVerificationResult.TabIndex = 15;
-            lblVerificationResult.Text = "Please select a worksheet and verify the file.";
-            // 
-            // btnVerify
-            // 
-            btnVerify.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnVerify.AutoSize = true;
-            btnVerify.Enabled = false;
-            btnVerify.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnVerify.Location = new Point(392, 145);
-            btnVerify.Margin = new Padding(0, 0, 8, 0);
-            btnVerify.Name = "btnVerify";
-            btnVerify.Size = new Size(75, 28);
-            btnVerify.TabIndex = 14;
-            btnVerify.Text = "Verify";
-            btnVerify.UseVisualStyleBackColor = true;
             // 
             // label3
             // 
@@ -168,7 +141,7 @@
             cmbWorkSheet.Location = new Point(16, 146);
             cmbWorkSheet.Margin = new Padding(0, 0, 8, 4);
             cmbWorkSheet.Name = "cmbWorkSheet";
-            cmbWorkSheet.Size = new Size(368, 26);
+            cmbWorkSheet.Size = new Size(451, 26);
             cmbWorkSheet.TabIndex = 12;
             // 
             // btnSelect
@@ -211,11 +184,22 @@
             // 
             pnlLine2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             pnlLine2.BorderStyle = BorderStyle.FixedSingle;
+            pnlLine2.Controls.Add(panel1);
             pnlLine2.Location = new Point(16, 43);
             pnlLine2.Margin = new Padding(0, 0, 0, 16);
             pnlLine2.Name = "pnlLine2";
             pnlLine2.Size = new Size(452, 1);
             pnlLine2.TabIndex = 1;
+            // 
+            // panel1
+            // 
+            panel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            panel1.BorderStyle = BorderStyle.FixedSingle;
+            panel1.Location = new Point(-1, 0);
+            panel1.Margin = new Padding(0, 0, 0, 16);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(452, 1);
+            panel1.TabIndex = 2;
             // 
             // label1
             // 
@@ -232,7 +216,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(484, 256);
+            ClientSize = new Size(484, 238);
             Controls.Add(pnlBody);
             Controls.Add(pnlFooter);
             Controls.Add(pnlLine1);
@@ -248,6 +232,7 @@
             flowLayoutPanel1.PerformLayout();
             pnlBody.ResumeLayout(false);
             pnlBody.PerformLayout();
+            pnlLine2.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -266,7 +251,6 @@
         private FlowLayoutPanel flowLayoutPanel1;
         private Button btnConfirm;
         private Button btnCancel;
-        private Button btnVerify;
-        private Label lblVerificationResult;
+        private Panel panel1;
     }
 }

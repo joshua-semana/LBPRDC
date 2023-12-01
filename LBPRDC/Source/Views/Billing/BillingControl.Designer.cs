@@ -47,6 +47,7 @@
             flowLayoutPanel1 = new FlowLayoutPanel();
             btnNew = new Button();
             btnUpload = new Button();
+            btnVerify = new Button();
             pnlRight.SuspendLayout();
             pnlRightFooter.SuspendLayout();
             flowFooterActions.SuspendLayout();
@@ -241,19 +242,20 @@
             // 
             flowLayoutPanel1.Controls.Add(btnNew);
             flowLayoutPanel1.Controls.Add(btnUpload);
+            flowLayoutPanel1.Controls.Add(btnVerify);
             flowLayoutPanel1.Dock = DockStyle.Right;
             flowLayoutPanel1.FlowDirection = FlowDirection.RightToLeft;
-            flowLayoutPanel1.Location = new Point(649, 0);
+            flowLayoutPanel1.Location = new Point(568, 0);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Padding = new Padding(23, 16, 0, 16);
-            flowLayoutPanel1.Size = new Size(203, 60);
+            flowLayoutPanel1.Size = new Size(284, 60);
             flowLayoutPanel1.TabIndex = 4;
             // 
             // btnNew
             // 
             btnNew.AutoSize = true;
             btnNew.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnNew.Location = new Point(105, 16);
+            btnNew.Location = new Point(186, 16);
             btnNew.Margin = new Padding(8, 0, 0, 0);
             btnNew.Name = "btnNew";
             btnNew.Size = new Size(75, 28);
@@ -266,7 +268,7 @@
             // 
             btnUpload.AutoSize = true;
             btnUpload.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnUpload.Location = new Point(22, 16);
+            btnUpload.Location = new Point(103, 16);
             btnUpload.Margin = new Padding(8, 0, 0, 0);
             btnUpload.Name = "btnUpload";
             btnUpload.Size = new Size(75, 28);
@@ -274,6 +276,19 @@
             btnUpload.Text = "Upload";
             btnUpload.UseVisualStyleBackColor = true;
             btnUpload.Click += btnUpload_Click;
+            // 
+            // btnVerify
+            // 
+            btnVerify.AutoSize = true;
+            btnVerify.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnVerify.Location = new Point(20, 16);
+            btnVerify.Margin = new Padding(8, 0, 0, 0);
+            btnVerify.Name = "btnVerify";
+            btnVerify.Size = new Size(75, 28);
+            btnVerify.TabIndex = 10;
+            btnVerify.Text = "Verify";
+            btnVerify.UseVisualStyleBackColor = true;
+            btnVerify.Click += btnVerify_Click;
             // 
             // BillingControl
             // 
@@ -318,5 +333,6 @@
         private Panel pnlLine1;
         private Button btnSearch;
         private Button btnUpload;
+        private Button btnVerify;
     }
 }

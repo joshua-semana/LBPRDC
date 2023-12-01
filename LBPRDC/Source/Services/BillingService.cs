@@ -16,6 +16,8 @@ namespace LBPRDC.Source.Services
             public DateTime StartDate { get; set; }
             public DateTime EndDate { get; set; }
             public DateTime Timestamp { get; set; }
+            public string? IsFileUploaded { get; set; }
+            public string? VerificationStatus { get; set; }
             public string? Description { get; set; }
         }
 
@@ -92,6 +94,8 @@ namespace LBPRDC.Source.Services
                         StartDate = Convert.ToDateTime(reader["StartDate"]),
                         EndDate = Convert.ToDateTime(reader["EndDate"]),
                         Timestamp = Convert.ToDateTime(reader["Timestamp"]),
+                        IsFileUploaded = (Convert.ToString(reader["IsFileUploaded"]) == "Yes") ? "Yes" : "",
+                        VerificationStatus = (Convert.ToString(reader["VerificationStatus"]) == "Yes") ? "Yes" : "",
                         Description = Convert.ToString(reader["Description"]),
                         FullName = $"{Convert.ToString(reader["FirstName"])} {Convert.ToString(reader["LastName"])}",
                         MonthName = monthNames[Convert.ToInt32(reader["Month"]) - 1],
@@ -113,8 +117,8 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string QueryAdd = "INSERT INTO Billing (UserID, Name, Month, Year, Quarter, StartDate, EndDate, Timestamp, BaseFile, OutputFile, Description) " +
-                                  "VALUES (@UserID, @Name, @Month, @Year, @Quarter, @StartDate, @EndDate, @Timestamp, @BaseFile, @OutputFile, @Description)";
+                string QueryAdd = "INSERT INTO Billing (UserID, Name, Month, Year, Quarter, StartDate, EndDate, Timestamp, IsFileUploaded, VerificationStatus, Description) " +
+                                  "VALUES (@UserID, @Name, @Month, @Year, @Quarter, @StartDate, @EndDate, @Timestamp, @IsFileUploaded, @VerificationStatus, @Description)";
 
                 using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
                 using SqlCommand command = new(QueryAdd, connection);
@@ -127,8 +131,10 @@ namespace LBPRDC.Source.Services
                 command.Parameters.AddWithValue("@StartDate", data.StartDate);
                 command.Parameters.AddWithValue("@EndDate", data.EndDate);
                 command.Parameters.AddWithValue("@Timestamp", DateTime.Now);
-                command.Parameters.AddWithValue("@BaseFile", Array.Empty<byte>());
-                command.Parameters.AddWithValue("@OutputFile", Array.Empty<byte>());
+                command.Parameters.AddWithValue("@IsFileUploaded", "No");
+                command.Parameters.AddWithValue("@VerificationStatus", "No");
+                //command.Parameters.AddWithValue("@BaseFile", Array.Empty<byte>());
+                //command.Parameters.AddWithValue("@OutputFile", Array.Empty<byte>());
                 command.Parameters.AddWithValue("@Description", data.Description);
 
                 connection.Open();
@@ -148,6 +154,24 @@ namespace LBPRDC.Source.Services
 
                 return true;
 
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static bool UpdateFileUploadStatus(string billingName, string status)
+        {
+            try
+            {
+                string QueryUpdate = "UPDATE Billing SET " +
+                    $"IsFileUploaded = '{status}' " +
+                    $"WHERE Name = '{billingName}'";
+                using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
+                using SqlCommand command = new(QueryUpdate, connection);
+                connection.Open();
+
+                command.ExecuteNonQuery();
+
+                return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
