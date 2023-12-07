@@ -34,8 +34,10 @@
             btnConfirm = new Button();
             btnCancel = new Button();
             pnlBody = new Panel();
+            cmbReportWorksheet = new ComboBox();
+            label4 = new Label();
             label3 = new Label();
-            cmbWorkSheet = new ComboBox();
+            cmbTimekeepSheet = new ComboBox();
             btnSelect = new Button();
             label2 = new Label();
             txtFilePath = new TextBox();
@@ -54,7 +56,7 @@
             pnlLine1.Dock = DockStyle.Top;
             pnlLine1.Location = new Point(0, 0);
             pnlLine1.Name = "pnlLine1";
-            pnlLine1.Size = new Size(484, 1);
+            pnlLine1.Size = new Size(476, 1);
             pnlLine1.TabIndex = 0;
             // 
             // pnlFooter
@@ -62,9 +64,9 @@
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Controls.Add(flowLayoutPanel1);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 192);
+            pnlFooter.Location = new Point(0, 260);
             pnlFooter.Name = "pnlFooter";
-            pnlFooter.Size = new Size(484, 46);
+            pnlFooter.Size = new Size(476, 46);
             pnlFooter.TabIndex = 1;
             // 
             // flowLayoutPanel1
@@ -73,7 +75,7 @@
             flowLayoutPanel1.Controls.Add(btnCancel);
             flowLayoutPanel1.Dock = DockStyle.Right;
             flowLayoutPanel1.FlowDirection = FlowDirection.RightToLeft;
-            flowLayoutPanel1.Location = new Point(295, 0);
+            flowLayoutPanel1.Location = new Point(287, 0);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Padding = new Padding(16, 9, 0, 0);
             flowLayoutPanel1.Size = new Size(189, 46);
@@ -107,8 +109,10 @@
             // 
             // pnlBody
             // 
+            pnlBody.Controls.Add(cmbReportWorksheet);
+            pnlBody.Controls.Add(label4);
             pnlBody.Controls.Add(label3);
-            pnlBody.Controls.Add(cmbWorkSheet);
+            pnlBody.Controls.Add(cmbTimekeepSheet);
             pnlBody.Controls.Add(btnSelect);
             pnlBody.Controls.Add(label2);
             pnlBody.Controls.Add(txtFilePath);
@@ -118,38 +122,61 @@
             pnlBody.Location = new Point(0, 1);
             pnlBody.Name = "pnlBody";
             pnlBody.Padding = new Padding(16);
-            pnlBody.Size = new Size(484, 191);
+            pnlBody.Size = new Size(476, 259);
             pnlBody.TabIndex = 2;
+            // 
+            // cmbReportWorksheet
+            // 
+            cmbReportWorksheet.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbReportWorksheet.Enabled = false;
+            cmbReportWorksheet.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            cmbReportWorksheet.FormattingEnabled = true;
+            cmbReportWorksheet.Location = new Point(16, 142);
+            cmbReportWorksheet.Margin = new Padding(0, 0, 8, 16);
+            cmbReportWorksheet.Name = "cmbReportWorksheet";
+            cmbReportWorksheet.Size = new Size(443, 26);
+            cmbReportWorksheet.TabIndex = 16;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label4.Location = new Point(16, 122);
+            label4.Margin = new Padding(0, 0, 0, 4);
+            label4.Name = "label4";
+            label4.Size = new Size(122, 16);
+            label4.TabIndex = 15;
+            label4.Text = "Report Worksheet";
             // 
             // label3
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label3.Location = new Point(16, 126);
+            label3.Location = new Point(16, 184);
             label3.Margin = new Padding(0, 0, 0, 4);
             label3.Name = "label3";
-            label3.Size = new Size(75, 16);
+            label3.Size = new Size(140, 16);
             label3.TabIndex = 13;
-            label3.Text = "Worksheet";
+            label3.Text = "Timekeep Worksheet";
             // 
-            // cmbWorkSheet
+            // cmbTimekeepSheet
             // 
-            cmbWorkSheet.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbWorkSheet.Enabled = false;
-            cmbWorkSheet.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            cmbWorkSheet.FormattingEnabled = true;
-            cmbWorkSheet.Location = new Point(16, 146);
-            cmbWorkSheet.Margin = new Padding(0, 0, 8, 4);
-            cmbWorkSheet.Name = "cmbWorkSheet";
-            cmbWorkSheet.Size = new Size(451, 26);
-            cmbWorkSheet.TabIndex = 12;
+            cmbTimekeepSheet.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbTimekeepSheet.Enabled = false;
+            cmbTimekeepSheet.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            cmbTimekeepSheet.FormattingEnabled = true;
+            cmbTimekeepSheet.Location = new Point(16, 204);
+            cmbTimekeepSheet.Margin = new Padding(0, 0, 8, 16);
+            cmbTimekeepSheet.Name = "cmbTimekeepSheet";
+            cmbTimekeepSheet.Size = new Size(443, 26);
+            cmbTimekeepSheet.TabIndex = 12;
             // 
             // btnSelect
             // 
             btnSelect.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnSelect.AutoSize = true;
             btnSelect.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnSelect.Location = new Point(392, 79);
+            btnSelect.Location = new Point(384, 79);
             btnSelect.Margin = new Padding(4, 0, 8, 0);
             btnSelect.Name = "btnSelect";
             btnSelect.Size = new Size(75, 28);
@@ -177,7 +204,7 @@
             txtFilePath.Margin = new Padding(0, 0, 4, 16);
             txtFilePath.Name = "txtFilePath";
             txtFilePath.ReadOnly = true;
-            txtFilePath.Size = new Size(368, 26);
+            txtFilePath.Size = new Size(360, 26);
             txtFilePath.TabIndex = 2;
             // 
             // pnlLine2
@@ -188,7 +215,7 @@
             pnlLine2.Location = new Point(16, 43);
             pnlLine2.Margin = new Padding(0, 0, 0, 16);
             pnlLine2.Name = "pnlLine2";
-            pnlLine2.Size = new Size(452, 1);
+            pnlLine2.Size = new Size(444, 1);
             pnlLine2.TabIndex = 1;
             // 
             // panel1
@@ -198,7 +225,7 @@
             panel1.Location = new Point(-1, 0);
             panel1.Margin = new Padding(0, 0, 0, 16);
             panel1.Name = "panel1";
-            panel1.Size = new Size(452, 1);
+            panel1.Size = new Size(444, 1);
             panel1.TabIndex = 2;
             // 
             // label1
@@ -216,7 +243,8 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(484, 238);
+            ClientSize = new Size(476, 306);
+            ControlBox = false;
             Controls.Add(pnlBody);
             Controls.Add(pnlFooter);
             Controls.Add(pnlLine1);
@@ -227,6 +255,7 @@
             Name = "UploadFileForm";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
+            Load += UploadFileForm_Load;
             pnlFooter.ResumeLayout(false);
             flowLayoutPanel1.ResumeLayout(false);
             flowLayoutPanel1.PerformLayout();
@@ -247,10 +276,13 @@
         private Label label1;
         private Button btnSelect;
         private Label label3;
-        private ComboBox cmbWorkSheet;
+        private ComboBox cmbReportSheet;
         private FlowLayoutPanel flowLayoutPanel1;
         private Button btnConfirm;
         private Button btnCancel;
         private Panel panel1;
+        private Label label4;
+        private ComboBox cmbTimekeepSheet;
+        private ComboBox cmbReportWorksheet;
     }
 }

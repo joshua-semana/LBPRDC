@@ -51,10 +51,9 @@ namespace LBPRDC.Source.Views.Billing
             ControlUtils.AddColumn(dgvBillings, "QuarterName", "Quarter", "QuarterName");
             ControlUtils.AddColumn(dgvBillings, "FormattedStartDate", "Start Date", "FormattedStartDate");
             ControlUtils.AddColumn(dgvBillings, "FormattedEndDate", "End Date", "FormattedEndDate");
-            ControlUtils.AddColumn(dgvBillings, "IsFileUploaded", "Upload", "IsFileUploaded");
+            ControlUtils.AddColumn(dgvBillings, "JSONData", "Timekeeping File Upload", "JSONData");
             ControlUtils.AddColumn(dgvBillings, "VerificationStatus", "Verified", "VerificationStatus");
             //dgvBillings.Columns[dgvBillings.Columns["VerificationStatus"].Index].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-
         }
 
         private void btnNew_Click(object sender, EventArgs e)
@@ -78,18 +77,15 @@ namespace LBPRDC.Source.Views.Billing
         {
             if (dgvBillings.Rows.Count > 0)
             {
-                if (dgvBillings.SelectedRows[0].Cells[4].Value.ToString() == "Yes")
+                if (dgvBillings.SelectedRows[0].Cells[4].Value.ToString() != "")
                 {
                     var output = MessageBox.Show("Are you sure you want to overwrite new file to this billing? All your saved or current progress in this billing will be remove and overwritten.", "File Upload Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (output == DialogResult.No)
-                    {
-                        return;
-                    }
+                    if (output == DialogResult.No) return;
                 }
 
                 UploadFileForm uploadFileForm = new()
                 {
-                    billingName = Convert.ToString(dgvBillings.SelectedRows[0].Cells[0].Value),
+                    BillingName = Convert.ToString(dgvBillings.SelectedRows[0].Cells[0].Value),
                     ParentControl = this,
                 };
                 uploadFileForm.ShowDialog();
@@ -103,18 +99,48 @@ namespace LBPRDC.Source.Views.Billing
 
         private void btnVerify_Click(object sender, EventArgs e)
         {
-            if (dgvBillings.SelectedRows[0].Cells[4].Value.ToString() != "")
+            if (dgvBillings.Rows.Count > 0)
             {
-                var loadEntries = ExcelService.LoadEntries(dgvBillings.SelectedRows[0].Cells[0].Value.ToString());
+                if (dgvBillings.SelectedRows[0].Cells[4].Value.ToString() == "")
+                {
+                    MessageBox.Show("Please upload a timekeeping file to this billing before you can proceed with the verification of employee timekeeping information.", "Verify Billing Invalid", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var loadEntries = BillingService.LoadJSONData(dgvBillings.SelectedRows[0].Cells[0].Value.ToString());
 
                 if (loadEntries.Count == 0) return;
 
+                string billingName = dgvBillings.SelectedRows[0].Cells[0].Value.ToString();
+                string dateQuarter = dgvBillings.SelectedRows[0].Cells[1].Value.ToString();
+                string fromDate = dgvBillings.SelectedRows[0].Cells[2].Value.ToString();
+                string toDate = dgvBillings.SelectedRows[0].Cells[3].Value.ToString();
+
+
                 EmployeeTimekeepReviewForm form = new()
                 {
-                    Entries = loadEntries,
+                    InitialEntries = loadEntries,
                     ParentControl = this,
+                    BillingName = billingName,
+                    DateQuarter = dateQuarter,
+                    DateCoverage = $"{fromDate} - {toDate}"
                 };
                 form.ShowDialog();
+            }
+        }
+
+        private async void btnArchive_Click(object sender, EventArgs e)
+        {
+            if (dgvBillings.SelectedRows.Count > 0)
+            {
+                string billingName = dgvBillings.SelectedRows[0].Cells[0].Value.ToString();
+                var output = MessageBox.Show("Are you sure you want to archive this billing record?", "Archive Billing Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (output == DialogResult.No) return;
+                if (await Task.Run(() => BillingService.UpdateStatus(billingName, "Inactive")))
+                {
+                    MessageBox.Show($"You have successfully archived the {billingName} billing.", "Archive Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ApplySearchThenPopulate();
+                }
             }
         }
     }

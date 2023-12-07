@@ -7,11 +7,12 @@ namespace LBPRDC.Source.Services
 {
     public class Entry : EmployeeBase
     {
-        public string? ID { get; set; }
         public EntryTimeDetails? TimeDetails { get; set; }
         public EntryAdjustments[]? Adjustments { get; set; }
-        public string[]? Remarks { get; set; }
-        public string? FlagStatus { get; set; }
+        public string[]? AdjustmentRemarks { get; set; }
+        public string? InitialRemarks { get; set; } // Timekeeping Remarks
+        public string? CustomRemarks { get; set; } // Your Remarks
+        public string? Status { get; set; }
     }
 
     public class EntryTimeDetails
@@ -38,11 +39,22 @@ namespace LBPRDC.Source.Services
 
     public class EntryAdjustments
     {
+        public int ID { get; set; }
         public string? Type { get; set; }
         public string? Operation { get; set; }
         public TimeSpan OriginalValue { get; set; }
-        public TimeSpan AdjustedValue { get; set; }
-        public DateTime? AppliedDate { get; set; }
+        public TimeSpan InputValue { get; set; }
+        public TimeSpan NewAdjustedValue { get; set; }
+        public string? RawOriginalValue { get; set; }
+        public string? RawInputValue { get; set; }
+        public string? RawNewAdjustedValue { get; set; }
+        public string? Units { get; set; }
+        public string AppliedDate { get; set; }
+    }
+
+    public class EntryReportRemarks : EmployeeBase
+    {
+        public string? Remarks { get; set; }
     }
 
     internal class ExcelService
@@ -64,17 +76,28 @@ namespace LBPRDC.Source.Services
             return null;
         }
 
-        public static bool isWorksheetMatchesTo(string filePath, string sheetName)
+        public static bool AreWorksheetsValid(string filePath, string reportSheet, string timekeepSheet)
         {
             using var file = new ExcelPackage(new FileInfo(filePath));
 
-            var selectedSheet = file.Workbook.Worksheets[sheetName];
+            var selectedReportWorksheet = file.Workbook.Worksheets[reportSheet];
+            var selectedTimekeepSheet = file.Workbook.Worksheets[timekeepSheet];
 
-            for (int i = 1; i <= FileFormatConstants.ExcelWorksheetFormat.Count; i++)
+            for (int i = 1; i <= FileFormatConstants.ExcelReportWorksheetFormat.Count; i++)
             {
-                if (!selectedSheet.Cells[1, i].Text.Contains(FileFormatConstants.ExcelWorksheetFormat[i - 1]))
+                var text = selectedReportWorksheet.Cells[2, i].Text.ToString();
+                if (!selectedReportWorksheet.Cells[2, i].Text.Contains(FileFormatConstants.ExcelReportWorksheetFormat[i - 1]))
                 {
-                    MessageBox.Show("The content of this file is not supported by this operation. Header columns do not match the set header constant format. Please select another worksheet. ", "Excel Worksheet Not Valid", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("The content of the report worksheet is not supported by this operation. Header columns do not match the set header constant format. Please select another worksheet. ", "Excel Worksheet Not Valid", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+            }
+
+            for (int i = 1; i <= FileFormatConstants.ExcelTimekeepWorksheetFormat.Count; i++)
+            {
+                if (!selectedTimekeepSheet.Cells[1, i].Text.Contains(FileFormatConstants.ExcelTimekeepWorksheetFormat[i - 1]))
+                {
+                    MessageBox.Show("The content of the timekeep worksheet is not supported by this operation. Header columns do not match the set header constant format. Please select another worksheet. ", "Excel Worksheet Not Valid", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
             }
@@ -177,48 +200,72 @@ namespace LBPRDC.Source.Services
             return "00:00";
         }
 
-        public static List<Entry> PreProcessEntries(string filePath, string sheetName)
+        public static List<Entry> PreProcessEntries(string filePath, string reportSheetName ,string timekeepSheetName)
         {
             List<Entry> entries = new();
+            List<EntryReportRemarks> remarks = new();
             try
             {
                 using var file = new ExcelPackage(new FileInfo(filePath));
-                var sheet = file.Workbook.Worksheets[sheetName];
+                var reportSheet = file.Workbook.Worksheets[reportSheetName];
+                var timekeepSheet = file.Workbook.Worksheets[timekeepSheetName];
 
-                int rowCount = sheet.Dimension.Rows;
+                int reportRowCount = reportSheet.Dimension.Rows;
+                int timekeepRowCount = timekeepSheet.Dimension.Rows;
 
                 var employeeBase = EmployeeService.GetAllEmployeesBase();
 
-                for (int row = 2; row < rowCount; row++)
+                // Getting of remarks from the report
+                for (int row = 7; row < reportRowCount; row++)
                 {
-                    string idValue = sheet.Cells[row, 1].Value?.ToString();
-                    string nameValue = sheet.Cells[row, 2].Value?.ToString();
+                    string idValue = reportSheet.Cells[row, 1].Value?.ToString();
+                    string nameValue = reportSheet.Cells[row, 2].Value?.ToString();
 
-                    if (idValue == null || idValue == "#REF!" || nameValue == "#REF!" || nameValue == "#N/A") continue;
+                    if (idValue == null || idValue == "#REF!" || idValue == "#N/A" || nameValue == "#REF!" || nameValue == "#N/A") continue;
 
-                    var RegularHours = ParseTime(GetTime(sheet.Cells[row, 6].Text));
-                    var LegalHoliday_100 = ParseTime(GetTime(sheet.Cells[row, 7].Text));
-                    var RegOT_125 = ParseTime(GetTime(sheet.Cells[row, 8].Text));
-                    var RestDayOT_130 = ParseTime(GetTime(sheet.Cells[row, 9].Text));
-                    var RestDayOTExcess_169 = ParseTime(GetTime(sheet.Cells[row, 10].Text));
-                    var SpecialHolidayOT_130 = ParseTime(GetTime(sheet.Cells[row, 11].Text));
-                    var SpecialExcessOT_195 = ParseTime(GetTime(sheet.Cells[row, 12].Text));
-                    var LegalHolidayOT_200 = ParseTime(GetTime(sheet.Cells[row, 13].Text));
-                    var LegalHolidayOT_260 = ParseTime(GetTime(sheet.Cells[row, 14].Text));
-                    var RestDayOT_150 = ParseTime(GetTime(sheet.Cells[row, 15].Text));
-                    var RegularHoliday_160 = ParseTime(GetTime(sheet.Cells[row, 16].Text));
-                    var NightDiff_10 = ParseTime(GetTime(sheet.Cells[row, 18].Text));
-                    var NightDiff_125 = ParseTime(GetTime(sheet.Cells[row, 19].Text));
-                    var NightDiff_130 = ParseTime(GetTime(sheet.Cells[row, 20].Text));
-                    var NightDiff_150 = ParseTime(GetTime(sheet.Cells[row, 21].Text));
-                    var NightDiff_20 = ParseTime(GetTime(sheet.Cells[row, 22].Text));
-                    var NightDiff_50 = ParseTime(GetTime(sheet.Cells[row, 23].Text));
-                    var UnderTime = ParseTime(GetTime(sheet.Cells[row, 25].Text));
-                    var Absent = ParseTime(GetTime(sheet.Cells[row, 26].Text));
-
-                    if (entries.Any(e => e.ID == idValue.ToString()))
+                    var TimekeepRemarks = reportSheet.Cells[row, 30].Text;
+                    
+                    if (!remarks.Any(e => e.EmployeeID == idValue.ToString()))
                     {
-                        var currentEntry = entries.First(f => f.ID == idValue).TimeDetails;
+                        remarks.Add(new EntryReportRemarks
+                        {
+                            EmployeeID = idValue,
+                            Remarks = TimekeepRemarks
+                        });
+                    }
+                }
+
+                // Getting of data from Timekeep Sheet
+                for (int row = 2; row < timekeepRowCount; row++)
+                {
+                    string idValue = timekeepSheet.Cells[row, 1].Value?.ToString();
+                    string nameValue = timekeepSheet.Cells[row, 2].Value?.ToString();
+
+                    if (idValue == null || idValue == "#REF!" || idValue == "#N/A" || nameValue == "#REF!" || nameValue == "#N/A") continue;
+
+                    var RegularHours = ParseTime(GetTime(timekeepSheet.Cells[row, 6].Text));
+                    var LegalHoliday_100 = ParseTime(GetTime(timekeepSheet.Cells[row, 7].Text));
+                    var RegOT_125 = ParseTime(GetTime(timekeepSheet.Cells[row, 8].Text));
+                    var RestDayOT_130 = ParseTime(GetTime(timekeepSheet.Cells[row, 9].Text));
+                    var RestDayOTExcess_169 = ParseTime(GetTime(timekeepSheet.Cells[row, 10].Text));
+                    var SpecialHolidayOT_130 = ParseTime(GetTime(timekeepSheet.Cells[row, 11].Text));
+                    var SpecialExcessOT_195 = ParseTime(GetTime(timekeepSheet.Cells[row, 12].Text));
+                    var LegalHolidayOT_200 = ParseTime(GetTime(timekeepSheet.Cells[row, 13].Text));
+                    var LegalHolidayOT_260 = ParseTime(GetTime(timekeepSheet.Cells[row, 14].Text));
+                    var RestDayOT_150 = ParseTime(GetTime(timekeepSheet.Cells[row, 15].Text));
+                    var RegularHoliday_160 = ParseTime(GetTime(timekeepSheet.Cells[row, 16].Text));
+                    var NightDiff_10 = ParseTime(GetTime(timekeepSheet.Cells[row, 18].Text));
+                    var NightDiff_125 = ParseTime(GetTime(timekeepSheet.Cells[row, 19].Text));
+                    var NightDiff_130 = ParseTime(GetTime(timekeepSheet.Cells[row, 20].Text));
+                    var NightDiff_150 = ParseTime(GetTime(timekeepSheet.Cells[row, 21].Text));
+                    var NightDiff_20 = ParseTime(GetTime(timekeepSheet.Cells[row, 22].Text));
+                    var NightDiff_50 = ParseTime(GetTime(timekeepSheet.Cells[row, 23].Text));
+                    var UnderTime = ParseTime(GetTime(timekeepSheet.Cells[row, 25].Text));
+                    var Absent = ParseTime(GetTime(timekeepSheet.Cells[row, 26].Text));
+
+                    if (entries.Any(e => e.EmployeeID == idValue.ToString()))
+                    {
+                        var currentEntry = entries.First(f => f.EmployeeID == idValue).TimeDetails;
                         currentEntry.RegularHours += RegularHours;
                         currentEntry.LegalHoliday_100 += LegalHoliday_100;
                         currentEntry.RegOT_125 += RegOT_125;
@@ -244,7 +291,7 @@ namespace LBPRDC.Source.Services
 
                         entries.Add(new Entry
                         {
-                            ID = idValue.ToString(),
+                            EmployeeID = idValue.ToString(),
                             FullName = $"{currentEmployee.LastName}, {currentEmployee.FirstName} {currentEmployee.MiddleName}".Trim(),
                             Position = currentEmployee.Position,
                             Department = currentEmployee.Department,
@@ -270,9 +317,16 @@ namespace LBPRDC.Source.Services
                                 UnderTime = UnderTime,
                                 Absent = Absent,
                             },
-                            FlagStatus = "Unverified"
+                            Status = "Unverified"
                         });
                     }
+                }
+
+                //Getting the remarks and saving it to each entries
+                foreach (var entry in entries)
+                {
+                    string? timekeepRemarks = remarks.FirstOrDefault(f => f.EmployeeID == entry.EmployeeID).Remarks;
+                    entry.InitialRemarks = timekeepRemarks;
                 }
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }

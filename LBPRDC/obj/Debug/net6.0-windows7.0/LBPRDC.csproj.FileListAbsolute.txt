@@ -129,3 +129,17 @@ C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Sou
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.UploadFileForm.resources
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.UnrecognizedEmployeeForm.resources
 C:\Users\Sonny\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.EmployeeTimekeepReviewForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Accounts.AddNewUser.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Accounts.EditUserForAdminForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Accounts.EditUserForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Accounts.ViewGeneratedPassword.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.BillingControl.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.EmployeeTimekeepReviewForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.NewBillingForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.UnrecognizedEmployeeForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.UploadFileForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Categories.AddCategoryItemForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Categories.CategoriesControl.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Categories.PositionRatesHistory.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Profile.ViewAndEditProfileForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.AddAdjustmentForm.resources

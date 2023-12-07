@@ -7,13 +7,18 @@ namespace LBPRDC.Source.Views.Billing
     {
         public BillingControl? ParentControl { get; set; }
 
-        public string billingName { get; set; }
+        public string BillingName { get; set; }
 
-        private string filePath = "", sheetName = "";
+        private string filePath = "", reportSheetName = "", timekeepSheetName = "";
 
         public UploadFileForm()
         {
             InitializeComponent();
+        }
+
+        private void UploadFileForm_Load(object sender, EventArgs e)
+        {
+            this.Text = BillingName;
         }
 
         private void btnSelect_Click(object sender, EventArgs e)
@@ -39,10 +44,15 @@ namespace LBPRDC.Source.Views.Billing
 
         private void PopulateAndEnableWorksheetSelection(string[] worksheets)
         {
-            cmbWorkSheet.Items.Clear();
-            cmbWorkSheet.Enabled = worksheets.Length > 0;
-            cmbWorkSheet.Items.AddRange(worksheets);
-            cmbWorkSheet.SelectedIndex = 0;
+            cmbTimekeepSheet.Items.Clear();
+            cmbTimekeepSheet.Enabled = worksheets.Length > 0;
+            cmbTimekeepSheet.Items.AddRange(worksheets);
+            cmbTimekeepSheet.SelectedIndex = 0;
+
+            cmbReportWorksheet.Items.Clear();
+            cmbReportWorksheet.Enabled = worksheets.Length > 0;
+            cmbReportWorksheet.Items.AddRange(worksheets);
+            cmbReportWorksheet.SelectedIndex = 0;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -50,48 +60,51 @@ namespace LBPRDC.Source.Views.Billing
             var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
-                this.Close();
+                Close();
             }
         }
 
         private async void btnConfirm_Click(object sender, EventArgs e)
         {
             ToggleInputs(false);
-            bool isWorkSheetValid = ExcelService.isWorksheetMatchesTo(txtFilePath.Text, cmbWorkSheet.Text);
 
-            if (isWorkSheetValid)
+            if (!ExcelService.AreWorksheetsValid(txtFilePath.Text, cmbReportWorksheet.Text, cmbTimekeepSheet.Text))
             {
-                filePath = txtFilePath.Text;
-                sheetName = cmbWorkSheet.Text;
-
-                var unrecognizedEmployees = await Task.Run(() => CheckEmployeeExistense());
-
-                if (unrecognizedEmployees.Count > 0)
-                {
-                    UnrecognizedEmployeeForm unrecognizedEmployee = new()
-                    {
-                        Employees = unrecognizedEmployees
-                    };
-                    unrecognizedEmployee.ShowDialog();
-                }
-                else
-                {
-                    var entries = await Task.Run(() => ExcelService.PreProcessEntries(txtFilePath.Text, sheetName));
-
-                    if (entries.Count > 0)
-                    {
-                        var isAdded = await Task.Run(() => ExcelService.SaveEntries(entries, billingName));
-                        var isUpdated = await Task.Run(() => BillingService.UpdateFileUploadStatus(billingName, "Yes"));
-                        if (isAdded && isUpdated)
-                        {
-                            ToggleInputs(true);
-                            MessageBox.Show("You have successfully uploaded a timekeep file to this billing.", "Upload Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            ParentControl?.ResetTableSearch();
-                            this.Close();
-                        }
-                    }
-                }
+                ToggleInputs(true);
+                return;
             }
+
+            filePath = txtFilePath.Text;
+            reportSheetName = cmbReportWorksheet.Text;
+            timekeepSheetName = cmbTimekeepSheet.Text;
+
+            var unrecognizedEmployees = await Task.Run(() => CheckEmployeeExistense());
+
+            if (unrecognizedEmployees.Count > 0)
+            {
+                UnrecognizedEmployeeForm form = new()
+                {
+                    Employees = unrecognizedEmployees
+                };
+                form.ShowDialog();
+                ToggleInputs(true);
+                return;
+            }
+
+            var entries = await Task.Run(() => ExcelService.PreProcessEntries(txtFilePath.Text, reportSheetName, timekeepSheetName));
+
+            if (entries.Count > 0 && await Task.Run(() => BillingService.UpdateJSONData(entries, BillingName)))
+            {
+                MessageBox.Show("You have successfully uploaded a timekeep file to this billing.", "Upload Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ParentControl?.ResetTableSearch();
+                Close();
+            }
+            else
+            {
+                MessageBox.Show("Failed to upload timekeep data to this billing. Please try again.", "Upload Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            ToggleInputs(true);
         }
 
         private List<EmployeeBase> CheckEmployeeExistense()
@@ -99,7 +112,7 @@ namespace LBPRDC.Source.Views.Billing
             List<EmployeeBase> nonExistingEmployees = new();
 
             var employeeList = EmployeeService.GetAllEmployeesBase();
-            var identifiersDictionary = ExcelService.GetAllIdentifiers(filePath, sheetName, 1, 2);
+            var identifiersDictionary = ExcelService.GetAllIdentifiers(filePath, timekeepSheetName, 1, 2);
 
             foreach (var (id, name) in identifiersDictionary)
             {
@@ -124,7 +137,8 @@ namespace LBPRDC.Source.Views.Billing
             btnConfirm.Enabled = state;
             btnCancel.Enabled = state;
             btnSelect.Enabled = state;
-            cmbWorkSheet.Enabled = state;
+            cmbReportWorksheet.Enabled = state;
+            cmbTimekeepSheet.Enabled = state;
         }
     }
 }

@@ -27,7 +27,7 @@
             "EMPLOYMENT STATUS"
         };
 
-        public static readonly List<string> ExcelWorksheetFormat = new()
+        public static readonly List<string> ExcelTimekeepWorksheetFormat = new()
         {
             "Scanning Number",
             "Name",
@@ -55,6 +55,11 @@
             "TOTAL NDOT",
             "UT",
             "Absent"
+        };
+
+        public static readonly List<string> ExcelReportWorksheetFormat = new()
+        {
+            "PAYROLL COMPUTATION - SHFC"
         };
     }
 }

@@ -94,7 +94,8 @@ namespace LBPRDC.Source.Views.Billing
                 Quarter = (radFirst.Checked) ? 1 : 2,
                 StartDate = startDate,
                 EndDate = endDate,
-                Description = txtDescription.Text
+                Description = txtDescription.Text,
+                Status = "Active"
             };
 
             var isAdded = await BillingService.Add(newBilling);
