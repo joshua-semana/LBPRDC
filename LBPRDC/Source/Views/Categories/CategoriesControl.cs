@@ -15,10 +15,17 @@ namespace LBPRDC.Source.Views.Categories
         private readonly List<Control> CommonFields;
         private readonly List<Control> PositionSpecificFields;
         private readonly List<Control> LocationSpecificFields;
+        private readonly List<Control> DepartmentSpecificFields;
+
+        UserControl loadingControl = new ucLoading() { Dock = DockStyle.Fill };
 
         public CategoriesControl()
         {
             InitializeComponent();
+
+            this.Controls.Add(loadingControl);
+            loadingControl.BringToFront();
+
             Categories = new()
             {
                 "Position",
@@ -56,6 +63,12 @@ namespace LBPRDC.Source.Views.Categories
                 cmbDepartment
             };
 
+            DepartmentSpecificFields = new()
+            {
+                lblCode,
+                txtCode
+            };
+
             CurrentCategory = Categories[0];
             OriginalValues = new();
             RequiredFields = new();
@@ -65,10 +78,12 @@ namespace LBPRDC.Source.Views.Categories
 
         public void PopulateTableAndFields()
         {
+            ShowLoadingProgressBar(true);
             CurrentCategory = cmbCategories.SelectedItem.ToString();
 
             ControlUtils.ToggleControlsVisibilityInContainer(flowRightContent, false);
             ControlUtils.ToggleControlVisibility(CommonFields, true);
+            btnHistory.Visible = false;
 
             dgvCategory.Columns.Clear();
 
@@ -77,6 +92,7 @@ namespace LBPRDC.Source.Views.Categories
                 case "Position":
                     dgvCategory.DataSource = PositionService.GetAllItems();
                     ControlUtils.ToggleControlVisibility(PositionSpecificFields, true);
+                    btnHistory.Visible = true;
                     break;
 
                 case "Location":
@@ -87,6 +103,7 @@ namespace LBPRDC.Source.Views.Categories
 
                 case "Department":
                     dgvCategory.DataSource = DepartmentService.GetAllItems();
+                    ControlUtils.ToggleControlVisibility(DepartmentSpecificFields, true);
                     break;
 
                 case "Civil Status":
@@ -99,6 +116,7 @@ namespace LBPRDC.Source.Views.Categories
             }
 
             UpdateRequiredFields();
+            ShowLoadingProgressBar(false);
         }
 
         private void CategoriesControl_VisibleChanged(object sender, EventArgs e)
@@ -154,6 +172,9 @@ namespace LBPRDC.Source.Views.Categories
                     case "Location":
                         PopulateLocationSpecificTextFieldData(selectedRow);
                         break;
+                    case "Department":
+                        PopulateDepartmentSpecificTextFieldDate(selectedRow);
+                        break;
                 }
 
                 UpdateOriginalValues();
@@ -186,6 +207,11 @@ namespace LBPRDC.Source.Views.Categories
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
             cmbDepartment.SelectedValue = value;
+        }
+
+        private void PopulateDepartmentSpecificTextFieldDate(DataGridViewRow data)
+        {
+            txtCode.Text = data.Cells["Code"].Value.ToString();
         }
 
         private void UpdateOriginalValues()
@@ -253,9 +279,16 @@ namespace LBPRDC.Source.Views.Categories
                         break;
 
                     case "Department":
+                        var similarDepartmentCodes = DepartmentService.GetAllItems().Where(w => txtCode.Text.ToUpper().Equals(w.Code)).ToList();
+                        if (similarDepartmentCodes.Count > 0 && txtCode.Text != OriginalValues[txtCode])
+                        {
+                            MessageBox.Show("This code has already been used. Please enter another code to continue.", "Duplicate Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        };
                         DepartmentService.Department UpdateForDepartment = new()
                         {
                             ID = Convert.ToInt32(txtID.Text),
+                            Code = txtCode.Text.ToUpper().Trim(),
                             Name = txtName.Text.Trim(),
                             Description = txtDescription.Text.ToUpper().Trim(),
                             Status = cmbStatus.Text
@@ -287,6 +320,13 @@ namespace LBPRDC.Source.Views.Categories
                         break;
 
                     case "Position":
+                        var similarPositionCodes = PositionService.GetAllItems().Where(w => txtCode.Text.ToUpper().Equals(w.Code)).ToList();
+                        if (similarPositionCodes.Count > 0 && txtCode.Text != OriginalValues[txtCode])
+                        {
+                            MessageBox.Show("This code has already been used. Please enter another code to continue.", "Duplicate Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        };
+
                         PositionService.Position UpdateForPosition = new()
                         {
                             ID = Convert.ToInt32(txtID.Text),
@@ -298,6 +338,17 @@ namespace LBPRDC.Source.Views.Categories
                             BillingRate = Convert.ToDecimal(txtBillingRate.Text)
                         };
                         PositionService.Update(UpdateForPosition);
+
+                        if (txtSalaryRate.Text != OriginalValues[txtSalaryRate] || txtBillingRate.Text != OriginalValues[txtBillingRate])
+                        {
+                            PositionService.RatesHistory newRates = new()
+                            {
+                                PositionID = Convert.ToInt32(txtID.Text),
+                                SalaryRate = Convert.ToDecimal(txtSalaryRate.Text),
+                                BillingRate = Convert.ToDecimal(txtBillingRate.Text)
+                            };
+                            PositionService.AddRatesHistory(newRates);
+                        };
                         break;
 
                     default:
@@ -318,6 +369,26 @@ namespace LBPRDC.Source.Views.Categories
                 CategoryName = CurrentCategory
             };
             addCategoryItemForm.ShowDialog();
+        }
+
+        private void ShowLoadingProgressBar(bool state)
+        {
+            loadingControl.Visible = state;
+            pnlRight.Enabled = !state;
+        }
+
+        private void ToUpperCase_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (char.IsLetter(e.KeyChar)) e.KeyChar = char.ToUpper(e.KeyChar);
+        }
+
+        private void btnHistory_Click(object sender, EventArgs e)
+        {
+            PositionRatesHistory positionRatesHistory = new()
+            {
+                PositionID = Convert.ToInt32(txtID.Text)
+            };
+            positionRatesHistory.ShowDialog();
         }
     }
 }

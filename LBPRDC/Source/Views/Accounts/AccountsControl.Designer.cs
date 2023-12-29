@@ -37,17 +37,14 @@
             btnEdit = new Button();
             btnReset = new Button();
             panel1 = new Panel();
-            pnlContainerSearch = new Panel();
-            label1 = new Label();
-            txtSearch = new TextBox();
-            panel2 = new Panel();
             lblRowCounter = new Label();
+            txtSearch = new TextBox();
+            btnSearch = new Button();
+            panel2 = new Panel();
             dgvUsers = new DataGridView();
             pnlFooter.SuspendLayout();
             flowControls.SuspendLayout();
             panel1.SuspendLayout();
-            pnlContainerSearch.SuspendLayout();
-            panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUsers).BeginInit();
             SuspendLayout();
             // 
@@ -69,20 +66,20 @@
             flowControls.Controls.Add(btnReset);
             flowControls.Dock = DockStyle.Right;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
-            flowControls.Location = new Point(585, 0);
+            flowControls.Location = new Point(922, 0);
             flowControls.Name = "flowControls";
-            flowControls.Padding = new Padding(16, 16, 0, 16);
-            flowControls.Size = new Size(628, 60);
+            flowControls.Padding = new Padding(23, 16, 0, 16);
+            flowControls.Size = new Size(291, 60);
             flowControls.TabIndex = 2;
             // 
             // btnAdd
             // 
             btnAdd.AutoSize = true;
             btnAdd.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnAdd.Location = new Point(512, 16);
+            btnAdd.Location = new Point(193, 16);
             btnAdd.Margin = new Padding(8, 0, 0, 0);
             btnAdd.Name = "btnAdd";
-            btnAdd.Size = new Size(100, 28);
+            btnAdd.Size = new Size(75, 28);
             btnAdd.TabIndex = 6;
             btnAdd.Text = "Add";
             btnAdd.UseVisualStyleBackColor = true;
@@ -92,10 +89,10 @@
             // 
             btnEdit.AutoSize = true;
             btnEdit.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnEdit.Location = new Point(404, 16);
+            btnEdit.Location = new Point(110, 16);
             btnEdit.Margin = new Padding(8, 0, 0, 0);
             btnEdit.Name = "btnEdit";
-            btnEdit.Size = new Size(100, 28);
+            btnEdit.Size = new Size(75, 28);
             btnEdit.TabIndex = 7;
             btnEdit.Text = "Edit";
             btnEdit.UseVisualStyleBackColor = true;
@@ -105,10 +102,10 @@
             // 
             btnReset.AutoSize = true;
             btnReset.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnReset.Location = new Point(296, 16);
+            btnReset.Location = new Point(27, 16);
             btnReset.Margin = new Padding(0);
             btnReset.Name = "btnReset";
-            btnReset.Size = new Size(100, 28);
+            btnReset.Size = new Size(75, 28);
             btnReset.TabIndex = 8;
             btnReset.Text = "Reset";
             btnReset.UseVisualStyleBackColor = true;
@@ -116,72 +113,63 @@
             // 
             // panel1
             // 
-            panel1.Controls.Add(pnlContainerSearch);
+            panel1.Controls.Add(lblRowCounter);
+            panel1.Controls.Add(txtSearch);
+            panel1.Controls.Add(btnSearch);
             panel1.Controls.Add(panel2);
             panel1.Controls.Add(dgvUsers);
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
-            panel1.Padding = new Padding(16);
+            panel1.Padding = new Padding(24, 24, 24, 10);
             panel1.Size = new Size(1213, 569);
             panel1.TabIndex = 3;
             // 
-            // pnlContainerSearch
+            // lblRowCounter
             // 
-            pnlContainerSearch.BorderStyle = BorderStyle.FixedSingle;
-            pnlContainerSearch.Controls.Add(label1);
-            pnlContainerSearch.Controls.Add(txtSearch);
-            pnlContainerSearch.Location = new Point(16, 16);
-            pnlContainerSearch.Margin = new Padding(0, 0, 16, 16);
-            pnlContainerSearch.Name = "pnlContainerSearch";
-            pnlContainerSearch.Padding = new Padding(8);
-            pnlContainerSearch.Size = new Size(268, 45);
-            pnlContainerSearch.TabIndex = 11;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.ForeColor = SystemColors.WindowText;
-            label1.Location = new Point(8, 13);
-            label1.Margin = new Padding(0);
-            label1.Name = "label1";
-            label1.Size = new Size(52, 16);
-            label1.TabIndex = 8;
-            label1.Text = "Search";
+            lblRowCounter.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            lblRowCounter.AutoSize = true;
+            lblRowCounter.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            lblRowCounter.ForeColor = SystemColors.GrayText;
+            lblRowCounter.Location = new Point(20, 543);
+            lblRowCounter.Margin = new Padding(0, 8, 0, 0);
+            lblRowCounter.Name = "lblRowCounter";
+            lblRowCounter.Size = new Size(45, 16);
+            lblRowCounter.TabIndex = 1;
+            lblRowCounter.Text = "Count";
             // 
             // txtSearch
             // 
             txtSearch.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            txtSearch.Location = new Point(62, 8);
-            txtSearch.Margin = new Padding(0, 0, 0, 4);
+            txtSearch.Location = new Point(24, 24);
+            txtSearch.Margin = new Padding(0, 0, 4, 16);
             txtSearch.Name = "txtSearch";
-            txtSearch.Size = new Size(197, 26);
+            txtSearch.Size = new Size(215, 26);
             txtSearch.TabIndex = 1;
             txtSearch.KeyUp += txtSearch_KeyUp;
+            // 
+            // btnSearch
+            // 
+            btnSearch.AutoSize = true;
+            btnSearch.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnSearch.Location = new Point(247, 23);
+            btnSearch.Margin = new Padding(4, 0, 8, 0);
+            btnSearch.Name = "btnSearch";
+            btnSearch.Size = new Size(75, 28);
+            btnSearch.TabIndex = 12;
+            btnSearch.Text = "Search";
+            btnSearch.UseVisualStyleBackColor = true;
+            btnSearch.Click += btnSearch_Click;
             // 
             // panel2
             // 
             panel2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panel2.BorderStyle = BorderStyle.FixedSingle;
-            panel2.Controls.Add(lblRowCounter);
-            panel2.Location = new Point(300, 16);
+            panel2.Location = new Point(24, 66);
             panel2.Margin = new Padding(0, 0, 0, 16);
             panel2.Name = "panel2";
-            panel2.Size = new Size(897, 45);
+            panel2.Size = new Size(1165, 1);
             panel2.TabIndex = 9;
-            // 
-            // lblRowCounter
-            // 
-            lblRowCounter.AutoSize = true;
-            lblRowCounter.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            lblRowCounter.ForeColor = SystemColors.ControlDarkDark;
-            lblRowCounter.Location = new Point(8, 13);
-            lblRowCounter.Margin = new Padding(0);
-            lblRowCounter.Name = "lblRowCounter";
-            lblRowCounter.Size = new Size(77, 16);
-            lblRowCounter.TabIndex = 1;
-            lblRowCounter.Text = "Logs count";
             // 
             // dgvUsers
             // 
@@ -194,6 +182,7 @@
             dgvUsers.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvUsers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvUsers.BackgroundColor = SystemColors.Window;
+            dgvUsers.BorderStyle = BorderStyle.Fixed3D;
             dgvUsers.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvUsers.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
             dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
@@ -208,7 +197,7 @@
             dgvUsers.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvUsers.EditMode = DataGridViewEditMode.EditOnF2;
             dgvUsers.GridColor = SystemColors.Control;
-            dgvUsers.Location = new Point(16, 77);
+            dgvUsers.Location = new Point(24, 83);
             dgvUsers.Margin = new Padding(0);
             dgvUsers.MultiSelect = false;
             dgvUsers.Name = "dgvUsers";
@@ -227,7 +216,7 @@
             dgvUsers.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
             dgvUsers.RowTemplate.Height = 41;
             dgvUsers.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvUsers.Size = new Size(1181, 476);
+            dgvUsers.Size = new Size(1165, 452);
             dgvUsers.TabIndex = 5;
             dgvUsers.VirtualMode = true;
             // 
@@ -245,10 +234,7 @@
             flowControls.ResumeLayout(false);
             flowControls.PerformLayout();
             panel1.ResumeLayout(false);
-            pnlContainerSearch.ResumeLayout(false);
-            pnlContainerSearch.PerformLayout();
-            panel2.ResumeLayout(false);
-            panel2.PerformLayout();
+            panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUsers).EndInit();
             ResumeLayout(false);
         }
@@ -260,12 +246,11 @@
         private DataGridView dgvUsers;
         private Panel panel2;
         private Label lblRowCounter;
-        private Panel pnlContainerSearch;
         private TextBox txtSearch;
-        private Label label1;
         private FlowLayoutPanel flowControls;
         private Button btnAdd;
         private Button btnEdit;
         private Button btnReset;
+        private Button btnSearch;
     }
 }

@@ -52,6 +52,7 @@
             btnLogs = new Button();
             btnAccounts = new Button();
             pnlLine3 = new Panel();
+            btnBilling = new Button();
             pnlHeader.SuspendLayout();
             flowHeaderLeft.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)picLogo).BeginInit();
@@ -153,12 +154,12 @@
             // 
             lblLine1.AutoSize = true;
             lblLine1.Font = new Font("Arial", 14F, FontStyle.Regular, GraphicsUnit.Point);
-            lblLine1.Location = new Point(393, 12);
-            lblLine1.Margin = new Padding(3, 12, 0, 0);
+            lblLine1.Location = new Point(390, 14);
+            lblLine1.Margin = new Padding(4, 14, 2, 0);
             lblLine1.Name = "lblLine1";
-            lblLine1.Size = new Size(16, 22);
+            lblLine1.Size = new Size(17, 22);
             lblLine1.TabIndex = 4;
-            lblLine1.Text = "|";
+            lblLine1.Text = "•";
             lblLine1.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // lblGreetUser
@@ -166,7 +167,7 @@
             lblGreetUser.AutoEllipsis = true;
             lblGreetUser.AutoSize = true;
             lblGreetUser.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            lblGreetUser.Location = new Point(314, 17);
+            lblGreetUser.Location = new Point(310, 17);
             lblGreetUser.Margin = new Padding(0, 17, 0, 0);
             lblGreetUser.Name = "lblGreetUser";
             lblGreetUser.Size = new Size(76, 16);
@@ -251,6 +252,7 @@
             // flowSideNavTop
             // 
             flowSideNavTop.Controls.Add(btnNavHome);
+            flowSideNavTop.Controls.Add(btnBilling);
             flowSideNavTop.Controls.Add(btnNavEmployees);
             flowSideNavTop.Controls.Add(btnCategories);
             flowSideNavTop.Controls.Add(btnLogs);
@@ -284,7 +286,7 @@
             btnNavEmployees.FlatAppearance.BorderSize = 0;
             btnNavEmployees.FlatStyle = FlatStyle.Flat;
             btnNavEmployees.Image = (Image)resources.GetObject("btnNavEmployees.Image");
-            btnNavEmployees.Location = new Point(0, 50);
+            btnNavEmployees.Location = new Point(0, 100);
             btnNavEmployees.Margin = new Padding(0);
             btnNavEmployees.Name = "btnNavEmployees";
             btnNavEmployees.Size = new Size(50, 50);
@@ -298,7 +300,7 @@
             btnCategories.FlatAppearance.BorderSize = 0;
             btnCategories.FlatStyle = FlatStyle.Flat;
             btnCategories.Image = (Image)resources.GetObject("btnCategories.Image");
-            btnCategories.Location = new Point(0, 100);
+            btnCategories.Location = new Point(0, 150);
             btnCategories.Margin = new Padding(0);
             btnCategories.Name = "btnCategories";
             btnCategories.Size = new Size(50, 50);
@@ -312,7 +314,7 @@
             btnLogs.FlatAppearance.BorderSize = 0;
             btnLogs.FlatStyle = FlatStyle.Flat;
             btnLogs.Image = (Image)resources.GetObject("btnLogs.Image");
-            btnLogs.Location = new Point(0, 150);
+            btnLogs.Location = new Point(0, 200);
             btnLogs.Margin = new Padding(0);
             btnLogs.Name = "btnLogs";
             btnLogs.Size = new Size(50, 50);
@@ -327,7 +329,7 @@
             btnAccounts.FlatAppearance.BorderSize = 0;
             btnAccounts.FlatStyle = FlatStyle.Flat;
             btnAccounts.Image = (Image)resources.GetObject("btnAccounts.Image");
-            btnAccounts.Location = new Point(0, 200);
+            btnAccounts.Location = new Point(0, 250);
             btnAccounts.Margin = new Padding(0);
             btnAccounts.Name = "btnAccounts";
             btnAccounts.Size = new Size(50, 50);
@@ -343,6 +345,20 @@
             pnlLine3.Name = "pnlLine3";
             pnlLine3.Size = new Size(1264, 1);
             pnlLine3.TabIndex = 3;
+            // 
+            // btnBilling
+            // 
+            btnBilling.Cursor = Cursors.Hand;
+            btnBilling.FlatAppearance.BorderSize = 0;
+            btnBilling.FlatStyle = FlatStyle.Flat;
+            btnBilling.Image = (Image)resources.GetObject("btnBilling.Image");
+            btnBilling.Location = new Point(0, 50);
+            btnBilling.Margin = new Padding(0);
+            btnBilling.Name = "btnBilling";
+            btnBilling.Size = new Size(50, 50);
+            btnBilling.TabIndex = 13;
+            btnBilling.Tag = "Billing";
+            btnBilling.UseVisualStyleBackColor = true;
             // 
             // frmMain
             // 
@@ -399,5 +415,6 @@
         private Label lblPageName;
         private Button btnCategories;
         private Button btnProfile;
+        private Button btnBilling;
     }
 }

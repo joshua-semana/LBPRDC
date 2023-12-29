@@ -1,51 +1,54 @@
 ﻿using LBPRDC.Source.Utilities;
-using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
+using static LBPRDC.Source.Services.EmployeeService;
 
 namespace LBPRDC.Source.Services
 {
-    
+    public class EmployeeBase
+    {
+        public string? EmployeeID { get; set; }
+        public string? LastName { get; set; }
+        public string? FirstName { get; set; }
+        public string? MiddleName { get; set; }
+        public string? FullName { get; set; }
+        public string? Department { get; set; }
+        public int DepartmentID { get; set; }
+        public string? Position { get; set; }
+        public int PositionID { get; set; }
+        public string? Location { get; set; }
+    }
+
+    public class EmployeeCompositeType : EmployeeBase
+    {
+        public string? Type { get; set; }
+    }
+
     internal class EmployeeService
     {
-        public class Employee
+        public class Employee : EmployeeBase
         {
-            public string? EmployeeID { get; set; }
-            public string? LastName { get; set; }
-            public string? FirstName { get; set; }
-            public string? MiddleName { get; set; }
             public string? Gender { get; set; }
             public DateTime? Birthday { get; set; }
             public string? Education { get; set; }
-            public int DepartmentID { get; set; }
             public int LocationID { get; set; }
             public string? EmailAddress1 { get; set; }
             public string? EmailAddress2 { get; set; }
             public string? ContactNumber1 { get; set; }
             public string? ContactNumber2 { get; set; }
             public int CivilStatusID { get; set; }
-            public int PositionID { get; set; }
             public int EmploymentStatusID { get; set; }
             public int SuffixID { get; set; }
             public string? Remarks { get; set; }
 
-            public string? FullName { get; set; }
             public string? EmailAddress { get; set; }
             public string? ContactNumber { get; set; }
             public string? CivilStatus { get; set; }
             public string? PositionCode { get; set; }
             public string? PositionName { get; set; }
-            public string? Position { get; set; }
             public string? EmploymentStatus { get; set; }
             public string? Suffix { get; set; }
             public decimal SalaryRate { get; set; }
             public decimal BillingRate { get; set; }
-            public string? Department { get; set; }
-            public string? Location { get; set; }
         }
 
         public class EmployeeHistory : Employee
@@ -91,6 +94,43 @@ namespace LBPRDC.Source.Services
             public int EmploymentStatusID { get; set; }
         }
 
+        public static List<EmployeeBase> GetAllEmployeesBase()
+        {
+            List<EmployeeBase> employees = new();
+
+            try
+            {
+                string querySelect = "SELECT EmployeeID, LastName, FirstName, MiddleName, DepartmentID, PositionID, LocationID FROM Employee";
+                using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
+                using SqlCommand command = new(querySelect, connection);
+                connection.Open();
+                using SqlDataReader reader = command.ExecuteReader();
+
+                var Department = DepartmentService.GetAllItems();
+                var Location = LocationService.GetAllItems();
+                var Position = PositionService.GetAllItems();
+
+                while (reader.Read())
+                {
+                    EmployeeBase employee = new()
+                    {
+                        EmployeeID = Convert.ToString(reader["EmployeeID"]),
+                        LastName = Convert.ToString(reader["LastName"]),
+                        FirstName = Convert.ToString(reader["FirstName"]),
+                        MiddleName = Convert.ToString(reader["MiddleName"]),
+                        Department = Department.First(f => f.ID == Convert.ToInt32(reader["DepartmentID"])).Name,
+                        Location = Location.First(f => f.ID == Convert.ToInt32(reader["LocationID"])).Name,
+                        Position = Position.First(f => f.ID == Convert.ToInt32(reader["PositionID"])).Name,
+                    };
+
+                    employees.Add(employee);
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return employees;
+        }
+
         private static UserPreference preference;
         public static List<Employee> GetAllEmployees()
         {
@@ -106,6 +146,13 @@ namespace LBPRDC.Source.Services
                     connection.Open();
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
+                        var CivilStatus = CivilStatusService.GetAllItems();
+                        var EmploymentStatus = EmploymentStatusService.GetAllItems();
+                        var Suffix = SuffixService.GetAllItems();
+                        var Department = DepartmentService.GetAllItems();
+                        var Location = LocationService.GetAllItems();
+                        var Position = PositionService.GetAllItems();
+
                         while (reader.Read())
                         {
                             Employee emp = new()
@@ -130,16 +177,16 @@ namespace LBPRDC.Source.Services
                                 Remarks = Convert.ToString(reader["Remarks"])
                             };
 
-                            var position = PositionService.GetAllItems().First(f => f.ID == emp.PositionID);
+                            var position = Position.First(f => f.ID == emp.PositionID);
                             emp.PositionName = position.Name;
                             emp.PositionCode = position.Code;
                             emp.BillingRate = Convert.ToDecimal(position.BillingRate);
                             emp.SalaryRate = Convert.ToDecimal(position.SalaryRate);
-                            emp.CivilStatus = CivilStatusService.GetAllItems().First(f => f.ID == emp.CivilStatusID).Name;
-                            emp.EmploymentStatus = EmploymentStatusService.GetAllItems().First(f => f.ID == emp.EmploymentStatusID).Name;
-                            emp.Suffix = SuffixService.GetAllItems().First(f => f.ID == emp.SuffixID).Name;
-                            emp.Department = DepartmentService.GetAllItems().First(f => f.ID == emp.DepartmentID).Name;
-                            emp.Location = LocationService.GetAllItems().First(f => f.ID == emp.LocationID).Name;
+                            emp.CivilStatus = CivilStatus.First(f => f.ID == emp.CivilStatusID).Name;
+                            emp.EmploymentStatus = EmploymentStatus.First(f => f.ID == emp.EmploymentStatusID).Name;
+                            emp.Suffix = Suffix.First(f => f.ID == emp.SuffixID).Name;
+                            emp.Department = Department.First(f => f.ID == emp.DepartmentID).Name;
+                            emp.Location = Location.First(f => f.ID == emp.LocationID).Name;
 
                             if (preference.ShowName)
                             {
@@ -641,6 +688,122 @@ namespace LBPRDC.Source.Services
                 return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static bool ArchiveEmployee(string EmployeeID)
+        {
+            try
+            {
+                var Suffix = SuffixService.GetAllItems();
+                var Department = DepartmentService.GetAllItems();
+                var Location = LocationService.GetAllItems();
+                var CivilStatus = CivilStatusService.GetAllItems();
+                var Position = PositionService.GetAllItems();
+                var EmploymentStatus = EmploymentStatusService.GetAllItems();
+
+                string QuerySelect = $"SELECT * FROM Employee WHERE EmployeeID = '{EmployeeID}'";
+                using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
+                using SqlCommand commandSelect = new(QuerySelect, connection);
+                connection.Open();
+                using SqlDataReader reader = commandSelect.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    Employee employee = new()
+                    {
+                        EmployeeID = Convert.ToString(reader["EmployeeID"]),
+                        LastName = Convert.ToString(reader["LastName"]),
+                        FirstName = Convert.ToString(reader["FirstName"]),
+                        MiddleName = Convert.ToString(reader["MiddleName"]),
+                        Suffix = Suffix.First(f => f.ID == Convert.ToInt32(reader["SuffixID"])).Name,
+                        Gender = Convert.ToString(reader["Gender"]),
+                        Birthday = Convert.ToDateTime(reader["Birthday"]),
+                        Education = Convert.ToString(reader["Education"]),
+                        Department = Department.First(f => f.ID == Convert.ToInt32(reader["DepartmentID"])).Name,
+                        Location = Location.First(f => f.ID == Convert.ToInt32(reader["LocationID"])).Name,
+                        EmailAddress1 = Convert.ToString(reader["EmailAddress1"]),
+                        EmailAddress2 = Convert.ToString(reader["EmailAddress2"]),
+                        ContactNumber1 = Convert.ToString(reader["ContactNumber1"]),
+                        ContactNumber2 = Convert.ToString(reader["ContactNumber2"]),
+                        CivilStatus = CivilStatus.First(f => f.ID == Convert.ToInt32(reader["CivilStatusID"])).Name,
+                        Position = Position.First(f => f.ID == Convert.ToInt32(reader["PositionID"])).Name,
+                        EmploymentStatus = EmploymentStatus.First(f => f.ID == Convert.ToInt32(reader["EmploymentStatusID"])).Name,
+                        Remarks = Convert.ToString(reader["Remarks"])
+                    };
+
+                    AddToArchive(employee);
+                    RemoveEmployeeRecord(EmployeeID);
+
+                    if (UserService.CurrentUser != null)
+                    {
+                        LoggingService.Log newLog = new()
+                        {
+                            UserID = UserService.CurrentUser.UserID,
+                            ActivityType = "Archive",
+                            ActivityDetails = $"This user has archived an employee with the ID {EmployeeID}."
+                        };
+
+                        LoggingService.LogActivity(newLog);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("There seems to be a problem archiving this employee. Please contact support");
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        private static void AddToArchive(Employee employee)
+        {
+            try
+            {
+                string QueryInsert = "INSERT INTO Archive_Employee (EmployeeID, LastName, FirstName, MiddleName, Suffix, Gender, Birthday, Education, Department, Location, EmailAddress1, EmailAddress2, ContactNumber1, ContactNumber2, CivilStatus, Position, EmploymentStatus, Remarks) " +
+                                "VALUES (@EmployeeID, @LastName, @FirstName, @MiddleName, @Suffix, @Gender, @Birthday, @Education, @Department, @Location, @EmailAddress1, @EmailAddress2, @ContactNumber1, @ContactNumber2, @CivilStatus, @Position, @EmploymentStatus, @Remarks)";
+                using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
+                using SqlCommand commandInsert = new(QueryInsert, connection);
+                commandInsert.Parameters.AddWithValue("@EmployeeID", employee.EmployeeID);
+                commandInsert.Parameters.AddWithValue("@LastName", employee.LastName);
+                commandInsert.Parameters.AddWithValue("@FirstName", employee.FirstName);
+                commandInsert.Parameters.AddWithValue("@MiddleName", employee.MiddleName);
+                commandInsert.Parameters.AddWithValue("@Suffix", employee.Suffix);
+                commandInsert.Parameters.AddWithValue("@Gender", employee.Gender);
+                commandInsert.Parameters.AddWithValue("@Birthday", employee.Birthday);
+                commandInsert.Parameters.AddWithValue("@Education", employee.Education);
+                commandInsert.Parameters.AddWithValue("@Department", employee.Department);
+                commandInsert.Parameters.AddWithValue("@Location", employee.Location);
+                commandInsert.Parameters.AddWithValue("@EmailAddress1", employee.EmailAddress1);
+                commandInsert.Parameters.AddWithValue("@EmailAddress2", employee.EmailAddress2);
+                commandInsert.Parameters.AddWithValue("@ContactNumber1", employee.ContactNumber1);
+                commandInsert.Parameters.AddWithValue("@ContactNumber2", employee.ContactNumber2);
+                commandInsert.Parameters.AddWithValue("@CivilStatus", employee.CivilStatus);
+                commandInsert.Parameters.AddWithValue("@Position", employee.Position);
+                commandInsert.Parameters.AddWithValue("@EmploymentStatus", employee.EmploymentStatus);
+                commandInsert.Parameters.AddWithValue("@Remarks", employee.Remarks);
+                connection.Open();
+                commandInsert.ExecuteNonQuery();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        private static void RemoveEmployeeRecord(string EmployeeID)
+        {
+            try
+            {
+                string QueryDelete = $"DELETE FROM EmployeeCivilStatusHistory WHERE EmployeeID = '{EmployeeID}';" +
+                            $"DELETE FROM EmployeeDepartmentLocationHistory WHERE EmployeeID = '{EmployeeID}';" +
+                            $"DELETE FROM EmployeeEmploymentHistory WHERE EmployeeID = '{EmployeeID}';" +
+                            $"DELETE FROM EmployeePositionHistory WHERE EmployeeID = '{EmployeeID}';" +
+                            $"DELETE FROM EmployeePreviousRecord WHERE EmployeeID = '{EmployeeID}';" +
+                            $"DELETE FROM Employee WHERE EmployeeID = '{EmployeeID}';";
+                using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
+                using SqlCommand commandDelete = new(QueryDelete, connection);
+                connection.Open();
+                commandDelete.ExecuteNonQuery();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
     }
 }

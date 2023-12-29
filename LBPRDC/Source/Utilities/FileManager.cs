@@ -1,10 +1,4 @@
 ﻿using OfficeOpenXml;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LBPRDC.Source.Utilities
 {
@@ -12,16 +6,28 @@ namespace LBPRDC.Source.Utilities
     {
         public static string? OpenFile()
         {
-            using (OpenFileDialog openFile = new OpenFileDialog())
-            {
-                openFile.Title = "Select an Excel File";
-                openFile.Filter = "Excel Files|*.xlsx";
-                openFile.Multiselect = false;
+            using OpenFileDialog openFile = new();
+            openFile.Title = "Select an Excel File";
+            openFile.Filter = "Excel Files|*.xlsx";
+            openFile.Multiselect = false;
 
-                if (openFile.ShowDialog() == DialogResult.OK)
-                {
-                    return openFile.FileName;
-                }
+            if (openFile.ShowDialog() == DialogResult.OK)
+            {
+                return openFile.FileName;
+            }
+
+            return null;
+        }
+
+        public static string? ChooseSavingPath()
+        {
+            using SaveFileDialog saveFileDialog = new();
+            saveFileDialog.Title = "Select the Saving Path for the Excel Report";
+            saveFileDialog.Filter = "Excel Files|*.xlsx";
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                return saveFileDialog.FileName;
             }
 
             return null;

@@ -241,6 +241,22 @@ namespace LBPRDC.Source.Views
             frmEditEmployee.ShowDialog();
         }
 
+        private async void cntxtMenuArchive_Click(object sender, EventArgs e)
+        {
+            var output = MessageBox.Show("Are you sure you want to archive this employee?", "Archive Employee", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (output == DialogResult.Yes)
+            {
+                Cursor = Cursors.WaitCursor;
+                EmployeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+                if (await Task.Run(() => EmployeeService.ArchiveEmployee(EmployeeID)))
+                {
+                    MessageBox.Show("You have successfully archived this employee.", "Archive Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ApplyFilterAndSearchThenPopulate();
+                }
+                Cursor = Cursors.Default;
+            }
+        }
+
         private void menuUpdatePosition_Click(object sender, EventArgs e)
         {
             EmployeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
@@ -340,6 +356,11 @@ namespace LBPRDC.Source.Views
         private void menuHistoryDepartmentLocation_Click(object sender, EventArgs e)
         {
             ViewEmployeeHistory("Department and Location");
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            ApplyFilterAndSearchThenPopulate();
         }
     }
 }

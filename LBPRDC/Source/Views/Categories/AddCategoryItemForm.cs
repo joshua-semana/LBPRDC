@@ -12,6 +12,7 @@ namespace LBPRDC.Source.Views.Categories
         private readonly List<Control> CommonFields;
         private readonly List<Control> PositionSpecificFields;
         private readonly List<Control> LocationSpecificFields;
+        private readonly List<Control> DepartmentSpecificFields;
 
         public AddCategoryItemForm()
         {
@@ -42,6 +43,12 @@ namespace LBPRDC.Source.Views.Categories
                 cmbDepartment
             };
 
+            DepartmentSpecificFields = new()
+            {
+                lblCode,
+                txtCode
+            };
+
             RequiredFields = new();
         }
 
@@ -63,6 +70,7 @@ namespace LBPRDC.Source.Views.Categories
                     break;
 
                 case "Department":
+                    ControlUtils.ToggleControlVisibility(DepartmentSpecificFields, true);
                     break;
 
                 case "Civil Status":
@@ -122,6 +130,27 @@ namespace LBPRDC.Source.Views.Categories
         {
             if (ControlUtils.AreRequiredFieldsFilled(RequiredFields))
             {
+                switch (CategoryName)
+                {
+                    case "Department":
+                        var similarDepartmentCodes = DepartmentService.GetAllItems().Where(w => txtCode.Text.ToUpper().Equals(w.Code)).ToList();
+                        if (similarDepartmentCodes.Count > 0)
+                        {
+                            MessageBox.Show("This code has already been used. Please enter another code to continue.", "Duplicate Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        };
+                        break;
+
+                    case "Position":
+                        var similarPositionCodes = PositionService.GetAllItems().Where(w => txtCode.Text.ToUpper().Equals(w.Code)).ToList();
+                        if (similarPositionCodes.Count > 0)
+                        {
+                            MessageBox.Show("This code has already been used. Please enter another code to continue.", "Duplicate Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        };
+                        break;
+                };
+
                 AddNewItem();
             }
         }
@@ -144,6 +173,7 @@ namespace LBPRDC.Source.Views.Categories
                 case "Department":
                     DepartmentService.Department AddForDepartment = new()
                     {
+                        Code = txtCode.Text.ToUpper().Trim(),
                         Name = txtName.Text.Trim(),
                         Description = txtDescription.Text.ToUpper().Trim(),
                         Status = cmbStatus.Text
@@ -196,6 +226,11 @@ namespace LBPRDC.Source.Views.Categories
                 ParentControl?.PopulateTableAndFields();
                 this.Close();
             }
+        }
+
+        private void ToUpperCase_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (char.IsLetter(e.KeyChar)) e.KeyChar = char.ToUpper(e.KeyChar);
         }
     }
 }

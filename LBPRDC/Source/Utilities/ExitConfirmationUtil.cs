@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LBPRDC.Source.Utilities
+﻿namespace LBPRDC.Source.Utilities
 {
     internal class ExitConfirmationUtil
     {
@@ -12,6 +6,12 @@ namespace LBPRDC.Source.Utilities
         {
             DialogResult result = MessageBox.Show("Are you sure you want to exit? Your account will be signed out, and any unsaved changes will be lost.", "Exit Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             return (result == DialogResult.Yes);
+        }
+
+        public static bool CloseProgress()
+        {
+            var output = MessageBox.Show("Are you sure you want to exit? You have unsaved progress. Any unsaved changes will be lost.", "Exit Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            return output == DialogResult.Yes;
         }
     }
 }

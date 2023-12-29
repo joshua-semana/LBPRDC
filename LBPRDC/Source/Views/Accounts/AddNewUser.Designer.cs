@@ -47,6 +47,12 @@
             txtUsername = new TextBox();
             label7 = new Label();
             grpPersonalData = new GroupBox();
+            label13 = new Label();
+            txtPositionTitle = new TextBox();
+            label14 = new Label();
+            label11 = new Label();
+            label12 = new Label();
+            txtMiddleName = new TextBox();
             label9 = new Label();
             txtEmailAddress = new TextBox();
             label3 = new Label();
@@ -129,7 +135,7 @@
             btnAdd.Margin = new Padding(8, 0, 0, 0);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(75, 28);
-            btnAdd.TabIndex = 27;
+            btnAdd.TabIndex = 9;
             btnAdd.Text = "Add";
             btnAdd.UseVisualStyleBackColor = true;
             btnAdd.Click += btnAdd_Click;
@@ -142,7 +148,7 @@
             btnCancel.Margin = new Padding(0);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(75, 28);
-            btnCancel.TabIndex = 26;
+            btnCancel.TabIndex = 8;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
@@ -199,7 +205,7 @@
             txtConfirmPassword.MaxLength = 50;
             txtConfirmPassword.Name = "txtConfirmPassword";
             txtConfirmPassword.Size = new Size(400, 26);
-            txtConfirmPassword.TabIndex = 20;
+            txtConfirmPassword.TabIndex = 7;
             txtConfirmPassword.UseSystemPasswordChar = true;
             // 
             // label8
@@ -235,7 +241,7 @@
             txtPassword.MaxLength = 50;
             txtPassword.Name = "txtPassword";
             txtPassword.Size = new Size(400, 26);
-            txtPassword.TabIndex = 17;
+            txtPassword.TabIndex = 6;
             txtPassword.UseSystemPasswordChar = true;
             // 
             // label4
@@ -271,7 +277,7 @@
             txtUsername.MaxLength = 50;
             txtUsername.Name = "txtUsername";
             txtUsername.Size = new Size(400, 26);
-            txtUsername.TabIndex = 0;
+            txtUsername.TabIndex = 5;
             // 
             // label7
             // 
@@ -287,6 +293,12 @@
             // 
             // grpPersonalData
             // 
+            grpPersonalData.Controls.Add(label13);
+            grpPersonalData.Controls.Add(txtPositionTitle);
+            grpPersonalData.Controls.Add(label14);
+            grpPersonalData.Controls.Add(label11);
+            grpPersonalData.Controls.Add(label12);
+            grpPersonalData.Controls.Add(txtMiddleName);
             grpPersonalData.Controls.Add(label9);
             grpPersonalData.Controls.Add(txtEmailAddress);
             grpPersonalData.Controls.Add(label3);
@@ -304,6 +316,71 @@
             grpPersonalData.TabIndex = 1;
             grpPersonalData.TabStop = false;
             grpPersonalData.Text = "Personal Information";
+            // 
+            // label13
+            // 
+            label13.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label13.AutoSize = true;
+            label13.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label13.ForeColor = Color.Red;
+            label13.Location = new Point(292, 90);
+            label13.Margin = new Padding(0, 0, 0, 4);
+            label13.Name = "label13";
+            label13.Size = new Size(14, 18);
+            label13.TabIndex = 29;
+            label13.Text = "*";
+            // 
+            // txtPositionTitle
+            // 
+            txtPositionTitle.AccessibleName = "Position Title";
+            txtPositionTitle.Location = new Point(213, 115);
+            txtPositionTitle.MaxLength = 100;
+            txtPositionTitle.Name = "txtPositionTitle";
+            txtPositionTitle.Size = new Size(197, 26);
+            txtPositionTitle.TabIndex = 4;
+            // 
+            // label14
+            // 
+            label14.AutoSize = true;
+            label14.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label14.Location = new Point(209, 92);
+            label14.Margin = new Padding(3, 0, 0, 4);
+            label14.Name = "label14";
+            label14.Size = new Size(87, 16);
+            label14.TabIndex = 27;
+            label14.Text = "Position Title";
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label11.ForeColor = Color.Red;
+            label11.Location = new Point(226, 25);
+            label11.Margin = new Padding(0, 0, 0, 4);
+            label11.Name = "label11";
+            label11.Size = new Size(14, 18);
+            label11.TabIndex = 26;
+            label11.Text = "*";
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label12.Location = new Point(142, 27);
+            label12.Margin = new Padding(3, 0, 0, 4);
+            label12.Name = "label12";
+            label12.Size = new Size(88, 16);
+            label12.TabIndex = 25;
+            label12.Text = "Middle Name";
+            // 
+            // txtMiddleName
+            // 
+            txtMiddleName.AccessibleName = "Middle Name";
+            txtMiddleName.Location = new Point(146, 50);
+            txtMiddleName.MaxLength = 50;
+            txtMiddleName.Name = "txtMiddleName";
+            txtMiddleName.Size = new Size(129, 26);
+            txtMiddleName.TabIndex = 1;
             // 
             // label9
             // 
@@ -324,8 +401,8 @@
             txtEmailAddress.Location = new Point(10, 115);
             txtEmailAddress.MaxLength = 100;
             txtEmailAddress.Name = "txtEmailAddress";
-            txtEmailAddress.Size = new Size(400, 26);
-            txtEmailAddress.TabIndex = 20;
+            txtEmailAddress.Size = new Size(197, 26);
+            txtEmailAddress.TabIndex = 3;
             // 
             // label3
             // 
@@ -343,7 +420,7 @@
             label24.AutoSize = true;
             label24.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             label24.ForeColor = Color.Red;
-            label24.Location = new Point(279, 25);
+            label24.Location = new Point(347, 25);
             label24.Margin = new Padding(0, 0, 0, 4);
             label24.Name = "label24";
             label24.Size = new Size(14, 18);
@@ -367,7 +444,7 @@
             // 
             label22.AutoSize = true;
             label22.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label22.Location = new Point(209, 27);
+            label22.Location = new Point(277, 27);
             label22.Margin = new Padding(3, 0, 0, 4);
             label22.Name = "label22";
             label22.Size = new Size(74, 16);
@@ -377,10 +454,10 @@
             // txtLastName
             // 
             txtLastName.AccessibleName = "Last Name";
-            txtLastName.Location = new Point(213, 50);
+            txtLastName.Location = new Point(281, 50);
             txtLastName.MaxLength = 50;
             txtLastName.Name = "txtLastName";
-            txtLastName.Size = new Size(197, 26);
+            txtLastName.Size = new Size(129, 26);
             txtLastName.TabIndex = 2;
             // 
             // txtFirstName
@@ -390,7 +467,7 @@
             txtFirstName.Margin = new Padding(7, 3, 3, 16);
             txtFirstName.MaxLength = 50;
             txtFirstName.Name = "txtFirstName";
-            txtFirstName.Size = new Size(197, 26);
+            txtFirstName.Size = new Size(129, 26);
             txtFirstName.TabIndex = 0;
             // 
             // label1
@@ -488,5 +565,11 @@
         private Label label10;
         private Label label32;
         private Panel pnlHeader;
+        private Label label11;
+        private Label label12;
+        private TextBox txtMiddleName;
+        private Label label13;
+        private TextBox txtPositionTitle;
+        private Label label14;
     }
 }

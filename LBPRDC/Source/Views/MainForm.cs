@@ -3,7 +3,8 @@ using LBPRDC.Source.Views.Logs;
 using LBPRDC.Source.Views.Accounts;
 using LBPRDC.Source.Views.Profile;
 using LBPRDC.Source.Views.Categories;
-
+using LBPRDC.Source.Views.Billing;
+using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views
 {
@@ -12,10 +13,11 @@ namespace LBPRDC.Source.Views
         private List<Button> pageSwitchButtons = new();
         private string currentPage = "Home";
 
-        UserControl employeesMainControl = new ucEmployees() { Dock = DockStyle.Fill };
-        UserControl logsControl = new LogsControl() { Dock = DockStyle.Fill };
-        UserControl accountsControl = new AccountsControl() { Dock = DockStyle.Fill };
-        UserControl categoriesControl = new CategoriesControl() { Dock = DockStyle.Fill};
+        readonly UserControl EmployeeControl = new ucEmployees() { Dock = DockStyle.Fill };
+        readonly UserControl LogsControl = new LogsControl() { Dock = DockStyle.Fill };
+        readonly UserControl AccountsControl = new AccountsControl() { Dock = DockStyle.Fill };
+        readonly UserControl CategoriesControl = new CategoriesControl() { Dock = DockStyle.Fill };
+        readonly UserControl BillingControl = new BillingControl() { Dock = DockStyle.Fill };
 
         public frmMain()
         {
@@ -27,9 +29,15 @@ namespace LBPRDC.Source.Views
         {
             UpdatePageSwitchButtonsStyle();
             InitializeFeatureBasedOnUserRole();
+            PopulateGreetingText();
             lblDateToday.Text = DateTime.Now.ToString("MMM. dd, yyyy (ddd)");
-            lblGreetUser.Text = "Hello, " + UserService.CurrentUser?.FirstName;
             lblPageName.Text = currentPage;
+        }
+
+        private void PopulateGreetingText()
+        {
+            string randomGreeting = StringConstants.Greetings[new Random().Next(StringConstants.Greetings.Length)];
+            lblGreetUser.Text = $"{randomGreeting} {UserService.CurrentUser?.FirstName} 👋🏻";
         }
 
         private void InitializeFeatureBasedOnUserRole()
@@ -59,14 +67,9 @@ namespace LBPRDC.Source.Views
         {
             foreach (Button button in pageSwitchButtons)
             {
-                if ((string)button.Tag == currentPage)
-                {
-                    button.BackColor = Utilities.ColorConstants.PageSwitchButton;
-                }
-                else
-                {
-                    button.BackColor = Utilities.ColorConstants.Default;
-                }
+                button.BackColor = ((string)button.Tag == currentPage) ?
+                    Utilities.ColorConstants.PageSwitchButton :
+                    Utilities.ColorConstants.Default;
             }
         }
 
@@ -82,38 +85,44 @@ namespace LBPRDC.Source.Views
         private void DisplayPage(string pageName)
         {
             //homeControl.Hide();
-            employeesMainControl.Hide();
-            accountsControl.Hide();
-            logsControl.Hide();
-            categoriesControl.Hide();
+            BillingControl.Hide();
+            EmployeeControl.Hide();
+            AccountsControl.Hide();
+            LogsControl.Hide();
+            CategoriesControl.Hide();
 
             lblPageName.Text = pageName;
 
             switch (pageName)
             {
                 case "Home":
-                    //homeControl.Dock = DockStyle.Fill;
                     //pnlContent.Controls.Add(homeControl);
                     //homeControl.Show();
                     break;
+
+                case "Billing":
+                    pnlContent.Controls.Add(BillingControl);
+                    BillingControl.Show();
+                    break;
+
                 case "Employees":
-                    pnlContent.Controls.Add(employeesMainControl);
-                    employeesMainControl.Show();
+                    pnlContent.Controls.Add(EmployeeControl);
+                    EmployeeControl.Show();
                     break;
 
                 case "Accounts":
-                    pnlContent.Controls.Add(accountsControl);
-                    accountsControl.Show();
+                    pnlContent.Controls.Add(AccountsControl);
+                    AccountsControl.Show();
                     break;
 
                 case "Logs":
-                    pnlContent.Controls.Add(logsControl);
-                    logsControl.Show();
+                    pnlContent.Controls.Add(LogsControl);
+                    LogsControl.Show();
                     break;
 
                 case "Categories":
-                    pnlContent.Controls.Add(categoriesControl);
-                    categoriesControl.Show();
+                    pnlContent.Controls.Add(CategoriesControl);
+                    CategoriesControl.Show();
                     break;
             }
         }

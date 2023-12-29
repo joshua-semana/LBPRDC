@@ -16,11 +16,38 @@
     <Compile Update="Source\Views\Accounts\ViewGeneratedPassword.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Source\Views\Billing\AddAdjustmentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Source\Views\Billing\BillingControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Source\Views\Billing\EmployeeTimekeepReviewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Source\Views\Billing\ExportEmployeeSelectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Source\Views\Billing\NewBillingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Source\Views\Billing\UnrecognizedEmployeeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Source\Views\Billing\SummaryViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Source\Views\Billing\UploadFileForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Source\Views\Categories\AddCategoryItemForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Source\Views\Categories\CategoriesControl.cs">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Source\Views\Categories\PositionRatesHistory.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Update="Source\Views\EmployeeFlow\EditEmployeeForm.cs">
       <SubType>Form</SubType>

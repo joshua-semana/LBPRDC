@@ -138,5 +138,10 @@ namespace LBPRDC.Source.Views.Accounts
                 viewGeneratedPassword.ShowDialog();
             }
         }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            PopulateTableWithSearch(txtSearch.Text.Trim().ToLower());
+        }
     }
 }

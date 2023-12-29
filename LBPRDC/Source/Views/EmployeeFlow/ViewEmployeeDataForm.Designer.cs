@@ -724,7 +724,7 @@
             Name = "ViewEmployeeDataForm";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Employee Details";
+            Text = "Employee Information";
             Load += ViewEmployeeDataForm_Load;
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();

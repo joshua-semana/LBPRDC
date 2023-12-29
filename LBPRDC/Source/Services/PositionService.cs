@@ -96,7 +96,8 @@ namespace LBPRDC.Source.Services
             try
             {
                 string QueryUpdate = "INSERT INTO Position (Code, Name, SalaryRate, BillingRate, Description, Status) " +
-                    "VALUES (@Code, @Name, @SalaryRate, @BillingRate, @Description, @Status)";
+                    "VALUES (@Code, @Name, @SalaryRate, @BillingRate, @Description, @Status); " +
+                    "SELECT SCOPE_IDENTITY();"; // <-- This is to get the last inserted ID
 
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(QueryUpdate, connection))
@@ -108,7 +109,16 @@ namespace LBPRDC.Source.Services
                     command.Parameters.AddWithValue("@Description", data.Description);
                     command.Parameters.AddWithValue("@Status", data.Status);
                     connection.Open();
-                    await command.ExecuteNonQueryAsync();
+                    var insertedId = await command.ExecuteScalarAsync();
+
+                    RatesHistory newRates = new()
+                    {
+                        PositionID = Convert.ToInt32(insertedId),
+                        SalaryRate = data.SalaryRate,
+                        BillingRate = data.BillingRate
+                    };
+
+                    AddRatesHistory(newRates);
                 }
 
                 if (UserService.CurrentUser != null)
@@ -388,6 +398,78 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
+        }
+
+        public class RatesHistory
+        {
+            public int PositionID { get; set; }
+            public decimal SalaryRate { get; set; }
+            public decimal BillingRate { get; set; }
+        }
+
+        public class RatesHistoryView
+        {
+            public string? Status { get; set; }
+            public decimal SalaryRate { get; set; }
+            public decimal BillingRate { get; set; }
+            public DateTime Timestamp { get; set; }
+        }
+
+        public static void AddRatesHistory(RatesHistory history)
+        {
+            try
+            {
+                string queryAdd = "INSERT INTO PositionRatesHistory (PositionID, SalaryRate, BillingRate, TimeStamp) " +
+                    "VALUES (@PositionID, @SalaryRate, @BillingRate, @TimeStamp)";
+                using (SqlConnection connection =  new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(queryAdd, connection))
+                {
+                    command.Parameters.AddWithValue("@PositionID", history.PositionID);
+                    command.Parameters.AddWithValue("@SalaryRate", history.SalaryRate);
+                    command.Parameters.AddWithValue("@BillingRate", history.BillingRate);
+                    command.Parameters.AddWithValue("@TimeStamp", DateTime.Now);
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static List<RatesHistoryView> GetRatesHistoryByID(int? positionID)
+        {
+            List<RatesHistoryView> histories = new();
+
+            try
+            {
+                string query = "SELECT * FROM PositionRatesHistory WHERE PositionID = @PositionID " +
+                    "ORDER BY Timestamp DESC";
+                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
+                using (SqlCommand command = new(new(query), connection))
+                {
+                    command.Parameters.AddWithValue("@PositionID", positionID);
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        RatesHistoryView history = new()
+                        {
+                            SalaryRate = Convert.ToDecimal(reader["SalaryRate"]),
+                            BillingRate = Convert.ToDecimal(reader["BillingRate"]),
+                            Timestamp = Convert.ToDateTime(reader["Timestamp"])
+                        };
+
+                        histories.Add(history);
+                    }
+                }
+
+                if (histories.Count > 0)
+                {
+                    histories[0].Status = "Current";
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return histories;
         }
     }
 }
