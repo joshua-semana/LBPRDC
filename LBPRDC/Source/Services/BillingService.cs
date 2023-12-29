@@ -1,11 +1,36 @@
 ﻿using System.Data.SqlClient;
 using System.Globalization;
-using System.Net.NetworkInformation;
 using System.Text.Json;
-using System.Web;
 
 namespace LBPRDC.Source.Services
 {
+    public class EntryAdjustments
+    {
+        public int ID { get; set; }
+        public string? Type { get; set; }
+        public string? Operation { get; set; }
+        public string? InputValue { get; set; }
+        public string? Units { get; set; }
+        public string? AppliedDate { get; set; }
+        public string? Remarks { get; set; }
+    }
+
+    public class AdjustmentSummary
+    {
+        public string? Type { get; set; }
+        public string? OriginalValue { get; set; }
+        public string? InputValueTotal { get; set; }
+        public string? NewValue { get; set; }
+        public string? Units { get; set; }
+    }
+
+    public class AdjustmentRemarks
+    {
+        public string? Type { get; set; }
+        public string? TimeType { get; set; }
+        public string? Value { get; set; }
+    }
+
     internal class BillingService
     {
         public class Billing
@@ -19,7 +44,8 @@ namespace LBPRDC.Source.Services
             public DateTime StartDate { get; set; }
             public DateTime EndDate { get; set; }
             public DateTime Timestamp { get; set; }
-            public string? JSONData { get; set; }
+            public string? ConstantJSON { get; set; }
+            public string? EditableJSON { get; set; }
             public string? VerificationStatus { get; set; }
             public string? Description { get; set; }
             public string? Status { get; set; }
@@ -50,6 +76,47 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return totalCount;
+        }
+
+        public static BillingView GetBillingDetailsByName(string billingName)
+        {
+            BillingView billing = new();
+            try
+            {
+                string QueryGet = $"SELECT * FROM Billing WHERE Name = '{billingName}'";
+                using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
+                connection.Open();
+
+                using SqlCommand command = new(QueryGet, connection);
+                using SqlDataReader reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    string[] monthNames = DateTimeFormatInfo.CurrentInfo.MonthNames;
+                    billing = new() 
+                    {
+                        ID = Convert.ToInt32(reader["ID"]),
+                        UserID = Convert.ToInt32(reader["UserID"]),
+                        Name = Convert.ToString(reader["Name"]),
+                        Month = Convert.ToInt32(reader["Month"]),
+                        Year = Convert.ToInt32(reader["Year"]),
+                        Quarter = Convert.ToInt32(reader["Quarter"]),
+                        StartDate = Convert.ToDateTime(reader["StartDate"]),
+                        EndDate = Convert.ToDateTime(reader["EndDate"]),
+                        Timestamp = Convert.ToDateTime(reader["Timestamp"]),
+                        ConstantJSON = Convert.ToString(reader["ConstantJSON"]),
+                        EditableJSON = Convert.ToString(reader["EditableJSON"]),
+                        VerificationStatus = Convert.ToString(reader["VerificationStatus"]),
+                        Description = Convert.ToString(reader["Description"]),
+                        MonthName = monthNames[Convert.ToInt32(reader["Month"]) - 1],
+                        QuarterName = Convert.ToString(reader["Quarter"]),
+                        FormattedStartDate = Convert.ToDateTime(reader["StartDate"]).ToString("MMMM dd, yyyy"),
+                        FormattedEndDate = Convert.ToDateTime(reader["EndDate"]).ToString("MMMM dd, yyyy"),
+                        Status = Convert.ToString(reader["Status"])
+                    };
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+            return billing;
         }
 
         public static (List<BillingView>, int TotalCount) GetFilteredItems(string searchWord)
@@ -98,8 +165,9 @@ namespace LBPRDC.Source.Services
                         StartDate = Convert.ToDateTime(reader["StartDate"]),
                         EndDate = Convert.ToDateTime(reader["EndDate"]),
                         Timestamp = Convert.ToDateTime(reader["Timestamp"]),
-                        JSONData = Convert.ToString(reader["JSONData"]) != "" ? "✔️ (Uploaded)" : "",
-                        VerificationStatus = (Convert.ToString(reader["VerificationStatus"]) == "Yes") ? "Yes" : "",
+                        ConstantJSON = Convert.ToString(reader["ConstantJSON"]) != "" ? "✔️" : "",
+                        EditableJSON = Convert.ToString(reader["EditableJSON"]),
+                        VerificationStatus = (Convert.ToString(reader["VerificationStatus"]) == "Verified") ? "✔️" : "",
                         Description = Convert.ToString(reader["Description"]),
                         FullName = $"{Convert.ToString(reader["FirstName"])} {Convert.ToString(reader["LastName"])}",
                         MonthName = monthNames[Convert.ToInt32(reader["Month"]) - 1],
@@ -121,8 +189,8 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string QueryAdd = "INSERT INTO Billing (UserID, Name, Month, Year, Quarter, StartDate, EndDate, Timestamp, JSONData, VerificationStatus, Description, Status) " +
-                                  "VALUES (@UserID, @Name, @Month, @Year, @Quarter, @StartDate, @EndDate, @Timestamp, @JSONData, @VerificationStatus, @Description, @Status)";
+                string QueryAdd = "INSERT INTO Billing (UserID, Name, Month, Year, Quarter, StartDate, EndDate, Timestamp, ConstantJSON, EditableJSON, VerificationStatus, Description, Status) " +
+                                  "VALUES (@UserID, @Name, @Month, @Year, @Quarter, @StartDate, @EndDate, @Timestamp, @ConstantJSON, @EditableJSON, @VerificationStatus, @Description, @Status)";
 
                 using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
                 using SqlCommand command = new(QueryAdd, connection);
@@ -135,10 +203,9 @@ namespace LBPRDC.Source.Services
                 command.Parameters.AddWithValue("@StartDate", data.StartDate);
                 command.Parameters.AddWithValue("@EndDate", data.EndDate);
                 command.Parameters.AddWithValue("@Timestamp", DateTime.Now);
-                command.Parameters.AddWithValue("@JSONData", String.Empty);
+                command.Parameters.AddWithValue("@ConstantJSON", String.Empty);
+                command.Parameters.AddWithValue("@EditableJSON", String.Empty);
                 command.Parameters.AddWithValue("@VerificationStatus", "No");
-                //command.Parameters.AddWithValue("@BaseFile", Array.Empty<byte>());
-                //command.Parameters.AddWithValue("@OutputFile", Array.Empty<byte>());
                 command.Parameters.AddWithValue("@Description", data.Description);
                 command.Parameters.AddWithValue("@Status", data.Status);
 
@@ -173,54 +240,45 @@ namespace LBPRDC.Source.Services
                 using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
                 using SqlCommand command = new(QueryUpdate, connection);
                 connection.Open();
-
-                command.ExecuteNonQuery();
-
-                return true;
+                var output = command.ExecuteNonQuery();
+                return (output > 0);
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateJSONData(List<Entry> entries, string billingName)
+        public static bool UploadJSON(List<Entry> entries, string billingName)
         {
             try
             {
                 string json = JsonSerializer.Serialize(entries);
-                string QueryUpdate = "UPDATE BILLING SET " +
-                    $"JSONData = '{json}' " +
+                string QueryUpdate = "UPDATE Billing SET " +
+                    $"ConstantJSON = '{json}', " +
+                    $"EditableJSON = '{json}' " +
                     $"WHERE Name = '{billingName}'";
                 using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
                 using SqlCommand command = new(QueryUpdate, connection);
                 connection.Open();
-                command.ExecuteNonQuery();
-
-                return true;
+                var output = command.ExecuteNonQuery();
+                return (output > 0);
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static List<Entry> LoadJSONData(string billingName)
+        public static bool UpdateEditableJSON(List<Entry> entries, string billingName)
         {
-            List<Entry> entries = new();
-
             try
             {
-                string QueryUpdate = $"SELECT JSONData FROM Billing WHERE Name = '{billingName}'";
+                string json = JsonSerializer.Serialize(entries);
+                string QueryUpdate = "UPDATE Billing SET " +
+                    $"EditableJSON = '{json}' " +
+                    $"WHERE Name = '{billingName}'";
                 using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
                 using SqlCommand command = new(QueryUpdate, connection);
                 connection.Open();
-                
-                using SqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    string json = Convert.ToString(reader["JSONData"]);
-                    var entry = JsonSerializer.Deserialize<List<Entry>>(json);
-                    entries.AddRange(entry);
-                }
+                var output = command.ExecuteNonQuery();
+                return (output > 0);
             }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-
-            return entries;
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
         public static bool UpdateStatus(string billingName, string status)
@@ -234,9 +292,54 @@ namespace LBPRDC.Source.Services
                 using SqlCommand command = new(QueryUpdate, connection);
                 connection.Open();
                 var output = command.ExecuteNonQuery();
-                return (output > 0) ? true : false;
+                return (output > 0);
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static bool UpdateVerificationStatus(string billingName, string status)
+        {
+            try
+            {
+                string QueryUpdate = "UPDATE Billing SET " +
+                    $"VerificationStatus = '{status}' " +
+                    $"WHERE Name = '{billingName}'";
+                using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
+                using SqlCommand command = new(QueryUpdate, connection);
+                connection.Open();
+                var output = command.ExecuteNonQuery();
+                return (output > 0);
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static (List<Entry>, List<Entry>) LoadJSONData(string billingName)
+        {
+            List<Entry> constantEntries = new();
+            List<Entry> editableEntries = new();
+
+            try
+            {
+                string QueryUpdate = $"SELECT ConstantJSON, EditableJSON FROM Billing WHERE Name = '{billingName}'";
+                using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
+                using SqlCommand command = new(QueryUpdate, connection);
+                connection.Open();
+                
+                using SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    string jsonConstant = Convert.ToString(reader["ConstantJSON"]);
+                    var constantEntry = JsonSerializer.Deserialize<List<Entry>>(jsonConstant);
+                    constantEntries.AddRange(constantEntry);
+
+                    string jsonEditable = Convert.ToString(reader["EditableJSON"]);
+                    var editableEntry = JsonSerializer.Deserialize<List<Entry>>(jsonEditable);
+                    editableEntries.AddRange(editableEntry);
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return (constantEntries, editableEntries);
         }
     }
 }

@@ -79,6 +79,7 @@
             menuHistoryCivilStatus = new ToolStripMenuItem();
             menuHistoryEmploymentStatus = new ToolStripMenuItem();
             menuHistoryDepartmentLocation = new ToolStripMenuItem();
+            cntxtMenuArchive = new ToolStripMenuItem();
             flowControls.SuspendLayout();
             pnlContainerHeader.SuspendLayout();
             pnlFilterContainer.SuspendLayout();
@@ -518,27 +519,27 @@
             // cntxtEmployeeActions
             // 
             cntxtEmployeeActions.Font = new Font("Arial", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            cntxtEmployeeActions.Items.AddRange(new ToolStripItem[] { cntxtMenuView, toolStripSeparator1, cntxtMenuEdit, cntxtMenuUpdate, toolStripSeparator2, cntxtMenuHistory });
+            cntxtEmployeeActions.Items.AddRange(new ToolStripItem[] { cntxtMenuView, cntxtMenuHistory, toolStripSeparator1, cntxtMenuEdit, cntxtMenuUpdate, toolStripSeparator2, cntxtMenuArchive });
             cntxtEmployeeActions.Name = "cntxtEmployeeActions";
-            cntxtEmployeeActions.Size = new Size(143, 104);
+            cntxtEmployeeActions.Size = new Size(181, 148);
             // 
             // cntxtMenuView
             // 
             cntxtMenuView.DisplayStyle = ToolStripItemDisplayStyle.Text;
             cntxtMenuView.Name = "cntxtMenuView";
-            cntxtMenuView.Size = new Size(142, 22);
+            cntxtMenuView.Size = new Size(180, 22);
             cntxtMenuView.Text = "View Details";
             cntxtMenuView.Click += cntxtMenuView_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(139, 6);
+            toolStripSeparator1.Size = new Size(177, 6);
             // 
             // cntxtMenuEdit
             // 
             cntxtMenuEdit.Name = "cntxtMenuEdit";
-            cntxtMenuEdit.Size = new Size(142, 22);
+            cntxtMenuEdit.Size = new Size(180, 22);
             cntxtMenuEdit.Text = "Edit";
             cntxtMenuEdit.Click += cntxtMenuEdit_Click;
             // 
@@ -546,7 +547,7 @@
             // 
             cntxtMenuUpdate.DropDownItems.AddRange(new ToolStripItem[] { menuUpdatePosition, menuUpdateCivilStatus, menuUpdateEmploymentStatus, menuUpdateDepartmentLocation });
             cntxtMenuUpdate.Name = "cntxtMenuUpdate";
-            cntxtMenuUpdate.Size = new Size(142, 22);
+            cntxtMenuUpdate.Size = new Size(180, 22);
             cntxtMenuUpdate.Text = "Update";
             // 
             // menuUpdatePosition
@@ -580,13 +581,13 @@
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(139, 6);
+            toolStripSeparator2.Size = new Size(177, 6);
             // 
             // cntxtMenuHistory
             // 
             cntxtMenuHistory.DropDownItems.AddRange(new ToolStripItem[] { menuHistoryPosition, menuHistoryCivilStatus, menuHistoryEmploymentStatus, menuHistoryDepartmentLocation });
             cntxtMenuHistory.Name = "cntxtMenuHistory";
-            cntxtMenuHistory.Size = new Size(142, 22);
+            cntxtMenuHistory.Size = new Size(180, 22);
             cntxtMenuHistory.Text = "History";
             // 
             // menuHistoryPosition
@@ -616,6 +617,13 @@
             menuHistoryDepartmentLocation.Size = new Size(213, 22);
             menuHistoryDepartmentLocation.Text = "Department and Location";
             menuHistoryDepartmentLocation.Click += menuHistoryDepartmentLocation_Click;
+            // 
+            // cntxtMenuArchive
+            // 
+            cntxtMenuArchive.Name = "cntxtMenuArchive";
+            cntxtMenuArchive.Size = new Size(180, 22);
+            cntxtMenuArchive.Text = "Archive";
+            cntxtMenuArchive.Click += cntxtMenuArchive_Click;
             // 
             // ucEmployees
             // 
@@ -690,5 +698,6 @@
         private Label label1;
         private Panel pnlLine2;
         private Button button1;
+        private ToolStripMenuItem cntxtMenuArchive;
     }
 }

@@ -1,7 +1,8 @@
 ﻿using LBPRDC.Source.Utilities;
 using OfficeOpenXml;
-using System.DirectoryServices;
+using OfficeOpenXml.Style;
 using System.Text.Json;
+using static LBPRDC.Source.Services.PositionService;
 
 namespace LBPRDC.Source.Services
 {
@@ -9,10 +10,12 @@ namespace LBPRDC.Source.Services
     {
         public EntryTimeDetails? TimeDetails { get; set; }
         public EntryAdjustments[]? Adjustments { get; set; }
-        public string[]? AdjustmentRemarks { get; set; }
-        public string? InitialRemarks { get; set; } // Timekeeping Remarks
-        public string? CustomRemarks { get; set; } // Your Remarks
+        public AdjustmentRemarks[]? AdjustmentRemarks { get; set; }
+        public string? TimekeepRemarks { get; set; } // Timekeeping Remarks
+        public string? FinalReportRemarks { get; set; } // Your Remarks
+        public string? BookmarkRemarks { get; set; } // If has data, turn the emloyee name in list to be color red.
         public string? Status { get; set; }
+        public bool ExportIncluded { get; set; }
     }
 
     public class EntryTimeDetails
@@ -20,12 +23,12 @@ namespace LBPRDC.Source.Services
         public TimeSpan RegularHours { get; set; }
         public TimeSpan LegalHoliday_100 { get; set; }
         public TimeSpan RegOT_125 { get; set; }
-        public TimeSpan RestDayAndSpecialOT_130 { get; set; }
-        public TimeSpan RestDayOTExcess_169 { get; set; }
+        public TimeSpan RestDaySpecialOT_130 { get; set; }
+        public TimeSpan RestDaySpecialOT_150 { get; set; }
+        public TimeSpan RestDaySpecialOTExcess_169 { get; set; }
         public TimeSpan SpecialExcessOT_195 { get; set; }
         public TimeSpan LegalHolidayOT_200 { get; set; }
         public TimeSpan LegalHolidayOT_260 { get; set; }
-        public TimeSpan RestDayOT_150 { get; set; }
         public TimeSpan RegularHoliday_160 { get; set; }
         public TimeSpan NightDiff_10 { get; set; }
         public TimeSpan NightDiff_125 { get; set; }
@@ -37,24 +40,16 @@ namespace LBPRDC.Source.Services
         public TimeSpan Absent { get; set; }
     }
 
-    public class EntryAdjustments
-    {
-        public int ID { get; set; }
-        public string? Type { get; set; }
-        public string? Operation { get; set; }
-        public TimeSpan OriginalValue { get; set; }
-        public TimeSpan InputValue { get; set; }
-        public TimeSpan NewAdjustedValue { get; set; }
-        public string? RawOriginalValue { get; set; }
-        public string? RawInputValue { get; set; }
-        public string? RawNewAdjustedValue { get; set; }
-        public string? Units { get; set; }
-        public string AppliedDate { get; set; }
-    }
-
     public class EntryReportRemarks : EmployeeBase
     {
-        public string? Remarks { get; set; }
+        public string? TimekeepRemarks { get; set; }
+    }
+
+    public class AdjustmentOvertimePair
+    {
+        public string? FullName { get; set; }
+        public string? PositionCode { get; set; }
+        public string? Value { get; set; }
     }
 
     internal class ExcelService
@@ -200,7 +195,7 @@ namespace LBPRDC.Source.Services
             return "00:00";
         }
 
-        public static List<Entry> PreProcessEntries(string filePath, string reportSheetName ,string timekeepSheetName)
+        public static List<Entry> PreProcessEntries(string filePath, string reportSheetName, string timekeepSheetName)
         {
             List<Entry> entries = new();
             List<EntryReportRemarks> remarks = new();
@@ -215,7 +210,7 @@ namespace LBPRDC.Source.Services
 
                 var employeeBase = EmployeeService.GetAllEmployeesBase();
 
-                // Getting of remarks from the report
+                // Getting the remarks from the report sheet
                 for (int row = 7; row < reportRowCount; row++)
                 {
                     string idValue = reportSheet.Cells[row, 1].Value?.ToString();
@@ -230,18 +225,21 @@ namespace LBPRDC.Source.Services
                         remarks.Add(new EntryReportRemarks
                         {
                             EmployeeID = idValue,
-                            Remarks = TimekeepRemarks
+                            TimekeepRemarks = TimekeepRemarks
                         });
                     }
                 }
 
-                // Getting of data from Timekeep Sheet
+                // Getting data from Timekeep Sheet
+                var allPositionHistory = PositionService.GetAllHistory();
+
                 for (int row = 2; row < timekeepRowCount; row++)
                 {
                     string idValue = timekeepSheet.Cells[row, 1].Value?.ToString();
                     string nameValue = timekeepSheet.Cells[row, 2].Value?.ToString();
+                    string Date = timekeepSheet.Cells[row, 3].Text;
 
-                    if (idValue == null || idValue == "#REF!" || idValue == "#N/A" || nameValue == "#REF!" || nameValue == "#N/A") continue;
+                    if (idValue == null || idValue == "#REF!" || idValue == "#N/A" || nameValue == "#REF!" || nameValue == "#N/A" || Date == null || Date == string.Empty) continue;
 
                     var RegularHours = ParseTime(GetTime(timekeepSheet.Cells[row, 6].Text));
                     var LegalHoliday_100 = ParseTime(GetTime(timekeepSheet.Cells[row, 7].Text));
@@ -263,18 +261,21 @@ namespace LBPRDC.Source.Services
                     var UnderTime = ParseTime(GetTime(timekeepSheet.Cells[row, 25].Text));
                     var Absent = ParseTime(GetTime(timekeepSheet.Cells[row, 26].Text));
 
-                    if (entries.Any(e => e.EmployeeID == idValue.ToString()))
+                    var positions = allPositionHistory.Where(w => w.EmployeeID == idValue).OrderByDescending(ob => ob.Timestamp).ToList();
+                    int positionID = GetPositionIdByDate(positions, Convert.ToDateTime(Date));
+
+                    if (entries.Any(e => e.EmployeeID == idValue.ToString() && e.PositionID == positionID))
                     {
-                        var currentEntry = entries.First(f => f.EmployeeID == idValue).TimeDetails;
+                        var currentEntry = entries.First(f => f.EmployeeID == idValue && f.PositionID == positionID).TimeDetails;
                         currentEntry.RegularHours += RegularHours;
                         currentEntry.LegalHoliday_100 += LegalHoliday_100;
                         currentEntry.RegOT_125 += RegOT_125;
-                        currentEntry.RestDayAndSpecialOT_130 += RestDayOT_130.Add(SpecialHolidayOT_130);
-                        currentEntry.RestDayOTExcess_169 += RestDayOTExcess_169;
+                        currentEntry.RestDaySpecialOT_130 += RestDayOT_130.Add(SpecialHolidayOT_130);
+                        currentEntry.RestDaySpecialOTExcess_169 += RestDayOTExcess_169;
                         currentEntry.SpecialExcessOT_195 += SpecialExcessOT_195;
                         currentEntry.LegalHolidayOT_200 += LegalHolidayOT_200;
                         currentEntry.LegalHolidayOT_260 += LegalHolidayOT_260;
-                        currentEntry.RestDayOT_150 += RestDayOT_150;
+                        currentEntry.RestDaySpecialOT_150 += RestDayOT_150;
                         currentEntry.RegularHoliday_160 += RegularHoliday_160;
                         currentEntry.NightDiff_10 += NightDiff_10;
                         currentEntry.NightDiff_125 += NightDiff_125;
@@ -293,7 +294,7 @@ namespace LBPRDC.Source.Services
                         {
                             EmployeeID = idValue.ToString(),
                             FullName = $"{currentEmployee.LastName}, {currentEmployee.FirstName} {currentEmployee.MiddleName}".Trim(),
-                            Position = currentEmployee.Position,
+                            PositionID = positionID,
                             Department = currentEmployee.Department,
                             Location = currentEmployee.Location,
                             TimeDetails = new EntryTimeDetails
@@ -301,12 +302,12 @@ namespace LBPRDC.Source.Services
                                 RegularHours = RegularHours,
                                 LegalHoliday_100 = LegalHoliday_100,
                                 RegOT_125 = RegOT_125,
-                                RestDayAndSpecialOT_130 = RestDayOT_130.Add(SpecialHolidayOT_130),
-                                RestDayOTExcess_169 = RestDayOTExcess_169,
+                                RestDaySpecialOT_130 = RestDayOT_130.Add(SpecialHolidayOT_130),
+                                RestDaySpecialOTExcess_169 = RestDayOTExcess_169,
                                 SpecialExcessOT_195 = SpecialExcessOT_195,
                                 LegalHolidayOT_200 = LegalHolidayOT_200,
                                 LegalHolidayOT_260 = LegalHolidayOT_260,
-                                RestDayOT_150 = RestDayOT_150,
+                                RestDaySpecialOT_150 = RestDayOT_150,
                                 RegularHoliday_160 = RegularHoliday_160,
                                 NightDiff_10 = NightDiff_10,
                                 NightDiff_125 = NightDiff_125,
@@ -317,7 +318,8 @@ namespace LBPRDC.Source.Services
                                 UnderTime = UnderTime,
                                 Absent = Absent,
                             },
-                            Status = "Unverified"
+                            Status = "Unverified",
+                            ExportIncluded = true
                         });
                     }
                 }
@@ -325,13 +327,25 @@ namespace LBPRDC.Source.Services
                 //Getting the remarks and saving it to each entries
                 foreach (var entry in entries)
                 {
-                    string? timekeepRemarks = remarks.FirstOrDefault(f => f.EmployeeID == entry.EmployeeID).Remarks;
-                    entry.InitialRemarks = timekeepRemarks;
+                    string timekeepRemarks = remarks.FirstOrDefault(f => f.EmployeeID == entry.EmployeeID)?.TimekeepRemarks ?? "Error getting remarks for this employee.";
+                    entry.TimekeepRemarks = timekeepRemarks;
                 }
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
             
             return entries;
+        }
+
+        public static int GetPositionIdByDate(List<History> positions, DateTime date)
+        {
+            for (int i = 0; i < positions.Count; i++)
+            {
+                if (date.Date >= positions[i].Timestamp.Value.Date)
+                {
+                    return positions[i].PositionID;
+                }
+            }
+            return positions[positions.Count - 1].PositionID;
         }
 
         public static bool SaveEntries(List<Entry> entries, string fileName)
@@ -374,6 +388,519 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return entries;
+        }
+
+        public static bool HasContentInOvertime(Entry entry)
+        {
+            return entry.TimeDetails != null &&
+                   (entry.TimeDetails.RegOT_125 != TimeSpan.Zero || entry.TimeDetails.RestDaySpecialOT_130 != TimeSpan.Zero ||
+                    entry.TimeDetails.RestDaySpecialOTExcess_169 != TimeSpan.Zero || entry.TimeDetails.SpecialExcessOT_195 != TimeSpan.Zero ||
+                    entry.TimeDetails.LegalHolidayOT_200 != TimeSpan.Zero || entry.TimeDetails.LegalHolidayOT_260 != TimeSpan.Zero ||
+                    entry.TimeDetails.RestDaySpecialOT_150 != TimeSpan.Zero || entry.TimeDetails.RegularHoliday_160 != TimeSpan.Zero ||
+                    entry.TimeDetails.NightDiff_10 != TimeSpan.Zero || entry.TimeDetails.NightDiff_125 != TimeSpan.Zero ||
+                    entry.TimeDetails.NightDiff_130 != TimeSpan.Zero || entry.TimeDetails.NightDiff_150 != TimeSpan.Zero ||
+                    entry.TimeDetails.NightDiff_20 != TimeSpan.Zero || entry.TimeDetails.NightDiff_50 != TimeSpan.Zero);
+        }
+
+        private static void ConvertToMoney(ExcelWorksheet sheet, string cell) => sheet.Cells[cell].Style.Numberformat.Format = "#,##0.00";
+        private static void ConvertToParenthesis(ExcelWorksheet sheet, string cell) => sheet.Cells[cell].Style.Numberformat.Format = "(0)";
+        private static void ConvertToDecimal(ExcelWorksheet sheet, string cell) => sheet.Cells[cell].Style.Numberformat.Format = "0.00";
+        private static void ConvertToTime(ExcelWorksheet sheet, string cell) => sheet.Cells[cell].Style.Numberformat.Format = "[h]:mm";
+        private static void SetCellToCenter(ExcelWorksheet sheet, string cell) => sheet.Cells[cell].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        private static void SetCellToBold(ExcelWorksheet sheet, string cell) => sheet.Cells[cell].Style.Font.Bold = true;
+        private static void DecreaseRowHeight(ExcelWorksheet sheet, int row) => sheet.Row(row).Height = 5.25;
+        private static void IncreaseRowHeight(ExcelWorksheet sheet, int row) => sheet.Row(row).Height = 48;
+        private static void ComputeColumnTotal(ExcelWorksheet sheet, int start, int row, string col) => sheet.Cells[$"{col}{row}"].Formula = $"=ROUND(SUMPRODUCT({col}{start}:{col}{row - 2}, --(MOD(ROW({col}{start}:{col}{row - 2}), 2) =0)), 2)";
+
+        public static bool ExportBilling(List<Entry> entries, string billingName)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            var billing = BillingService.GetBillingDetailsByName(billingName);
+            var departments = DepartmentService.GetAllItems();
+            var positionAndRates = PositionService.GetAllItems();
+
+            try
+            {
+                var filePath = FileManager.ChooseSavingPath();
+                if (filePath == null) return false;
+
+                var groupedEntries = entries.GroupBy(entry => entry.Department);
+
+                using var package = new ExcelPackage();
+
+                var adjustmentSheet = package.Workbook.Worksheets.Add("ADJUSTMENTS");
+
+                int adjRow = 1;
+                
+                foreach (var department in groupedEntries)
+                {
+                    List<AdjustmentOvertimePair> overtimePairs = new();
+
+                    string departmentName = department.Key.ToString();
+                    string departmentCode = departments.First(f => f.Name == department.Key).Code;
+                    var regularSheet = package.Workbook.Worksheets.Add(departmentName);
+                    var overtimeSheet = package.Workbook.Worksheets.Add($"{departmentName} OVERTIME");
+
+                    SetReportHeadersRegular(regularSheet, departmentCode, billing.StartDate, billing.EndDate);
+                    SetReportHeadersOvertime(overtimeSheet, departmentCode, billing.StartDate, billing.EndDate);
+
+                    if (department.Any(a => a.AdjustmentRemarks != null && a.AdjustmentRemarks.Any(aa => aa.Type == "regular")))
+                    {
+                        adjRow = AddAdjustmentTitle(adjustmentSheet, adjRow, departmentName);
+                    }
+
+                    int regIndex = 1, overIndex = 1;
+                    int regRow = 8, overRow = 8;
+
+                    foreach (var entry in department)
+                    {
+                        // Addition of entries to regular and overtime department sheet
+                        if (!entry.ExportIncluded) continue;
+                        (regIndex, regRow) = AddToRegularSheet(regularSheet, entry, positionAndRates, regIndex, regRow);
+                        if (HasContentInOvertime(entry)) (overIndex, overRow) = AddToOvertimeSheet(overtimeSheet, entry, positionAndRates, overIndex, overRow);
+
+                        // Addition of Adjustment Rows
+                        if (entry.AdjustmentRemarks == null) continue;
+                        string regularRemarks = string.Join(", ", entry.AdjustmentRemarks.Where(w => w.Type == "regular").Select(s => s.Value).ToArray());
+                        if (!string.IsNullOrEmpty(regularRemarks))
+                        {
+                            string? positionCode = positionAndRates.First(f => f.ID == entry.PositionID).Code;
+                            adjRow = AddAdjustmentRow(adjustmentSheet, adjRow, $"{entry.FullName} | {positionCode}", regularRemarks);
+                        }
+
+                        string overtimeRemarks = string.Join(", ", entry.AdjustmentRemarks.Where(w => w.Type == "overtime").Select(s => s.Value).ToArray());
+                        if (!string.IsNullOrEmpty(overtimeRemarks))
+                        {
+                            overtimePairs.Add(new()
+                            {
+                                FullName = entry.FullName,
+                                PositionCode = positionAndRates.First(f => f.ID == entry.PositionID).Code,
+                                Value = overtimeRemarks
+                            });
+                        }
+                    }
+
+                    if (overtimePairs.Count > 0)
+                    {
+                        adjRow = AddAdjustmentTitle(adjustmentSheet, adjRow, $"{departmentName} OVERTIME");
+                        foreach (var pair in overtimePairs)
+                        {
+                            adjRow = AddAdjustmentRow(adjustmentSheet, adjRow, $"{pair.FullName} | {pair.PositionCode}", pair.Value);
+                        }
+                    }
+
+                    adjRow += 1;
+
+                    regularSheet.Cells[$"A{regRow - 1}:J{regRow - 1}"].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+                    overtimeSheet.Cells[$"A{overRow - 1}:U{overRow - 1}"].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+                    DecreaseRowHeight(regularSheet, regRow);
+                    DecreaseRowHeight(overtimeSheet, overRow);
+
+                    regRow++; overRow++;
+                    ComputeRegularTotal(regularSheet, regRow);
+                    ComputeOvertimeTotal(overtimeSheet, overRow);
+                    regularSheet.Calculate();
+                    var t1 = regularSheet.Cells[$"J{regRow}"].Value; // GOT THE GROSS BILLING
+
+                    regRow++; overRow++;
+                    DecreaseRowHeight(regularSheet, regRow);
+                    DecreaseRowHeight(overtimeSheet, overRow);
+
+                    regRow++; overRow++;
+                    AddNetBilling(regularSheet, regRow, "I", "J");
+                    AddNetBilling(overtimeSheet, overRow, "T", "U");
+
+                    regRow += 2; overRow += 2;
+                    AddFooter(regularSheet, regRow);
+                    AddFooter(overtimeSheet, overRow);
+                    SetCellToBold(regularSheet, $"A{regRow - 4}:J{regRow + 2}");
+                    SetCellToBold(overtimeSheet, $"A{overRow - 4}:U{overRow + 2}");
+                    SetColumnWidthsRegular(regularSheet);
+                    SetColumnWidthsOvertime(overtimeSheet);
+                }
+
+                // Add legend within the end of the Adjustment Sheet
+                adjRow = AddAdjustmentTitle(adjustmentSheet, adjRow, "LEGEND");
+                AddLegend(adjustmentSheet, adjRow);
+                SetColumnWidthsAdjustment(adjustmentSheet);
+
+                package.SaveAs(new FileInfo(filePath));
+
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+            return true;
+        }
+
+        private static int AddAdjustmentTitle(ExcelWorksheet sheet, int row, string title)
+        {
+            var cell = sheet.Cells[$"A{row}:B{row}"];
+            cell.Value = title;
+            cell.Merge = true;
+            cell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+            cell.Style.Fill.BackgroundColor.SetColor(Color.PaleGreen);
+            SetCellToBold(sheet, $"A{row}:B{row}");
+            return row += 1;
+        }
+
+        private static int AddAdjustmentRow(ExcelWorksheet sheet, int row, string value1, string value2)
+        {
+            sheet.Cells[$"A{row}"].Value = value1;
+            sheet.Cells[$"B{row}"].Value = value2;
+            return row += 1;
+        }
+
+        private static void AddLegend(ExcelWorksheet sheet, int row)
+        {
+            Dictionary<string, string> legendMapping = new()
+            {
+                { "Regular Days", "REG" },
+                { "Undertime", "UT" },
+                { "Legal Holiday 100%", "LH 100%" },
+                { "Regular Overtime 125%", "REG OT 125%" },
+                { "Regular Holiday 160%", "RHOT 160%" },
+                { "Rest Day/Special Holiday 130%", "RDOT/SHOT 130%" },
+                { "Rest Day Special Holiday 150%", "RDOT 150%" },
+                { "Rest Day/Special Holiday Excess 169%", "RDOT Excess 169%" },
+                { "Special Holiday Excess Overtime 195%", "SHOT Excess" },
+                { "Legal Holiday Overtime 200%", "LHOT 200%" },
+                { "Legal Holiday Overtime 260%", "LHOT 260%" },
+                { "Night Differential 10%", "NDOT 10%" },
+                { "Night Differential 20%", "NDOT 20%" },
+                { "Night Differential 50%", "NDOT 50%" },
+                { "Night Differential 125%", "NDOT 125%" },
+                { "Night Differential 130%", "NDOT 130%" },
+                { "Night Differential 150%", "NDOT 150%" },
+            };
+
+            foreach (var (key, value) in legendMapping)
+            {
+                AddAdjustmentRow(sheet, row, value, key);
+                row++;
+            }
+        }
+
+        private static void SetReportHeadersRegular(ExcelWorksheet sheet, string departmentCode, DateTime startDate, DateTime endDate)
+        {
+            string headerStartDate = startDate.ToString("MMMM dd");
+            string headerEndDate = endDate.ToString("yyyy");
+            string soaStartDate = startDate.ToString("MM-dd");
+            string soaEndDate = endDate.ToString("yy");
+
+            DecreaseRowHeight(sheet, 5);
+            IncreaseRowHeight(sheet, 7);
+
+            AddHeader(sheet, "A1:J1", "LBP RESOURCES AND DEVELOPMENT CORPORATION");
+            AddHeader(sheet, "A2:J2", "STATEMENT OF ACCOUNT");
+            AddHeader(sheet, "A3:J3", "CLIENT: SOCIAL HOUSING FINANCE CORPORATION");
+            AddHeader(sheet, "A4:J4", $"FOR THE PERIOD OF {headerStartDate.ToUpper()}-{endDate.Day}, {headerEndDate}");
+
+            AddAccountNumber(sheet, "H", "I", $"SHFC-{departmentCode}-{soaStartDate}-{endDate.Day}-{soaEndDate}");
+
+            AddColumnHeader(sheet, "A7", "No.");
+            AddColumnHeader(sheet, "B7", "Name");
+            AddColumnHeader(sheet, "C7", "Position");
+            AddColumnHeader(sheet, "D7", "Billing Rate");
+            AddColumnHeader(sheet, "E7", "# of worked days");
+            AddColumnHeader(sheet, "F7", "Reg Bill Wrk days");
+            AddColumnHeader(sheet, "G7", "UTIME");
+            AddColumnHeader(sheet, "H7", "LH (100%)");
+            AddColumnHeader(sheet, "I7", "Net Reg Bill");
+            AddColumnHeader(sheet, "J7", "Gross Billing");
+
+            AddMediumBorders(sheet, "A7:J7");
+        }
+
+        private static (int, int) AddToRegularSheet(ExcelWorksheet sheet, Entry entry, List<Position> rates, int index, int row)
+        {
+            sheet.Cells[$"A{row}"].Value = index;
+            sheet.Cells[$"B{row}"].Value = $"{entry.FullName}{(entry.FinalReportRemarks != null && entry.FinalReportRemarks != "" ? " - " + entry.FinalReportRemarks : "")}";
+            sheet.Cells[$"B{row + 1}"].Value = entry.EmployeeID;
+            sheet.Cells[$"C{row}"].Value = entry.Position;
+            sheet.Cells[$"D{row}"].Value = rates.First(f => f.ID == entry.PositionID).BillingRate;
+            sheet.Cells[$"E{row}"].Value = entry.TimeDetails?.RegularHours.TotalHours / 8;
+            sheet.Cells[$"F{row}"].Formula = $"=ROUND(D{row}*E{row},2)";
+            sheet.Cells[$"G{row + 1}"].Value = (entry.TimeDetails?.UnderTime.TotalMinutes > 0) ? entry.TimeDetails.UnderTime.TotalMinutes : "";
+            sheet.Cells[$"G{row}"].Formula = $"=IF(G{row + 1}<>\"\", ROUND(G{row + 1}*D{row}/8/60*-1,2), 0)";
+            sheet.Cells[$"H{row + 1}"].Value = (entry.TimeDetails?.LegalHoliday_100.TotalHours / 8 > 0) ? entry.TimeDetails.LegalHoliday_100.TotalHours / 8 : "";
+            sheet.Cells[$"H{row}"].Formula = $"=IF(H{row + 1}<>\"\", ROUND(D{row}*H{row + 1},2), 0)";
+            sheet.Cells[$"I{row}"].Formula = $"=ROUND(SUM(F{row}:H{row}),2)";
+            sheet.Cells[$"J{row}"].Formula = $"=ROUND(I{row},2)";
+
+            ConvertToMoney(sheet, $"D{row}");
+            ConvertToMoney(sheet, $"F{row}:J{row}");
+            ConvertToParenthesis(sheet, $"G{row + 1}");
+            ConvertToDecimal(sheet, $"H{row + 1}");
+            ConvertToDecimal(sheet, $"E{row}");
+
+            AddThinBorders(sheet, $"A{row}:J{row + 1}");
+            sheet.Cells[$"A{row}:J{row}"].Style.Border.Bottom.Style = ExcelBorderStyle.None;
+            sheet.Cells[$"J{row}"].Style.Border.Right.Style = ExcelBorderStyle.Medium;
+            sheet.Cells[$"J{row + 1}"].Style.Border.Right.Style = ExcelBorderStyle.Medium;
+
+            SetCellToCenter(sheet, $"A{row}");
+            SetCellToCenter(sheet, $"C{row}");
+            return (index += 1, row += 2);
+        }
+
+        private static void ComputeRegularTotal(ExcelWorksheet sheet, int row)
+        {
+            sheet.Cells[$"E{row}"].Value = "TOTAL";
+            SetCellToCenter(sheet, $"E{row}");
+
+            ComputeColumnTotal(sheet, 8, row, "F");
+            ComputeColumnTotal(sheet, 8, row, "G");
+            ComputeColumnTotal(sheet, 8, row, "H");
+            ComputeColumnTotal(sheet, 8, row, "I");
+            sheet.Cells[$"J{row}"].Formula = $"=ROUND(SUM(J8:J{row-2}), 2)";
+
+            ConvertToMoney(sheet, $"F{row}:J{row}");
+            AddDoubleBorders(sheet, $"F{row}:J{row}");
+        }
+
+        private static void SetReportHeadersOvertime(ExcelWorksheet sheet, string departmentCode, DateTime startDate, DateTime endDate)
+        {
+            string headerStartDate = startDate.ToString("MMMM dd");
+            string headerEndDate = endDate.ToString("yyyy");
+            string soaStartDate = startDate.ToString("MM-dd");
+            string soaEndDate = endDate.ToString("yy");
+
+            DecreaseRowHeight(sheet, 5);
+            IncreaseRowHeight(sheet, 7);
+
+            AddHeader(sheet, "A1:U1", "LBP RESOURCES AND DEVELOPMENT CORPORATION");
+            AddHeader(sheet, "A2:U2", "STATEMENT OF ACCOUNT");
+            AddHeader(sheet, "A3:U3", "CLIENT: SOCIAL HOUSING FINANCE CORPORATION");
+            AddHeader(sheet, "A4:U4", $"FOR THE PERIOD OF {headerStartDate.ToUpper()}-{endDate.Day}, {headerEndDate}");
+
+            AddAccountNumber(sheet, "S", "T", $"SHFC-{departmentCode}-OT-{soaStartDate}-{endDate.Day}-{soaEndDate}");
+
+            AddColumnHeader(sheet, "A7", "No.");
+            AddColumnHeader(sheet, "B7", "Name");
+            AddColumnHeader(sheet, "C7", "Position");
+            AddColumnHeader(sheet, "D7", "Billing Rate");
+            AddColumnHeader(sheet, "E7", "# of worked days");
+            AddColumnHeader(sheet, "F7", "Reg OT (125%)");
+            AddColumnHeader(sheet, "G7", "RDOT/SHOT (130%)");
+            AddColumnHeader(sheet, "H7", "RDOT (150%)");
+            AddColumnHeader(sheet, "I7", "RDOT Excess (169%)");
+            AddColumnHeader(sheet, "J7", "SHOT Excess (195%)");
+            AddColumnHeader(sheet, "K7", "LHOT (200%)");
+            AddColumnHeader(sheet, "L7", "LHOT (260%)");
+            AddColumnHeader(sheet, "M7", "Reg Holiday OT (160%)");
+            AddColumnHeader(sheet, "N7", "NDOT (10%)");
+            AddColumnHeader(sheet, "O7", "NDOT (20%)");
+            AddColumnHeader(sheet, "P7", "NDOT (50%)");
+            AddColumnHeader(sheet, "Q7", "NDOT (125%)");
+            AddColumnHeader(sheet, "R7", "NDOT (130%)");
+            AddColumnHeader(sheet, "S7", "NDOT (150%)");
+            AddColumnHeader(sheet, "T7", "TOTAL OT");
+            AddColumnHeader(sheet, "U7", "Gross Billing");
+
+            AddMediumBorders(sheet, "A7:U7");
+        }
+
+        private static (int, int) AddToOvertimeSheet(ExcelWorksheet sheet, Entry entry, List<Position> rates, int index, int row)
+        {
+            var time = entry.TimeDetails;
+            sheet.Cells[$"A{row}"].Value = index;
+            sheet.Cells[$"B{row}"].Value = $"{entry.FullName}{(entry.FinalReportRemarks != null && entry.FinalReportRemarks != "" ? " - " + entry.FinalReportRemarks : "")}";
+            sheet.Cells[$"B{row + 1}"].Value = entry.EmployeeID;
+            sheet.Cells[$"C{row}"].Value = entry.Position;
+            sheet.Cells[$"D{row}"].Value = rates.First(f => f.ID == entry.PositionID).BillingRate;
+            sheet.Cells[$"E{row}"].Value = time?.RegularHours.TotalHours / 8;
+
+            sheet.Cells[$"F{row + 1}"].Value = (time?.RegOT_125 > TimeSpan.Zero) ? time.RegOT_125 : "";
+            sheet.Cells[$"G{row + 1}"].Value = (time?.RestDaySpecialOT_130 > TimeSpan.Zero) ? time.RestDaySpecialOT_130 : "";
+            sheet.Cells[$"H{row + 1}"].Value = (time?.RestDaySpecialOT_150 > TimeSpan.Zero) ? time.RestDaySpecialOT_150 : "";
+            sheet.Cells[$"I{row + 1}"].Value = (time?.RestDaySpecialOTExcess_169 > TimeSpan.Zero) ? time.RestDaySpecialOTExcess_169 : "";
+            sheet.Cells[$"J{row + 1}"].Value = (time?.SpecialExcessOT_195 > TimeSpan.Zero) ? time.SpecialExcessOT_195 : "";
+            sheet.Cells[$"K{row + 1}"].Value = (time?.LegalHolidayOT_200 > TimeSpan.Zero) ? time.LegalHolidayOT_200 : "";
+            sheet.Cells[$"L{row + 1}"].Value = (time?.LegalHolidayOT_260 > TimeSpan.Zero) ? time.LegalHolidayOT_260 : "";
+            sheet.Cells[$"M{row + 1}"].Value = (time?.RegularHoliday_160 > TimeSpan.Zero) ? time.RegularHoliday_160 : "";
+            sheet.Cells[$"N{row + 1}"].Value = (time?.NightDiff_10 > TimeSpan.Zero) ? time.NightDiff_10 : "";
+            sheet.Cells[$"O{row + 1}"].Value = (time?.NightDiff_20 > TimeSpan.Zero) ? time.NightDiff_20 : "";
+            sheet.Cells[$"P{row + 1}"].Value = (time?.NightDiff_50 > TimeSpan.Zero) ? time.NightDiff_50 : "";
+            sheet.Cells[$"Q{row + 1}"].Value = (time?.NightDiff_125 > TimeSpan.Zero) ? time.NightDiff_125 : "";
+            sheet.Cells[$"R{row + 1}"].Value = (time?.NightDiff_130 > TimeSpan.Zero) ? time.NightDiff_130 : "";
+            sheet.Cells[$"S{row + 1}"].Value = (time?.NightDiff_150 > TimeSpan.Zero) ? time.NightDiff_150 : "";
+
+            sheet.Cells[$"F{row}"].Formula = $"=IF(F{row + 1}<>\"\", ROUND((D{row}/8)*125%*(F{row + 1}*24),2), 0)";
+            sheet.Cells[$"G{row}"].Formula = $"=IF(G{row + 1}<>\"\", ROUND((D{row}/8)*130%*(G{row + 1}*24),2), 0)";
+            sheet.Cells[$"H{row}"].Formula = $"=IF(H{row + 1}<>\"\", ROUND((D{row}/8)*150%*(H{row + 1}*24),2), 0)";
+            sheet.Cells[$"I{row}"].Formula = $"=IF(I{row + 1}<>\"\", ROUND((D{row}/8)*169%*(I{row + 1}*24),2), 0)";
+            sheet.Cells[$"J{row}"].Formula = $"=IF(J{row + 1}<>\"\", ROUND((D{row}/8)*195%*(J{row + 1}*24),2), 0)";
+            sheet.Cells[$"K{row}"].Formula = $"=IF(K{row + 1}<>\"\", ROUND((D{row}/8)*200%*(K{row + 1}*24),2), 0)";
+            sheet.Cells[$"L{row}"].Formula = $"=IF(L{row + 1}<>\"\", ROUND((D{row}/8)*260%*(L{row + 1}*24),2), 0)";
+            sheet.Cells[$"M{row}"].Formula = $"=IF(M{row + 1}<>\"\", ROUND((D{row}/8)*160%*(M{row + 1}*24),2), 0)";
+            sheet.Cells[$"N{row}"].Formula = $"=IF(N{row + 1}<>\"\", ROUND((D{row}/8)*1%*(N{row + 1}*24),2), 0)";
+            sheet.Cells[$"O{row}"].Formula = $"=IF(O{row + 1}<>\"\", ROUND((D{row}/8)*2%*(O{row + 1}*24),2), 0)";
+            sheet.Cells[$"P{row}"].Formula = $"=IF(P{row + 1}<>\"\", ROUND((D{row}/8)*5%*(P{row + 1}*24),2), 0)";
+            sheet.Cells[$"Q{row}"].Formula = $"=IF(Q{row + 1}<>\"\", ROUND((D{row}/8)*12.5%*(Q{row + 1}*24),2), 0)";
+            sheet.Cells[$"R{row}"].Formula = $"=IF(R{row + 1}<>\"\", ROUND((D{row}/8)*13%*(R{row + 1}*24),2), 0)";
+            sheet.Cells[$"S{row}"].Formula = $"=IF(S{row + 1}<>\"\", ROUND((D{row}/8)*15%*(S{row + 1}*24),2), 0)";
+
+            sheet.Cells[$"T{row}"].Formula = $"=ROUND(SUM(F{row}:S{row}),2)";
+            sheet.Cells[$"U{row}"].Formula = $"=ROUND(T{row},2)";
+
+            ConvertToMoney(sheet, $"D{row}");
+            ConvertToMoney(sheet, $"F{row}:U{row}");
+            ConvertToDecimal(sheet, $"E{row}");
+            ConvertToTime(sheet, $"F{row + 1}:S{row + 1}");
+
+            AddThinBorders(sheet, $"A{row}:U{row + 1}");
+            sheet.Cells[$"A{row}:U{row}"].Style.Border.Bottom.Style = ExcelBorderStyle.None;
+            sheet.Cells[$"U{row}"].Style.Border.Right.Style = ExcelBorderStyle.Medium;
+            sheet.Cells[$"U{row + 1}"].Style.Border.Right.Style = ExcelBorderStyle.Medium;
+
+            SetCellToCenter(sheet, $"A{row}");
+            SetCellToCenter(sheet, $"C{row}");
+            return (index += 1, row += 2);
+        }
+
+        private static void ComputeOvertimeTotal(ExcelWorksheet sheet, int row)
+        {
+            sheet.Cells[$"E{row}"].Value = "TOTAL";
+            SetCellToCenter(sheet, $"E{row}");
+
+            ComputeColumnTotal(sheet, 8, row, "F");
+            ComputeColumnTotal(sheet, 8, row, "G");
+            ComputeColumnTotal(sheet, 8, row, "H");
+            ComputeColumnTotal(sheet, 8, row, "I");
+            ComputeColumnTotal(sheet, 8, row, "J");
+            ComputeColumnTotal(sheet, 8, row, "K");
+            ComputeColumnTotal(sheet, 8, row, "L");
+            ComputeColumnTotal(sheet, 8, row, "M");
+            ComputeColumnTotal(sheet, 8, row, "N");
+            ComputeColumnTotal(sheet, 8, row, "O");
+            ComputeColumnTotal(sheet, 8, row, "P");
+            ComputeColumnTotal(sheet, 8, row, "Q");
+            ComputeColumnTotal(sheet, 8, row, "R");
+            ComputeColumnTotal(sheet, 8, row, "S");
+            ComputeColumnTotal(sheet, 8, row, "T");
+            sheet.Cells[$"U{row}"].Formula = $"=ROUND(SUM(U8:U{row - 2}), 2)";
+
+            ConvertToMoney(sheet, $"F{row}:U{row}");
+            AddDoubleBorders(sheet, $"F{row}:U{row}");
+        }
+
+        private static void AddNetBilling(ExcelWorksheet sheet, int row, string colHeader, string colValue)
+        {
+            sheet.Cells[$"{colHeader}{row}"].Value = "NET BILLING";
+            sheet.Cells[$"{colValue}{row}"].Formula = $"=ROUND({colValue}{row - 2}-({colValue}{row - 2}/1.12*0.07),2)";
+            ConvertToMoney(sheet, $"{colValue}{row}");
+        }
+
+        private static void AddFooter(ExcelWorksheet sheet, int row)
+        {
+            sheet.Cells[$"B{row}"].Value = "Prepared By:";
+            sheet.Cells[$"E{row}"].Value = "Checked By:";
+
+            row += 2;
+            var user = UserService.CurrentUser;
+            sheet.Cells[$"B{row}"].Value = $"{user?.FirstName?.ToUpper()} {user?.MiddleName?[..1].ToUpper()}. {user?.LastName?.ToUpper()}";
+            AddUnderlineBorders(sheet, $"B{row}");
+            SetCellToCenter(sheet, $"B{row}");
+
+            sheet.Cells[$"E{row}:H{row}"].Merge = true;
+            sheet.Cells[$"E{row}:H{row}"].Value = "TESTING NAME";
+            AddUnderlineBorders(sheet, $"E{row}:H{row}");
+            SetCellToCenter(sheet, $"E{row}:H{row}");
+
+            row++;
+            sheet.Cells[$"B{row}"].Value = user?.PositionTitle;
+            SetCellToCenter(sheet, $"B{row}");
+
+            sheet.Cells[$"E{row}:H{row}"].Merge = true;
+            sheet.Cells[$"E{row}:H{row}"].Value = "Position";
+            SetCellToCenter(sheet, $"E{row}:H{row}");
+        }
+
+        private static void SetColumnWidthsAdjustment(ExcelWorksheet sheet)
+        {
+            sheet.Cells[sheet.Dimension.Address].AutoFitColumns();
+        }
+
+        private static void SetColumnWidthsRegular(ExcelWorksheet sheet)
+        {
+            //sheet.Cells[sheet.Dimension.Address].AutoFitColumns();
+            sheet.Column(1).Width = 6;
+            sheet.Column(2).AutoFit();
+            //sheet.Column(2).Width = 45;
+            sheet.Column(3).Width = 22;
+            sheet.Column(4).Width = 13;
+            sheet.Column(5).Width = 8;
+            for (int i = 6; i <= 10; i++)
+            {
+                sheet.Column(i).Width = 12;
+            }
+        }
+
+        private static void SetColumnWidthsOvertime(ExcelWorksheet sheet)
+        {
+            sheet.Column(1).Width = 6;
+            sheet.Column(2).AutoFit();
+            sheet.Column(3).Width = 22;
+            sheet.Column(4).Width = 13;
+            sheet.Column(5).Width = 8;
+            for (int i = 6; i <= 26; i++)
+            {
+                sheet.Column(i).Width = 12;
+            }
+        }
+
+        private static void AddHeader(ExcelWorksheet sheet, string cellRange, string value)
+        {
+            sheet.Cells[cellRange].Merge = true;
+            sheet.Cells[cellRange].Value = value;
+            sheet.Cells[cellRange].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            sheet.Cells[cellRange].Style.Font.Size = 14;
+            sheet.Cells[cellRange].Style.Font.Bold = true;
+        }
+
+        private static void AddAccountNumber(ExcelWorksheet sheet, string cellHeader, string cellValue, string value)
+        {
+            sheet.Cells[$"{cellHeader}6"].Value = "SOA NO.";
+            sheet.Cells[$"{cellHeader}6"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+
+            sheet.Cells[$"{cellValue}6"].Value = value;
+            sheet.Cells[$"{cellValue}6"].Style.Font.Bold = true;
+        }
+
+        private static void AddColumnHeader(ExcelWorksheet sheet, string cell, string value)
+        {
+            sheet.Cells[cell].Value = value;
+            sheet.Cells[cell].Style.Font.Bold = true;
+            sheet.Cells[cell].Style.WrapText = true;
+            sheet.Cells[cell].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            sheet.Cells[cell].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+        }
+
+        // BORDERS
+
+        static void AddMediumBorders(ExcelWorksheet sheet, string cell)
+        {
+            sheet.Cells[cell].Style.Border.Top.Style = ExcelBorderStyle.Medium;
+            sheet.Cells[cell].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+            sheet.Cells[cell].Style.Border.Left.Style = ExcelBorderStyle.Medium;
+            sheet.Cells[cell].Style.Border.Right.Style = ExcelBorderStyle.Medium;
+        }
+
+        static void AddThinBorders(ExcelWorksheet sheet, string cell)
+        {
+            sheet.Cells[cell].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            sheet.Cells[cell].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            sheet.Cells[cell].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+        }
+
+        static void AddDoubleBorders(ExcelWorksheet sheet, string cell)
+        {
+            sheet.Cells[cell].Style.Border.Bottom.Style = ExcelBorderStyle.Double;
+        }
+
+        static void AddUnderlineBorders(ExcelWorksheet sheet, string cell)
+        {
+            sheet.Cells[cell].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
     }
 }

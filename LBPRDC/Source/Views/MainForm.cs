@@ -4,6 +4,7 @@ using LBPRDC.Source.Views.Accounts;
 using LBPRDC.Source.Views.Profile;
 using LBPRDC.Source.Views.Categories;
 using LBPRDC.Source.Views.Billing;
+using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views
 {
@@ -28,9 +29,15 @@ namespace LBPRDC.Source.Views
         {
             UpdatePageSwitchButtonsStyle();
             InitializeFeatureBasedOnUserRole();
+            PopulateGreetingText();
             lblDateToday.Text = DateTime.Now.ToString("MMM. dd, yyyy (ddd)");
-            lblGreetUser.Text = "Hello, " + UserService.CurrentUser?.FirstName;
             lblPageName.Text = currentPage;
+        }
+
+        private void PopulateGreetingText()
+        {
+            string randomGreeting = StringConstants.Greetings[new Random().Next(StringConstants.Greetings.Length)];
+            lblGreetUser.Text = $"{randomGreeting} {UserService.CurrentUser?.FirstName} 👋🏻";
         }
 
         private void InitializeFeatureBasedOnUserRole()

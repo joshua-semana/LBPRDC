@@ -1,4 +1,5 @@
 ﻿using LBPRDC.Source.Services;
+using System.Globalization;
 
 namespace LBPRDC.Source.Views.Billing
 {
@@ -10,6 +11,7 @@ namespace LBPRDC.Source.Views.Billing
 
         public Entry CurrentEmployee = new();
         public string InputFormat = "";
+        public string SelectedDays = "";
 
         public AddAdjustmentForm()
         {
@@ -19,6 +21,7 @@ namespace LBPRDC.Source.Views.Billing
         private void AddAdjustmentForm_Load(object sender, EventArgs e)
         {
             this.Text = $"Adjustment for {CurrentEmployee.EmployeeID}";
+            InitializeCustomCalendar();
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -28,7 +31,8 @@ namespace LBPRDC.Source.Views.Billing
 
         private void cmbCategory_SelectedIndexChanged(object sender, EventArgs e)
         {
-            grpDetails.Enabled = (cmbCategory.SelectedIndex == -1) ? false : true;
+            grpDetails.Enabled = cmbCategory.SelectedIndex != -1;
+            chkSIL.Enabled = (cmbCategory.Text == "Regular Days" || cmbCategory.Text == "Undertime");
             PopulateDetails();
         }
 
@@ -52,7 +56,7 @@ namespace LBPRDC.Source.Views.Billing
 
                 case "Legal Holiday 100%":
                     txtInitialValue.Text = (time.LegalHoliday_100.TotalHours / 8).ToString();
-                    InputFormat = txtInputValueUnits.Text = txtInitialValueUnits.Text = "day(s)";
+                    txtInitialValueUnits.Text = "day(s)";
                     break;
 
                 case "Regular Overtime 125%":
@@ -63,19 +67,19 @@ namespace LBPRDC.Source.Views.Billing
                     txtInitialValue.Text = (GetTotalHours(time.RegularHoliday_160)).ToString();
                     break;
 
-                case "Rest Day and Special Overtime 130%":
-                    txtInitialValue.Text = (GetTotalHours(time.RestDayAndSpecialOT_130)).ToString();
+                case "Rest Day/Special Holiday 130%":
+                    txtInitialValue.Text = (GetTotalHours(time.RestDaySpecialOT_130)).ToString();
                     break;
 
-                case "Rest Day Overtime 150%":
-                    txtInitialValue.Text = (GetTotalHours(time.RestDayOT_150)).ToString();
+                case "Rest Day Special Holiday 150%":
+                    txtInitialValue.Text = (GetTotalHours(time.RestDaySpecialOT_150)).ToString();
                     break;
 
-                case "Rest Day Overtime Excess 169%":
-                    txtInitialValue.Text = (GetTotalHours(time.RestDayOTExcess_169)).ToString();
+                case "Rest Day/Special Holiday Excess 169%":
+                    txtInitialValue.Text = (GetTotalHours(time.RestDaySpecialOTExcess_169)).ToString();
                     break;
 
-                case "Special Excess Overtime 195%":
+                case "Special Holiday Excess Overtime 195%":
                     txtInitialValue.Text = (GetTotalHours(time.SpecialExcessOT_195)).ToString();
                     break;
 
@@ -125,7 +129,11 @@ namespace LBPRDC.Source.Views.Billing
 
         private void txtInputValue_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back)
+            if (char.IsDigit(e.KeyChar) || e.KeyChar == (char)Keys.Back)
+            {
+                e.Handled = false;
+            }
+            else
             {
                 e.Handled = true;
             }
@@ -140,87 +148,226 @@ namespace LBPRDC.Source.Views.Billing
                 textBox.Text = textBox.Text.Insert(2, ":");
                 textBox.SelectionStart = textBox.Text.Length;
             }
-
-            btnAdd.Enabled = (textBox.Text.Length > 0) ? true : false;
-        }
-
-        private void btnReset_Click(object sender, EventArgs e)
-        {
-            txtInputValue.Text = "";
-            dtpDate.Value = DateTime.Now;
         }
 
         private bool IsTimeFormatValid(string input) => System.Text.RegularExpressions.Regex.IsMatch(input, @"^\d{2}:\d{2}$");
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
+            if (AreRequiredFieldsAreFilled() == false)
+            {
+                MessageBox.Show("Please fill up the necessary fields to add an adjustment.", "Required Fields", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             if (InputFormat == "hour(s):minute(s)" && !IsTimeFormatValid(txtInputValue.Text))
             {
                 MessageBox.Show("The input value is invalid. The correct format for this category is '00:00', just like the format stated in the units textbox.", "Format Invalid", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            if (CurrentEmployee.Adjustments != null)
-            {
-                var tempList = CurrentEmployee.Adjustments.ToList().Where(a => a.Type.Contains(cmbCategory.Text)).ToList();
-
-                if (tempList.Count > 0)
-                {
-                    MessageBox.Show("You already have this adjustment; please remove the first one in order to add this specific adjustment with a new value again.", "Adjustment Duplicate Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-            }
-
-            string operation = cmbOperation.Text;
-
-            TimeSpan initialValueInTime = TimeSpan.Zero;
-            TimeSpan inputValueInTime = TimeSpan.Zero;
-            string rawOutput = "";
-
-            switch (InputFormat)
-            {
-                case "day(s)":
-                    int initialValue = Convert.ToInt32(txtInitialValue.Text);
-                    int inputValue = Convert.ToInt32(txtInputValue.Text);
-                    initialValueInTime = TimeSpan.FromHours(initialValue * 8);
-                    inputValueInTime = TimeSpan.FromHours(inputValue * 8);
-                    rawOutput = ((operation == "Add") ? initialValue + inputValue : initialValue - inputValue).ToString();
-                    break;
-
-                case "minute(s)":
-                    initialValueInTime = TimeSpan.FromMinutes(Convert.ToInt32(txtInitialValue.Text));
-                    inputValueInTime = TimeSpan.FromMinutes(Convert.ToInt32(txtInputValue.Text));
-                    TimeSpan temp1 = (operation == "Add") ? initialValueInTime.Add(inputValueInTime) : initialValueInTime.Subtract(inputValueInTime);
-                    rawOutput = temp1.TotalMinutes.ToString();
-                    break;
-
-                case "hour(s):minute(s)":
-                    initialValueInTime = ExcelService.ParseTime(txtInitialValue.Text);
-                    inputValueInTime = ExcelService.ParseTime(txtInputValue.Text);
-                    TimeSpan temp2 = (operation == "Add") ? initialValueInTime.Add(inputValueInTime) : initialValueInTime.Subtract(inputValueInTime);
-                    rawOutput = GetTotalHours(temp2).ToString();
-                    break;
-            }
-
-            TimeSpan newValue = (operation == "Add") ? initialValueInTime.Add(inputValueInTime) : initialValueInTime.Subtract(inputValueInTime);
-
             Adjustment = new()
             {
                 ID = AdjustmentListCount++,
                 Type = cmbCategory.Text,
-                OriginalValue = initialValueInTime,
                 Operation = cmbOperation.Text,
-                InputValue = inputValueInTime,
-                NewAdjustedValue = newValue,
-                RawOriginalValue = txtInitialValue.Text,
-                RawInputValue = txtInputValue.Text,
-                RawNewAdjustedValue = rawOutput,
+                InputValue = (cmbOperation.Text == "Add") ? $"+{txtInputValue.Text}" : $"-{txtInputValue.Text}",
                 Units = InputFormat,
-                AppliedDate = dtpDate.Value.ToString("MMM dd, yyyy")
+                AppliedDate = SelectedDays,
+                Remarks = (chkSIL.Checked) ? $"[SIL] {txtRemarks.Text}" : txtRemarks.Text
             };
 
             this.DialogResult = DialogResult.OK;
             this.Close();
+        }
+
+        private bool AreRequiredFieldsAreFilled()
+        {
+            if (string.IsNullOrEmpty(txtInputValue.Text)) return false;
+            if (string.IsNullOrEmpty(SelectedDays)) return false; // TENTATIVE
+            return true;
+        }
+
+        private Dictionary<DateTime, List<DateTime>> selectedDatesByMonth = new();
+        private DateTime displayedMonth;
+        private TableLayoutPanel calendar;
+
+        private void InitializeCustomCalendar()
+        {
+            displayedMonth = DateTime.Now.Date;
+            selectedDatesByMonth[displayedMonth] = new List<DateTime>();
+
+            pnlCalendar.Controls.Add(CreateCalendarTable());
+            UpdateCalendar();
+        }
+
+        private TableLayoutPanel CreateCalendarTable()
+        {
+            calendar = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                BorderStyle = BorderStyle.FixedSingle,
+                ColumnCount = 7
+            };
+
+            return calendar;
+        }
+
+        private void UpdateCalendar()
+        {
+            calendar.Controls.Clear();
+
+            calendar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.28f));
+            calendar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.28f));
+            calendar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.28f));
+            calendar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.28f));
+            calendar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.28f));
+            calendar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.28f));
+            calendar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 14.28f));
+
+            for (int i = 0; i < 7; i++)
+            {
+                Label dayLabel = new()
+                {
+                    Text = CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedDayNames[i],
+                    TextAlign = ContentAlignment.MiddleCenter
+                };
+                calendar.Controls.Add(dayLabel, i, 0);
+            }
+
+            lblMonthYear.Text = "Date: " + displayedMonth.ToString("MMMM, yyyy");
+
+            int daysInMonth = DateTime.DaysInMonth(displayedMonth.Year, displayedMonth.Month);
+
+            DateTime firstDayOfMonth = new DateTime(displayedMonth.Year, displayedMonth.Month, 1);
+            int offset = (int)firstDayOfMonth.DayOfWeek;
+
+            List<DateTime> selectedDates = selectedDatesByMonth.TryGetValue(displayedMonth, out var dates) ? dates : new List<DateTime>();
+
+            for (int i = 0; i < daysInMonth; i++)
+            {
+                DateTime day = firstDayOfMonth.AddDays(i);
+                Button dayButton = new()
+                {
+                    Text = (i + 1).ToString(),
+                    Tag = day.Date,
+                    TextAlign = ContentAlignment.MiddleCenter
+                };
+                dayButton.Click += DayButton_Click;
+
+                int row = (int)((i + offset) / 7) + 1;
+                int col = (i + offset) % 7;
+
+                calendar.Controls.Add(dayButton, col, row);
+
+                if (selectedDates.Contains(day.Date))
+                {
+                    dayButton.BackColor = Color.LightBlue;
+                }
+            }
+        }
+
+        private void DayButton_Click(object sender, EventArgs e)
+        {
+            Button clickedButton = (Button)sender;
+            DateTime selectedDate = ((DateTime)clickedButton.Tag).Date;  // Ensure we're working with the date part only
+
+            if (!selectedDatesByMonth.TryGetValue(displayedMonth, out var selectedDates))
+            {
+                selectedDatesByMonth[displayedMonth] = selectedDates = new List<DateTime>();
+            }
+
+            if (selectedDates.Contains(selectedDate))
+            {
+                selectedDates.Remove(selectedDate);
+                clickedButton.BackColor = SystemColors.Control;
+            }
+            else
+            {
+                selectedDates.Add(selectedDate);
+                clickedButton.BackColor = Color.LightBlue;
+            }
+
+            DisplaySelectedDates();
+        }
+
+        private void DisplaySelectedDates()
+        {
+            List<string> formattedDates = new();
+
+            foreach (var selectedMonth in selectedDatesByMonth.Keys)
+            {
+                List<DateTime> selectedDates = selectedDatesByMonth[selectedMonth];
+
+                if (selectedDates.Count > 0)
+                {
+                    string formattedDate = selectedMonth.ToString("MM.");
+
+                    if (selectedDates.Count == 1)
+                    {
+                        formattedDate += selectedDates[0].ToString("dd.yy");
+                    }
+                    else
+                    {
+                        List<string> dayParts = new();
+
+                        for (int i = 0; i < selectedDates.Count; i++)
+                        {
+                            DateTime currentDate = selectedDates[i];
+                            string dayPart = currentDate.ToString("dd");
+
+                            while (i + 1 < selectedDates.Count &&
+                                   selectedDates[i + 1].Month == currentDate.Month &&
+                                   selectedDates[i + 1].Year == currentDate.Year)
+                            {
+                                i++;
+                                currentDate = selectedDates[i];
+                                dayPart += $",{currentDate:dd}";
+                            }
+
+                            if (currentDate == selectedDates[i])
+                            {
+                                dayPart += $".{currentDate:yy}";
+                            }
+
+                            dayParts.Add(dayPart);
+                        }
+
+                        formattedDate += string.Join(", ", dayParts);
+                    }
+
+                    formattedDates.Add(formattedDate);
+                }
+            }
+
+            SelectedDays = (formattedDates.Count > 0) ? string.Join(", ", formattedDates) : string.Empty;
+
+            lblDatePreview.Text = formattedDates.Count > 0
+                ? "Date Preview: " + string.Join(", ", formattedDates)
+                : "Please select date(s) to preview.";
+        }
+
+        private void btnNextMonth_Click(object sender, EventArgs e)
+        {
+            displayedMonth = displayedMonth.AddMonths(1);
+            UpdateCalendar();
+        }
+
+        private void btnPrevMonth_Click(object sender, EventArgs e)
+        {
+            displayedMonth = displayedMonth.AddMonths(-1);
+            UpdateCalendar();
+        }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            txtInputValue.Text = "";
+            txtRemarks.Text = "";
+            selectedDatesByMonth.Clear();
+            displayedMonth = DateTime.Now.Date;
+            chkSIL.Checked = false;
+            UpdateCalendar();
+            lblDatePreview.Text = "Please select date(s) to preview.";
         }
     }
 }

@@ -102,6 +102,17 @@ namespace LBPRDC.Source.Views.Billing
             if (isAdded == true)
             {
                 MessageBox.Show("You have successfully added a new billing.", "New Billing Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (UserService.CurrentUser != null)
+                {
+                    LoggingService.Log newLog = new()
+                    {
+                        UserID = UserService.CurrentUser.UserID,
+                        ActivityType = "Add",
+                        ActivityDetails = $"This user has added a new billing named as {newBilling.Name}."
+                    };
+
+                    LoggingService.LogActivity(newLog);
+                }
                 ParentControl?.ResetTableSearch();
                 this.Close();
             }

@@ -93,7 +93,7 @@ namespace LBPRDC.Source.Views.Billing
 
             var entries = await Task.Run(() => ExcelService.PreProcessEntries(txtFilePath.Text, reportSheetName, timekeepSheetName));
 
-            if (entries.Count > 0 && await Task.Run(() => BillingService.UpdateJSONData(entries, BillingName)))
+            if (entries.Count > 0 && await Task.Run(() => BillingService.UploadJSON(entries, BillingName)) && await Task.Run(() => BillingService.UpdateVerificationStatus(BillingName, "Unverified")))
             {
                 MessageBox.Show("You have successfully uploaded a timekeep file to this billing.", "Upload Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ParentControl?.ResetTableSearch();

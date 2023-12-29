@@ -130,7 +130,7 @@ namespace LBPRDC.Source.Services
                 using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
                 using (SqlCommand command = new(QueryUpdate, connection))
                 {
-                    command.Parameters.AddWithValue("@Cond", data.Code);
+                    command.Parameters.AddWithValue("@Code", data.Code);
                     command.Parameters.AddWithValue("@Name", data.Name);
                     command.Parameters.AddWithValue("@Description", data.Description);
                     command.Parameters.AddWithValue("@Status", data.Status);

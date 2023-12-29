@@ -1,6 +1,6 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
-using Microsoft.VisualBasic;
+
 
 namespace LBPRDC.Source.Views.Billing
 {
@@ -51,7 +51,7 @@ namespace LBPRDC.Source.Views.Billing
             ControlUtils.AddColumn(dgvBillings, "QuarterName", "Quarter", "QuarterName");
             ControlUtils.AddColumn(dgvBillings, "FormattedStartDate", "Start Date", "FormattedStartDate");
             ControlUtils.AddColumn(dgvBillings, "FormattedEndDate", "End Date", "FormattedEndDate");
-            ControlUtils.AddColumn(dgvBillings, "JSONData", "Timekeeping File Upload", "JSONData");
+            ControlUtils.AddColumn(dgvBillings, "ConstantJSON", "File", "ConstantJSON");
             ControlUtils.AddColumn(dgvBillings, "VerificationStatus", "Verified", "VerificationStatus");
             //dgvBillings.Columns[dgvBillings.Columns["VerificationStatus"].Index].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
         }
@@ -107,19 +107,19 @@ namespace LBPRDC.Source.Views.Billing
                     return;
                 }
 
-                var loadEntries = BillingService.LoadJSONData(dgvBillings.SelectedRows[0].Cells[0].Value.ToString());
+                var (constantEntries, editableEntries) = BillingService.LoadJSONData(dgvBillings.SelectedRows[0].Cells[0].Value.ToString());
 
-                if (loadEntries.Count == 0) return;
+                if (constantEntries.Count == 0 || editableEntries.Count == 0) return;
 
                 string billingName = dgvBillings.SelectedRows[0].Cells[0].Value.ToString();
                 string dateQuarter = dgvBillings.SelectedRows[0].Cells[1].Value.ToString();
                 string fromDate = dgvBillings.SelectedRows[0].Cells[2].Value.ToString();
                 string toDate = dgvBillings.SelectedRows[0].Cells[3].Value.ToString();
 
-
                 EmployeeTimekeepReviewForm form = new()
                 {
-                    InitialEntries = loadEntries,
+                    ConstantEntries = constantEntries,
+                    EditableEntries = editableEntries,
                     ParentControl = this,
                     BillingName = billingName,
                     DateQuarter = dateQuarter,
@@ -139,8 +139,47 @@ namespace LBPRDC.Source.Views.Billing
                 if (await Task.Run(() => BillingService.UpdateStatus(billingName, "Inactive")))
                 {
                     MessageBox.Show($"You have successfully archived the {billingName} billing.", "Archive Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (UserService.CurrentUser != null)
+                    {
+                        LoggingService.Log newLog = new()
+                        {
+                            UserID = UserService.CurrentUser.UserID,
+                            ActivityType = "Archive",
+                            ActivityDetails = $"This user has archive a billing with a name of {billingName}."
+                        };
+                        LoggingService.LogActivity(newLog);
+                    }
                     ApplySearchThenPopulate();
                 }
+            }
+        }
+
+        private void btnExport_Click(object sender, EventArgs e)
+        {
+            if (dgvBillings.SelectedRows.Count > 0)
+            {
+                if (dgvBillings.SelectedRows[0].Cells[4].Value.ToString() == "")
+                {
+                    MessageBox.Show("Please upload a timekeeping file to this billing before you can proceed with the verification of employee timekeeping information.", "Verify Billing Invalid", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (dgvBillings.SelectedRows[0].Cells[5].Value.ToString() == "")
+                {
+                    MessageBox.Show("Please verify the timekeeping information of the employees to proceed with exporting this billing. If you haven't, please upload an Excel file first containing a report and timekeeping work sheet.", "Export Billing Invalid", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                string billingName = dgvBillings.SelectedRows[0].Cells[0].Value.ToString();
+                var (constantEntries, editableEntries) = BillingService.LoadJSONData(dgvBillings.SelectedRows[0].Cells[0].Value.ToString());
+
+                if (constantEntries.Count == 0 || editableEntries.Count == 0)
+                {
+                    MessageBox.Show("Error in getting the entry data of this billing. Please call for support.", "Error Loading Employee Data", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                ExcelService.ExportBilling(editableEntries, billingName);
             }
         }
     }

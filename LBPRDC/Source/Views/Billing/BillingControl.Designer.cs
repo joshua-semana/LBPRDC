@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             pnlRight = new Panel();
             pnlRightFooter = new Panel();
             flowFooterActions = new FlowLayoutPanel();
@@ -47,8 +47,9 @@
             flowLayoutPanel1 = new FlowLayoutPanel();
             btnNew = new Button();
             btnUpload = new Button();
-            btnArchive = new Button();
             btnVerify = new Button();
+            btnArchive = new Button();
+            btnExport = new Button();
             pnlRight.SuspendLayout();
             pnlRightFooter.SuspendLayout();
             flowFooterActions.SuspendLayout();
@@ -186,23 +187,23 @@
             dgvBillings.AllowUserToDeleteRows = false;
             dgvBillings.AllowUserToOrderColumns = true;
             dgvBillings.AllowUserToResizeRows = false;
-            dataGridViewCellStyle7.SelectionBackColor = Color.SeaGreen;
-            dgvBillings.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle1.SelectionBackColor = Color.SeaGreen;
+            dgvBillings.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             dgvBillings.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvBillings.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvBillings.BackgroundColor = SystemColors.Window;
             dgvBillings.BorderStyle = BorderStyle.Fixed3D;
             dgvBillings.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvBillings.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = SystemColors.Control;
-            dataGridViewCellStyle8.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle8.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle8.Padding = new Padding(0, 2, 0, 2);
-            dataGridViewCellStyle8.SelectionBackColor = Color.MediumSeaGreen;
-            dataGridViewCellStyle8.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = DataGridViewTriState.True;
-            dgvBillings.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.Padding = new Padding(0, 2, 0, 2);
+            dataGridViewCellStyle2.SelectionBackColor = Color.MediumSeaGreen;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            dgvBillings.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dgvBillings.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvBillings.EditMode = DataGridViewEditMode.EditOnF2;
             dgvBillings.GridColor = SystemColors.Control;
@@ -211,15 +212,15 @@
             dgvBillings.MultiSelect = false;
             dgvBillings.Name = "dgvBillings";
             dgvBillings.ReadOnly = true;
-            dataGridViewCellStyle9.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = SystemColors.Control;
-            dataGridViewCellStyle9.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle9.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle9.Padding = new Padding(4);
-            dataGridViewCellStyle9.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = DataGridViewTriState.True;
-            dgvBillings.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Control;
+            dataGridViewCellStyle3.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle3.Padding = new Padding(4);
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            dgvBillings.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             dgvBillings.RowHeadersVisible = false;
             dgvBillings.RowTemplate.DefaultCellStyle.Padding = new Padding(4, 8, 4, 8);
             dgvBillings.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
@@ -243,21 +244,22 @@
             // 
             flowLayoutPanel1.Controls.Add(btnNew);
             flowLayoutPanel1.Controls.Add(btnUpload);
-            flowLayoutPanel1.Controls.Add(btnArchive);
             flowLayoutPanel1.Controls.Add(btnVerify);
+            flowLayoutPanel1.Controls.Add(btnArchive);
+            flowLayoutPanel1.Controls.Add(btnExport);
             flowLayoutPanel1.Dock = DockStyle.Right;
             flowLayoutPanel1.FlowDirection = FlowDirection.RightToLeft;
-            flowLayoutPanel1.Location = new Point(470, 0);
+            flowLayoutPanel1.Location = new Point(373, 0);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Padding = new Padding(23, 16, 0, 16);
-            flowLayoutPanel1.Size = new Size(382, 60);
+            flowLayoutPanel1.Size = new Size(479, 60);
             flowLayoutPanel1.TabIndex = 4;
             // 
             // btnNew
             // 
             btnNew.AutoSize = true;
             btnNew.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnNew.Location = new Point(284, 16);
+            btnNew.Location = new Point(381, 16);
             btnNew.Margin = new Padding(8, 0, 0, 0);
             btnNew.Name = "btnNew";
             btnNew.Size = new Size(75, 28);
@@ -270,7 +272,7 @@
             // 
             btnUpload.AutoSize = true;
             btnUpload.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnUpload.Location = new Point(201, 16);
+            btnUpload.Location = new Point(298, 16);
             btnUpload.Margin = new Padding(8, 0, 0, 0);
             btnUpload.Name = "btnUpload";
             btnUpload.Size = new Size(75, 28);
@@ -279,11 +281,24 @@
             btnUpload.UseVisualStyleBackColor = true;
             btnUpload.Click += btnUpload_Click;
             // 
+            // btnVerify
+            // 
+            btnVerify.AutoSize = true;
+            btnVerify.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnVerify.Location = new Point(215, 16);
+            btnVerify.Margin = new Padding(8, 0, 0, 0);
+            btnVerify.Name = "btnVerify";
+            btnVerify.Size = new Size(75, 28);
+            btnVerify.TabIndex = 10;
+            btnVerify.Text = "Verify";
+            btnVerify.UseVisualStyleBackColor = true;
+            btnVerify.Click += btnVerify_Click;
+            // 
             // btnArchive
             // 
             btnArchive.AutoSize = true;
             btnArchive.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnArchive.Location = new Point(118, 16);
+            btnArchive.Location = new Point(132, 16);
             btnArchive.Margin = new Padding(8, 0, 0, 0);
             btnArchive.Name = "btnArchive";
             btnArchive.Size = new Size(75, 28);
@@ -292,18 +307,18 @@
             btnArchive.UseVisualStyleBackColor = true;
             btnArchive.Click += btnArchive_Click;
             // 
-            // btnVerify
+            // btnExport
             // 
-            btnVerify.AutoSize = true;
-            btnVerify.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnVerify.Location = new Point(35, 16);
-            btnVerify.Margin = new Padding(8, 0, 0, 0);
-            btnVerify.Name = "btnVerify";
-            btnVerify.Size = new Size(75, 28);
-            btnVerify.TabIndex = 10;
-            btnVerify.Text = "Verify";
-            btnVerify.UseVisualStyleBackColor = true;
-            btnVerify.Click += btnVerify_Click;
+            btnExport.AutoSize = true;
+            btnExport.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnExport.Location = new Point(49, 16);
+            btnExport.Margin = new Padding(8, 0, 0, 0);
+            btnExport.Name = "btnExport";
+            btnExport.Size = new Size(75, 28);
+            btnExport.TabIndex = 12;
+            btnExport.Text = "Export";
+            btnExport.UseVisualStyleBackColor = true;
+            btnExport.Click += btnExport_Click;
             // 
             // BillingControl
             // 
@@ -350,5 +365,6 @@
         private Button btnUpload;
         private Button btnVerify;
         private Button btnArchive;
+        private Button btnExport;
     }
 }
