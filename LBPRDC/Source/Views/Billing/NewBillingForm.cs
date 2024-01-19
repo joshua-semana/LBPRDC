@@ -20,7 +20,9 @@ namespace LBPRDC.Source.Views.Billing
 
             RequiredFields = new()
             {
-                txtBillingName
+                txtBillingName,
+                txtOfficerInCharge,
+                txtOfficerPosition
             };
         }
 
@@ -61,6 +63,8 @@ namespace LBPRDC.Source.Views.Billing
 
             txtFromDatePreview.Text = startDate.ToString("MMMM dd, yyyy");
             txtToDatePreview.Text = endDate.ToString("MMMM dd, yyyy");
+
+            SetBillingName();
         }
 
         private void btnPreviewDateRange_Click(object sender, EventArgs e)
@@ -85,34 +89,31 @@ namespace LBPRDC.Source.Views.Billing
 
         private async void AddNewBillingRecord()
         {
-            BillingService.Billing newBilling = new()
+            Services.Billing newBilling = new()
             {
                 UserID = UserService.CurrentUser.UserID,
-                Name = Utilities.StringFormat.ToSentenceCase(txtBillingName.Text),
+                Name = Utilities.StringFormat.ToSentenceCase(txtBillingName.Text.Trim()),
+                OfficerName = txtOfficerInCharge.Text.ToUpper().Trim(),
+                OfficerPosition = txtOfficerPosition.Text.ToUpper().Trim(),
                 Month = cmbMonth.SelectedIndex + 1,
                 Year = Convert.ToInt32(cmbYear.SelectedItem),
                 Quarter = (radFirst.Checked) ? 1 : 2,
                 StartDate = startDate,
                 EndDate = endDate,
-                Description = txtDescription.Text,
-                Status = "Active"
+                Timestamp = DateTime.Now,
+                ReleaseDate = null,
+                ConstantJSON = String.Empty,
+                EditableJSON = String.Empty,
+                AccrualsJSON = String.Empty,
+                VerificationStatus = "Unverified",
+                Description = txtDescription.Text.Trim(),
+                Status = "Active",
+                LockStatus = "Unlock"
             };
 
-            var isAdded = await BillingService.Add(newBilling);
-            if (isAdded == true)
+            if (await Task.Run(() => BillingService.Add(newBilling)))
             {
                 MessageBox.Show("You have successfully added a new billing.", "New Billing Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                if (UserService.CurrentUser != null)
-                {
-                    LoggingService.Log newLog = new()
-                    {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Add",
-                        ActivityDetails = $"This user has added a new billing named as {newBilling.Name}."
-                    };
-
-                    LoggingService.LogActivity(newLog);
-                }
                 ParentControl?.ResetTableSearch();
                 this.Close();
             }
@@ -120,8 +121,7 @@ namespace LBPRDC.Source.Views.Billing
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result == DialogResult.Yes)
+            if (string.IsNullOrEmpty(txtDescription.Text) || MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 this.Close();
             }
@@ -135,6 +135,11 @@ namespace LBPRDC.Source.Views.Billing
         private void NewBillingForm_Load(object sender, EventArgs e)
         {
             btnPreviewDateRange.PerformClick();
+        }
+
+        private void SetBillingName()
+        {
+            txtBillingName.Text = $"{startDate:MMMM dd}-{endDate:dd, yyyy} Billing";
         }
     }
 }

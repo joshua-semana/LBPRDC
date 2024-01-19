@@ -79,7 +79,7 @@ namespace LBPRDC.Source.Views.Billing
             foreach (var employee in GroupedEntriesByDepartment[CurrentDepartment])
             {
                 string statusSIL = "";
-                string status = (employee.Status == "Verified") ? "✔" : "";
+                string status = (employee.VerificationStatus == "Verified") ? "✔" : "";
                 var adjustmentList = employee?.Adjustments?.ToList() ?? new List<EntryAdjustments>();
                 if (adjustmentList != null)
                 {

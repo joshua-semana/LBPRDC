@@ -10,7 +10,7 @@
 
         public static bool CloseProgress()
         {
-            var output = MessageBox.Show("Are you sure you want to exit? You have unsaved progress. Any unsaved changes will be lost.", "Exit Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            var output = MessageBox.Show("Are you sure you want to close this form? You have unsaved progress. Any unsaved changes will be lost.", "Exit Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             return output == DialogResult.Yes;
         }
     }

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Configuration;
+using System.Data.SqlClient;
 
 namespace LBPRDC.Source.Data
 {
@@ -12,6 +8,13 @@ namespace LBPRDC.Source.Data
         public static string GetConnectionString()
         {
             return ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString;
+        }
+
+        public static SqlConnection DBConnect()
+        {
+            SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
+            connection.Open();
+            return connection;
         }
     }
 }

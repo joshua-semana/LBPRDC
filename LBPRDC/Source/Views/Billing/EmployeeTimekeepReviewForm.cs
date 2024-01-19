@@ -1,6 +1,5 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace LBPRDC.Source.Views.Billing
 {
@@ -12,6 +11,8 @@ namespace LBPRDC.Source.Views.Billing
         public string BillingName = "";
         public string DateQuarter = "";
         public string DateCoverage = "";
+
+        public string LockStatus = "";
 
         private Dictionary<string, int> CurrentIndexByDepartment = new();
         private Dictionary<string, List<Entry>> GroupedEntriesByDepartment = new();
@@ -28,6 +29,31 @@ namespace LBPRDC.Source.Views.Billing
         private static string ConvertToHoursMinutes(TimeSpan time) => $"{(int)time.TotalHours:D2}:{time.Minutes:D2}";
         private async void SaveProgress() => await Task.Run(() => BillingService.UpdateEditableJSON(EditableEntries, BillingName));
 
+        private EntryTimeDetails CustomEntryOriginalTime()
+        {
+            return new EntryTimeDetails
+            {
+                RegularHours = TimeSpan.Zero,
+                LegalHoliday_100 = TimeSpan.Zero,
+                RegOT_125 = TimeSpan.Zero,
+                RestDaySpecialOT_130 = TimeSpan.Zero,
+                RestDaySpecialOTExcess_169 = TimeSpan.Zero,
+                SpecialExcessOT_195 = TimeSpan.Zero,
+                LegalHolidayOT_200 = TimeSpan.Zero,
+                LegalHolidayOT_260 = TimeSpan.Zero,
+                RestDaySpecialOT_150 = TimeSpan.Zero,
+                RegularHoliday_160 = TimeSpan.Zero,
+                NightDiff_10 = TimeSpan.Zero,
+                NightDiff_125 = TimeSpan.Zero,
+                NightDiff_130 = TimeSpan.Zero,
+                NightDiff_150 = TimeSpan.Zero,
+                NightDiff_20 = TimeSpan.Zero,
+                NightDiff_50 = TimeSpan.Zero,
+                UnderTime = TimeSpan.Zero,
+                Absent = TimeSpan.Zero,
+            };
+        }
+
         public EmployeeTimekeepReviewForm()
         {
             InitializeComponent();
@@ -35,24 +61,49 @@ namespace LBPRDC.Source.Views.Billing
 
         private void EmployeeTimekeepReviewForm_Load(object sender, EventArgs e)
         {
-            this.Text = $"{BillingName} | {DateQuarter} Quarter | {DateCoverage}";
+            this.Text = $"{BillingName}";
+
+            SetButtonsState(LockStatus == "Unlock");
             GetLatestEmployeeInformation();
             InitializeDepartmentComboBoxItems();
             GroupEntriesByDepartment();
             RefreshDisplayInformation();
         }
 
+        private void SetButtonsState(bool state)
+        {
+            btnInsertEntry.Enabled = state;
+            btnRemoveEntry.Enabled = state;
+            btnAddAdjustment.Enabled = state;
+            btnRemove.Enabled = state;
+            grpRemarks.Enabled = state;
+            btnVerify.Enabled = state;
+            btnSave.Enabled = state;
+            btnVerifyBilling.Enabled = state;
+            grpExport.Enabled = state;
+        }
+
         private void GetLatestEmployeeInformation()
         {
             var employees = EmployeeService.GetAllEmployeesBase();
+            var positions = PositionService.GetAllItems();
             foreach (var entry in EditableEntries)
             {
-                var emp = employees.First(f => f.EmployeeID == entry.EmployeeID);
-                entry.Department = emp.Department;
-                entry.DepartmentID = emp.DepartmentID;
-                entry.Position = PositionService.GetAllItems().First(f => f.ID == entry.PositionID).Name;
-                entry.Location = emp.Location;
-                entry.FullName = $"{emp.LastName}, {emp.FirstName} {emp.MiddleName[..1]}.";
+                var emp = employees.FirstOrDefault(f => f.EmployeeID == entry.EmployeeID);
+                string? position = positions.FirstOrDefault(f => f.ID == entry.PositionID)?.Name;
+                if (emp != null)
+                {
+                    entry.Department = emp.Department;
+                    entry.DepartmentID = emp.DepartmentID;
+                    entry.Position = position ?? entry.Position;
+                    entry.Location = emp.Location;
+                    entry.FullName = $"{emp.LastName}, {emp.FirstName} {emp.MiddleName[..1]}.";
+                }
+                else
+                {
+                    entry.Position = position ?? entry.Position;
+                    entry.FullName = $"{entry.LastName}, {entry.FirstName} {entry.MiddleName[..1]}.";
+                }
             }
         }
 
@@ -77,7 +128,7 @@ namespace LBPRDC.Source.Views.Billing
             {
                 string statusSIL = "";
                 string position = "";
-                string status = (employee.Status == "Verified") ? "✔" : "•";
+                string status = (employee.VerificationStatus == "Verified") ? "✔" : "•";
                 var adjustmentList = employee?.Adjustments?.ToList() ?? new List<EntryAdjustments>();
 
                 if (adjustmentList != null)
@@ -136,9 +187,10 @@ namespace LBPRDC.Source.Views.Billing
 
             var person = CurrentEmployee();
             var time = person.TimeDetails;
-            string status = (person.Status == "Verified") ? "(Verified) " : "";
+            string status = (person.VerificationStatus == "Verified") ? "(Verified) " : "";
+            btnRemoveEntry.Enabled = (person.EntryType == "Custom Entry");
 
-            lblEmployeeInformation.Text = $"{status}{person.EmployeeID} | {Utilities.StringFormat.ToSentenceCase(person.FullName)} | {Utilities.StringFormat.ToSentenceCase(person.Position)} | {person.Location}";
+            lblEmployeeInformation.Text = $"{status}{person.EmployeeID} | {Utilities.StringFormat.ToSentenceCase(person.FullName)} | {Utilities.StringFormat.ToSentenceCase(person.Position)} | Location: {person.Location} | Rate: {person.BillingRate.ToString("C2").Replace("$", "₱")}";
 
             txtRegularInDays.Text = (time.RegularHours.TotalHours / 8).ToString();
             txtTotalRegularHours.Text = time.RegularHours.TotalHours.ToString();
@@ -172,7 +224,7 @@ namespace LBPRDC.Source.Views.Billing
             radYesExport.Checked = person.ExportIncluded;
             radNoExport.Checked = !person.ExportIncluded;
 
-            btnVerify.Text = (person?.Status == "Verified") ? "✘ Unverify" : "✔ Verify";
+            btnVerify.Text = (person?.VerificationStatus == "Verified") ? "✘ Unverify" : "✔ Verify";
             lblEntryCounter.Text = $"{GetCurrentIndex() + 1} out of {GetTotalOfEntriesByDepartment()} employees under \"{CurrentDepartment}\" department.";
         }
 
@@ -215,7 +267,17 @@ namespace LBPRDC.Source.Views.Billing
 
                         if (summary == null)
                         {
-                            var originalValues = ConstantEntries.First(f => f.EmployeeID == CurrentEmployee().EmployeeID).TimeDetails;
+                            EntryTimeDetails originalValues = new();
+                            if (CurrentEmployee().EntryType == "Regular Entry")
+                            {
+                                originalValues = ConstantEntries.First(f => f.Guid == CurrentEmployee().Guid).TimeDetails;
+                            }
+                            else if (CurrentEmployee().EntryType == "Custom Entry")
+                            {
+                                originalValues = CustomEntryOriginalTime();
+                            }
+
+                            if (originalValues == null) continue;
 
                             string originalValue = type switch
                             {
@@ -313,7 +375,7 @@ namespace LBPRDC.Source.Views.Billing
         {
             List<AdjustmentRemarks> remarksList = new();
             ClearAdjustmentRemarks();
-            if (dgvAdjustmentSummary.Rows.Count > 0 )
+            if (dgvAdjustmentSummary.Rows.Count > 0)
             {
                 foreach (DataGridViewRow row in dgvAdjustmentSummary.Rows)
                 {
@@ -393,7 +455,15 @@ namespace LBPRDC.Source.Views.Billing
 
         private void UpdateTimeDetailByType(string type, TimeSpan newValue, bool reset)
         {
-            var originalTime = ConstantEntries.First(f => f.EmployeeID == CurrentEmployee().EmployeeID).TimeDetails;
+            EntryTimeDetails originalTime = new();
+            if (CurrentEmployee().EntryType == "Regular Entry")
+            {
+                originalTime = ConstantEntries.First(f => f.Guid == CurrentEmployee().Guid).TimeDetails;
+            }
+            else if (CurrentEmployee().EntryType == "Custom Entry")
+            {
+                originalTime = CustomEntryOriginalTime();
+            }
             switch (type)
             {
                 case "Regular Days":
@@ -513,6 +583,44 @@ namespace LBPRDC.Source.Views.Billing
             }
         }
 
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            DisplayEmployeeList();
+        }
+
+        private void btnInsertEntry_Click(object sender, EventArgs e)
+        {
+            InsertCustomEntryForm form = new()
+            {
+                BillingName = BillingName,
+                EditableEntries = EditableEntries
+            };
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                EditableEntries = form.EditableEntries;
+                ChangesInBilling(true);
+                InitializeDepartmentComboBoxItems();
+                GroupEntriesByDepartment();
+                RefreshDisplayInformation();
+            }
+        }
+
+        List<Guid> removedEntries = new();
+        private void btnRemoveEntry_Click(object sender, EventArgs e)
+        {
+            var output = MessageBox.Show("Are you sure you want to remove this custom entry?", "Remove Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (output == DialogResult.Yes)
+            {
+                var entryToRemove = EditableEntries.First(w => w.Guid == CurrentEmployee().Guid);
+                removedEntries.Add(entryToRemove.Guid);
+                EditableEntries.Remove(entryToRemove);
+                ChangesInBilling(true);
+                InitializeDepartmentComboBoxItems();
+                GroupEntriesByDepartment();
+                RefreshDisplayInformation();
+            }
+        }
+
         // BUTTONS WITH ACTIONS
         private async void btnSave_Click(object sender, EventArgs e)
         {
@@ -527,7 +635,7 @@ namespace LBPRDC.Source.Views.Billing
 
         private void btnVerify_Click(object sender, EventArgs e)
         {
-            CurrentEmployee().Status = (btnVerify.Text == "✔ Verify") ? "Verified" : "Unverified";
+            CurrentEmployee().VerificationStatus = (btnVerify.Text == "✔ Verify") ? "Verified" : "Unverified";
             ChangesInBilling(true);
             if (btnVerify.Text == "Verify")
             {
@@ -587,6 +695,7 @@ namespace LBPRDC.Source.Views.Billing
         {
             CurrentEmployee().FinalReportRemarks = txtCustomRemarks.Text;
             MessageBox.Show("Custom remarks are applied to this employee.", "Custom Remarks Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            ChangesInBilling(true);
             DisplayEmployeeInformation();
         }
 
@@ -599,6 +708,7 @@ namespace LBPRDC.Source.Views.Billing
         {
             CurrentEmployee().BookmarkRemarks = txtBookmarkReason.Text;
             MessageBox.Show("Bookmark reasons are applied to this employee.", "Bookmark Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            ChangesInBilling(true);
             DisplayEmployeeInformation();
         }
 
@@ -641,7 +751,7 @@ namespace LBPRDC.Source.Views.Billing
             List<Entry> employeeList = new();
             foreach (var employee in EditableEntries)
             {
-                if (employee.Status == "Unverified" || !string.IsNullOrEmpty(employee.BookmarkRemarks) || (employee.Adjustments != null && employee.Adjustments.Any(a => a.Remarks.Contains("[SIL]") )))
+                if (employee.ExportIncluded && employee.VerificationStatus == "Unverified" || !string.IsNullOrEmpty(employee.BookmarkRemarks) || (employee.Adjustments != null && employee.Adjustments.Any(a => a.Remarks.Contains("[SIL]"))))
                 {
                     employeeList.Add(employee);
                 }
@@ -662,28 +772,51 @@ namespace LBPRDC.Source.Views.Billing
                 }
             }
 
-            SaveProgress();
-            if (await Task.Run(() => BillingService.UpdateVerificationStatus(BillingName, "Verified")))
+            var hasExportEmployees = EditableEntries.Any(a => a.ExportIncluded == true);
+            
+            if (!hasExportEmployees)
             {
-                MessageBox.Show($"You have successfully set the status of '{BillingName}' as verified.", "Verified Successfuly", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ChangesInBilling(false);
-                this.Close();
-                ParentControl?.ApplySearchThenPopulate();
+                MessageBox.Show("You must include at least 1 employee in export in order to mark this billing as verified.", "Finish Billing Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            frmLoading loadingForm = new()
+            {
+                BooleanProcess = Task.Run(() => ExcelService.ExportBilling(EditableEntries, BillingName, "", "Unreleased", removedEntries)),
+                Description = "Generating a temporary billing record, please wait ..."
+            };
+            loadingForm.ShowDialog();
+
+            if (loadingForm.DialogResult == DialogResult.OK)
+            {
+                SaveProgress();
+                if (await Task.Run(() => BillingService.UpdateVerificationStatus(BillingName, "Verified")))
+                {
+                    MessageBox.Show($"You have successfully set the status of '{BillingName}' as verified.", "Verified Successfuly", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ChangesInBilling(false);
+                    this.Close();
+                    ParentControl?.ApplySearchThenPopulate();
+                }
+            }
+            else if (loadingForm.DialogResult == DialogResult.Abort)
+            {
+                MessageBox.Show($"There is a problem generating a temporary billing record; please try again. If the error persists, please save your progress and call for support.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        private void radYesExport_CheckedChanged(object sender, EventArgs e)
+        private void radYesExport_Click(object sender, EventArgs e)
         {
             if (radYesExport.Checked)
             {
+                ChangesInBilling(true);
                 CurrentEmployee().ExportIncluded = true;
             }
         }
 
-        private void radNoExport_CheckedChanged(object sender, EventArgs e)
+        private void radNoExport_Click(object sender, EventArgs e)
         {
             if (radNoExport.Checked)
             {
+                ChangesInBilling(true);
                 CurrentEmployee().ExportIncluded = false;
             }
         }
