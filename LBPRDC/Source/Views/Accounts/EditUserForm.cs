@@ -55,7 +55,7 @@ namespace LBPRDC.Source.Views.Accounts
 
         private void EditUserInformation()
         {
-            //TODO
+            // TODO
         }
 
         private void chkChangePassword_CheckedChanged(object sender, EventArgs e)

@@ -56,7 +56,7 @@
             pnlLine1.Dock = DockStyle.Top;
             pnlLine1.Location = new Point(0, 0);
             pnlLine1.Name = "pnlLine1";
-            pnlLine1.Size = new Size(476, 1);
+            pnlLine1.Size = new Size(456, 1);
             pnlLine1.TabIndex = 0;
             // 
             // pnlFooter
@@ -64,9 +64,9 @@
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Controls.Add(flowLayoutPanel1);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 260);
+            pnlFooter.Location = new Point(0, 252);
             pnlFooter.Name = "pnlFooter";
-            pnlFooter.Size = new Size(476, 46);
+            pnlFooter.Size = new Size(456, 46);
             pnlFooter.TabIndex = 1;
             // 
             // flowLayoutPanel1
@@ -75,7 +75,7 @@
             flowLayoutPanel1.Controls.Add(btnCancel);
             flowLayoutPanel1.Dock = DockStyle.Right;
             flowLayoutPanel1.FlowDirection = FlowDirection.RightToLeft;
-            flowLayoutPanel1.Location = new Point(287, 0);
+            flowLayoutPanel1.Location = new Point(267, 0);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Padding = new Padding(16, 9, 0, 0);
             flowLayoutPanel1.Size = new Size(189, 46);
@@ -122,19 +122,20 @@
             pnlBody.Location = new Point(0, 1);
             pnlBody.Name = "pnlBody";
             pnlBody.Padding = new Padding(16);
-            pnlBody.Size = new Size(476, 259);
+            pnlBody.Size = new Size(456, 251);
             pnlBody.TabIndex = 2;
             // 
             // cmbReportWorksheet
             // 
+            cmbReportWorksheet.AccessibleName = "Report Worksheet";
             cmbReportWorksheet.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbReportWorksheet.Enabled = false;
             cmbReportWorksheet.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             cmbReportWorksheet.FormattingEnabled = true;
             cmbReportWorksheet.Location = new Point(16, 142);
-            cmbReportWorksheet.Margin = new Padding(0, 0, 8, 16);
+            cmbReportWorksheet.Margin = new Padding(0, 0, 0, 16);
             cmbReportWorksheet.Name = "cmbReportWorksheet";
-            cmbReportWorksheet.Size = new Size(443, 26);
+            cmbReportWorksheet.Size = new Size(424, 26);
             cmbReportWorksheet.TabIndex = 16;
             // 
             // label4
@@ -161,14 +162,15 @@
             // 
             // cmbTimekeepSheet
             // 
+            cmbTimekeepSheet.AccessibleName = "Timekeep Worksheet";
             cmbTimekeepSheet.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbTimekeepSheet.Enabled = false;
             cmbTimekeepSheet.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             cmbTimekeepSheet.FormattingEnabled = true;
             cmbTimekeepSheet.Location = new Point(16, 204);
-            cmbTimekeepSheet.Margin = new Padding(0, 0, 8, 16);
+            cmbTimekeepSheet.Margin = new Padding(0, 0, 0, 16);
             cmbTimekeepSheet.Name = "cmbTimekeepSheet";
-            cmbTimekeepSheet.Size = new Size(443, 26);
+            cmbTimekeepSheet.Size = new Size(424, 26);
             cmbTimekeepSheet.TabIndex = 12;
             // 
             // btnSelect
@@ -176,7 +178,7 @@
             btnSelect.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnSelect.AutoSize = true;
             btnSelect.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnSelect.Location = new Point(384, 79);
+            btnSelect.Location = new Point(365, 80);
             btnSelect.Margin = new Padding(4, 0, 8, 0);
             btnSelect.Name = "btnSelect";
             btnSelect.Size = new Size(75, 28);
@@ -198,13 +200,14 @@
             // 
             // txtFilePath
             // 
+            txtFilePath.AccessibleName = "File";
             txtFilePath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtFilePath.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtFilePath.Location = new Point(16, 80);
             txtFilePath.Margin = new Padding(0, 0, 4, 16);
             txtFilePath.Name = "txtFilePath";
             txtFilePath.ReadOnly = true;
-            txtFilePath.Size = new Size(360, 26);
+            txtFilePath.Size = new Size(341, 26);
             txtFilePath.TabIndex = 2;
             // 
             // pnlLine2
@@ -215,7 +218,7 @@
             pnlLine2.Location = new Point(16, 43);
             pnlLine2.Margin = new Padding(0, 0, 0, 16);
             pnlLine2.Name = "pnlLine2";
-            pnlLine2.Size = new Size(444, 1);
+            pnlLine2.Size = new Size(424, 1);
             pnlLine2.TabIndex = 1;
             // 
             // panel1
@@ -225,7 +228,7 @@
             panel1.Location = new Point(-1, 0);
             panel1.Margin = new Padding(0, 0, 0, 16);
             panel1.Name = "panel1";
-            panel1.Size = new Size(444, 1);
+            panel1.Size = new Size(424, 1);
             panel1.TabIndex = 2;
             // 
             // label1
@@ -235,15 +238,15 @@
             label1.Location = new Point(16, 16);
             label1.Margin = new Padding(0, 0, 0, 8);
             label1.Name = "label1";
-            label1.Size = new Size(95, 19);
+            label1.Size = new Size(173, 19);
             label1.TabIndex = 0;
-            label1.Text = "Upload File";
+            label1.Text = "Upload Timekeep File";
             // 
             // UploadFileForm
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(476, 306);
+            ClientSize = new Size(456, 298);
             ControlBox = false;
             Controls.Add(pnlBody);
             Controls.Add(pnlFooter);
@@ -255,6 +258,7 @@
             Name = "UploadFileForm";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
+            Text = "Upload File";
             Load += UploadFileForm_Load;
             pnlFooter.ResumeLayout(false);
             flowLayoutPanel1.ResumeLayout(false);

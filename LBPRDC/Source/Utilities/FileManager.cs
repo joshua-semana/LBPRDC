@@ -19,10 +19,11 @@ namespace LBPRDC.Source.Utilities
             return null;
         }
 
-        public static string? ChooseSavingPath()
+        public static string? ChooseSavingPath(string filename)
         {
             using SaveFileDialog saveFileDialog = new();
-            saveFileDialog.Title = "Select the Saving Path for the Excel Report";
+            saveFileDialog.FileName = filename;
+            saveFileDialog.Title = "Select the saving path for the Excel Report";
             saveFileDialog.Filter = "Excel Files|*.xlsx";
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)

@@ -55,6 +55,14 @@
             txtFromDatePreview = new TextBox();
             label7 = new Label();
             label8 = new Label();
+            panel1 = new Panel();
+            label10 = new Label();
+            txtOfficerInCharge = new TextBox();
+            label6 = new Label();
+            panel2 = new Panel();
+            label11 = new Label();
+            txtOfficerPosition = new TextBox();
+            label12 = new Label();
             pnlGroup5 = new Panel();
             txtDescription = new TextBox();
             label9 = new Label();
@@ -66,6 +74,8 @@
             pnlGroup2.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
+            panel1.SuspendLayout();
+            panel2.SuspendLayout();
             pnlGroup5.SuspendLayout();
             SuspendLayout();
             // 
@@ -83,7 +93,7 @@
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Controls.Add(flowLayoutPanel2);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 445);
+            pnlFooter.Location = new Point(0, 562);
             pnlFooter.Name = "pnlFooter";
             pnlFooter.Size = new Size(434, 46);
             pnlFooter.TabIndex = 2;
@@ -98,7 +108,7 @@
             flowLayoutPanel2.Name = "flowLayoutPanel2";
             flowLayoutPanel2.Padding = new Padding(16, 9, 0, 0);
             flowLayoutPanel2.Size = new Size(191, 46);
-            flowLayoutPanel2.TabIndex = 5;
+            flowLayoutPanel2.TabIndex = 8;
             // 
             // btnConfirm
             // 
@@ -108,7 +118,7 @@
             btnConfirm.Margin = new Padding(8, 0, 0, 0);
             btnConfirm.Name = "btnConfirm";
             btnConfirm.Size = new Size(75, 28);
-            btnConfirm.TabIndex = 8;
+            btnConfirm.TabIndex = 10;
             btnConfirm.Text = "Confirm";
             btnConfirm.UseVisualStyleBackColor = true;
             btnConfirm.Click += btnConfirm_Click;
@@ -121,7 +131,7 @@
             btnCancel.Margin = new Padding(8, 0, 0, 0);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(75, 28);
-            btnCancel.TabIndex = 7;
+            btnCancel.TabIndex = 9;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
@@ -149,7 +159,7 @@
             pnlBody.Location = new Point(0, 1);
             pnlBody.Name = "pnlBody";
             pnlBody.Padding = new Padding(16);
-            pnlBody.Size = new Size(434, 444);
+            pnlBody.Size = new Size(434, 561);
             pnlBody.TabIndex = 3;
             // 
             // pnlLine2
@@ -175,17 +185,19 @@
             // 
             // flowLayoutPanel1
             // 
-            flowLayoutPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            flowLayoutPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             flowLayoutPanel1.Controls.Add(pnlGroup1);
             flowLayoutPanel1.Controls.Add(pnlGroup2);
             flowLayoutPanel1.Controls.Add(groupBox2);
             flowLayoutPanel1.Controls.Add(groupBox1);
+            flowLayoutPanel1.Controls.Add(panel1);
+            flowLayoutPanel1.Controls.Add(panel2);
             flowLayoutPanel1.Controls.Add(pnlGroup5);
             flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
             flowLayoutPanel1.Location = new Point(16, 60);
             flowLayoutPanel1.Margin = new Padding(0);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(403, 360);
+            flowLayoutPanel1.Size = new Size(403, 477);
             flowLayoutPanel1.TabIndex = 0;
             // 
             // pnlGroup1
@@ -198,7 +210,7 @@
             pnlGroup1.Margin = new Padding(0, 0, 0, 16);
             pnlGroup1.Name = "pnlGroup1";
             pnlGroup1.Size = new Size(402, 46);
-            pnlGroup1.TabIndex = 16;
+            pnlGroup1.TabIndex = 1;
             // 
             // label3
             // 
@@ -246,7 +258,7 @@
             pnlGroup2.Margin = new Padding(0, 0, 0, 16);
             pnlGroup2.Name = "pnlGroup2";
             pnlGroup2.Size = new Size(402, 46);
-            pnlGroup2.TabIndex = 15;
+            pnlGroup2.TabIndex = 2;
             // 
             // cmbYear
             // 
@@ -303,7 +315,7 @@
             groupBox2.Name = "groupBox2";
             groupBox2.Padding = new Padding(16, 8, 8, 8);
             groupBox2.Size = new Size(402, 53);
-            groupBox2.TabIndex = 21;
+            groupBox2.TabIndex = 3;
             groupBox2.TabStop = false;
             groupBox2.Text = "Quarter Period";
             // 
@@ -346,13 +358,13 @@
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new Padding(16, 8, 8, 0);
             groupBox1.Size = new Size(402, 97);
-            groupBox1.TabIndex = 20;
+            groupBox1.TabIndex = 4;
             groupBox1.TabStop = false;
             groupBox1.Text = "Selected Date Preview";
             // 
             // txtToDatePreview
             // 
-            txtToDatePreview.AccessibleName = "Code";
+            txtToDatePreview.AccessibleName = "";
             txtToDatePreview.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtToDatePreview.Location = new Point(68, 55);
             txtToDatePreview.Margin = new Padding(0);
@@ -365,7 +377,7 @@
             // 
             // txtFromDatePreview
             // 
-            txtFromDatePreview.AccessibleName = "Code";
+            txtFromDatePreview.AccessibleName = "";
             txtFromDatePreview.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtFromDatePreview.Location = new Point(68, 24);
             txtFromDatePreview.Margin = new Padding(0, 0, 0, 8);
@@ -398,27 +410,121 @@
             label8.TabIndex = 22;
             label8.Text = "To:";
             // 
+            // panel1
+            // 
+            panel1.AutoSize = true;
+            panel1.Controls.Add(label10);
+            panel1.Controls.Add(txtOfficerInCharge);
+            panel1.Controls.Add(label6);
+            panel1.Location = new Point(0, 306);
+            panel1.Margin = new Padding(0, 0, 0, 16);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(402, 46);
+            panel1.TabIndex = 5;
+            // 
+            // label10
+            // 
+            label10.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label10.AutoSize = true;
+            label10.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label10.ForeColor = Color.Red;
+            label10.Location = new Point(153, 0);
+            label10.Margin = new Padding(0);
+            label10.Name = "label10";
+            label10.Size = new Size(12, 16);
+            label10.TabIndex = 22;
+            label10.Text = "*";
+            // 
+            // txtOfficerInCharge
+            // 
+            txtOfficerInCharge.AccessibleName = "Officer-in-Charge Name";
+            txtOfficerInCharge.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            txtOfficerInCharge.Location = new Point(0, 20);
+            txtOfficerInCharge.Margin = new Padding(0);
+            txtOfficerInCharge.MaxLength = 100;
+            txtOfficerInCharge.Name = "txtOfficerInCharge";
+            txtOfficerInCharge.Size = new Size(402, 26);
+            txtOfficerInCharge.TabIndex = 6;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label6.Location = new Point(0, 0);
+            label6.Margin = new Padding(0, 0, 0, 4);
+            label6.Name = "label6";
+            label6.Size = new Size(157, 16);
+            label6.TabIndex = 20;
+            label6.Text = "Officer-in-Charge Name";
+            // 
+            // panel2
+            // 
+            panel2.AutoSize = true;
+            panel2.Controls.Add(label11);
+            panel2.Controls.Add(txtOfficerPosition);
+            panel2.Controls.Add(label12);
+            panel2.Location = new Point(0, 368);
+            panel2.Margin = new Padding(0, 0, 0, 16);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(402, 46);
+            panel2.TabIndex = 6;
+            // 
+            // label11
+            // 
+            label11.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label11.AutoSize = true;
+            label11.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label11.ForeColor = Color.Red;
+            label11.Location = new Point(109, 0);
+            label11.Margin = new Padding(0);
+            label11.Name = "label11";
+            label11.Size = new Size(12, 16);
+            label11.TabIndex = 22;
+            label11.Text = "*";
+            // 
+            // txtOfficerPosition
+            // 
+            txtOfficerPosition.AccessibleName = "Officer's Position";
+            txtOfficerPosition.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            txtOfficerPosition.Location = new Point(0, 20);
+            txtOfficerPosition.Margin = new Padding(0);
+            txtOfficerPosition.MaxLength = 100;
+            txtOfficerPosition.Name = "txtOfficerPosition";
+            txtOfficerPosition.Size = new Size(402, 26);
+            txtOfficerPosition.TabIndex = 7;
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label12.Location = new Point(0, 0);
+            label12.Margin = new Padding(0, 0, 0, 4);
+            label12.Name = "label12";
+            label12.Size = new Size(113, 16);
+            label12.TabIndex = 20;
+            label12.Text = "Officer's Position";
+            // 
             // pnlGroup5
             // 
             pnlGroup5.AutoSize = true;
             pnlGroup5.Controls.Add(txtDescription);
             pnlGroup5.Controls.Add(label9);
-            pnlGroup5.Location = new Point(0, 306);
-            pnlGroup5.Margin = new Padding(0, 0, 0, 8);
+            pnlGroup5.Location = new Point(0, 430);
+            pnlGroup5.Margin = new Padding(0);
             pnlGroup5.Name = "pnlGroup5";
             pnlGroup5.Size = new Size(402, 46);
-            pnlGroup5.TabIndex = 19;
+            pnlGroup5.TabIndex = 7;
             // 
             // txtDescription
             // 
-            txtDescription.AccessibleName = "Code";
+            txtDescription.AccessibleName = "";
             txtDescription.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtDescription.Location = new Point(0, 20);
             txtDescription.Margin = new Padding(0);
             txtDescription.MaxLength = 100;
             txtDescription.Name = "txtDescription";
             txtDescription.Size = new Size(402, 26);
-            txtDescription.TabIndex = 6;
+            txtDescription.TabIndex = 8;
             // 
             // label9
             // 
@@ -435,7 +541,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(434, 491);
+            ClientSize = new Size(434, 608);
             Controls.Add(pnlBody);
             Controls.Add(pnlFooter);
             Controls.Add(pnlLine1);
@@ -462,6 +568,10 @@
             groupBox2.PerformLayout();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
             pnlGroup5.ResumeLayout(false);
             pnlGroup5.PerformLayout();
             ResumeLayout(false);
@@ -500,5 +610,13 @@
         private Button btnCancel;
         private Label label5;
         private Panel pnlLine2;
+        private Panel panel1;
+        private TextBox txtOfficerInCharge;
+        private Label label6;
+        private Label label10;
+        private Panel panel2;
+        private Label label11;
+        private TextBox txtOfficerPosition;
+        private Label label12;
     }
 }

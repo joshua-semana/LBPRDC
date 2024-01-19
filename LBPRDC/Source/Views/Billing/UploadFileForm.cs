@@ -1,4 +1,5 @@
 ﻿using LBPRDC.Source.Services;
+using LBPRDC.Source.Utilities;
 using OfficeOpenXml;
 
 namespace LBPRDC.Source.Views.Billing
@@ -6,14 +7,21 @@ namespace LBPRDC.Source.Views.Billing
     public partial class UploadFileForm : Form
     {
         public BillingControl? ParentControl { get; set; }
-
         public string BillingName { get; set; }
+        public string UploadType { get; set; }
+
+        private readonly List<Control> RequiredFields;
 
         private string filePath = "", reportSheetName = "", timekeepSheetName = "";
 
         public UploadFileForm()
         {
             InitializeComponent();
+
+            RequiredFields = new()
+            {
+                txtFilePath
+            };
         }
 
         private void UploadFileForm_Load(object sender, EventArgs e)
@@ -66,45 +74,58 @@ namespace LBPRDC.Source.Views.Billing
 
         private async void btnConfirm_Click(object sender, EventArgs e)
         {
-            ToggleInputs(false);
-
-            if (!ExcelService.AreWorksheetsValid(txtFilePath.Text, cmbReportWorksheet.Text, cmbTimekeepSheet.Text))
+            if (ControlUtils.AreRequiredFieldsFilled(RequiredFields))
             {
-                ToggleInputs(true);
-                return;
-            }
+                ToggleInputs(false);
 
-            filePath = txtFilePath.Text;
-            reportSheetName = cmbReportWorksheet.Text;
-            timekeepSheetName = cmbTimekeepSheet.Text;
-
-            var unrecognizedEmployees = await Task.Run(() => CheckEmployeeExistense());
-
-            if (unrecognizedEmployees.Count > 0)
-            {
-                UnrecognizedEmployeeForm form = new()
+                if (!ExcelService.AreTimekeepSheetsValid(txtFilePath.Text, cmbReportWorksheet.Text, cmbTimekeepSheet.Text))
                 {
-                    Employees = unrecognizedEmployees
-                };
-                form.ShowDialog();
+                    ToggleInputs(true);
+                    return;
+                }
+
+                filePath = txtFilePath.Text;
+                reportSheetName = cmbReportWorksheet.Text;
+                timekeepSheetName = cmbTimekeepSheet.Text;
+
+                var unrecognizedEmployees = await Task.Run(() => CheckEmployeeExistense());
+
+                if (unrecognizedEmployees.Count > 0)
+                {
+                    UnrecognizedEmployeeForm form = new()
+                    {
+                        Employees = unrecognizedEmployees
+                    };
+                    form.ShowDialog();
+                    ToggleInputs(true);
+                    return;
+                }
+
+                if (UploadType == "Overwrite")
+                {
+                    var recordsAreRemoved = await Task.Run(() => BillingService.RemoveBillingRecordsByBillingName(BillingName));
+                    if (!recordsAreRemoved)
+                    {
+                        MessageBox.Show("There's a problem overwriting the timekeeping file of this billing; please try again. If the error still persists, please call for support.", "Error Overwriting Timekeep File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }
+
+                var entries = await Task.Run(() => ExcelService.PreProcessEntries(txtFilePath.Text, reportSheetName, timekeepSheetName));
+
+                if (entries.Count > 0 && await Task.Run(() => BillingService.UpdateConstantAndEditableJSON(entries, BillingName)) && await Task.Run(() => BillingService.UpdateVerificationStatus(BillingName, "Unverified")))
+                {
+                    MessageBox.Show("You have successfully uploaded a timekeep file to this billing.", "Upload Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ParentControl?.ResetTableSearch();
+                    Close();
+                }
+                else
+                {
+                    MessageBox.Show("Failed to upload timekeep data to this billing. Please try again.", "Upload Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
                 ToggleInputs(true);
-                return;
             }
-
-            var entries = await Task.Run(() => ExcelService.PreProcessEntries(txtFilePath.Text, reportSheetName, timekeepSheetName));
-
-            if (entries.Count > 0 && await Task.Run(() => BillingService.UploadJSON(entries, BillingName)) && await Task.Run(() => BillingService.UpdateVerificationStatus(BillingName, "Unverified")))
-            {
-                MessageBox.Show("You have successfully uploaded a timekeep file to this billing.", "Upload Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ParentControl?.ResetTableSearch();
-                Close();
-            }
-            else
-            {
-                MessageBox.Show("Failed to upload timekeep data to this billing. Please try again.", "Upload Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            ToggleInputs(true);
         }
 
         private List<EmployeeBase> CheckEmployeeExistense()

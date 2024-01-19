@@ -13,5 +13,6 @@ namespace LBPRDC.Source.Utilities
 
             return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(input.ToLower());
         }
+
     }
 }

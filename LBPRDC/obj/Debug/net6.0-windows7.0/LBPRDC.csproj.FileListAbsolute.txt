@@ -108,6 +108,7 @@ C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Sou
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.BillingControl.resources
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.EmployeeTimekeepReviewForm.resources
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.ExportEmployeeSelectionForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.InsertCustomEntryForm.resources
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.NewBillingForm.resources
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.SummaryView.resources
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.UnrecognizedEmployeeForm.resources
@@ -145,3 +146,10 @@ C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\refint\LBP
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.pdb
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.genruntimeconfig.cache
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\ref\LBPRDC.dll
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\bin\Debug\net6.0-windows7.0\Dapper.dll
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.BillingDetailsForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.UploadAccrualsForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.BillingInformationForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.ReleaseBillingForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.CollectAccountForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Billing.ViewAccountBillings.resources

@@ -279,6 +279,11 @@ namespace LBPRDC.Source.Views.Categories
                         break;
 
                     case "Department":
+                        if (txtCode.Text.ToUpper() == "OT")
+                        {
+                            MessageBox.Show("The code 'OT' cannot be used; please try another code.", "Invalid Code Entry", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
                         var similarDepartmentCodes = DepartmentService.GetAllItems().Where(w => txtCode.Text.ToUpper().Equals(w.Code)).ToList();
                         if (similarDepartmentCodes.Count > 0 && txtCode.Text != OriginalValues[txtCode])
                         {

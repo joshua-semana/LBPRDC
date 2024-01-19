@@ -21,7 +21,7 @@ namespace LBPRDC.Source.Views.Billing
 
         private void SummaryViewForm_Load(object sender, EventArgs e)
         {
-            UnverifiedEmployees = Employees.Where(w => w.Status == "Unverified").ToList();
+            UnverifiedEmployees = Employees.Where(w => w.VerificationStatus == "Unverified").ToList();
             BookmarkedEmployees = Employees.Where(w => w.BookmarkRemarks != null && w.BookmarkRemarks != "").ToList();
             SILEmployees = Employees.Where(w => w.Adjustments != null && w.Adjustments.Any(a => a.Remarks.Contains("[SIL]"))).ToList();
 

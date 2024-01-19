@@ -28,12 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle10 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle11 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle12 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             pnlLine1 = new Panel();
             pnlFooter = new Panel();
             lblEntryCounter = new Label();
@@ -138,6 +138,9 @@
             pnlLeftBody = new Panel();
             flowLeftEmployeeList = new FlowLayoutPanel();
             pnlLeftHeader = new Panel();
+            btnRemoveEntry = new Button();
+            btnInsertEntry = new Button();
+            btnSearch = new Button();
             label10 = new Label();
             txtSearch = new TextBox();
             cmbDepartment = new ComboBox();
@@ -329,7 +332,7 @@
             radNoExport.TabStop = true;
             radNoExport.Text = "No, don't include";
             radNoExport.UseVisualStyleBackColor = true;
-            radNoExport.CheckedChanged += radNoExport_CheckedChanged;
+            radNoExport.Click += radNoExport_Click;
             // 
             // radYesExport
             // 
@@ -342,7 +345,7 @@
             radYesExport.TabStop = true;
             radYesExport.Text = "Yes, include this employee";
             radYesExport.UseVisualStyleBackColor = true;
-            radYesExport.CheckedChanged += radYesExport_CheckedChanged;
+            radYesExport.Click += radYesExport_Click;
             // 
             // grpNightDifferential
             // 
@@ -607,23 +610,23 @@
             dgvAdjustmentSummary.AllowUserToDeleteRows = false;
             dgvAdjustmentSummary.AllowUserToOrderColumns = true;
             dgvAdjustmentSummary.AllowUserToResizeRows = false;
-            dataGridViewCellStyle7.SelectionBackColor = Color.SeaGreen;
-            dgvAdjustmentSummary.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle1.SelectionBackColor = Color.SeaGreen;
+            dgvAdjustmentSummary.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             dgvAdjustmentSummary.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             dgvAdjustmentSummary.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvAdjustmentSummary.BackgroundColor = SystemColors.Window;
             dgvAdjustmentSummary.BorderStyle = BorderStyle.Fixed3D;
             dgvAdjustmentSummary.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvAdjustmentSummary.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = SystemColors.Control;
-            dataGridViewCellStyle8.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle8.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle8.Padding = new Padding(0, 2, 0, 2);
-            dataGridViewCellStyle8.SelectionBackColor = Color.MediumSeaGreen;
-            dataGridViewCellStyle8.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = DataGridViewTriState.True;
-            dgvAdjustmentSummary.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.Padding = new Padding(0, 2, 0, 2);
+            dataGridViewCellStyle2.SelectionBackColor = Color.MediumSeaGreen;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            dgvAdjustmentSummary.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dgvAdjustmentSummary.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvAdjustmentSummary.EditMode = DataGridViewEditMode.EditOnF2;
             dgvAdjustmentSummary.GridColor = SystemColors.Control;
@@ -632,15 +635,15 @@
             dgvAdjustmentSummary.MultiSelect = false;
             dgvAdjustmentSummary.Name = "dgvAdjustmentSummary";
             dgvAdjustmentSummary.ReadOnly = true;
-            dataGridViewCellStyle9.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = SystemColors.Control;
-            dataGridViewCellStyle9.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle9.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle9.Padding = new Padding(4);
-            dataGridViewCellStyle9.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = DataGridViewTriState.True;
-            dgvAdjustmentSummary.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Control;
+            dataGridViewCellStyle3.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle3.Padding = new Padding(4);
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            dgvAdjustmentSummary.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             dgvAdjustmentSummary.RowHeadersVisible = false;
             dgvAdjustmentSummary.RowTemplate.DefaultCellStyle.Padding = new Padding(4, 8, 4, 8);
             dgvAdjustmentSummary.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
@@ -1202,6 +1205,7 @@
             txtCustomRemarks.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtCustomRemarks.Location = new Point(20, 98);
             txtCustomRemarks.Margin = new Padding(0, 0, 8, 8);
+            txtCustomRemarks.MaxLength = 255;
             txtCustomRemarks.Name = "txtCustomRemarks";
             txtCustomRemarks.Size = new Size(602, 26);
             txtCustomRemarks.TabIndex = 3;
@@ -1224,23 +1228,23 @@
             dgvAdjustments.AllowUserToDeleteRows = false;
             dgvAdjustments.AllowUserToOrderColumns = true;
             dgvAdjustments.AllowUserToResizeRows = false;
-            dataGridViewCellStyle10.SelectionBackColor = Color.SeaGreen;
-            dgvAdjustments.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle4.SelectionBackColor = Color.SeaGreen;
+            dgvAdjustments.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
             dgvAdjustments.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             dgvAdjustments.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvAdjustments.BackgroundColor = SystemColors.Window;
             dgvAdjustments.BorderStyle = BorderStyle.Fixed3D;
             dgvAdjustments.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvAdjustments.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle11.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle11.BackColor = SystemColors.Control;
-            dataGridViewCellStyle11.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle11.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle11.Padding = new Padding(0, 2, 0, 2);
-            dataGridViewCellStyle11.SelectionBackColor = Color.MediumSeaGreen;
-            dataGridViewCellStyle11.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle11.WrapMode = DataGridViewTriState.True;
-            dgvAdjustments.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = SystemColors.Control;
+            dataGridViewCellStyle5.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle5.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle5.Padding = new Padding(0, 2, 0, 2);
+            dataGridViewCellStyle5.SelectionBackColor = Color.MediumSeaGreen;
+            dataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.True;
+            dgvAdjustments.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             dgvAdjustments.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvAdjustments.EditMode = DataGridViewEditMode.EditOnF2;
             dgvAdjustments.GridColor = SystemColors.Control;
@@ -1249,15 +1253,15 @@
             dgvAdjustments.MultiSelect = false;
             dgvAdjustments.Name = "dgvAdjustments";
             dgvAdjustments.ReadOnly = true;
-            dataGridViewCellStyle12.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle12.BackColor = SystemColors.Control;
-            dataGridViewCellStyle12.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle12.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle12.Padding = new Padding(4);
-            dataGridViewCellStyle12.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle12.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle12.WrapMode = DataGridViewTriState.True;
-            dgvAdjustments.RowHeadersDefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = SystemColors.Control;
+            dataGridViewCellStyle6.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle6.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle6.Padding = new Padding(4);
+            dataGridViewCellStyle6.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.True;
+            dgvAdjustments.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             dgvAdjustments.RowHeadersVisible = false;
             dgvAdjustments.RowTemplate.DefaultCellStyle.Padding = new Padding(4, 8, 4, 8);
             dgvAdjustments.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
@@ -1586,9 +1590,9 @@
             pnlLeftBody.AutoScroll = true;
             pnlLeftBody.Controls.Add(flowLeftEmployeeList);
             pnlLeftBody.Dock = DockStyle.Fill;
-            pnlLeftBody.Location = new Point(0, 133);
+            pnlLeftBody.Location = new Point(0, 176);
             pnlLeftBody.Name = "pnlLeftBody";
-            pnlLeftBody.Size = new Size(302, 850);
+            pnlLeftBody.Size = new Size(302, 807);
             pnlLeftBody.TabIndex = 1;
             // 
             // flowLeftEmployeeList
@@ -1605,6 +1609,9 @@
             // 
             // pnlLeftHeader
             // 
+            pnlLeftHeader.Controls.Add(btnRemoveEntry);
+            pnlLeftHeader.Controls.Add(btnInsertEntry);
+            pnlLeftHeader.Controls.Add(btnSearch);
             pnlLeftHeader.Controls.Add(label10);
             pnlLeftHeader.Controls.Add(txtSearch);
             pnlLeftHeader.Controls.Add(cmbDepartment);
@@ -1614,8 +1621,48 @@
             pnlLeftHeader.Location = new Point(0, 0);
             pnlLeftHeader.Name = "pnlLeftHeader";
             pnlLeftHeader.Padding = new Padding(16);
-            pnlLeftHeader.Size = new Size(302, 133);
+            pnlLeftHeader.Size = new Size(302, 176);
             pnlLeftHeader.TabIndex = 0;
+            // 
+            // btnRemoveEntry
+            // 
+            btnRemoveEntry.AutoSize = true;
+            btnRemoveEntry.Enabled = false;
+            btnRemoveEntry.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnRemoveEntry.Location = new Point(206, 130);
+            btnRemoveEntry.Margin = new Padding(8, 0, 0, 0);
+            btnRemoveEntry.Name = "btnRemoveEntry";
+            btnRemoveEntry.Size = new Size(80, 28);
+            btnRemoveEntry.TabIndex = 21;
+            btnRemoveEntry.Text = "Remove";
+            btnRemoveEntry.UseVisualStyleBackColor = true;
+            btnRemoveEntry.Click += btnRemoveEntry_Click;
+            // 
+            // btnInsertEntry
+            // 
+            btnInsertEntry.AutoSize = true;
+            btnInsertEntry.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnInsertEntry.Location = new Point(16, 130);
+            btnInsertEntry.Margin = new Padding(0);
+            btnInsertEntry.Name = "btnInsertEntry";
+            btnInsertEntry.Size = new Size(182, 28);
+            btnInsertEntry.TabIndex = 20;
+            btnInsertEntry.Text = "Insert Custom Entry";
+            btnInsertEntry.UseVisualStyleBackColor = true;
+            btnInsertEntry.Click += btnInsertEntry_Click;
+            // 
+            // btnSearch
+            // 
+            btnSearch.AutoSize = true;
+            btnSearch.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnSearch.Location = new Point(206, 87);
+            btnSearch.Margin = new Padding(8, 0, 0, 0);
+            btnSearch.Name = "btnSearch";
+            btnSearch.Size = new Size(80, 28);
+            btnSearch.TabIndex = 19;
+            btnSearch.Text = "Search";
+            btnSearch.UseVisualStyleBackColor = true;
+            btnSearch.Click += btnSearch_Click;
             // 
             // label10
             // 
@@ -1633,9 +1680,9 @@
             txtSearch.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtSearch.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtSearch.Location = new Point(16, 88);
-            txtSearch.Margin = new Padding(0, 0, 0, 8);
+            txtSearch.Margin = new Padding(0, 0, 0, 16);
             txtSearch.Name = "txtSearch";
-            txtSearch.Size = new Size(270, 26);
+            txtSearch.Size = new Size(182, 26);
             txtSearch.TabIndex = 14;
             txtSearch.KeyUp += txtSearch_KeyUp;
             // 
@@ -1655,7 +1702,7 @@
             // 
             pnlLine3.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             pnlLine3.BorderStyle = BorderStyle.FixedSingle;
-            pnlLine3.Location = new Point(16, 125);
+            pnlLine3.Location = new Point(16, 168);
             pnlLine3.Margin = new Padding(0, 0, 0, 16);
             pnlLine3.Name = "pnlLine3";
             pnlLine3.Size = new Size(270, 1);
@@ -1693,6 +1740,7 @@
             Controls.Add(pnlLeft);
             Controls.Add(pnlLine1);
             Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "EmployeeTimekeepReviewForm";
@@ -1844,5 +1892,8 @@
         private Label label16;
         private RadioButton radNoExport;
         private RadioButton radYesExport;
+        private Button btnSearch;
+        private Button btnInsertEntry;
+        private Button btnRemoveEntry;
     }
 }

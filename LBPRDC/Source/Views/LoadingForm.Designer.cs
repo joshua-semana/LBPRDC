@@ -28,35 +28,48 @@
         /// </summary>
         private void InitializeComponent()
         {
-            label1 = new Label();
+            lblDescription = new Label();
             progressBar1 = new ProgressBar();
+            btnCancel = new Button();
             SuspendLayout();
             // 
-            // label1
+            // lblDescription
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(12, 14);
-            label1.Margin = new Padding(3, 0, 3, 8);
-            label1.Name = "label1";
-            label1.Size = new Size(186, 18);
-            label1.TabIndex = 0;
-            label1.Text = "Processing, please wait...";
+            lblDescription.AutoSize = true;
+            lblDescription.Location = new Point(12, 14);
+            lblDescription.Margin = new Padding(3, 0, 3, 8);
+            lblDescription.Name = "lblDescription";
+            lblDescription.Size = new Size(186, 18);
+            lblDescription.TabIndex = 0;
+            lblDescription.Text = "Processing, please wait...";
             // 
             // progressBar1
             // 
+            progressBar1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             progressBar1.Location = new Point(12, 43);
             progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(360, 23);
+            progressBar1.Size = new Size(415, 23);
             progressBar1.Style = ProgressBarStyle.Marquee;
             progressBar1.TabIndex = 1;
+            // 
+            // btnCancel
+            // 
+            btnCancel.Location = new Point(352, 72);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(75, 31);
+            btnCancel.TabIndex = 2;
+            btnCancel.Text = "Cancel";
+            btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Click += btnCancel_Click;
             // 
             // frmLoading
             // 
             AutoScaleMode = AutoScaleMode.None;
-            ClientSize = new Size(380, 77);
+            ClientSize = new Size(439, 114);
             ControlBox = false;
+            Controls.Add(btnCancel);
             Controls.Add(progressBar1);
-            Controls.Add(label1);
+            Controls.Add(lblDescription);
             Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Margin = new Padding(4);
@@ -65,6 +78,7 @@
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Status";
+            Load += frmLoading_Load;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -73,5 +87,7 @@
 
         private Label label1;
         private ProgressBar progressBar1;
+        private Label lblDescription;
+        private Button btnCancel;
     }
 }

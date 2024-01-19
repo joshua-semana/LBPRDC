@@ -16,6 +16,8 @@ namespace LBPRDC.Source.Services
         public string? Position { get; set; }
         public int PositionID { get; set; }
         public string? Location { get; set; }
+        public decimal SalaryRate { get; set; }
+        public decimal BillingRate { get; set; }
     }
 
     public class EmployeeCompositeType : EmployeeBase
@@ -47,8 +49,6 @@ namespace LBPRDC.Source.Services
             public string? PositionName { get; set; }
             public string? EmploymentStatus { get; set; }
             public string? Suffix { get; set; }
-            public decimal SalaryRate { get; set; }
-            public decimal BillingRate { get; set; }
         }
 
         public class EmployeeHistory : Employee

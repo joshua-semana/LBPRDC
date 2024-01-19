@@ -2,19 +2,23 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Text.Json;
+using System.Windows.Forms;
+using static LBPRDC.Source.Services.DepartmentService;
 using static LBPRDC.Source.Services.PositionService;
 
 namespace LBPRDC.Source.Services
 {
     public class Entry : EmployeeBase
     {
+        public Guid Guid { get; set; }
         public EntryTimeDetails? TimeDetails { get; set; }
         public EntryAdjustments[]? Adjustments { get; set; }
         public AdjustmentRemarks[]? AdjustmentRemarks { get; set; }
         public string? TimekeepRemarks { get; set; } // Timekeeping Remarks
         public string? FinalReportRemarks { get; set; } // Your Remarks
         public string? BookmarkRemarks { get; set; } // If has data, turn the emloyee name in list to be color red.
-        public string? Status { get; set; }
+        public string? VerificationStatus { get; set; }
+        public string? EntryType { get; set; } // Regular Entry or Custom Entry
         public bool ExportIncluded { get; set; }
     }
 
@@ -52,6 +56,27 @@ namespace LBPRDC.Source.Services
         public string? Value { get; set; }
     }
 
+    public class BalancingRowDetails
+    {
+        public string? AccrualsFullName { get; set; }
+        public string? BillingFullName { get; set; }
+        public decimal? AccrualsValue { get; set; }
+        public decimal? BillingValue { get; set; }
+        public string? BillingRemarks { get; set; }
+    }
+
+    public class AccrualsEntry
+    {
+        public string? EmployeeID { get; set; }
+        public string? EmployeeName { get; set; }
+        public string? EmployeePosition { get; set; }
+        public decimal? BillingRate { get; set; }
+        public decimal? RegularBillingValue { get; set; }
+        public decimal? OvertimeBillingValue { get; set; }
+        public bool HasAdded { get; set; } = false;
+        public string? Department { get; set; } = "";
+    }
+
     internal class ExcelService
     {
         public static string? OpenFile()
@@ -71,7 +96,7 @@ namespace LBPRDC.Source.Services
             return null;
         }
 
-        public static bool AreWorksheetsValid(string filePath, string reportSheet, string timekeepSheet)
+        public static bool AreTimekeepSheetsValid(string filePath, string reportSheet, string timekeepSheet)
         {
             using var file = new ExcelPackage(new FileInfo(filePath));
 
@@ -92,7 +117,26 @@ namespace LBPRDC.Source.Services
             {
                 if (!selectedTimekeepSheet.Cells[1, i].Text.Contains(FileFormatConstants.ExcelTimekeepWorksheetFormat[i - 1]))
                 {
-                    MessageBox.Show("The content of the timekeep worksheet is not supported by this operation. Header columns do not match the set header constant format. Please select another worksheet. ", "Excel Worksheet Not Valid", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("The content of the timekeep worksheet is not supported by this operation. Header columns do not match the set header constant format. Please select another worksheet.", "Excel Worksheet Not Valid", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public static bool AreAccrualsSheetValid(string filePath, string sheet)
+        {
+            using var file = new ExcelPackage(new FileInfo(filePath));
+
+            var selectedSheet = file.Workbook.Worksheets[sheet];
+
+            for (int i = 1; i <= FileFormatConstants.ExcelAccrualsWorksheetFormat.Count; i++)
+            {
+                var text = selectedSheet.Cells[2, i].Text.ToString();
+                if (!selectedSheet.Cells[7, i].Text.Contains(FileFormatConstants.ExcelAccrualsWorksheetFormat[i - 1]))
+                {
+                    MessageBox.Show("The content of the worksheet is not supported by this operation. Header columns do not match the set header constant format. Please select another worksheet.", "Excel Worksheet Not Valid", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
             }
@@ -232,9 +276,18 @@ namespace LBPRDC.Source.Services
 
                 // Getting data from Timekeep Sheet
                 var allPositionHistory = PositionService.GetAllHistory();
+                var positionAndRates = PositionService.GetAllItems();
+
+                var databaseGuids = new HashSet<Guid>(BillingService.GetBillingRecordGuids());
 
                 for (int row = 2; row < timekeepRowCount; row++)
                 {
+                    Guid newGuid = Guid.NewGuid();
+                    while (databaseGuids.Contains(newGuid))
+                    {
+                        newGuid = Guid.NewGuid();
+                    }
+
                     string idValue = timekeepSheet.Cells[row, 1].Value?.ToString();
                     string nameValue = timekeepSheet.Cells[row, 2].Value?.ToString();
                     string Date = timekeepSheet.Cells[row, 3].Text;
@@ -292,11 +345,14 @@ namespace LBPRDC.Source.Services
 
                         entries.Add(new Entry
                         {
+                            Guid = newGuid,
                             EmployeeID = idValue.ToString(),
                             FullName = $"{currentEmployee.LastName}, {currentEmployee.FirstName} {currentEmployee.MiddleName}".Trim(),
                             PositionID = positionID,
                             Department = currentEmployee.Department,
                             Location = currentEmployee.Location,
+                            BillingRate = positionAndRates.First(f => f.ID == positionID).BillingRate,
+                            SalaryRate = positionAndRates.First(f => f.ID == positionID).SalaryRate,
                             TimeDetails = new EntryTimeDetails
                             {
                                 RegularHours = RegularHours,
@@ -318,7 +374,8 @@ namespace LBPRDC.Source.Services
                                 UnderTime = UnderTime,
                                 Absent = Absent,
                             },
-                            Status = "Unverified",
+                            EntryType = "Regular Entry",
+                            VerificationStatus = "Unverified",
                             ExportIncluded = true
                         });
                     }
@@ -336,7 +393,7 @@ namespace LBPRDC.Source.Services
             return entries;
         }
 
-        public static int GetPositionIdByDate(List<History> positions, DateTime date)
+        public static int GetPositionIdByDate(List<PositionService.History> positions, DateTime date)
         {
             for (int i = 0; i < positions.Count; i++)
             {
@@ -412,23 +469,21 @@ namespace LBPRDC.Source.Services
         private static void IncreaseRowHeight(ExcelWorksheet sheet, int row) => sheet.Row(row).Height = 48;
         private static void ComputeColumnTotal(ExcelWorksheet sheet, int start, int row, string col) => sheet.Cells[$"{col}{row}"].Formula = $"=ROUND(SUMPRODUCT({col}{start}:{col}{row - 2}, --(MOD(ROW({col}{start}:{col}{row - 2}), 2) =0)), 2)";
 
-        public static bool ExportBilling(List<Entry> entries, string billingName)
+        private static List<BillingRecord> BillingRecords = new();
+
+        public static bool ExportBilling(List<Entry> entries, string billingName, string filePath, string exportType, List<Guid> removedEntries)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            var billing = BillingService.GetBillingDetailsByName(billingName);
+            var billing = BillingService.GetAllBillingDetailsByName(billingName);
             var departments = DepartmentService.GetAllItems();
             var positionAndRates = PositionService.GetAllItems();
 
             try
             {
-                var filePath = FileManager.ChooseSavingPath();
-                if (filePath == null) return false;
-
-                var groupedEntries = entries.GroupBy(entry => entry.Department);
-
                 using var package = new ExcelPackage();
 
+                var groupedEntries = entries.GroupBy(entry => entry.Department);
                 var adjustmentSheet = package.Workbook.Worksheets.Add("ADJUSTMENTS");
 
                 int adjRow = 1;
@@ -438,12 +493,12 @@ namespace LBPRDC.Source.Services
                     List<AdjustmentOvertimePair> overtimePairs = new();
 
                     string departmentName = department.Key.ToString();
-                    string departmentCode = departments.First(f => f.Name == department.Key).Code;
+                    string? departmentCode = departments.First(f => f.Name == department.Key).Code;
                     var regularSheet = package.Workbook.Worksheets.Add(departmentName);
                     var overtimeSheet = package.Workbook.Worksheets.Add($"{departmentName} OVERTIME");
 
-                    SetReportHeadersRegular(regularSheet, departmentCode, billing.StartDate, billing.EndDate);
-                    SetReportHeadersOvertime(overtimeSheet, departmentCode, billing.StartDate, billing.EndDate);
+                    (string dateCoverage, string regularAccountNumber) = SetReportHeadersRegular(regularSheet, departmentCode, billing.StartDate, billing.EndDate);
+                    string overtimeAccountNumber = SetReportHeadersOvertime(overtimeSheet, departmentCode, billing.Quarter, billing.StartDate, billing.EndDate);
 
                     if (department.Any(a => a.AdjustmentRemarks != null && a.AdjustmentRemarks.Any(aa => aa.Type == "regular")))
                     {
@@ -457,8 +512,8 @@ namespace LBPRDC.Source.Services
                     {
                         // Addition of entries to regular and overtime department sheet
                         if (!entry.ExportIncluded) continue;
-                        (regIndex, regRow) = AddToRegularSheet(regularSheet, entry, positionAndRates, regIndex, regRow);
-                        if (HasContentInOvertime(entry)) (overIndex, overRow) = AddToOvertimeSheet(overtimeSheet, entry, positionAndRates, overIndex, overRow);
+                        (regIndex, regRow) = AddToRegularSheet(regularSheet, entry, regIndex, regRow, regularAccountNumber, billingName, exportType);
+                        if (HasContentInOvertime(entry)) (overIndex, overRow) = AddToOvertimeSheet(overtimeSheet, entry, overIndex, overRow, overtimeAccountNumber, billingName, exportType);
 
                         // Addition of Adjustment Rows
                         if (entry.AdjustmentRemarks == null) continue;
@@ -481,6 +536,9 @@ namespace LBPRDC.Source.Services
                         }
                     }
 
+                    SetPrintSettings(regularSheet, dateCoverage);
+                    SetPrintSettings(overtimeSheet, dateCoverage);
+
                     if (overtimePairs.Count > 0)
                     {
                         adjRow = AddAdjustmentTitle(adjustmentSheet, adjRow, $"{departmentName} OVERTIME");
@@ -500,8 +558,8 @@ namespace LBPRDC.Source.Services
                     regRow++; overRow++;
                     ComputeRegularTotal(regularSheet, regRow);
                     ComputeOvertimeTotal(overtimeSheet, overRow);
-                    regularSheet.Calculate();
-                    var t1 = regularSheet.Cells[$"J{regRow}"].Value; // GOT THE GROSS BILLING
+                    overtimeSheet.Calculate();
+                    var t1 = overtimeSheet.Cells[$"U{overRow}"].Value; // GOT THE GROSS BILLING
 
                     regRow++; overRow++;
                     DecreaseRowHeight(regularSheet, regRow);
@@ -512,8 +570,8 @@ namespace LBPRDC.Source.Services
                     AddNetBilling(overtimeSheet, overRow, "T", "U");
 
                     regRow += 2; overRow += 2;
-                    AddFooter(regularSheet, regRow);
-                    AddFooter(overtimeSheet, overRow);
+                    AddFooter(regularSheet, regRow, billing.OfficerName, billing.OfficerPosition);
+                    AddFooter(overtimeSheet, overRow, billing.OfficerName, billing.OfficerPosition);
                     SetCellToBold(regularSheet, $"A{regRow - 4}:J{regRow + 2}");
                     SetCellToBold(overtimeSheet, $"A{overRow - 4}:U{overRow + 2}");
                     SetColumnWidthsRegular(regularSheet);
@@ -525,11 +583,38 @@ namespace LBPRDC.Source.Services
                 AddLegend(adjustmentSheet, adjRow);
                 SetColumnWidthsAdjustment(adjustmentSheet);
 
-                package.SaveAs(new FileInfo(filePath));
+                if (filePath != "")
+                {
+                    try
+                    {
+                        package.SaveAs(new FileInfo(filePath));
+                    }
+                    catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+                }
 
+                if (exportType == "Unreleased")
+                {
+                    if (removedEntries.Any())
+                    {
+                        var result = BillingService.RemoveBillingRecordsByGuid(removedEntries);
+                    }
+
+                    var output = BillingService.AddBillingRecords(billingName, BillingRecords);
+                    if (output)
+                    {
+                        BillingRecords.Clear();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Error in saving temporary billing records, you cannot process accruals balancing if you encounter this error.", "Error Saving Billing Records", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+
+                    return output;
+                }
+
+                return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-            return true;
         }
 
         private static int AddAdjustmentTitle(ExcelWorksheet sheet, int row, string title)
@@ -580,7 +665,7 @@ namespace LBPRDC.Source.Services
             }
         }
 
-        private static void SetReportHeadersRegular(ExcelWorksheet sheet, string departmentCode, DateTime startDate, DateTime endDate)
+        private static (string, string) SetReportHeadersRegular(ExcelWorksheet sheet, string departmentCode, DateTime startDate, DateTime endDate)
         {
             string headerStartDate = startDate.ToString("MMMM dd");
             string headerEndDate = endDate.ToString("yyyy");
@@ -590,39 +675,44 @@ namespace LBPRDC.Source.Services
             DecreaseRowHeight(sheet, 5);
             IncreaseRowHeight(sheet, 7);
 
-            AddHeader(sheet, "A1:J1", "LBP RESOURCES AND DEVELOPMENT CORPORATION");
-            AddHeader(sheet, "A2:J2", "STATEMENT OF ACCOUNT");
-            AddHeader(sheet, "A3:J3", "CLIENT: SOCIAL HOUSING FINANCE CORPORATION");
-            AddHeader(sheet, "A4:J4", $"FOR THE PERIOD OF {headerStartDate.ToUpper()}-{endDate.Day}, {headerEndDate}");
+            string dateCoverage = $"{headerStartDate.ToUpper()}-{endDate.Day}, {headerEndDate}";
 
-            AddAccountNumber(sheet, "H", "I", $"SHFC-{departmentCode}-{soaStartDate}-{endDate.Day}-{soaEndDate}");
+            AddHeader(sheet, "A1:J1", "LBP RESOURCES AND DEVELOPMENT CORPORATION", 14, true);
+            AddHeader(sheet, "A2:J2", "STATEMENT OF ACCOUNT", 14, true);
+            AddHeader(sheet, "A3:J3", "CLIENT: SOCIAL HOUSING FINANCE CORPORATION", 14, true);
+            AddHeader(sheet, "A4:J4", $"FOR THE PERIOD OF {dateCoverage}", 14, true);
 
-            AddColumnHeader(sheet, "A7", "No.");
-            AddColumnHeader(sheet, "B7", "Name");
-            AddColumnHeader(sheet, "C7", "Position");
-            AddColumnHeader(sheet, "D7", "Billing Rate");
-            AddColumnHeader(sheet, "E7", "# of worked days");
-            AddColumnHeader(sheet, "F7", "Reg Bill Wrk days");
-            AddColumnHeader(sheet, "G7", "UTIME");
-            AddColumnHeader(sheet, "H7", "LH (100%)");
-            AddColumnHeader(sheet, "I7", "Net Reg Bill");
-            AddColumnHeader(sheet, "J7", "Gross Billing");
+            string accountNumber = $"SHFC-{departmentCode}-{soaStartDate}-{endDate.Day}-{soaEndDate}";
+
+            AddAccountNumber(sheet, "H", "I", accountNumber);
+
+            AddHeader(sheet, "A7", "No.", 11, true);
+            AddHeader(sheet, "B7", "Name", 11, true);
+            AddHeader(sheet, "C7", "Position", 11, true);
+            AddHeader(sheet, "D7", "Billing Rate", 11, true);
+            AddHeader(sheet, "E7", "# of worked days", 11, true);
+            AddHeader(sheet, "F7", "Reg Bill Wrk days", 11, true);
+            AddHeader(sheet, "G7", "UTIME", 11, true);
+            AddHeader(sheet, "H7", "LH (100%)", 11, true);
+            AddHeader(sheet, "I7", "Net Reg Bill", 11, true);
+            AddHeader(sheet, "J7", "Gross Billing", 11, true);
 
             AddMediumBorders(sheet, "A7:J7");
+            return (dateCoverage, accountNumber);
         }
 
-        private static (int, int) AddToRegularSheet(ExcelWorksheet sheet, Entry entry, List<Position> rates, int index, int row)
+        private static (int, int) AddToRegularSheet(ExcelWorksheet sheet, Entry entry, int index, int row, string accountNumber, string billingName, string exportType)
         {
             sheet.Cells[$"A{row}"].Value = index;
             sheet.Cells[$"B{row}"].Value = $"{entry.FullName}{(entry.FinalReportRemarks != null && entry.FinalReportRemarks != "" ? " - " + entry.FinalReportRemarks : "")}";
             sheet.Cells[$"B{row + 1}"].Value = entry.EmployeeID;
             sheet.Cells[$"C{row}"].Value = entry.Position;
-            sheet.Cells[$"D{row}"].Value = rates.First(f => f.ID == entry.PositionID).BillingRate;
+            sheet.Cells[$"D{row}"].Value = entry.BillingRate;
             sheet.Cells[$"E{row}"].Value = entry.TimeDetails?.RegularHours.TotalHours / 8;
             sheet.Cells[$"F{row}"].Formula = $"=ROUND(D{row}*E{row},2)";
             sheet.Cells[$"G{row + 1}"].Value = (entry.TimeDetails?.UnderTime.TotalMinutes > 0) ? entry.TimeDetails.UnderTime.TotalMinutes : "";
             sheet.Cells[$"G{row}"].Formula = $"=IF(G{row + 1}<>\"\", ROUND(G{row + 1}*D{row}/8/60*-1,2), 0)";
-            sheet.Cells[$"H{row + 1}"].Value = (entry.TimeDetails?.LegalHoliday_100.TotalHours / 8 > 0) ? entry.TimeDetails.LegalHoliday_100.TotalHours / 8 : "";
+            sheet.Cells[$"H{row + 1}"].Value = (entry.TimeDetails?.LegalHoliday_100.TotalHours / 8 > 0) ? entry.TimeDetails?.LegalHoliday_100.TotalHours / 8 : "";
             sheet.Cells[$"H{row}"].Formula = $"=IF(H{row + 1}<>\"\", ROUND(D{row}*H{row + 1},2), 0)";
             sheet.Cells[$"I{row}"].Formula = $"=ROUND(SUM(F{row}:H{row}),2)";
             sheet.Cells[$"J{row}"].Formula = $"=ROUND(I{row},2)";
@@ -635,11 +725,21 @@ namespace LBPRDC.Source.Services
 
             AddThinBorders(sheet, $"A{row}:J{row + 1}");
             sheet.Cells[$"A{row}:J{row}"].Style.Border.Bottom.Style = ExcelBorderStyle.None;
+            sheet.Cells[$"A{row}:A{row + 1}"].Style.Border.Left.Style = ExcelBorderStyle.Medium;
             sheet.Cells[$"J{row}"].Style.Border.Right.Style = ExcelBorderStyle.Medium;
             sheet.Cells[$"J{row + 1}"].Style.Border.Right.Style = ExcelBorderStyle.Medium;
 
             SetCellToCenter(sheet, $"A{row}");
             SetCellToCenter(sheet, $"C{row}");
+
+            if (exportType == "Unreleased")
+            {
+                sheet.Calculate();
+                var billingValue = Convert.ToDecimal(sheet.Cells[$"J{row}"].Value);
+
+                AddToBillingRecordList(entry, billingName, accountNumber, billingValue, "regular");
+            }
+
             return (index += 1, row += 2);
         }
 
@@ -658,56 +758,63 @@ namespace LBPRDC.Source.Services
             AddDoubleBorders(sheet, $"F{row}:J{row}");
         }
 
-        private static void SetReportHeadersOvertime(ExcelWorksheet sheet, string departmentCode, DateTime startDate, DateTime endDate)
+        private static string SetReportHeadersOvertime(ExcelWorksheet sheet, string departmentCode, int quarter, DateTime startDate, DateTime endDate)
         {
             string headerStartDate = startDate.ToString("MMMM dd");
             string headerEndDate = endDate.ToString("yyyy");
-            string soaStartDate = startDate.ToString("MM-dd");
+            
+            string soaStartDate = (quarter == 1) ? startDate.ToString("MM-dd") : $"{startDate:MM}-01";
             string soaEndDate = endDate.ToString("yy");
 
             DecreaseRowHeight(sheet, 5);
             IncreaseRowHeight(sheet, 7);
 
-            AddHeader(sheet, "A1:U1", "LBP RESOURCES AND DEVELOPMENT CORPORATION");
-            AddHeader(sheet, "A2:U2", "STATEMENT OF ACCOUNT");
-            AddHeader(sheet, "A3:U3", "CLIENT: SOCIAL HOUSING FINANCE CORPORATION");
-            AddHeader(sheet, "A4:U4", $"FOR THE PERIOD OF {headerStartDate.ToUpper()}-{endDate.Day}, {headerEndDate}");
+            AddHeader(sheet, "A1:U1", "LBP RESOURCES AND DEVELOPMENT CORPORATION", 14, true);
+            AddHeader(sheet, "A2:U2", "STATEMENT OF ACCOUNT", 14, true);
+            AddHeader(sheet, "A3:U3", "CLIENT: SOCIAL HOUSING FINANCE CORPORATION", 14, true);
+            AddHeader(sheet, "A4:U4", $"FOR THE PERIOD OF {headerStartDate.ToUpper()}-{endDate.Day}, {headerEndDate}", 14, true);
 
-            AddAccountNumber(sheet, "S", "T", $"SHFC-{departmentCode}-OT-{soaStartDate}-{endDate.Day}-{soaEndDate}");
+            string accountNumber = $"SHFC-{departmentCode}-OT-{soaStartDate}-{endDate.Day}-{soaEndDate}";
 
-            AddColumnHeader(sheet, "A7", "No.");
-            AddColumnHeader(sheet, "B7", "Name");
-            AddColumnHeader(sheet, "C7", "Position");
-            AddColumnHeader(sheet, "D7", "Billing Rate");
-            AddColumnHeader(sheet, "E7", "# of worked days");
-            AddColumnHeader(sheet, "F7", "Reg OT (125%)");
-            AddColumnHeader(sheet, "G7", "RDOT/SHOT (130%)");
-            AddColumnHeader(sheet, "H7", "RDOT (150%)");
-            AddColumnHeader(sheet, "I7", "RDOT Excess (169%)");
-            AddColumnHeader(sheet, "J7", "SHOT Excess (195%)");
-            AddColumnHeader(sheet, "K7", "LHOT (200%)");
-            AddColumnHeader(sheet, "L7", "LHOT (260%)");
-            AddColumnHeader(sheet, "M7", "Reg Holiday OT (160%)");
-            AddColumnHeader(sheet, "N7", "NDOT (10%)");
-            AddColumnHeader(sheet, "O7", "NDOT (20%)");
-            AddColumnHeader(sheet, "P7", "NDOT (50%)");
-            AddColumnHeader(sheet, "Q7", "NDOT (125%)");
-            AddColumnHeader(sheet, "R7", "NDOT (130%)");
-            AddColumnHeader(sheet, "S7", "NDOT (150%)");
-            AddColumnHeader(sheet, "T7", "TOTAL OT");
-            AddColumnHeader(sheet, "U7", "Gross Billing");
+            AddAccountNumber(sheet, "S", "T", accountNumber);
+
+            AddHeader(sheet, "A7", "No.", 11, true);
+            AddHeader(sheet, "B7", "Name", 11, true);
+            AddHeader(sheet, "C7", "Position", 11, true);
+            AddHeader(sheet, "D7", "Billing Rate", 11, true);
+            AddHeader(sheet, "E7", "# of worked days", 11, true);
+            AddHeader(sheet, "F7", "Reg OT (125%)", 11, true);
+            AddHeader(sheet, "G7", "RDOT/SHOT (130%)", 11, true);
+            AddHeader(sheet, "H7", "RDOT (150%)", 11, true);
+            AddHeader(sheet, "I7", "RDOT Excess (169%)", 11, true);
+            AddHeader(sheet, "J7", "SHOT Excess (195%)", 11, true);
+            AddHeader(sheet, "K7", "LHOT (200%)", 11, true);
+            AddHeader(sheet, "L7", "LHOT (260%)", 11, true);
+            AddHeader(sheet, "M7", "Reg Holiday OT (160%)", 11, true);
+            AddHeader(sheet, "N7", "NDOT (10%)", 11, true);
+            AddHeader(sheet, "O7", "NDOT (20%)", 11, true);
+            AddHeader(sheet, "P7", "NDOT (50%)", 11, true);
+            AddHeader(sheet, "Q7", "NDOT (125%)", 11, true);
+            AddHeader(sheet, "R7", "NDOT (130%)", 11, true);
+            AddHeader(sheet, "S7", "NDOT (150%)", 11, true);
+            AddHeader(sheet, "T7", "TOTAL OT", 11, true);
+            AddHeader(sheet, "U7", "Gross Billing", 11, true);
 
             AddMediumBorders(sheet, "A7:U7");
+            return accountNumber;
         }
 
-        private static (int, int) AddToOvertimeSheet(ExcelWorksheet sheet, Entry entry, List<Position> rates, int index, int row)
+        static decimal ComputeTime(decimal billingRate, double percent, TimeSpan time) => Math.Round((billingRate / 8) * Convert.ToDecimal(percent) * Convert.ToDecimal(time.TotalHours), 2, MidpointRounding.AwayFromZero);
+
+        private static (int, int) AddToOvertimeSheet(ExcelWorksheet sheet, Entry entry, int index, int row, string accountNumber, string billingName, string exportType)
         {
             var time = entry.TimeDetails;
+            decimal convertedRate = Convert.ToDecimal(entry.BillingRate);
             sheet.Cells[$"A{row}"].Value = index;
             sheet.Cells[$"B{row}"].Value = $"{entry.FullName}{(entry.FinalReportRemarks != null && entry.FinalReportRemarks != "" ? " - " + entry.FinalReportRemarks : "")}";
             sheet.Cells[$"B{row + 1}"].Value = entry.EmployeeID;
             sheet.Cells[$"C{row}"].Value = entry.Position;
-            sheet.Cells[$"D{row}"].Value = rates.First(f => f.ID == entry.PositionID).BillingRate;
+            sheet.Cells[$"D{row}"].Value = entry.BillingRate;
             sheet.Cells[$"E{row}"].Value = time?.RegularHours.TotalHours / 8;
 
             sheet.Cells[$"F{row + 1}"].Value = (time?.RegOT_125 > TimeSpan.Zero) ? time.RegOT_125 : "";
@@ -743,18 +850,43 @@ namespace LBPRDC.Source.Services
             sheet.Cells[$"T{row}"].Formula = $"=ROUND(SUM(F{row}:S{row}),2)";
             sheet.Cells[$"U{row}"].Formula = $"=ROUND(T{row},2)";
 
+            ConvertToTime(sheet, $"F{row + 1}:S{row + 1}");
             ConvertToMoney(sheet, $"D{row}");
             ConvertToMoney(sheet, $"F{row}:U{row}");
             ConvertToDecimal(sheet, $"E{row}");
-            ConvertToTime(sheet, $"F{row + 1}:S{row + 1}");
 
             AddThinBorders(sheet, $"A{row}:U{row + 1}");
             sheet.Cells[$"A{row}:U{row}"].Style.Border.Bottom.Style = ExcelBorderStyle.None;
+            sheet.Cells[$"A{row}:A{row + 1}"].Style.Border.Left.Style = ExcelBorderStyle.Medium;
             sheet.Cells[$"U{row}"].Style.Border.Right.Style = ExcelBorderStyle.Medium;
             sheet.Cells[$"U{row + 1}"].Style.Border.Right.Style = ExcelBorderStyle.Medium;
 
             SetCellToCenter(sheet, $"A{row}");
             SetCellToCenter(sheet, $"C{row}");
+
+            if (exportType == "Unreleased")
+            {
+                decimal regot_125 = ComputeTime(convertedRate, 1.25, time.RegOT_125);
+                decimal rdshot_130 = ComputeTime(convertedRate, 1.30, time.RestDaySpecialOT_130);
+                decimal rdot_150 = ComputeTime(convertedRate, 1.50, time.RestDaySpecialOT_150);
+                decimal rhot_excess_169 = ComputeTime(convertedRate, 1.69, time.RestDaySpecialOTExcess_169);
+                decimal shot_excess_195 = ComputeTime(convertedRate, 1.95, time.SpecialExcessOT_195);
+                decimal lhot_200 = ComputeTime(convertedRate, 2.00, time.LegalHolidayOT_200);
+                decimal lhot_260 = ComputeTime(convertedRate, 2.60, time.LegalHolidayOT_260);
+                decimal rhot_160 = ComputeTime(convertedRate, 1.60, time.RegularHoliday_160);
+                decimal ndot_10 = ComputeTime(convertedRate, 0.01, time.NightDiff_10);
+                decimal ndot_20 = ComputeTime(convertedRate, 0.02, time.NightDiff_20);
+                decimal ndot_50 = ComputeTime(convertedRate, 0.05, time.NightDiff_50);
+                decimal ndot_125 = ComputeTime(convertedRate, 0.125, time.NightDiff_125);
+                decimal ndot_130 = ComputeTime(convertedRate, 0.13, time.NightDiff_130);
+                decimal ndot_150 = ComputeTime(convertedRate, 0.15, time.NightDiff_150);
+
+                decimal billingValue = regot_125 + rdshot_130 + rdot_150 + rhot_excess_169 + shot_excess_195 + lhot_200 +
+                      lhot_260 + rhot_160 + ndot_10 + ndot_20 + ndot_50 + ndot_125 + ndot_130 + ndot_150;
+
+                AddToBillingRecordList(entry, billingName, accountNumber, billingValue, "overtime");
+            }
+
             return (index += 1, row += 2);
         }
 
@@ -791,7 +923,7 @@ namespace LBPRDC.Source.Services
             ConvertToMoney(sheet, $"{colValue}{row}");
         }
 
-        private static void AddFooter(ExcelWorksheet sheet, int row)
+        private static void AddFooter(ExcelWorksheet sheet, int row, string officerName, string officerPosition)
         {
             sheet.Cells[$"B{row}"].Value = "Prepared By:";
             sheet.Cells[$"E{row}"].Value = "Checked By:";
@@ -803,7 +935,7 @@ namespace LBPRDC.Source.Services
             SetCellToCenter(sheet, $"B{row}");
 
             sheet.Cells[$"E{row}:H{row}"].Merge = true;
-            sheet.Cells[$"E{row}:H{row}"].Value = "TESTING NAME";
+            sheet.Cells[$"E{row}:H{row}"].Value = officerName;
             AddUnderlineBorders(sheet, $"E{row}:H{row}");
             SetCellToCenter(sheet, $"E{row}:H{row}");
 
@@ -812,8 +944,20 @@ namespace LBPRDC.Source.Services
             SetCellToCenter(sheet, $"B{row}");
 
             sheet.Cells[$"E{row}:H{row}"].Merge = true;
-            sheet.Cells[$"E{row}:H{row}"].Value = "Position";
+            sheet.Cells[$"E{row}:H{row}"].Value = Utilities.StringFormat.ToSentenceCase(officerPosition);
             SetCellToCenter(sheet, $"E{row}:H{row}");
+        }
+
+        private static void SetPrintSettings(ExcelWorksheet sheet, string dateCoverage)
+        {
+            var printSettings = sheet.PrinterSettings;
+            sheet.HeaderFooter.OddFooter.CenteredText = "Page &P of &N";
+            sheet.HeaderFooter.OddFooter.RightAlignedText = "&\"Calibri,Bold\"&A\n&\"Calibri,Italic\"" + dateCoverage;
+            printSettings.Orientation = eOrientation.Landscape;
+            printSettings.RepeatRows = sheet.Cells["6:7"];
+            printSettings.FitToPage = true;
+            printSettings.FitToWidth = 1;
+            printSettings.FitToHeight = 2;
         }
 
         private static void SetColumnWidthsAdjustment(ExcelWorksheet sheet)
@@ -849,13 +993,15 @@ namespace LBPRDC.Source.Services
             }
         }
 
-        private static void AddHeader(ExcelWorksheet sheet, string cellRange, string value)
+        private static void AddHeader(ExcelWorksheet sheet, string cellRange, string value, int fontSize, bool boldState)
         {
             sheet.Cells[cellRange].Merge = true;
             sheet.Cells[cellRange].Value = value;
+            sheet.Cells[cellRange].Style.WrapText = true;
             sheet.Cells[cellRange].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            sheet.Cells[cellRange].Style.Font.Size = 14;
-            sheet.Cells[cellRange].Style.Font.Bold = true;
+            sheet.Cells[cellRange].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            sheet.Cells[cellRange].Style.Font.Size = fontSize;
+            sheet.Cells[cellRange].Style.Font.Bold = boldState;
         }
 
         private static void AddAccountNumber(ExcelWorksheet sheet, string cellHeader, string cellValue, string value)
@@ -865,15 +1011,6 @@ namespace LBPRDC.Source.Services
 
             sheet.Cells[$"{cellValue}6"].Value = value;
             sheet.Cells[$"{cellValue}6"].Style.Font.Bold = true;
-        }
-
-        private static void AddColumnHeader(ExcelWorksheet sheet, string cell, string value)
-        {
-            sheet.Cells[cell].Value = value;
-            sheet.Cells[cell].Style.Font.Bold = true;
-            sheet.Cells[cell].Style.WrapText = true;
-            sheet.Cells[cell].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            sheet.Cells[cell].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
         }
 
         // BORDERS
@@ -901,6 +1038,334 @@ namespace LBPRDC.Source.Services
         static void AddUnderlineBorders(ExcelWorksheet sheet, string cell)
         {
             sheet.Cells[cell].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+        }
+
+        private static void AddToBillingRecordList(Entry entry, string billingName, string accountNumber, decimal billingValue, string timeType)
+        {
+            try
+            {
+                string joinedAdjustmentRemarks = (entry.AdjustmentRemarks != null) ? string.Join(", ", entry.AdjustmentRemarks.Where(w => w.Type == timeType).Select(s => s.Value).ToArray()) : "";
+
+                if (timeType == "regular")
+                {
+                    string timeJSON = JsonSerializer.Serialize(entry.TimeDetails);
+                    
+                    BillingRecords.Add(new()
+                    {
+                        Guid = entry.Guid,
+                        EmployeeID = entry.EmployeeID,
+                        FullName = entry.FullName,
+                        EntryType = entry.EntryType,
+                        Position = entry.Position,
+                        Department = entry.Department,
+                        TimeDetailJSON = timeJSON,
+                        SalaryRate = entry.SalaryRate,
+                        BillingRate = entry.BillingRate,
+                        BillingName = billingName,
+                        RegularAccountNumber = accountNumber,
+                        OvertimeAccountNumber = "",
+                        RegularBillingValue = billingValue,
+                        RegularCollectedValue = 0,
+                        OvertimeCollectedValue = 0,
+                        RegularCollectedDate = null,
+                        OvertimeCollectedDate = null,
+                        TimekeepRemarks = entry.TimekeepRemarks ?? "",
+                        UserRemarks = entry.FinalReportRemarks ?? "",
+                        RegularAdjustmentRemarks = joinedAdjustmentRemarks,
+                        OvertimeAdjustmentRemarks = "",
+                        Description = entry.VerificationStatus,
+                        Status = "Unreleased",
+                        Timestamp = DateTime.Now
+                    });
+                }
+                else if (timeType == "overtime")
+                {
+                    var record = BillingRecords.FirstOrDefault(f => f.Guid == entry.Guid);
+                    if (record != null)
+                    {
+                        record.OvertimeAccountNumber = accountNumber;
+                        record.OvertimeBillingValue = billingValue;
+                        record.OvertimeAdjustmentRemarks = joinedAdjustmentRemarks;
+                    }
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static List<AccrualsEntry> FetchAccruals(string filePath, string accrualSheetName)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            List<AccrualsEntry> accruals = new();
+
+            try
+            {
+                using var file = new ExcelPackage(new FileInfo(filePath));
+                var sheet = file.Workbook.Worksheets[accrualSheetName];
+
+                int totalRowCount = sheet.Dimension.Rows;
+
+                List<string> invalidEntries = new()
+                {
+                    "GRAND TOTAL",
+                    "Prepared by:"
+                };
+
+                for (int row = 8; row < totalRowCount; row += 2)
+                {
+                    string? employeeName = sheet.Cells[$"C{row}"].Value?.ToString();
+                    string? employeeID = sheet.Cells[$"C{row + 1}"].Value?.ToString();
+                    string? employeePosition = sheet.Cells[$"D{row}"].Value?.ToString();
+
+                    if (string.IsNullOrEmpty(employeeName) && string.IsNullOrEmpty(employeeID) && string.IsNullOrEmpty(employeePosition)) { continue; }
+                    else if (invalidEntries.Contains(employeeName) || invalidEntries.Contains(employeeID)) { break; }
+                    
+                    decimal billingRate = (sheet.Cells[$"F{row}"].Value.ToString().Trim() == "-") ? 0 : Math.Round(Convert.ToDecimal(sheet.Cells[$"F{row}"].Value), 2, MidpointRounding.AwayFromZero);
+                    decimal regularBillingValue = (sheet.Cells[$"K{row}"].Value.ToString().Trim() == "-") ? 0 : Math.Round(Convert.ToDecimal(sheet.Cells[$"K{row}"].Value), 2, MidpointRounding.AwayFromZero);
+                    decimal overtimeBillingValue = (sheet.Cells[$"BU{row}"].Value.ToString().Trim() == "-") ? 0 : Math.Round(Convert.ToDecimal(sheet.Cells[$"BU{row}"].Value), 2, MidpointRounding.AwayFromZero);
+
+                    accruals.Add(new()
+                    {
+                        EmployeeName = employeeName,
+                        EmployeeID = employeeID,
+                        EmployeePosition = employeePosition,
+                        BillingRate = billingRate,
+                        RegularBillingValue = regularBillingValue,
+                        OvertimeBillingValue = overtimeBillingValue
+                    });
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return accruals;
+        }
+
+        // BALANCING
+
+        public static bool ExportBalancing(string billingName, string filePath)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            var employees = EmployeeService.GetAllEmployeesBase();
+            var departments = DepartmentService.GetAllItems();
+            var positions = PositionService.GetAllItems();
+
+            var billingDetails = BillingService.GetAllBillingDetailsByName(billingName);
+            var accrualsEntries = BillingService.GetAccrualsJSON(billingName);
+            var billingRecordEntries = BillingService.GetBillingRecordsByBillingName(billingName);
+            var groupedBillingRecordEntries = billingRecordEntries.GroupBy(gb => gb.Department);
+
+            foreach (var entry in accrualsEntries)
+            {
+                var matchedEmployee = employees.FirstOrDefault(f => entry.EmployeeID.Contains(f.EmployeeID));
+                if (matchedEmployee != null)
+                {
+                    entry.Department = matchedEmployee.Department?.ToUpper();
+                }
+            }
+
+            try
+            {
+                string startDate = billingDetails.StartDate.ToString("MMMM dd");
+                string endDate = billingDetails.EndDate.ToString("dd, yyyy");
+
+                using var package = new ExcelPackage();
+                var balancingSheet = package.Workbook.Worksheets.Add("Balancing");
+
+                int row = 1;
+                int startRow = 0;
+
+                AddHeader(balancingSheet, $"A{row}:F{row}", $"{startDate}-{endDate}", 14, true);
+                IncreaseRowHeight(balancingSheet, row);
+
+                row += 1;
+
+                foreach (var department in groupedBillingRecordEntries)
+                {
+                    startRow = row = SetBalancingHeaders(balancingSheet, department.Key, row);
+
+                    List<BalancingRowDetails> regularDetailsList = new();
+                    List<BalancingRowDetails> overtimeDetailsList = new();
+
+                    foreach (var billingEntry in department)
+                    {
+                        var accrualsEntry = accrualsEntries.FirstOrDefault(a => a.EmployeeID.Contains(billingEntry.EmployeeID) && a.EmployeePosition == billingEntry.Position);
+
+                        var billingPosition = positions.FirstOrDefault(f => f.Name == billingEntry.Position);
+                        string userRemarks = billingEntry.UserRemarks ?? "";
+                        string billing = $"{billingEntry.FullName} - {billingPosition?.Code}{(string.IsNullOrEmpty(userRemarks) ? "" : $" - {userRemarks}")}";
+
+                        if (accrualsEntry != null)
+                        {
+                            var accrualsPosition = positions.FirstOrDefault(f => f.Name == accrualsEntry.EmployeePosition);
+                            string accruals = (accrualsPosition != null) ? $"{accrualsEntry.EmployeeName} - {accrualsPosition?.Code}" : $"{accrualsEntry.EmployeeName} - {accrualsEntry.EmployeePosition}";
+                            
+                            accrualsEntry.HasAdded = true;
+
+                            regularDetailsList.Add(new()
+                            {
+                                AccrualsFullName = accruals,
+                                AccrualsValue = accrualsEntry.RegularBillingValue,
+                                BillingFullName = billing,
+                                BillingValue = billingEntry.RegularBillingValue,
+                                BillingRemarks = billingEntry.RegularAdjustmentRemarks
+                            });
+
+                            overtimeDetailsList.Add(new()
+                            {
+                                AccrualsFullName = accruals,
+                                AccrualsValue = accrualsEntry.OvertimeBillingValue,
+                                BillingFullName = billing,
+                                BillingValue = billingEntry.OvertimeBillingValue,
+                                BillingRemarks = billingEntry.OvertimeAdjustmentRemarks
+                            });
+                        }
+                        else
+                        {
+                            regularDetailsList.Add(new()
+                            {
+                                AccrualsFullName = "",
+                                AccrualsValue = 0,
+                                BillingFullName = billing,
+                                BillingValue = billingEntry.RegularBillingValue,
+                                BillingRemarks = billingEntry.RegularAdjustmentRemarks
+                            });
+
+                            overtimeDetailsList.Add(new()
+                            {
+                                AccrualsFullName = "",
+                                AccrualsValue = 0,
+                                BillingFullName = billing,
+                                BillingValue = billingEntry.OvertimeBillingValue,
+                                BillingRemarks = billingEntry.OvertimeAdjustmentRemarks
+                            });
+                        }
+                    }
+
+                    foreach (var skippedAccrual in accrualsEntries.Where(w => w.Department == department.Key.ToUpper() && !w.HasAdded))
+                    {
+                        var accrualsPosition = positions.FirstOrDefault(f => f.Name == skippedAccrual.EmployeePosition);
+                        string accruals = (accrualsPosition != null) ? $"{skippedAccrual.EmployeeName} - {accrualsPosition?.Code}" : $"{skippedAccrual.EmployeeName} - {skippedAccrual.EmployeePosition}";
+                        regularDetailsList.Add(new()
+                        {
+                            AccrualsFullName = accruals,
+                            AccrualsValue = skippedAccrual.RegularBillingValue,
+                            BillingFullName = "",
+                            BillingValue = 0,
+                            BillingRemarks = ""
+                        });
+
+                        skippedAccrual.HasAdded = true;
+
+                        //if (skippedAccrual.OvertimeBillingValue > 0)
+                        //{
+                        //    overtimeDetailsList.Add(new()
+                        //    {
+                        //        AccrualsFullName = accruals,
+                        //        AccrualsValue = skippedAccrual.OvertimeBillingValue,
+                        //        BillingFullName = "",
+                        //        BillingValue = 0,
+                        //        BillingRemarks = ""
+                        //    });
+                        //}
+
+                        overtimeDetailsList.Add(new()
+                        {
+                            AccrualsFullName = accruals,
+                            AccrualsValue = skippedAccrual.OvertimeBillingValue,
+                            BillingFullName = "",
+                            BillingValue = 0,
+                            BillingRemarks = ""
+                        });
+                    }
+
+                    if (regularDetailsList.Any())
+                    {
+                        foreach (var item in regularDetailsList)
+                        {
+                            row = AddBalancingRow(balancingSheet, item.AccrualsFullName, item.AccrualsValue, item.BillingFullName, item.BillingValue, item.BillingRemarks, row);
+                        }
+                    }
+
+                    balancingSheet.Cells[$"B{row}"].Formula = $"=SUM(B{startRow}:B{row - 1})";
+                    balancingSheet.Cells[$"E{row}"].Formula = $"=SUM(E{startRow}:E{row - 1})";
+                    SetCellToBold(balancingSheet, $"B{row}, E{row}");
+                    row += 1;
+
+                    startRow = row = SetBalancingHeaders(balancingSheet, $"{department.Key} OVERTIME", row);
+
+                    if (overtimeDetailsList.Any())
+                    {
+                        foreach (var item in overtimeDetailsList)
+                        {
+                            row = AddBalancingRow(balancingSheet, item.AccrualsFullName, item.AccrualsValue, item.BillingFullName, item.BillingValue, item.BillingRemarks, row);
+                        }
+                    }
+
+                    balancingSheet.Cells[$"B{row}"].Formula = $"=SUM(B{startRow}:B{row - 1})";
+                    balancingSheet.Cells[$"E{row}"].Formula = $"=SUM(E{startRow}:E{row - 1})";
+                    SetCellToBold(balancingSheet, $"B{row}, E{row}");
+                    row += 1;
+                }
+
+                row += 1;
+                AddHeader(balancingSheet, $"A{row}:B{row}", "UNCATEGORIZED ACCRUALS REGULAR", 12, true);
+                row += 1;
+
+                foreach (var entry in accrualsEntries.Where(w => !w.HasAdded))
+                {
+                    var accrualsPosition = positions.FirstOrDefault(f => f.Name == entry.EmployeePosition);
+                    string accruals = (accrualsPosition != null) ? $"{entry.EmployeeName} - {accrualsPosition?.Code}" : $"{entry.EmployeeName} - {entry.EmployeePosition}";
+                    row = AddBalancingRow(balancingSheet, accruals, entry.RegularBillingValue, "", 0, "", row);
+                }
+
+                row += 1;
+                AddHeader(balancingSheet, $"A{row}:B{row}", "UNCATEGORIZED ACCRUALS OVERTIME", 12, true);
+                row += 1;
+
+                foreach (var entry in accrualsEntries.Where(w => !w.HasAdded))
+                {
+                    var accrualsPosition = positions.FirstOrDefault(f => f.Name == entry.EmployeePosition);
+                    string accruals = (accrualsPosition != null) ? $"{entry.EmployeeName} - {accrualsPosition?.Code}" : $"{entry.EmployeeName} - {entry.EmployeePosition}";
+                    row = AddBalancingRow(balancingSheet, accruals, entry.OvertimeBillingValue, "", 0, "", row);
+                }
+
+                ConvertToMoney(balancingSheet, "B");
+                ConvertToMoney(balancingSheet, "C");
+                ConvertToMoney(balancingSheet, "E");
+                balancingSheet.Cells[balancingSheet.Dimension.Address].AutoFitColumns();
+
+                try
+                {
+                    package.SaveAs(new FileInfo(filePath));
+                }
+                catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static int SetBalancingHeaders(ExcelWorksheet sheet, string departmentName, int row)
+        {
+            row += 1;
+            AddHeader(sheet, $"A{row}:B{row}", departmentName, 12, true);
+            AddUnderlineBorders(sheet, $"A{row}:F{row}");
+            AddHeader(sheet, $"A{row + 1}:B{row + 1}", "Accruals", 11, false);
+            AddHeader(sheet, $"D{row + 1}:E{row + 1}", "Billing", 11, false);
+            AddHeader(sheet, $"F{row + 1}", "Remarks", 11, false);
+            AddUnderlineBorders(sheet, $"A{row + 1}:F{row + 1}");
+            return row += 2;
+        }
+
+        public static int AddBalancingRow(ExcelWorksheet sheet, string accrualsName, decimal? accrualsValue, string billingName, decimal? billingValue, string remarks, int row)
+        {
+            sheet.Cells[$"A{row}"].Value = accrualsName;
+            sheet.Cells[$"B{row}"].Value = accrualsValue;
+            sheet.Cells[$"C{row}"].Formula = $"=E{row}-B{row}";
+            sheet.Cells[$"D{row}"].Value = billingName;
+            sheet.Cells[$"E{row}"].Value = billingValue;
+            sheet.Cells[$"F{row}"].Value = remarks;
+            return row += 1;
         }
     }
 }
