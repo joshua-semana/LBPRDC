@@ -1,5 +1,6 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
+using static OfficeOpenXml.ExcelErrorValue;
 
 namespace LBPRDC.Source.Views.Categories
 {
@@ -28,10 +29,11 @@ namespace LBPRDC.Source.Views.Categories
 
             Categories = new()
             {
+                "Clients",
                 "Position",
-                "Civil Status",
                 "Department",
                 "Location",
+                "Civil Status",
                 "Employment Status"
             };
 
@@ -51,6 +53,8 @@ namespace LBPRDC.Source.Views.Categories
             {
                 lblCode,
                 txtCode,
+                lblClient,
+                cmbClient,
                 lblSalaryRate,
                 txtSalaryRate,
                 lblBillingRate,
@@ -79,7 +83,6 @@ namespace LBPRDC.Source.Views.Categories
         public void PopulateTableAndFields()
         {
             ShowLoadingProgressBar(true);
-            CurrentCategory = cmbCategories.SelectedItem.ToString();
 
             ControlUtils.ToggleControlsVisibilityInContainer(flowRightContent, false);
             ControlUtils.ToggleControlVisibility(CommonFields, true);
@@ -89,21 +92,25 @@ namespace LBPRDC.Source.Views.Categories
 
             switch (CurrentCategory)
             {
+                case "Clients":
+                    dgvCategory.DataSource = ClientService.GetClients();
+                    break;
+
                 case "Position":
                     dgvCategory.DataSource = PositionService.GetAllItems();
                     ControlUtils.ToggleControlVisibility(PositionSpecificFields, true);
                     btnHistory.Visible = true;
                     break;
 
+                case "Department":
+                    dgvCategory.DataSource = DepartmentService.GetAllItems();
+                    ControlUtils.ToggleControlVisibility(DepartmentSpecificFields, true);
+                    break;
+
                 case "Location":
                     dgvCategory.DataSource = LocationService.GetAllItemsForCategories()
                         .Where(w => w.ID != 1 && w.DepartmentName != NoneDepartmentName).ToList();
                     ControlUtils.ToggleControlVisibility(LocationSpecificFields, true);
-                    break;
-
-                case "Department":
-                    dgvCategory.DataSource = DepartmentService.GetAllItems();
-                    ControlUtils.ToggleControlVisibility(DepartmentSpecificFields, true);
                     break;
 
                 case "Civil Status":
@@ -115,7 +122,19 @@ namespace LBPRDC.Source.Views.Categories
                     break;
             }
 
+            if (dgvCategory.Rows.Count <= 0)
+            {
+                flowRightContent.Enabled = false;
+                flowFooterActions.Enabled = false;
+                ControlUtils.ClearInputs(flowRightContent);
+            }
+            else
+            {
+                flowRightContent.Enabled = true;
+                flowFooterActions.Enabled = true;
+            }
             UpdateRequiredFields();
+            UpdateOriginalValues();
             ShowLoadingProgressBar(false);
         }
 
@@ -134,6 +153,7 @@ namespace LBPRDC.Source.Views.Categories
 
         private void btnSelect_Click(object sender, EventArgs e)
         {
+            CurrentCategory = cmbCategories.Text.ToString();
             PopulateTableAndFields();
         }
 
@@ -142,9 +162,12 @@ namespace LBPRDC.Source.Views.Categories
             RequiredFields.Clear();
             foreach (Control control in flowRightContent.Controls)
             {
-                if ((control is TextBox && control.AccessibleName != "Description") || control is ComboBox)
+                if (control.Visible == true)
                 {
-                    RequiredFields.Add(control);
+                    if ((control is TextBox && control.AccessibleName != "Description") || control is ComboBox)
+                    {
+                        RequiredFields.Add(control);
+                    }
                 }
             }
         }
@@ -176,8 +199,8 @@ namespace LBPRDC.Source.Views.Categories
                         PopulateDepartmentSpecificTextFieldDate(selectedRow);
                         break;
                 }
-
-                UpdateOriginalValues();
+                //UpdateRequiredFields();
+                //UpdateOriginalValues();
             }
         }
 
@@ -191,6 +214,7 @@ namespace LBPRDC.Source.Views.Categories
 
         private void PopulatePositionSpecificTextFieldData(DataGridViewRow data)
         {
+            GetClientComboBoxValue(Convert.ToInt32(data.Cells["ClientID"].Value));
             txtCode.Text = data.Cells["Code"].Value.ToString();
             txtSalaryRate.Text = data.Cells["SalaryRate"].Value.ToString();
             txtBillingRate.Text = data.Cells["BillingRate"].Value.ToString();
@@ -207,6 +231,14 @@ namespace LBPRDC.Source.Views.Categories
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
             cmbDepartment.SelectedValue = value;
+        }
+
+        private void GetClientComboBoxValue(int value)
+        {
+            cmbClient.DataSource = ClientService.GetClientsForComboBoxByStatus("Active");
+            cmbClient.DisplayMember = "Name";
+            cmbClient.ValueMember = "ID";
+            cmbClient.SelectedValue = value;
         }
 
         private void PopulateDepartmentSpecificTextFieldDate(DataGridViewRow data)
@@ -259,21 +291,36 @@ namespace LBPRDC.Source.Views.Categories
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            var output = MessageBox.Show("Are you sure you want to update this item under this category?", "Update Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (output == DialogResult.No) return;
-
             if (ControlUtils.AreRequiredFieldsFilled(RequiredFields))
             {
+                var output = MessageBox.Show("Are you sure you want to update this item under this category?", "Update Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (output == DialogResult.No) return;
+
+                int ID = Convert.ToInt32(txtID.Text);
+                string name = txtName.Text.Trim();
+                string description = txtDescription.Text.Trim();
+                string status = cmbStatus.Text;
+
                 switch (CurrentCategory)
                 {
+                    case "Clients":
+                        ClientService.Update(new()
+                        {
+                            ID = ID,
+                            Name = name,
+                            Description = description,
+                            Status = status
+                        });
+                        break;
+
                     case "Civil Status":
 
                         CivilStatusService.CivilStatus UpdateForCivilStatus = new()
                         {
-                            ID = Convert.ToInt32(txtID.Text),
-                            Name = txtName.Text.ToUpper().Trim(),
-                            Description = txtDescription.Text.ToUpper().Trim(),
-                            Status = cmbStatus.Text
+                            ID = ID,
+                            Name = name,
+                            Description = description,
+                            Status = status
                         };
                         CivilStatusService.Update(UpdateForCivilStatus);
                         break;
@@ -292,11 +339,11 @@ namespace LBPRDC.Source.Views.Categories
                         };
                         DepartmentService.Department UpdateForDepartment = new()
                         {
-                            ID = Convert.ToInt32(txtID.Text),
+                            ID = ID,
                             Code = txtCode.Text.ToUpper().Trim(),
-                            Name = txtName.Text.Trim(),
-                            Description = txtDescription.Text.ToUpper().Trim(),
-                            Status = cmbStatus.Text
+                            Name = name,
+                            Description = description,
+                            Status = status
                         };
                         DepartmentService.Update(UpdateForDepartment);
                         break;
@@ -304,10 +351,10 @@ namespace LBPRDC.Source.Views.Categories
                     case "Employment Status":
                         EmploymentStatusService.EmploymentStatus UpdateForEmploymentStatus = new()
                         {
-                            ID = Convert.ToInt32(txtID.Text),
-                            Name = txtName.Text.ToUpper().Trim(),
-                            Description = txtDescription.Text.ToUpper().Trim(),
-                            Status = cmbStatus.Text
+                            ID = ID,
+                            Name = name,
+                            Description = description,
+                            Status = status
                         };
                         EmploymentStatusService.Update(UpdateForEmploymentStatus);
                         break;
@@ -315,10 +362,10 @@ namespace LBPRDC.Source.Views.Categories
                     case "Location":
                         LocationService.Location UpdateForLocation = new()
                         {
-                            ID = Convert.ToInt32(txtID.Text),
-                            Name = txtName.Text.Trim(),
-                            Description = txtDescription.Text.ToUpper().Trim(),
-                            Status = cmbStatus.Text,
+                            ID = ID,
+                            Name = name,
+                            Description = description,
+                            Status = status,
                             DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue)
                         };
                         LocationService.Update(UpdateForLocation);
@@ -334,10 +381,11 @@ namespace LBPRDC.Source.Views.Categories
 
                         PositionService.Position UpdateForPosition = new()
                         {
-                            ID = Convert.ToInt32(txtID.Text),
-                            Name = txtName.Text.Trim(),
-                            Description = txtDescription.Text.ToUpper().Trim(),
-                            Status = cmbStatus.Text,
+                            ID = ID,
+                            ClientID = Convert.ToInt32(cmbClient.SelectedValue),
+                            Name = name,
+                            Description = description,
+                            Status = status,
                             Code = txtCode.Text.ToUpper().Trim(),
                             SalaryRate = Convert.ToDecimal(txtSalaryRate.Text),
                             BillingRate = Convert.ToDecimal(txtBillingRate.Text)
@@ -348,7 +396,7 @@ namespace LBPRDC.Source.Views.Categories
                         {
                             PositionService.RatesHistory newRates = new()
                             {
-                                PositionID = Convert.ToInt32(txtID.Text),
+                                PositionID = ID,
                                 SalaryRate = Convert.ToDecimal(txtSalaryRate.Text),
                                 BillingRate = Convert.ToDecimal(txtBillingRate.Text)
                             };
@@ -389,11 +437,14 @@ namespace LBPRDC.Source.Views.Categories
 
         private void btnHistory_Click(object sender, EventArgs e)
         {
-            PositionRatesHistory positionRatesHistory = new()
+            if (dgvCategory.SelectedRows.Count == 1)
             {
-                PositionID = Convert.ToInt32(txtID.Text)
-            };
-            positionRatesHistory.ShowDialog();
+                PositionRatesHistory positionRatesHistory = new()
+                {
+                    PositionID = Convert.ToInt32(txtID.Text)
+                };
+                positionRatesHistory.ShowDialog();
+            }
         }
     }
 }

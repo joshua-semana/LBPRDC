@@ -68,7 +68,7 @@ namespace LBPRDC.Source.Views.Billing
         {
             Guid newGuid = Guid.NewGuid();
             var localEntriesGuids = new HashSet<Guid>(EditableEntries.Select(e => e.Guid));
-            var databaseGuids = new HashSet<Guid>(BillingService.GetBillingRecordGuids());
+            var databaseGuids = new HashSet<Guid>(BillingRecordService.GetGuids());
 
             while (localEntriesGuids.Contains(newGuid) || databaseGuids.Contains(newGuid))
             {

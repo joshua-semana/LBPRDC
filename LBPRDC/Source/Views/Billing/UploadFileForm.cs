@@ -103,7 +103,7 @@ namespace LBPRDC.Source.Views.Billing
 
                 if (UploadType == "Overwrite")
                 {
-                    var recordsAreRemoved = await Task.Run(() => BillingService.RemoveBillingRecordsByBillingName(BillingName));
+                    var recordsAreRemoved = await Task.Run(() => BillingRecordService.RemoveRecordsByBillingName(BillingName));
                     if (!recordsAreRemoved)
                     {
                         MessageBox.Show("There's a problem overwriting the timekeeping file of this billing; please try again. If the error still persists, please call for support.", "Error Overwriting Timekeep File", MessageBoxButtons.OK, MessageBoxIcon.Error);

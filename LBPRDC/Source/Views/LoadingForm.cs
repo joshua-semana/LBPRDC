@@ -4,9 +4,17 @@
     {
         private CancellationTokenSource? cancellationTokenSource;
 
+        public Task<string>? StringProcess { get; set; } = null;
+        public string? StringResult { get; set; } = null;
+        public Task<int>? IntegerProcess { get; set; } = null;
+        public int? IntegerResult { get; set; } = null;
         public Task<bool>? BooleanProcess { get; set; } = null;
         public Task<Services.Billing>? BillingProcess { get; set; } = null;
         public Services.Billing? BillingResult { get; set; } = null;
+        public Task<Services.BillingWithEquipment>? BillingWithEquipmentProcess { get; set; } = null;
+        public Services.BillingWithEquipment? BillingWithEquipmentResult { get; set; } = null;
+        public Task<Services.EquipmentAccountDetails>? EquipmentDetailsProcess { get; set; } = null;
+        public Services.EquipmentAccountDetails? EquipmentDetailsResult { get; set; } = null;
         public Task<List<string>>? StringListProcess { get; set; } = null;
         public List<string>? StringListResult { get; set; } = null;
         public Task<Services.BillingAccount>? BillingAccountProcess { get; set; } = null;
@@ -15,6 +23,8 @@
         public List<Services.BillingRecord>? BillingRecordResult { get; set; } = null;
         public Task<List<Services.AccountsDetails>>? AccountsTotalValuesProcess { get; set; } = null;
         public List<Services.AccountsDetails>? AccountsTotalValuesResult { get; set; } = null;
+        public Task<List<Services.AccountsComboBoxDetails>>? AccountsCollectionProcess { get; set; } = null;
+        public List<Services.AccountsComboBoxDetails>? AccountsCollectionResult { get; set; } = null;
         public string? Description { get; set; }
         public Services.Billing? Billing { get; set; }
 
@@ -30,6 +40,14 @@
             try
             {
                 cancellationTokenSource = new CancellationTokenSource();
+                if (StringProcess != null)
+                {
+                    StringResult = await Task.Run(() => StringProcess, cancellationTokenSource.Token);
+                }
+                if (IntegerProcess != null)
+                {
+                    IntegerResult = await Task.Run(() => IntegerProcess, cancellationTokenSource.Token);
+                }
                 if (BooleanProcess != null)
                 {
                     bool result = await Task.Run(() => BooleanProcess, cancellationTokenSource.Token);
@@ -37,30 +55,37 @@
                     else { DialogResult = DialogResult.Abort; }
                     return;
                 }
+                if (BillingWithEquipmentProcess != null)
+                {
+                    BillingWithEquipmentResult = await Task.Run(() => BillingWithEquipmentProcess, cancellationTokenSource.Token);
+                }
+                if (EquipmentDetailsProcess != null)
+                {
+                    EquipmentDetailsResult = await Task.Run(() => EquipmentDetailsProcess, cancellationTokenSource.Token);
+                }
                 if (BillingProcess != null)
                 {
-                    var result = await Task.Run(() => BillingProcess, cancellationTokenSource.Token);
-                    BillingResult = result;
+                    BillingResult = await Task.Run(() => BillingProcess, cancellationTokenSource.Token);
                 }
                 if (StringListProcess != null)
                 {
-                    var result = await Task.Run(() => StringListProcess, cancellationTokenSource.Token);
-                    StringListResult = result;
+                    StringListResult = await Task.Run(() => StringListProcess, cancellationTokenSource.Token);
                 }
                 if (BillingAccountProcess != null)
                 {
-                    var result = await Task.Run(() => BillingAccountProcess, cancellationTokenSource.Token);
-                    BillingAccountResult = result;
+                    BillingAccountResult = await Task.Run(() => BillingAccountProcess, cancellationTokenSource.Token);
                 }
                 if (BillingRecordProcess != null)
                 {
-                    var result = await Task.Run(() => BillingRecordProcess, cancellationTokenSource.Token);
-                    BillingRecordResult = result;
+                    BillingRecordResult = await Task.Run(() => BillingRecordProcess, cancellationTokenSource.Token);
                 }
                 if (AccountsTotalValuesProcess != null)
                 {
-                    var result = await Task.Run(() => AccountsTotalValuesProcess, cancellationTokenSource.Token);
-                    AccountsTotalValuesResult = result;
+                    AccountsTotalValuesResult = await Task.Run(() => AccountsTotalValuesProcess, cancellationTokenSource.Token);
+                }
+                if (AccountsCollectionProcess != null)
+                {
+                    AccountsCollectionResult = await Task.Run(() => AccountsCollectionProcess, cancellationTokenSource.Token);
                 }
                 DialogResult = DialogResult.OK;
             }

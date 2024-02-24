@@ -44,6 +44,10 @@ namespace LBPRDC.Source.Utilities
                 {
                     textBox.Text = "";
                 }
+                if (control is ComboBox comboBox)
+                {
+                    comboBox.SelectedIndex = -1;
+                }
             }
         }
 
@@ -90,13 +94,15 @@ namespace LBPRDC.Source.Utilities
             }
         }
 
-        public static void AddColumn(DataGridView dgvTable, string name, string header, string property)
+        public static void AddColumn(DataGridView dgvTable, string name, string header, string property, bool isVisible, bool isReadOnly)
         {
             dgvTable.Columns.Add(new DataGridViewTextBoxColumn
             {
                 Name = name,
                 HeaderText = header,
-                DataPropertyName = property
+                DataPropertyName = property,
+                Visible = isVisible,
+                ReadOnly = isReadOnly
             });
         }
 

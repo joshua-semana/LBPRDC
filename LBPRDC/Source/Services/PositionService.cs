@@ -1,9 +1,6 @@
-﻿using OfficeOpenXml.FormulaParsing.Excel.Functions.Finance.Implementations;
+﻿using Dapper;
+using LBPRDC.Source.Data;
 using System.Data.SqlClient;
-using System.Security.Permissions;
-using static LBPRDC.Source.Services.CivilStatusService;
-using static LBPRDC.Source.Services.LocationService;
-using static LBPRDC.Source.Services.PositionService;
 
 namespace LBPRDC.Source.Services
 {
@@ -12,6 +9,7 @@ namespace LBPRDC.Source.Services
         public class Position
         {
             public int ID { get; set; }
+            public int ClientID { get; set; }
             public string? Code { get; set; }
             public string? Name { get; set; }
             public decimal SalaryRate { get; set; }
@@ -20,39 +18,47 @@ namespace LBPRDC.Source.Services
             public string? Description { get; set; }
         }
 
+        public class PositionWithReferenceValues : Position
+        {
+            public string ClientName { get; set; } = "";
+        }
+
         public static List<Position> GetAllItems()
         {
             List<Position> items = new();
 
             try
             {
-                string query = "SELECT * FROM Position";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        Position item = new()
-                        {
-                            ID = Convert.ToInt32(reader["ID"]),
-                            Code = reader["Code"].ToString(),
-                            Name = reader["Name"].ToString(),
-                            SalaryRate = Convert.ToDecimal(reader["SalaryRate"]),
-                            BillingRate = Convert.ToDecimal(reader["BillingRate"]),
-                            Description = reader["Description"].ToString(),
-                            Status = reader["Status"].ToString()
-                        };
-
-                        items.Add(item);
-                    }
-                }
+                using var connection = Database.Connect();
+                string QuerySelect = "SELECT * FROM Position";
+                items = connection.Query<Position>(QuerySelect).ToList();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
         }
+
+        //public static List<PositionWithReferenceValues> GetAllItemsWithReferenceValues()
+        //{
+        //    List<PositionWithReferenceValues> items = new();
+
+        //    try
+        //    {
+        //        using var connection = Database.Connect();
+        //        string QuerySelect = @"
+        //            SELECT
+        //                p.*,
+        //                c.Name AS ClientName
+        //            FROM
+        //                Position p
+        //            JOIN
+        //                Clients c ON p.ClientID = c.ID";
+        //        items = connection.Query<PositionWithReferenceValues>(QuerySelect).ToList();
+        //    }
+        //    catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+        //    return items;
+        //}
 
         public static List<Position> GetAllItemsForComboBox()
         {
@@ -95,45 +101,56 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string QueryUpdate = "INSERT INTO Position (Code, Name, SalaryRate, BillingRate, Description, Status) " +
-                    "VALUES (@Code, @Name, @SalaryRate, @BillingRate, @Description, @Status); " +
-                    "SELECT SCOPE_IDENTITY();"; // <-- This is to get the last inserted ID
+                using var connection = Database.Connect();
+                using var transaction = connection?.BeginTransaction();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(QueryUpdate, connection))
+                try
                 {
-                    command.Parameters.AddWithValue("@Code", data.Code);
-                    command.Parameters.AddWithValue("@Name", data.Name);
-                    command.Parameters.AddWithValue("@SalaryRate", data.SalaryRate);
-                    command.Parameters.AddWithValue("@BillingRate", data.BillingRate);
-                    command.Parameters.AddWithValue("@Description", data.Description);
-                    command.Parameters.AddWithValue("@Status", data.Status);
-                    connection.Open();
-                    var insertedId = await command.ExecuteScalarAsync();
+                    string QueryUpdate = @"
+                    INSERT INTO Position (
+                        Code,
+                        ClientID,
+                        Name, 
+                        SalaryRate, 
+                        BillingRate, 
+                        Description, 
+                        Status
+                    ) VALUES (
+                        @Code,
+                        @ClientID,
+                        @Name, 
+                        @SalaryRate, 
+                        @BillingRate, 
+                        @Description, 
+                        @Status
+                    );
 
-                    RatesHistory newRates = new()
+                    SELECT SCOPE_IDENTITY();"; // <-- This is to get the last inserted ID
+
+                    int newInsertedID = await connection.ExecuteScalarAsync<int>(QueryUpdate, data, transaction);
+                    transaction?.Commit();
+
+                    AddRatesHistory(new()
                     {
-                        PositionID = Convert.ToInt32(insertedId),
+                        PositionID = Convert.ToInt32(newInsertedID),
                         SalaryRate = data.SalaryRate,
                         BillingRate = data.BillingRate
-                    };
+                    });
 
-                    AddRatesHistory(newRates);
-                }
-
-                if (UserService.CurrentUser != null)
-                {
-                    LoggingService.Log newLog = new()
+                    LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Add",
-                        ActivityDetails = $"This user added a new item for the position category with a name of {data.Name}."
-                    };
+                        ActivityType = "New Client",
+                        ActivityDetails = $"User added a new client"
+                    });
 
-                    LoggingService.LogActivity(newLog);
+                    return true;
                 }
-
-                return true;
+                catch (Exception)
+                {
+                    transaction?.Rollback();
+                    return false;
+                }
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
@@ -142,39 +159,30 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string QueryUpdate = "UPDATE Position SET " +
-                    "Code = @Code, " +
-                    "Name = @Name, " +
-                    "SalaryRate = @SalaryRate, " +
-                    "BillingRate = @BillingRate, " +
-                    "Description = @Description, " +
-                    "Status = @Status " +
-                    "WHERE ID = @ID";
+                using var connection = Database.Connect();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(QueryUpdate, connection))
-                {
-                    command.Parameters.AddWithValue("@Code", data.Code);
-                    command.Parameters.AddWithValue("@Name", data.Name);
-                    command.Parameters.AddWithValue("@SalaryRate", data.SalaryRate);
-                    command.Parameters.AddWithValue("@BillingRate", data.BillingRate);
-                    command.Parameters.AddWithValue("@Description", data.Description);
-                    command.Parameters.AddWithValue("@Status", data.Status);
-                    command.Parameters.AddWithValue("@ID", data.ID);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                string QueryUpdate = @"
+                    UPDATE Position SET
+                        ClientID = @ClientID,
+                        Code = @Code,
+                        Name = @Name,
+                        SalaryRate = @SalaryRate,
+                        BillingRate = @BillingRate,
+                        Description = @Description,
+                        Status = @Status
+                    WHERE
+                        ID = @ID";
+
+                connection.Execute(QueryUpdate, data);
 
                 if (UserService.CurrentUser != null)
                 {
-                    LoggingService.Log newLog = new()
+                    LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = "Update",
                         ActivityDetails = $"This user updated an item under the position category with an ID of {data.ID}."
-                    };
-
-                    LoggingService.LogActivity(newLog);
+                    });
                 }
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }

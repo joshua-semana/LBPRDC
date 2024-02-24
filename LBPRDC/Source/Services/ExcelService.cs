@@ -2,9 +2,6 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Text.Json;
-using System.Windows.Forms;
-using static LBPRDC.Source.Services.DepartmentService;
-using static LBPRDC.Source.Services.PositionService;
 
 namespace LBPRDC.Source.Services
 {
@@ -278,7 +275,7 @@ namespace LBPRDC.Source.Services
                 var allPositionHistory = PositionService.GetAllHistory();
                 var positionAndRates = PositionService.GetAllItems();
 
-                var databaseGuids = new HashSet<Guid>(BillingService.GetBillingRecordGuids());
+                var databaseGuids = new HashSet<Guid>(BillingRecordService.GetGuids());
 
                 for (int row = 2; row < timekeepRowCount; row++)
                 {
@@ -596,10 +593,10 @@ namespace LBPRDC.Source.Services
                 {
                     if (removedEntries.Any())
                     {
-                        var result = BillingService.RemoveBillingRecordsByGuid(removedEntries);
+                        var result = BillingRecordService.RemoveRecordsByGuid(removedEntries);
                     }
 
-                    var output = BillingService.AddBillingRecords(billingName, BillingRecords);
+                    var output = BillingRecordService.Add(billingName, BillingRecords);
                     if (output)
                     {
                         BillingRecords.Clear();
@@ -1151,7 +1148,7 @@ namespace LBPRDC.Source.Services
 
             var billingDetails = BillingService.GetAllBillingDetailsByName(billingName);
             var accrualsEntries = BillingService.GetAccrualsJSON(billingName);
-            var billingRecordEntries = BillingService.GetBillingRecordsByBillingName(billingName);
+            var billingRecordEntries = BillingRecordService.GetRecordsByBillingName(billingName);
             var groupedBillingRecordEntries = billingRecordEntries.GroupBy(gb => gb.Department);
 
             foreach (var entry in accrualsEntries)

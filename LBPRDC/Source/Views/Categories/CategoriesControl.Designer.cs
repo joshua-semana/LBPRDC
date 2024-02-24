@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             pnlBody = new Panel();
             btnAdd = new Button();
             dgvCategory = new DataGridView();
@@ -42,6 +42,8 @@
             flowRightContent = new FlowLayoutPanel();
             lblID = new Label();
             txtID = new TextBox();
+            lblClient = new Label();
+            cmbClient = new ComboBox();
             lblCode = new Label();
             txtCode = new TextBox();
             lblName = new Label();
@@ -108,23 +110,23 @@
             dgvCategory.AllowUserToDeleteRows = false;
             dgvCategory.AllowUserToOrderColumns = true;
             dgvCategory.AllowUserToResizeRows = false;
-            dataGridViewCellStyle4.SelectionBackColor = Color.SeaGreen;
-            dgvCategory.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.SelectionBackColor = Color.SeaGreen;
+            dgvCategory.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             dgvCategory.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvCategory.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvCategory.BackgroundColor = SystemColors.Window;
             dgvCategory.BorderStyle = BorderStyle.Fixed3D;
             dgvCategory.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvCategory.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = SystemColors.Control;
-            dataGridViewCellStyle5.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle5.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle5.Padding = new Padding(0, 2, 0, 2);
-            dataGridViewCellStyle5.SelectionBackColor = Color.MediumSeaGreen;
-            dataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.True;
-            dgvCategory.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.Padding = new Padding(0, 2, 0, 2);
+            dataGridViewCellStyle2.SelectionBackColor = Color.MediumSeaGreen;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            dgvCategory.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dgvCategory.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvCategory.EditMode = DataGridViewEditMode.EditOnF2;
             dgvCategory.GridColor = SystemColors.Control;
@@ -133,15 +135,15 @@
             dgvCategory.MultiSelect = false;
             dgvCategory.Name = "dgvCategory";
             dgvCategory.ReadOnly = true;
-            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = SystemColors.Control;
-            dataGridViewCellStyle6.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle6.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle6.Padding = new Padding(4);
-            dataGridViewCellStyle6.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.True;
-            dgvCategory.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = SystemColors.Control;
+            dataGridViewCellStyle3.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle3.Padding = new Padding(4);
+            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+            dgvCategory.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             dgvCategory.RowHeadersVisible = false;
             dgvCategory.RowTemplate.DefaultCellStyle.Padding = new Padding(4, 8, 4, 8);
             dgvCategory.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
@@ -211,6 +213,8 @@
             // 
             flowRightContent.Controls.Add(lblID);
             flowRightContent.Controls.Add(txtID);
+            flowRightContent.Controls.Add(lblClient);
+            flowRightContent.Controls.Add(cmbClient);
             flowRightContent.Controls.Add(lblCode);
             flowRightContent.Controls.Add(txtCode);
             flowRightContent.Controls.Add(lblName);
@@ -259,13 +263,39 @@
             txtID.TabIndex = 9;
             txtID.Visible = false;
             // 
+            // lblClient
+            // 
+            lblClient.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            lblClient.AutoSize = true;
+            lblClient.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblClient.ForeColor = SystemColors.GrayText;
+            lblClient.Location = new Point(19, 72);
+            lblClient.Margin = new Padding(3, 0, 3, 2);
+            lblClient.Name = "lblClient";
+            lblClient.Size = new Size(322, 16);
+            lblClient.TabIndex = 24;
+            lblClient.Text = "Client";
+            lblClient.Visible = false;
+            // 
+            // cmbClient
+            // 
+            cmbClient.AccessibleName = "Client";
+            cmbClient.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbClient.FormattingEnabled = true;
+            cmbClient.Location = new Point(22, 93);
+            cmbClient.Margin = new Padding(6, 3, 3, 12);
+            cmbClient.Name = "cmbClient";
+            cmbClient.Size = new Size(319, 24);
+            cmbClient.TabIndex = 25;
+            cmbClient.Visible = false;
+            // 
             // lblCode
             // 
             lblCode.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             lblCode.AutoSize = true;
             lblCode.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblCode.ForeColor = SystemColors.GrayText;
-            lblCode.Location = new Point(19, 72);
+            lblCode.Location = new Point(19, 129);
             lblCode.Margin = new Padding(3, 0, 3, 2);
             lblCode.Name = "lblCode";
             lblCode.Size = new Size(322, 16);
@@ -276,7 +306,7 @@
             // txtCode
             // 
             txtCode.AccessibleName = "Code";
-            txtCode.Location = new Point(22, 93);
+            txtCode.Location = new Point(22, 150);
             txtCode.Margin = new Padding(6, 3, 3, 12);
             txtCode.MaxLength = 100;
             txtCode.Name = "txtCode";
@@ -291,7 +321,7 @@
             lblName.AutoSize = true;
             lblName.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblName.ForeColor = SystemColors.GrayText;
-            lblName.Location = new Point(19, 128);
+            lblName.Location = new Point(19, 185);
             lblName.Margin = new Padding(3, 0, 3, 2);
             lblName.Name = "lblName";
             lblName.Size = new Size(322, 16);
@@ -302,7 +332,7 @@
             // txtName
             // 
             txtName.AccessibleName = "Name";
-            txtName.Location = new Point(22, 149);
+            txtName.Location = new Point(22, 206);
             txtName.Margin = new Padding(6, 3, 3, 12);
             txtName.MaxLength = 100;
             txtName.Name = "txtName";
@@ -316,7 +346,7 @@
             lblDepartment.AutoSize = true;
             lblDepartment.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblDepartment.ForeColor = SystemColors.GrayText;
-            lblDepartment.Location = new Point(19, 184);
+            lblDepartment.Location = new Point(19, 241);
             lblDepartment.Margin = new Padding(3, 0, 3, 2);
             lblDepartment.Name = "lblDepartment";
             lblDepartment.Size = new Size(322, 16);
@@ -329,7 +359,7 @@
             cmbDepartment.AccessibleName = "Department";
             cmbDepartment.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbDepartment.FormattingEnabled = true;
-            cmbDepartment.Location = new Point(22, 205);
+            cmbDepartment.Location = new Point(22, 262);
             cmbDepartment.Margin = new Padding(6, 3, 3, 12);
             cmbDepartment.Name = "cmbDepartment";
             cmbDepartment.Size = new Size(319, 24);
@@ -342,7 +372,7 @@
             lblSalaryRate.AutoSize = true;
             lblSalaryRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblSalaryRate.ForeColor = SystemColors.GrayText;
-            lblSalaryRate.Location = new Point(19, 241);
+            lblSalaryRate.Location = new Point(19, 298);
             lblSalaryRate.Margin = new Padding(3, 0, 3, 2);
             lblSalaryRate.Name = "lblSalaryRate";
             lblSalaryRate.Size = new Size(322, 16);
@@ -353,7 +383,7 @@
             // txtSalaryRate
             // 
             txtSalaryRate.AccessibleName = "Salary Rate";
-            txtSalaryRate.Location = new Point(22, 262);
+            txtSalaryRate.Location = new Point(22, 319);
             txtSalaryRate.Margin = new Padding(6, 3, 3, 12);
             txtSalaryRate.MaxLength = 100;
             txtSalaryRate.Name = "txtSalaryRate";
@@ -368,7 +398,7 @@
             lblBillingRate.AutoSize = true;
             lblBillingRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblBillingRate.ForeColor = SystemColors.GrayText;
-            lblBillingRate.Location = new Point(19, 297);
+            lblBillingRate.Location = new Point(19, 354);
             lblBillingRate.Margin = new Padding(3, 0, 3, 2);
             lblBillingRate.Name = "lblBillingRate";
             lblBillingRate.Size = new Size(322, 16);
@@ -379,7 +409,7 @@
             // txtBillingRate
             // 
             txtBillingRate.AccessibleName = "Billing Rate";
-            txtBillingRate.Location = new Point(22, 318);
+            txtBillingRate.Location = new Point(22, 375);
             txtBillingRate.Margin = new Padding(6, 3, 3, 12);
             txtBillingRate.MaxLength = 100;
             txtBillingRate.Name = "txtBillingRate";
@@ -394,7 +424,7 @@
             lblDescription.AutoSize = true;
             lblDescription.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblDescription.ForeColor = SystemColors.GrayText;
-            lblDescription.Location = new Point(19, 353);
+            lblDescription.Location = new Point(19, 410);
             lblDescription.Margin = new Padding(3, 0, 3, 2);
             lblDescription.Name = "lblDescription";
             lblDescription.Size = new Size(322, 16);
@@ -405,7 +435,7 @@
             // txtDescription
             // 
             txtDescription.AccessibleName = "Description";
-            txtDescription.Location = new Point(22, 374);
+            txtDescription.Location = new Point(22, 431);
             txtDescription.Margin = new Padding(6, 3, 3, 12);
             txtDescription.MaxLength = 100;
             txtDescription.Name = "txtDescription";
@@ -419,7 +449,7 @@
             lblStatus.AutoSize = true;
             lblStatus.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblStatus.ForeColor = SystemColors.GrayText;
-            lblStatus.Location = new Point(19, 409);
+            lblStatus.Location = new Point(19, 466);
             lblStatus.Margin = new Padding(3, 0, 3, 2);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(322, 16);
@@ -433,8 +463,8 @@
             cmbStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbStatus.FormattingEnabled = true;
             cmbStatus.Items.AddRange(new object[] { "(Choose Status)", "Active", "Inactive" });
-            cmbStatus.Location = new Point(22, 430);
-            cmbStatus.Margin = new Padding(6, 3, 3, 12);
+            cmbStatus.Location = new Point(22, 487);
+            cmbStatus.Margin = new Padding(6, 3, 3, 0);
             cmbStatus.Name = "cmbStatus";
             cmbStatus.Size = new Size(319, 24);
             cmbStatus.TabIndex = 21;
@@ -591,5 +621,7 @@
         private Button btnUpdate;
         private Button btnAdd;
         private Button btnHistory;
+        private Label lblClient;
+        private ComboBox cmbClient;
     }
 }

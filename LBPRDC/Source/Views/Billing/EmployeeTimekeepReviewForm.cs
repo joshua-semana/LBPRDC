@@ -239,12 +239,12 @@ namespace LBPRDC.Source.Views.Billing
 
         private void GetColumnsForAdjustmentTable()
         {
-            ControlUtils.AddColumn(dgvAdjustments, "ID", "", "ID");
-            ControlUtils.AddColumn(dgvAdjustments, "Type", "Type", "Type");
-            ControlUtils.AddColumn(dgvAdjustments, "InputValue", "Input", "InputValue");
-            ControlUtils.AddColumn(dgvAdjustments, "Units", "Unit", "Units");
-            ControlUtils.AddColumn(dgvAdjustments, "AppliedDate", "Date", "AppliedDate");
-            ControlUtils.AddColumn(dgvAdjustments, "Remarks", "Remarks", "Remarks");
+            ControlUtils.AddColumn(dgvAdjustments, "ID", "", "ID", true, true);
+            ControlUtils.AddColumn(dgvAdjustments, "Type", "Type", "Type", true, true);
+            ControlUtils.AddColumn(dgvAdjustments, "InputValue", "Input", "InputValue", true, true);
+            ControlUtils.AddColumn(dgvAdjustments, "Units", "Unit", "Units", true, true);
+            ControlUtils.AddColumn(dgvAdjustments, "AppliedDate", "Date", "AppliedDate", true, true);
+            ControlUtils.AddColumn(dgvAdjustments, "Remarks", "Remarks", "Remarks", true, true);
         }
 
         private void PopulateAdjustmentSummary()
@@ -362,11 +362,11 @@ namespace LBPRDC.Source.Views.Billing
 
         private void GetColumnsForAdjustmentummaryTable()
         {
-            ControlUtils.AddColumn(dgvAdjustmentSummary, "Type", "Type", "Type");
-            ControlUtils.AddColumn(dgvAdjustmentSummary, "OriginalValue", "Original", "OriginalValue");
-            ControlUtils.AddColumn(dgvAdjustmentSummary, "InputValueTotal", "Input", "InputValueTotal");
-            ControlUtils.AddColumn(dgvAdjustmentSummary, "NewValue", "Output", "NewValue");
-            ControlUtils.AddColumn(dgvAdjustmentSummary, "Units", "Unit", "Units");
+            ControlUtils.AddColumn(dgvAdjustmentSummary, "Type", "Type", "Type", true, true);
+            ControlUtils.AddColumn(dgvAdjustmentSummary, "OriginalValue", "Original", "OriginalValue", true, true);
+            ControlUtils.AddColumn(dgvAdjustmentSummary, "InputValueTotal", "Input", "InputValueTotal", true, true);
+            ControlUtils.AddColumn(dgvAdjustmentSummary, "NewValue", "Output", "NewValue", true, true);
+            ControlUtils.AddColumn(dgvAdjustmentSummary, "Units", "Unit", "Units", true, true);
         }
 
         private void ClearAdjustmentRemarks() => CurrentEmployee().AdjustmentRemarks = Array.Empty<AdjustmentRemarks>();

@@ -42,19 +42,32 @@
             label1 = new Label();
             txtReleaseDate = new TextBox();
             grpBillingInformation = new GroupBox();
+            txtSuppliesAndEquipmentsAmount = new TextBox();
+            label13 = new Label();
+            txtSuppliesAndEquipmentsAccount = new TextBox();
+            label12 = new Label();
             btnUpdateBillingInformation = new Button();
             label5 = new Label();
             txtOICandPosition = new TextBox();
             label7 = new Label();
             txtDescription = new TextBox();
             grpStatementOfAccounts = new GroupBox();
+            btnUpdateRemarks = new Button();
+            btnRemoveAccount = new Button();
+            btnAddAccount = new Button();
+            grpPurpose = new GroupBox();
+            btnForRebilling = new Button();
+            btnForAdjustment = new Button();
+            txtStatus = new TextBox();
+            label11 = new Label();
+            txtBalance = new TextBox();
             label10 = new Label();
             txtNetBilling = new TextBox();
             label9 = new Label();
-            txtRemarks = new TextBox();
+            txtAccountRemarks = new TextBox();
             label8 = new Label();
             txtBilledValue = new TextBox();
-            btnUpdateAccount = new Button();
+            btnCollectAccount = new Button();
             label6 = new Label();
             txtAmountCollected = new TextBox();
             label4 = new Label();
@@ -91,6 +104,7 @@
             menuExportBilling = new ToolStripMenuItem();
             menuExportBalancing = new ToolStripMenuItem();
             menuExportLetter = new ToolStripMenuItem();
+            menuExportTransmittal = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
             cntxtMenuArchive = new ToolStripMenuItem();
             pnlRight.SuspendLayout();
@@ -98,6 +112,7 @@
             flowRightContent.SuspendLayout();
             grpBillingInformation.SuspendLayout();
             grpStatementOfAccounts.SuspendLayout();
+            grpPurpose.SuspendLayout();
             pnlRightFooter.SuspendLayout();
             flowFooterActions.SuspendLayout();
             pnlLeft.SuspendLayout();
@@ -114,9 +129,9 @@
             pnlRight.Controls.Add(pnlRightBody);
             pnlRight.Controls.Add(pnlRightFooter);
             pnlRight.Dock = DockStyle.Right;
-            pnlRight.Location = new Point(853, 0);
+            pnlRight.Location = new Point(763, 0);
             pnlRight.Name = "pnlRight";
-            pnlRight.Size = new Size(360, 670);
+            pnlRight.Size = new Size(450, 670);
             pnlRight.TabIndex = 0;
             pnlRight.Visible = false;
             // 
@@ -127,7 +142,7 @@
             pnlRightBody.Dock = DockStyle.Fill;
             pnlRightBody.Location = new Point(0, 0);
             pnlRightBody.Name = "pnlRightBody";
-            pnlRightBody.Size = new Size(360, 610);
+            pnlRightBody.Size = new Size(450, 610);
             pnlRightBody.TabIndex = 1;
             // 
             // flowRightContent
@@ -146,7 +161,7 @@
             flowRightContent.Margin = new Padding(0);
             flowRightContent.Name = "flowRightContent";
             flowRightContent.Padding = new Padding(24, 24, 0, 24);
-            flowRightContent.Size = new Size(343, 944);
+            flowRightContent.Size = new Size(433, 1260);
             flowRightContent.TabIndex = 0;
             // 
             // label2
@@ -155,7 +170,7 @@
             label2.Location = new Point(24, 24);
             label2.Margin = new Padding(0, 0, 0, 16);
             label2.Name = "label2";
-            label2.Size = new Size(312, 19);
+            label2.Size = new Size(391, 19);
             label2.TabIndex = 28;
             label2.Text = "DETAILS";
             label2.TextAlign = ContentAlignment.MiddleCenter;
@@ -167,7 +182,7 @@
             pnlLine2.Location = new Point(24, 59);
             pnlLine2.Margin = new Padding(0, 0, 0, 16);
             pnlLine2.Name = "pnlLine2";
-            pnlLine2.Size = new Size(312, 1);
+            pnlLine2.Size = new Size(391, 1);
             pnlLine2.TabIndex = 10;
             // 
             // lblID
@@ -179,20 +194,21 @@
             lblID.Location = new Point(24, 76);
             lblID.Margin = new Padding(0, 0, 0, 8);
             lblID.Name = "lblID";
-            lblID.Size = new Size(312, 16);
+            lblID.Size = new Size(391, 16);
             lblID.TabIndex = 30;
             lblID.Text = "Creation Date";
             // 
             // txtCreationDate
             // 
             txtCreationDate.AccessibleName = "ID";
+            txtCreationDate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtCreationDate.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtCreationDate.Location = new Point(24, 100);
             txtCreationDate.Margin = new Padding(0, 0, 0, 12);
             txtCreationDate.MaxLength = 100;
             txtCreationDate.Name = "txtCreationDate";
             txtCreationDate.ReadOnly = true;
-            txtCreationDate.Size = new Size(312, 26);
+            txtCreationDate.Size = new Size(391, 26);
             txtCreationDate.TabIndex = 29;
             // 
             // label1
@@ -204,24 +220,30 @@
             label1.Location = new Point(24, 138);
             label1.Margin = new Padding(0, 0, 0, 8);
             label1.Name = "label1";
-            label1.Size = new Size(312, 16);
+            label1.Size = new Size(391, 16);
             label1.TabIndex = 32;
             label1.Text = "Release Date";
             // 
             // txtReleaseDate
             // 
             txtReleaseDate.AccessibleName = "ID";
+            txtReleaseDate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtReleaseDate.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtReleaseDate.Location = new Point(24, 162);
             txtReleaseDate.Margin = new Padding(0, 0, 0, 12);
             txtReleaseDate.MaxLength = 100;
             txtReleaseDate.Name = "txtReleaseDate";
             txtReleaseDate.ReadOnly = true;
-            txtReleaseDate.Size = new Size(312, 26);
+            txtReleaseDate.Size = new Size(391, 26);
             txtReleaseDate.TabIndex = 31;
             // 
             // grpBillingInformation
             // 
+            grpBillingInformation.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpBillingInformation.Controls.Add(txtSuppliesAndEquipmentsAmount);
+            grpBillingInformation.Controls.Add(label13);
+            grpBillingInformation.Controls.Add(txtSuppliesAndEquipmentsAccount);
+            grpBillingInformation.Controls.Add(label12);
             grpBillingInformation.Controls.Add(btnUpdateBillingInformation);
             grpBillingInformation.Controls.Add(label5);
             grpBillingInformation.Controls.Add(txtOICandPosition);
@@ -231,16 +253,69 @@
             grpBillingInformation.Margin = new Padding(0, 0, 0, 12);
             grpBillingInformation.Name = "grpBillingInformation";
             grpBillingInformation.Padding = new Padding(16, 10, 16, 8);
-            grpBillingInformation.Size = new Size(312, 199);
+            grpBillingInformation.Size = new Size(391, 333);
             grpBillingInformation.TabIndex = 11;
             grpBillingInformation.TabStop = false;
             grpBillingInformation.Text = "Billing Information";
             // 
+            // txtSuppliesAndEquipmentsAmount
+            // 
+            txtSuppliesAndEquipmentsAmount.AccessibleName = "ID";
+            txtSuppliesAndEquipmentsAmount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtSuppliesAndEquipmentsAmount.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            txtSuppliesAndEquipmentsAmount.Location = new Point(16, 244);
+            txtSuppliesAndEquipmentsAmount.Margin = new Padding(0, 0, 0, 16);
+            txtSuppliesAndEquipmentsAmount.MaxLength = 100;
+            txtSuppliesAndEquipmentsAmount.Name = "txtSuppliesAndEquipmentsAmount";
+            txtSuppliesAndEquipmentsAmount.ReadOnly = true;
+            txtSuppliesAndEquipmentsAmount.Size = new Size(359, 26);
+            txtSuppliesAndEquipmentsAmount.TabIndex = 50;
+            // 
+            // label13
+            // 
+            label13.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label13.AutoSize = true;
+            label13.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label13.ForeColor = SystemColors.ControlText;
+            label13.Location = new Point(16, 220);
+            label13.Margin = new Padding(0, 0, 0, 8);
+            label13.Name = "label13";
+            label13.Size = new Size(218, 16);
+            label13.TabIndex = 51;
+            label13.Text = "Supplies and Equipments Amount";
+            // 
+            // txtSuppliesAndEquipmentsAccount
+            // 
+            txtSuppliesAndEquipmentsAccount.AccessibleName = "ID";
+            txtSuppliesAndEquipmentsAccount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtSuppliesAndEquipmentsAccount.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            txtSuppliesAndEquipmentsAccount.Location = new Point(16, 178);
+            txtSuppliesAndEquipmentsAccount.Margin = new Padding(0, 0, 0, 16);
+            txtSuppliesAndEquipmentsAccount.MaxLength = 100;
+            txtSuppliesAndEquipmentsAccount.Name = "txtSuppliesAndEquipmentsAccount";
+            txtSuppliesAndEquipmentsAccount.ReadOnly = true;
+            txtSuppliesAndEquipmentsAccount.Size = new Size(359, 26);
+            txtSuppliesAndEquipmentsAccount.TabIndex = 48;
+            // 
+            // label12
+            // 
+            label12.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label12.AutoSize = true;
+            label12.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label12.ForeColor = SystemColors.ControlText;
+            label12.Location = new Point(16, 154);
+            label12.Margin = new Padding(0, 0, 0, 8);
+            label12.Name = "label12";
+            label12.Size = new Size(221, 16);
+            label12.TabIndex = 49;
+            label12.Text = "Supplies and Equipments Account";
+            // 
             // btnUpdateBillingInformation
             // 
+            btnUpdateBillingInformation.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnUpdateBillingInformation.AutoSize = true;
             btnUpdateBillingInformation.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnUpdateBillingInformation.Location = new Point(221, 154);
+            btnUpdateBillingInformation.Location = new Point(300, 286);
             btnUpdateBillingInformation.Margin = new Padding(8, 0, 0, 0);
             btnUpdateBillingInformation.Name = "btnUpdateBillingInformation";
             btnUpdateBillingInformation.Size = new Size(75, 28);
@@ -265,13 +340,14 @@
             // txtOICandPosition
             // 
             txtOICandPosition.AccessibleName = "ID";
+            txtOICandPosition.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtOICandPosition.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtOICandPosition.Location = new Point(16, 112);
             txtOICandPosition.Margin = new Padding(0, 0, 0, 16);
             txtOICandPosition.MaxLength = 100;
             txtOICandPosition.Name = "txtOICandPosition";
             txtOICandPosition.ReadOnly = true;
-            txtOICandPosition.Size = new Size(280, 26);
+            txtOICandPosition.Size = new Size(359, 26);
             txtOICandPosition.TabIndex = 43;
             // 
             // label7
@@ -290,24 +366,32 @@
             // txtDescription
             // 
             txtDescription.AccessibleName = "ID";
+            txtDescription.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtDescription.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtDescription.Location = new Point(16, 50);
             txtDescription.Margin = new Padding(0, 0, 0, 12);
             txtDescription.MaxLength = 100;
             txtDescription.Name = "txtDescription";
             txtDescription.ReadOnly = true;
-            txtDescription.Size = new Size(280, 26);
+            txtDescription.Size = new Size(359, 26);
             txtDescription.TabIndex = 41;
             // 
             // grpStatementOfAccounts
             // 
+            grpStatementOfAccounts.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpStatementOfAccounts.Controls.Add(btnUpdateRemarks);
+            grpStatementOfAccounts.Controls.Add(btnRemoveAccount);
+            grpStatementOfAccounts.Controls.Add(btnAddAccount);
+            grpStatementOfAccounts.Controls.Add(grpPurpose);
+            grpStatementOfAccounts.Controls.Add(label11);
+            grpStatementOfAccounts.Controls.Add(txtBalance);
             grpStatementOfAccounts.Controls.Add(label10);
             grpStatementOfAccounts.Controls.Add(txtNetBilling);
             grpStatementOfAccounts.Controls.Add(label9);
-            grpStatementOfAccounts.Controls.Add(txtRemarks);
+            grpStatementOfAccounts.Controls.Add(txtAccountRemarks);
             grpStatementOfAccounts.Controls.Add(label8);
             grpStatementOfAccounts.Controls.Add(txtBilledValue);
-            grpStatementOfAccounts.Controls.Add(btnUpdateAccount);
+            grpStatementOfAccounts.Controls.Add(btnCollectAccount);
             grpStatementOfAccounts.Controls.Add(label6);
             grpStatementOfAccounts.Controls.Add(txtAmountCollected);
             grpStatementOfAccounts.Controls.Add(label4);
@@ -316,14 +400,139 @@
             grpStatementOfAccounts.Controls.Add(txtCollectionDate);
             grpStatementOfAccounts.Controls.Add(cmbStatementOfAccounts);
             grpStatementOfAccounts.Controls.Add(btnViewAccountRecord);
-            grpStatementOfAccounts.Location = new Point(24, 411);
+            grpStatementOfAccounts.Location = new Point(24, 545);
             grpStatementOfAccounts.Margin = new Padding(0);
             grpStatementOfAccounts.Name = "grpStatementOfAccounts";
-            grpStatementOfAccounts.Padding = new Padding(16, 10, 16, 8);
-            grpStatementOfAccounts.Size = new Size(312, 509);
+            grpStatementOfAccounts.Padding = new Padding(16, 10, 16, 16);
+            grpStatementOfAccounts.Size = new Size(391, 691);
             grpStatementOfAccounts.TabIndex = 40;
             grpStatementOfAccounts.TabStop = false;
             grpStatementOfAccounts.Text = "Statement of Accounts";
+            // 
+            // btnUpdateRemarks
+            // 
+            btnUpdateRemarks.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnUpdateRemarks.AutoSize = true;
+            btnUpdateRemarks.Enabled = false;
+            btnUpdateRemarks.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnUpdateRemarks.Location = new Point(300, 484);
+            btnUpdateRemarks.Margin = new Padding(4, 0, 4, 0);
+            btnUpdateRemarks.Name = "btnUpdateRemarks";
+            btnUpdateRemarks.Size = new Size(75, 28);
+            btnUpdateRemarks.TabIndex = 57;
+            btnUpdateRemarks.Text = "Set";
+            btnUpdateRemarks.UseVisualStyleBackColor = true;
+            btnUpdateRemarks.Click += btnUpdateRemarks_Click;
+            // 
+            // btnRemoveAccount
+            // 
+            btnRemoveAccount.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnRemoveAccount.AutoSize = true;
+            btnRemoveAccount.Enabled = false;
+            btnRemoveAccount.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnRemoveAccount.Location = new Point(138, 527);
+            btnRemoveAccount.Margin = new Padding(8, 0, 0, 0);
+            btnRemoveAccount.Name = "btnRemoveAccount";
+            btnRemoveAccount.Size = new Size(75, 28);
+            btnRemoveAccount.TabIndex = 56;
+            btnRemoveAccount.Text = "Remove";
+            btnRemoveAccount.UseVisualStyleBackColor = true;
+            btnRemoveAccount.Visible = false;
+            // 
+            // btnAddAccount
+            // 
+            btnAddAccount.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnAddAccount.AutoSize = true;
+            btnAddAccount.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnAddAccount.Location = new Point(221, 527);
+            btnAddAccount.Margin = new Padding(8, 0, 0, 0);
+            btnAddAccount.Name = "btnAddAccount";
+            btnAddAccount.Size = new Size(75, 28);
+            btnAddAccount.TabIndex = 55;
+            btnAddAccount.Text = "Add";
+            btnAddAccount.UseVisualStyleBackColor = true;
+            btnAddAccount.Visible = false;
+            btnAddAccount.Click += btnAddAccount_Click;
+            // 
+            // grpPurpose
+            // 
+            grpPurpose.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            grpPurpose.Controls.Add(btnForRebilling);
+            grpPurpose.Controls.Add(btnForAdjustment);
+            grpPurpose.Controls.Add(txtStatus);
+            grpPurpose.Location = new Point(16, 566);
+            grpPurpose.Margin = new Padding(0);
+            grpPurpose.Name = "grpPurpose";
+            grpPurpose.Padding = new Padding(16, 10, 16, 8);
+            grpPurpose.Size = new Size(359, 109);
+            grpPurpose.TabIndex = 11;
+            grpPurpose.TabStop = false;
+            grpPurpose.Text = "Status";
+            // 
+            // btnForRebilling
+            // 
+            btnForRebilling.AutoSize = true;
+            btnForRebilling.Enabled = false;
+            btnForRebilling.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnForRebilling.Location = new Point(223, 62);
+            btnForRebilling.Margin = new Padding(8, 0, 0, 0);
+            btnForRebilling.Name = "btnForRebilling";
+            btnForRebilling.Size = new Size(120, 28);
+            btnForRebilling.TabIndex = 58;
+            btnForRebilling.Text = "For re-billing";
+            btnForRebilling.UseVisualStyleBackColor = true;
+            // 
+            // btnForAdjustment
+            // 
+            btnForAdjustment.AutoSize = true;
+            btnForAdjustment.Enabled = false;
+            btnForAdjustment.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnForAdjustment.Location = new Point(95, 62);
+            btnForAdjustment.Margin = new Padding(8, 0, 0, 0);
+            btnForAdjustment.Name = "btnForAdjustment";
+            btnForAdjustment.Size = new Size(120, 28);
+            btnForAdjustment.TabIndex = 57;
+            btnForAdjustment.Text = "For adjustment";
+            btnForAdjustment.UseVisualStyleBackColor = true;
+            // 
+            // txtStatus
+            // 
+            txtStatus.AccessibleName = "Status";
+            txtStatus.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtStatus.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            txtStatus.Location = new Point(16, 26);
+            txtStatus.Margin = new Padding(0, 0, 0, 10);
+            txtStatus.MaxLength = 100;
+            txtStatus.Name = "txtStatus";
+            txtStatus.ReadOnly = true;
+            txtStatus.Size = new Size(327, 26);
+            txtStatus.TabIndex = 56;
+            // 
+            // label11
+            // 
+            label11.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label11.AutoSize = true;
+            label11.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label11.ForeColor = SystemColors.ControlText;
+            label11.Location = new Point(16, 395);
+            label11.Margin = new Padding(0, 0, 0, 8);
+            label11.Name = "label11";
+            label11.Size = new Size(58, 16);
+            label11.TabIndex = 53;
+            label11.Text = "Balance";
+            // 
+            // txtBalance
+            // 
+            txtBalance.AccessibleName = "Balance";
+            txtBalance.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtBalance.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            txtBalance.Location = new Point(16, 419);
+            txtBalance.Margin = new Padding(0, 0, 0, 16);
+            txtBalance.MaxLength = 100;
+            txtBalance.Name = "txtBalance";
+            txtBalance.ReadOnly = true;
+            txtBalance.Size = new Size(359, 26);
+            txtBalance.TabIndex = 54;
             // 
             // label10
             // 
@@ -341,13 +550,14 @@
             // txtNetBilling
             // 
             txtNetBilling.AccessibleName = "Billed Value";
+            txtNetBilling.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtNetBilling.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtNetBilling.Location = new Point(16, 155);
             txtNetBilling.Margin = new Padding(0, 0, 0, 16);
             txtNetBilling.MaxLength = 100;
             txtNetBilling.Name = "txtNetBilling";
             txtNetBilling.ReadOnly = true;
-            txtNetBilling.Size = new Size(280, 26);
+            txtNetBilling.Size = new Size(359, 26);
             txtNetBilling.TabIndex = 52;
             // 
             // label9
@@ -356,24 +566,25 @@
             label9.AutoSize = true;
             label9.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label9.ForeColor = SystemColors.ControlText;
-            label9.Location = new Point(16, 395);
+            label9.Location = new Point(16, 461);
             label9.Margin = new Padding(0, 0, 0, 8);
             label9.Name = "label9";
             label9.Size = new Size(63, 16);
             label9.TabIndex = 49;
             label9.Text = "Remarks";
             // 
-            // txtRemarks
+            // txtAccountRemarks
             // 
-            txtRemarks.AccessibleName = "Remarks";
-            txtRemarks.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            txtRemarks.Location = new Point(16, 419);
-            txtRemarks.Margin = new Padding(0, 0, 0, 16);
-            txtRemarks.MaxLength = 100;
-            txtRemarks.Name = "txtRemarks";
-            txtRemarks.ReadOnly = true;
-            txtRemarks.Size = new Size(280, 26);
-            txtRemarks.TabIndex = 50;
+            txtAccountRemarks.AccessibleName = "Remarks";
+            txtAccountRemarks.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtAccountRemarks.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            txtAccountRemarks.Location = new Point(16, 485);
+            txtAccountRemarks.Margin = new Padding(0, 0, 0, 16);
+            txtAccountRemarks.MaxLength = 100;
+            txtAccountRemarks.Name = "txtAccountRemarks";
+            txtAccountRemarks.ReadOnly = true;
+            txtAccountRemarks.Size = new Size(280, 26);
+            txtAccountRemarks.TabIndex = 50;
             // 
             // label8
             // 
@@ -391,29 +602,30 @@
             // txtBilledValue
             // 
             txtBilledValue.AccessibleName = "Billed Value";
+            txtBilledValue.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtBilledValue.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtBilledValue.Location = new Point(16, 89);
             txtBilledValue.Margin = new Padding(0, 0, 0, 16);
             txtBilledValue.MaxLength = 100;
             txtBilledValue.Name = "txtBilledValue";
             txtBilledValue.ReadOnly = true;
-            txtBilledValue.Size = new Size(280, 26);
+            txtBilledValue.Size = new Size(359, 26);
             txtBilledValue.TabIndex = 48;
             // 
-            // btnUpdateAccount
+            // btnCollectAccount
             // 
-            btnUpdateAccount.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnUpdateAccount.AutoSize = true;
-            btnUpdateAccount.Enabled = false;
-            btnUpdateAccount.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnUpdateAccount.Location = new Point(221, 463);
-            btnUpdateAccount.Margin = new Padding(8, 0, 0, 0);
-            btnUpdateAccount.Name = "btnUpdateAccount";
-            btnUpdateAccount.Size = new Size(75, 28);
-            btnUpdateAccount.TabIndex = 46;
-            btnUpdateAccount.Text = "Update";
-            btnUpdateAccount.UseVisualStyleBackColor = true;
-            btnUpdateAccount.Click += btnUpdateAccount_Click;
+            btnCollectAccount.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnCollectAccount.AutoSize = true;
+            btnCollectAccount.Enabled = false;
+            btnCollectAccount.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnCollectAccount.Location = new Point(300, 527);
+            btnCollectAccount.Margin = new Padding(4, 0, 4, 0);
+            btnCollectAccount.Name = "btnCollectAccount";
+            btnCollectAccount.Size = new Size(75, 28);
+            btnCollectAccount.TabIndex = 46;
+            btnCollectAccount.Text = "Collect";
+            btnCollectAccount.UseVisualStyleBackColor = true;
+            btnCollectAccount.Click += btnUpdateAccount_Click;
             // 
             // label6
             // 
@@ -431,13 +643,14 @@
             // txtAmountCollected
             // 
             txtAmountCollected.AccessibleName = "Amount Collected";
+            txtAmountCollected.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtAmountCollected.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtAmountCollected.Location = new Point(16, 353);
             txtAmountCollected.Margin = new Padding(0, 0, 0, 16);
             txtAmountCollected.MaxLength = 100;
             txtAmountCollected.Name = "txtAmountCollected";
             txtAmountCollected.ReadOnly = true;
-            txtAmountCollected.Size = new Size(280, 26);
+            txtAmountCollected.Size = new Size(359, 26);
             txtAmountCollected.TabIndex = 45;
             // 
             // label4
@@ -456,13 +669,14 @@
             // txtReceiptNumber
             // 
             txtReceiptNumber.AccessibleName = "Official Receipt Number";
+            txtReceiptNumber.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtReceiptNumber.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtReceiptNumber.Location = new Point(16, 287);
             txtReceiptNumber.Margin = new Padding(0, 0, 0, 16);
             txtReceiptNumber.MaxLength = 100;
             txtReceiptNumber.Name = "txtReceiptNumber";
             txtReceiptNumber.ReadOnly = true;
-            txtReceiptNumber.Size = new Size(280, 26);
+            txtReceiptNumber.Size = new Size(359, 26);
             txtReceiptNumber.TabIndex = 43;
             // 
             // label3
@@ -481,13 +695,14 @@
             // txtCollectionDate
             // 
             txtCollectionDate.AccessibleName = "Collected Date";
+            txtCollectionDate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtCollectionDate.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             txtCollectionDate.Location = new Point(16, 221);
             txtCollectionDate.Margin = new Padding(0, 0, 0, 16);
             txtCollectionDate.MaxLength = 100;
             txtCollectionDate.Name = "txtCollectionDate";
             txtCollectionDate.ReadOnly = true;
-            txtCollectionDate.Size = new Size(280, 26);
+            txtCollectionDate.Size = new Size(359, 26);
             txtCollectionDate.TabIndex = 41;
             // 
             // cmbStatementOfAccounts
@@ -499,16 +714,17 @@
             cmbStatementOfAccounts.Location = new Point(16, 27);
             cmbStatementOfAccounts.Margin = new Padding(0, 0, 0, 12);
             cmbStatementOfAccounts.Name = "cmbStatementOfAccounts";
-            cmbStatementOfAccounts.Size = new Size(197, 26);
+            cmbStatementOfAccounts.Size = new Size(280, 26);
             cmbStatementOfAccounts.TabIndex = 36;
             cmbStatementOfAccounts.SelectedIndexChanged += cmbStatementOfAccounts_SelectedIndexChanged;
             // 
             // btnViewAccountRecord
             // 
+            btnViewAccountRecord.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnViewAccountRecord.AutoSize = true;
             btnViewAccountRecord.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnViewAccountRecord.Location = new Point(221, 26);
-            btnViewAccountRecord.Margin = new Padding(8, 0, 0, 0);
+            btnViewAccountRecord.Location = new Point(300, 26);
+            btnViewAccountRecord.Margin = new Padding(4, 0, 0, 0);
             btnViewAccountRecord.Name = "btnViewAccountRecord";
             btnViewAccountRecord.Size = new Size(75, 28);
             btnViewAccountRecord.TabIndex = 39;
@@ -523,7 +739,7 @@
             pnlRightFooter.Dock = DockStyle.Bottom;
             pnlRightFooter.Location = new Point(0, 610);
             pnlRightFooter.Name = "pnlRightFooter";
-            pnlRightFooter.Size = new Size(360, 60);
+            pnlRightFooter.Size = new Size(450, 60);
             pnlRightFooter.TabIndex = 0;
             // 
             // flowFooterActions
@@ -531,7 +747,7 @@
             flowFooterActions.Controls.Add(btnCloseDetails);
             flowFooterActions.Dock = DockStyle.Right;
             flowFooterActions.FlowDirection = FlowDirection.RightToLeft;
-            flowFooterActions.Location = new Point(225, 0);
+            flowFooterActions.Location = new Point(315, 0);
             flowFooterActions.Name = "flowFooterActions";
             flowFooterActions.Padding = new Padding(15, 16, 0, 16);
             flowFooterActions.Size = new Size(135, 60);
@@ -567,7 +783,7 @@
             // 
             pnlVLine1.BorderStyle = BorderStyle.FixedSingle;
             pnlVLine1.Dock = DockStyle.Right;
-            pnlVLine1.Location = new Point(852, 0);
+            pnlVLine1.Location = new Point(762, 0);
             pnlVLine1.Name = "pnlVLine1";
             pnlVLine1.Size = new Size(1, 670);
             pnlVLine1.TabIndex = 1;
@@ -579,7 +795,7 @@
             pnlLeft.Dock = DockStyle.Fill;
             pnlLeft.Location = new Point(0, 0);
             pnlLeft.Name = "pnlLeft";
-            pnlLeft.Size = new Size(852, 670);
+            pnlLeft.Size = new Size(762, 670);
             pnlLeft.TabIndex = 2;
             // 
             // pnlLeftBody
@@ -594,15 +810,16 @@
             pnlLeftBody.Location = new Point(0, 0);
             pnlLeftBody.Name = "pnlLeftBody";
             pnlLeftBody.Padding = new Padding(24, 24, 24, 10);
-            pnlLeftBody.Size = new Size(852, 610);
+            pnlLeftBody.Size = new Size(762, 610);
             pnlLeftBody.TabIndex = 1;
+            pnlLeftBody.EnabledChanged += pnlLeftBody_EnabledChanged;
             // 
             // btnNew
             // 
             btnNew.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnNew.AutoSize = true;
             btnNew.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnNew.Location = new Point(750, 23);
+            btnNew.Location = new Point(660, 23);
             btnNew.Margin = new Padding(8, 0, 0, 0);
             btnNew.Name = "btnNew";
             btnNew.Size = new Size(75, 28);
@@ -632,7 +849,7 @@
             pnlLine1.Location = new Point(24, 66);
             pnlLine1.Margin = new Padding(0, 0, 0, 16);
             pnlLine1.Name = "pnlLine1";
-            pnlLine1.Size = new Size(800, 1);
+            pnlLine1.Size = new Size(710, 1);
             pnlLine1.TabIndex = 9;
             // 
             // panel1
@@ -642,7 +859,7 @@
             panel1.Location = new Point(-1, 0);
             panel1.Margin = new Padding(0, 0, 0, 16);
             panel1.Name = "panel1";
-            panel1.Size = new Size(796, 1);
+            panel1.Size = new Size(706, 1);
             panel1.TabIndex = 10;
             // 
             // lblRowCounter
@@ -713,10 +930,11 @@
             dgvBillings.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
             dgvBillings.RowTemplate.Height = 41;
             dgvBillings.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvBillings.Size = new Size(800, 493);
+            dgvBillings.Size = new Size(710, 493);
             dgvBillings.TabIndex = 4;
             dgvBillings.VirtualMode = true;
             dgvBillings.CellMouseClick += dgvBillings_CellMouseClick;
+            dgvBillings.SelectionChanged += dgvBillings_SelectionChanged;
             // 
             // pnlLeftFooter
             // 
@@ -725,7 +943,7 @@
             pnlLeftFooter.Dock = DockStyle.Bottom;
             pnlLeftFooter.Location = new Point(0, 610);
             pnlLeftFooter.Name = "pnlLeftFooter";
-            pnlLeftFooter.Size = new Size(852, 60);
+            pnlLeftFooter.Size = new Size(762, 60);
             pnlLeftFooter.TabIndex = 0;
             // 
             // flowLayoutPanel1
@@ -733,7 +951,7 @@
             flowLayoutPanel1.Controls.Add(btnView);
             flowLayoutPanel1.Dock = DockStyle.Right;
             flowLayoutPanel1.FlowDirection = FlowDirection.RightToLeft;
-            flowLayoutPanel1.Location = new Point(373, 0);
+            flowLayoutPanel1.Location = new Point(283, 0);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Padding = new Padding(23, 16, 0, 16);
             flowLayoutPanel1.Size = new Size(479, 60);
@@ -795,7 +1013,7 @@
             // 
             // cntxtMenuExport
             // 
-            cntxtMenuExport.DropDownItems.AddRange(new ToolStripItem[] { menuExportBilling, menuExportBalancing, menuExportLetter });
+            cntxtMenuExport.DropDownItems.AddRange(new ToolStripItem[] { menuExportBilling, menuExportBalancing, menuExportLetter, menuExportTransmittal });
             cntxtMenuExport.Name = "cntxtMenuExport";
             cntxtMenuExport.Size = new Size(137, 22);
             cntxtMenuExport.Text = "Export";
@@ -819,6 +1037,13 @@
             menuExportLetter.Name = "menuExportLetter";
             menuExportLetter.Size = new Size(198, 22);
             menuExportLetter.Text = "Billing Letter";
+            // 
+            // menuExportTransmittal
+            // 
+            menuExportTransmittal.Name = "menuExportTransmittal";
+            menuExportTransmittal.Size = new Size(198, 22);
+            menuExportTransmittal.Text = "Transmittal Report";
+            menuExportTransmittal.Click += menuExportTransmittal_Click;
             // 
             // toolStripSeparator2
             // 
@@ -852,6 +1077,8 @@
             grpBillingInformation.PerformLayout();
             grpStatementOfAccounts.ResumeLayout(false);
             grpStatementOfAccounts.PerformLayout();
+            grpPurpose.ResumeLayout(false);
+            grpPurpose.PerformLayout();
             pnlRightFooter.ResumeLayout(false);
             flowFooterActions.ResumeLayout(false);
             flowFooterActions.PerformLayout();
@@ -875,7 +1102,6 @@
         private Panel pnlRightFooter;
         private Panel pnlLeftFooter;
         private FlowLayoutPanel flowFooterActions;
-        private Button btnView;
         private FlowLayoutPanel flowLayoutPanel1;
         private Button btnNew;
         private DataGridView dgvBillings;
@@ -921,7 +1147,7 @@
         private Label label4;
         private TextBox txtReceiptNumber;
         private ToolStripMenuItem cntxtMenuRelease;
-        private Button btnUpdateAccount;
+        private Button btnCollectAccount;
         private ToolStripMenuItem cntxtMenuDuplicate;
         private Label label5;
         private TextBox txtDescription;
@@ -933,12 +1159,27 @@
         private Label label8;
         private TextBox txtBilledValue;
         private Label label9;
-        private TextBox txtRemarks;
+        private TextBox txtAccountRemarks;
         private Button btnViewAccountRecord;
         public ComboBox cmbStatementOfAccounts;
         private Label label10;
         private TextBox txtNetBilling;
         private GroupBox grpBillingInformation;
         private GroupBox grpStatementOfAccounts;
+        private Label label11;
+        private TextBox txtBalance;
+        private TextBox txtStatus;
+        private GroupBox grpPurpose;
+        private Button btnForRebilling;
+        private Button btnForAdjustment;
+        private ToolStripMenuItem menuExportTransmittal;
+        private Button btnAddAccount;
+        private Button btnRemoveAccount;
+        public Button btnView;
+        private TextBox txtSuppliesAndEquipmentsAmount;
+        private Label label12;
+        private TextBox txtSuppliesAndEquipmentsAccount;
+        private Label label13;
+        private Button btnUpdateRemarks;
     }
 }

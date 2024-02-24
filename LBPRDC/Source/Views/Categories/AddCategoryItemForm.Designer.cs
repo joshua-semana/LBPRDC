@@ -35,6 +35,8 @@
             txtCode = new TextBox();
             lblName = new Label();
             txtName = new TextBox();
+            lblClient = new Label();
+            cmbClient = new ComboBox();
             lblDepartment = new Label();
             cmbDepartment = new ComboBox();
             lblSalaryRate = new Label();
@@ -82,6 +84,8 @@
             flowBody.Controls.Add(txtCode);
             flowBody.Controls.Add(lblName);
             flowBody.Controls.Add(txtName);
+            flowBody.Controls.Add(lblClient);
+            flowBody.Controls.Add(cmbClient);
             flowBody.Controls.Add(lblDepartment);
             flowBody.Controls.Add(cmbDepartment);
             flowBody.Controls.Add(lblSalaryRate);
@@ -97,7 +101,7 @@
             flowBody.Location = new Point(0, 40);
             flowBody.Name = "flowBody";
             flowBody.Padding = new Padding(16);
-            flowBody.Size = new Size(363, 426);
+            flowBody.Size = new Size(363, 484);
             flowBody.TabIndex = 4;
             // 
             // lblCode
@@ -122,7 +126,7 @@
             txtCode.MaxLength = 100;
             txtCode.Name = "txtCode";
             txtCode.Size = new Size(319, 23);
-            txtCode.TabIndex = 11;
+            txtCode.TabIndex = 1;
             txtCode.Visible = false;
             txtCode.KeyPress += ToUpperCase_KeyPress;
             // 
@@ -148,8 +152,35 @@
             txtName.MaxLength = 100;
             txtName.Name = "txtName";
             txtName.Size = new Size(319, 23);
-            txtName.TabIndex = 13;
+            txtName.TabIndex = 2;
             txtName.Visible = false;
+            // 
+            // lblClient
+            // 
+            lblClient.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            lblClient.AutoSize = true;
+            lblClient.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblClient.ForeColor = SystemColors.GrayText;
+            lblClient.Location = new Point(19, 128);
+            lblClient.Margin = new Padding(3, 0, 3, 2);
+            lblClient.Name = "lblClient";
+            lblClient.Size = new Size(322, 16);
+            lblClient.TabIndex = 24;
+            lblClient.Text = "Client";
+            lblClient.Visible = false;
+            // 
+            // cmbClient
+            // 
+            cmbClient.AccessibleName = "Client";
+            cmbClient.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbClient.FormattingEnabled = true;
+            cmbClient.Items.AddRange(new object[] { "(Choose Status)", "Active", "Inactive" });
+            cmbClient.Location = new Point(22, 149);
+            cmbClient.Margin = new Padding(6, 3, 3, 12);
+            cmbClient.Name = "cmbClient";
+            cmbClient.Size = new Size(319, 24);
+            cmbClient.TabIndex = 3;
+            cmbClient.Visible = false;
             // 
             // lblDepartment
             // 
@@ -157,7 +188,7 @@
             lblDepartment.AutoSize = true;
             lblDepartment.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblDepartment.ForeColor = SystemColors.GrayText;
-            lblDepartment.Location = new Point(19, 128);
+            lblDepartment.Location = new Point(19, 185);
             lblDepartment.Margin = new Padding(3, 0, 3, 2);
             lblDepartment.Name = "lblDepartment";
             lblDepartment.Size = new Size(322, 16);
@@ -170,11 +201,11 @@
             cmbDepartment.AccessibleName = "Department";
             cmbDepartment.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbDepartment.FormattingEnabled = true;
-            cmbDepartment.Location = new Point(22, 149);
+            cmbDepartment.Location = new Point(22, 206);
             cmbDepartment.Margin = new Padding(6, 3, 3, 12);
             cmbDepartment.Name = "cmbDepartment";
             cmbDepartment.Size = new Size(319, 24);
-            cmbDepartment.TabIndex = 23;
+            cmbDepartment.TabIndex = 4;
             cmbDepartment.Visible = false;
             // 
             // lblSalaryRate
@@ -183,7 +214,7 @@
             lblSalaryRate.AutoSize = true;
             lblSalaryRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblSalaryRate.ForeColor = SystemColors.GrayText;
-            lblSalaryRate.Location = new Point(19, 185);
+            lblSalaryRate.Location = new Point(19, 242);
             lblSalaryRate.Margin = new Padding(3, 0, 3, 2);
             lblSalaryRate.Name = "lblSalaryRate";
             lblSalaryRate.Size = new Size(322, 16);
@@ -194,12 +225,12 @@
             // txtSalaryRate
             // 
             txtSalaryRate.AccessibleName = "Salary Rate";
-            txtSalaryRate.Location = new Point(22, 206);
+            txtSalaryRate.Location = new Point(22, 263);
             txtSalaryRate.Margin = new Padding(6, 3, 3, 12);
             txtSalaryRate.MaxLength = 100;
             txtSalaryRate.Name = "txtSalaryRate";
             txtSalaryRate.Size = new Size(319, 23);
-            txtSalaryRate.TabIndex = 15;
+            txtSalaryRate.TabIndex = 5;
             txtSalaryRate.Visible = false;
             txtSalaryRate.KeyPress += ValidateInputIfNumber_KeyPress;
             // 
@@ -209,7 +240,7 @@
             lblBillingRate.AutoSize = true;
             lblBillingRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblBillingRate.ForeColor = SystemColors.GrayText;
-            lblBillingRate.Location = new Point(19, 241);
+            lblBillingRate.Location = new Point(19, 298);
             lblBillingRate.Margin = new Padding(3, 0, 3, 2);
             lblBillingRate.Name = "lblBillingRate";
             lblBillingRate.Size = new Size(322, 16);
@@ -220,12 +251,12 @@
             // txtBillingRate
             // 
             txtBillingRate.AccessibleName = "Billing Rate";
-            txtBillingRate.Location = new Point(22, 262);
+            txtBillingRate.Location = new Point(22, 319);
             txtBillingRate.Margin = new Padding(6, 3, 3, 12);
             txtBillingRate.MaxLength = 100;
             txtBillingRate.Name = "txtBillingRate";
             txtBillingRate.Size = new Size(319, 23);
-            txtBillingRate.TabIndex = 17;
+            txtBillingRate.TabIndex = 6;
             txtBillingRate.Visible = false;
             txtBillingRate.KeyPress += ValidateInputIfNumber_KeyPress;
             // 
@@ -235,7 +266,7 @@
             lblDescription.AutoSize = true;
             lblDescription.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblDescription.ForeColor = SystemColors.GrayText;
-            lblDescription.Location = new Point(19, 297);
+            lblDescription.Location = new Point(19, 354);
             lblDescription.Margin = new Padding(3, 0, 3, 2);
             lblDescription.Name = "lblDescription";
             lblDescription.Size = new Size(322, 16);
@@ -246,12 +277,12 @@
             // txtDescription
             // 
             txtDescription.AccessibleName = "Description";
-            txtDescription.Location = new Point(22, 318);
+            txtDescription.Location = new Point(22, 375);
             txtDescription.Margin = new Padding(6, 3, 3, 12);
             txtDescription.MaxLength = 100;
             txtDescription.Name = "txtDescription";
             txtDescription.Size = new Size(319, 23);
-            txtDescription.TabIndex = 19;
+            txtDescription.TabIndex = 7;
             txtDescription.Visible = false;
             // 
             // lblStatus
@@ -260,7 +291,7 @@
             lblStatus.AutoSize = true;
             lblStatus.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblStatus.ForeColor = SystemColors.GrayText;
-            lblStatus.Location = new Point(19, 353);
+            lblStatus.Location = new Point(19, 410);
             lblStatus.Margin = new Padding(3, 0, 3, 2);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(322, 16);
@@ -274,11 +305,11 @@
             cmbStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbStatus.FormattingEnabled = true;
             cmbStatus.Items.AddRange(new object[] { "(Choose Status)", "Active", "Inactive" });
-            cmbStatus.Location = new Point(22, 374);
+            cmbStatus.Location = new Point(22, 431);
             cmbStatus.Margin = new Padding(6, 3, 3, 12);
             cmbStatus.Name = "cmbStatus";
             cmbStatus.Size = new Size(319, 24);
-            cmbStatus.TabIndex = 21;
+            cmbStatus.TabIndex = 8;
             cmbStatus.Visible = false;
             // 
             // pnlFooter
@@ -286,7 +317,7 @@
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Controls.Add(flowFooterActions);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 466);
+            pnlFooter.Location = new Point(0, 524);
             pnlFooter.Name = "pnlFooter";
             pnlFooter.Size = new Size(363, 60);
             pnlFooter.TabIndex = 5;
@@ -333,7 +364,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(363, 526);
+            ClientSize = new Size(363, 584);
             Controls.Add(flowBody);
             Controls.Add(pnlHeader);
             Controls.Add(pnlFooter);
@@ -380,5 +411,7 @@
         private FlowLayoutPanel flowFooterActions;
         private Button btnAdd;
         private Button btnCancel;
+        private Label lblClient;
+        private ComboBox cmbClient;
     }
 }
