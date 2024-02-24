@@ -34,6 +34,9 @@
             btnConfirm = new Button();
             btnCancel = new Button();
             pnlBody = new Panel();
+            pnlEquipmentsGroup = new Panel();
+            chkIncludeEquipments = new CheckBox();
+            txtEquipmentsBilledValue = new TextBox();
             label7 = new Label();
             label6 = new Label();
             label4 = new Label();
@@ -48,6 +51,7 @@
             pnlFooter.SuspendLayout();
             flowLayoutPanel2.SuspendLayout();
             pnlBody.SuspendLayout();
+            pnlEquipmentsGroup.SuspendLayout();
             pnlLine2.SuspendLayout();
             SuspendLayout();
             // 
@@ -57,7 +61,7 @@
             pnlLine1.Dock = DockStyle.Top;
             pnlLine1.Location = new Point(0, 0);
             pnlLine1.Name = "pnlLine1";
-            pnlLine1.Size = new Size(378, 1);
+            pnlLine1.Size = new Size(334, 1);
             pnlLine1.TabIndex = 0;
             // 
             // pnlFooter
@@ -65,9 +69,9 @@
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Controls.Add(flowLayoutPanel2);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 249);
+            pnlFooter.Location = new Point(0, 308);
             pnlFooter.Name = "pnlFooter";
-            pnlFooter.Size = new Size(378, 46);
+            pnlFooter.Size = new Size(334, 46);
             pnlFooter.TabIndex = 1;
             // 
             // flowLayoutPanel2
@@ -76,7 +80,7 @@
             flowLayoutPanel2.Controls.Add(btnCancel);
             flowLayoutPanel2.Dock = DockStyle.Right;
             flowLayoutPanel2.FlowDirection = FlowDirection.RightToLeft;
-            flowLayoutPanel2.Location = new Point(187, 0);
+            flowLayoutPanel2.Location = new Point(143, 0);
             flowLayoutPanel2.Name = "flowLayoutPanel2";
             flowLayoutPanel2.Padding = new Padding(16, 9, 0, 0);
             flowLayoutPanel2.Size = new Size(191, 46);
@@ -110,6 +114,7 @@
             // 
             // pnlBody
             // 
+            pnlBody.Controls.Add(pnlEquipmentsGroup);
             pnlBody.Controls.Add(label7);
             pnlBody.Controls.Add(label6);
             pnlBody.Controls.Add(label4);
@@ -124,8 +129,43 @@
             pnlBody.Location = new Point(0, 1);
             pnlBody.Name = "pnlBody";
             pnlBody.Padding = new Padding(16);
-            pnlBody.Size = new Size(378, 248);
+            pnlBody.Size = new Size(334, 307);
             pnlBody.TabIndex = 2;
+            // 
+            // pnlEquipmentsGroup
+            // 
+            pnlEquipmentsGroup.AutoSize = true;
+            pnlEquipmentsGroup.Controls.Add(chkIncludeEquipments);
+            pnlEquipmentsGroup.Controls.Add(txtEquipmentsBilledValue);
+            pnlEquipmentsGroup.Location = new Point(16, 246);
+            pnlEquipmentsGroup.Margin = new Padding(0);
+            pnlEquipmentsGroup.Name = "pnlEquipmentsGroup";
+            pnlEquipmentsGroup.Size = new Size(302, 46);
+            pnlEquipmentsGroup.TabIndex = 25;
+            // 
+            // chkIncludeEquipments
+            // 
+            chkIncludeEquipments.AutoSize = true;
+            chkIncludeEquipments.Location = new Point(3, 0);
+            chkIncludeEquipments.Name = "chkIncludeEquipments";
+            chkIncludeEquipments.Size = new Size(240, 20);
+            chkIncludeEquipments.TabIndex = 9;
+            chkIncludeEquipments.Text = "Include supplies and equipments?";
+            chkIncludeEquipments.UseVisualStyleBackColor = true;
+            chkIncludeEquipments.CheckedChanged += chkIncludeEquipments_CheckedChanged;
+            // 
+            // txtEquipmentsBilledValue
+            // 
+            txtEquipmentsBilledValue.AccessibleName = "Supplies and Equipments Value";
+            txtEquipmentsBilledValue.Enabled = false;
+            txtEquipmentsBilledValue.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            txtEquipmentsBilledValue.Location = new Point(0, 20);
+            txtEquipmentsBilledValue.Margin = new Padding(0);
+            txtEquipmentsBilledValue.MaxLength = 100;
+            txtEquipmentsBilledValue.Name = "txtEquipmentsBilledValue";
+            txtEquipmentsBilledValue.PlaceholderText = "Enter Amount";
+            txtEquipmentsBilledValue.Size = new Size(302, 26);
+            txtEquipmentsBilledValue.TabIndex = 8;
             // 
             // label7
             // 
@@ -172,7 +212,7 @@
             txtOfficerPosition.Location = new Point(16, 204);
             txtOfficerPosition.Margin = new Padding(0, 0, 0, 16);
             txtOfficerPosition.Name = "txtOfficerPosition";
-            txtOfficerPosition.Size = new Size(346, 26);
+            txtOfficerPosition.Size = new Size(302, 26);
             txtOfficerPosition.TabIndex = 10;
             // 
             // label3
@@ -194,7 +234,7 @@
             txtOfficerName.Location = new Point(16, 142);
             txtOfficerName.Margin = new Padding(0, 0, 0, 16);
             txtOfficerName.Name = "txtOfficerName";
-            txtOfficerName.Size = new Size(346, 26);
+            txtOfficerName.Size = new Size(302, 26);
             txtOfficerName.TabIndex = 8;
             // 
             // label2
@@ -216,7 +256,7 @@
             txtDescription.Location = new Point(16, 80);
             txtDescription.Margin = new Padding(0, 0, 0, 16);
             txtDescription.Name = "txtDescription";
-            txtDescription.Size = new Size(346, 26);
+            txtDescription.Size = new Size(302, 26);
             txtDescription.TabIndex = 6;
             // 
             // pnlLine2
@@ -227,7 +267,7 @@
             pnlLine2.Location = new Point(16, 43);
             pnlLine2.Margin = new Padding(0, 0, 0, 16);
             pnlLine2.Name = "pnlLine2";
-            pnlLine2.Size = new Size(346, 1);
+            pnlLine2.Size = new Size(302, 1);
             pnlLine2.TabIndex = 5;
             // 
             // panel1
@@ -237,7 +277,7 @@
             panel1.Location = new Point(-1, 0);
             panel1.Margin = new Padding(0, 0, 0, 16);
             panel1.Name = "panel1";
-            panel1.Size = new Size(568, 1);
+            panel1.Size = new Size(524, 1);
             panel1.TabIndex = 2;
             // 
             // label1
@@ -255,7 +295,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(378, 295);
+            ClientSize = new Size(334, 354);
             ControlBox = false;
             Controls.Add(pnlBody);
             Controls.Add(pnlFooter);
@@ -272,6 +312,8 @@
             flowLayoutPanel2.PerformLayout();
             pnlBody.ResumeLayout(false);
             pnlBody.PerformLayout();
+            pnlEquipmentsGroup.ResumeLayout(false);
+            pnlEquipmentsGroup.PerformLayout();
             pnlLine2.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -296,5 +338,9 @@
         private FlowLayoutPanel flowLayoutPanel2;
         private Button btnConfirm;
         private Button btnCancel;
+        private Panel panel3;
+        private CheckBox chkIncludeEquipments;
+        private TextBox txtEquipmentsBilledValue;
+        private Panel pnlEquipmentsGroup;
     }
 }

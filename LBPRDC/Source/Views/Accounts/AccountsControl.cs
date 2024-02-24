@@ -61,15 +61,15 @@ namespace LBPRDC.Source.Views.Accounts
 
         private void ApplySettingsToTable()
         {
-            ControlUtils.AddColumn(dgvUsers, "UserID", "ID", "UserID");
-            ControlUtils.AddColumn(dgvUsers, "Role", "Role", "Role");
-            ControlUtils.AddColumn(dgvUsers, "Username", "Username", "Username");
-            ControlUtils.AddColumn(dgvUsers, "Email", "Email", "Email");
-            ControlUtils.AddColumn(dgvUsers, "FirstName", "First Name", "FirstName");
-            ControlUtils.AddColumn(dgvUsers, "LastName", "Last Name", "LastName");
-            ControlUtils.AddColumn(dgvUsers, "RegistrationDate", "Registration Date", "RegistrationDate");
-            ControlUtils.AddColumn(dgvUsers, "LastLoginDate", "Last Login Date", "LastLoginDate");
-            ControlUtils.AddColumn(dgvUsers, "Status", "Status", "Status");
+            ControlUtils.AddColumn(dgvUsers, "UserID", "ID", "UserID", true, true);
+            ControlUtils.AddColumn(dgvUsers, "Role", "Role", "Role", true, true);
+            ControlUtils.AddColumn(dgvUsers, "Username", "Username", "Username", true, true);
+            ControlUtils.AddColumn(dgvUsers, "Email", "Email", "Email", true, true);
+            ControlUtils.AddColumn(dgvUsers, "FirstName", "First Name", "FirstName", true, true);
+            ControlUtils.AddColumn(dgvUsers, "LastName", "Last Name", "LastName", true, true);
+            ControlUtils.AddColumn(dgvUsers, "RegistrationDate", "Registration Date", "RegistrationDate", true, true);
+            ControlUtils.AddColumn(dgvUsers, "LastLoginDate", "Last Login Date", "LastLoginDate", true, true);
+            ControlUtils.AddColumn(dgvUsers, "Status", "Status", "Status", true, true);
         }
 
         private void ShowLoadingProgressBar(bool state)

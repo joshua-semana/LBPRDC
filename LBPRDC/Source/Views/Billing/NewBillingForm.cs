@@ -1,6 +1,7 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using System.Globalization;
+using System.Transactions;
 
 namespace LBPRDC.Source.Views.Billing
 {
@@ -76,7 +77,7 @@ namespace LBPRDC.Source.Views.Billing
         {
             if (ControlUtils.AreRequiredFieldsFilled(RequiredFields))
             {
-                int nameCount = BillingService.GetItemCountByName(txtBillingName.Text);
+                int nameCount = BillingService.GetItemCountByName(txtBillingName.Text.Trim());
                 if (nameCount > 0)
                 {
                     MessageBox.Show("This billing name has already been used. Please enter another billing name to continue.", "Duplicate Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -89,10 +90,14 @@ namespace LBPRDC.Source.Views.Billing
 
         private async void AddNewBillingRecord()
         {
+            List<BillingAccount> newAccount = new();
+
+            string billingName = Utilities.StringFormat.ToSentenceCase(txtBillingName.Text.Trim());
+
             Services.Billing newBilling = new()
             {
                 UserID = UserService.CurrentUser.UserID,
-                Name = Utilities.StringFormat.ToSentenceCase(txtBillingName.Text.Trim()),
+                Name = billingName,
                 OfficerName = txtOfficerInCharge.Text.ToUpper().Trim(),
                 OfficerPosition = txtOfficerPosition.Text.ToUpper().Trim(),
                 Month = cmbMonth.SelectedIndex + 1,
@@ -106,17 +111,51 @@ namespace LBPRDC.Source.Views.Billing
                 EditableJSON = String.Empty,
                 AccrualsJSON = String.Empty,
                 VerificationStatus = "Unverified",
+                IsEquipmentIncluded = chkIncludeEquipments.Checked,
                 Description = txtDescription.Text.Trim(),
                 Status = "Active",
                 LockStatus = "Unlock"
             };
 
-            if (await Task.Run(() => BillingService.Add(newBilling)))
+            using var transaction = new TransactionScope();
+
+            try
             {
+                await Task.Run(() => BillingService.Add(newBilling));
+
+                if (chkIncludeEquipments.Checked)
+                {
+                    string accountYear = newBilling.Year.ToString();
+                    string accountMonth = newBilling.Month.ToString("D3");
+                    decimal equipmentGrossAmount = Convert.ToDecimal(txtEquipmentsBilledValue.Text);
+
+                    newAccount.Add(new()
+                    {
+                        BillingName = newBilling.Name,
+                        AccountNumber = $"SHFCEquip{accountYear}-{accountMonth}",
+                        EntryType = "Custom Entry",
+                        OfficialReceiptNumber = "",
+                        Classification = "SHFC Equipment",
+                        BilledValue = equipmentGrossAmount,
+                        NetBilling = equipmentGrossAmount - Convert.ToDecimal((double)equipmentGrossAmount / 1.12 * 0.07),
+                        CollectedValue = 0,
+                        CollectionDate = null,
+                        Balance = equipmentGrossAmount,
+                        Purpose = "",
+                        Timestamp = DateTime.Now,
+                        Remarks = "Supplies and Equipment Billing"
+                    });
+
+                    await Task.Run(() => BillingAccountService.Add(newAccount, billingName));
+                }
+
+                transaction.Complete();
+
                 MessageBox.Show("You have successfully added a new billing.", "New Billing Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ParentControl?.ResetTableSearch();
                 this.Close();
             }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -140,6 +179,27 @@ namespace LBPRDC.Source.Views.Billing
         private void SetBillingName()
         {
             txtBillingName.Text = $"{startDate:MMMM dd}-{endDate:dd, yyyy} Billing";
+        }
+
+        private void MoneyInput_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsDigit(e.KeyChar) && (e.KeyChar != '.' || (e.KeyChar == '.' && (sender as TextBox)?.Text.Contains('.') == true)) && e.KeyChar != (char)Keys.Back)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void chkIncludeEquipments_CheckedChanged(object sender, EventArgs e)
+        {
+            txtEquipmentsBilledValue.Enabled = chkIncludeEquipments.Checked;
+            if (chkIncludeEquipments.Checked)
+            {
+                RequiredFields.Add(txtEquipmentsBilledValue);
+            }
+            else
+            {
+                RequiredFields.Remove(txtEquipmentsBilledValue);
+            }
         }
     }
 }

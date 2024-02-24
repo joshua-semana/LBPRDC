@@ -31,6 +31,8 @@ namespace LBPRDC.Source.Views.Categories
             {
                 lblCode,
                 txtCode,
+                lblClient,
+                cmbClient,
                 lblSalaryRate,
                 txtSalaryRate,
                 lblBillingRate,
@@ -60,8 +62,12 @@ namespace LBPRDC.Source.Views.Categories
 
             switch (CategoryName)
             {
+                case "Clients":
+                    break;
+
                 case "Position":
                     ControlUtils.ToggleControlVisibility(PositionSpecificFields, true);
+                    InitializeClientComboBoxItems();
                     break;
 
                 case "Location":
@@ -93,6 +99,13 @@ namespace LBPRDC.Source.Views.Categories
             cmbDepartment.DataSource = DepartmentService.GetAllItemsForComboBox();
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
+        }
+
+        private void InitializeClientComboBoxItems()
+        {
+            cmbClient.DataSource = ClientService.GetClientsForComboBoxByStatus("Active");
+            cmbClient.DisplayMember = "Name";
+            cmbClient.ValueMember = "ID";
         }
 
         private void GetRequiredFields()
@@ -158,14 +171,28 @@ namespace LBPRDC.Source.Views.Categories
         private async void AddNewItem()
         {
             bool isAdded = false;
+            string code = txtCode.Text.ToUpper().Trim();
+            string name = txtName.Text.Trim();
+            string description = txtDescription.Text.Trim();
+            string status = cmbStatus.Text;
+
             switch (CategoryName)
             {
+                case "Clients":
+                    isAdded = await ClientService.AddClient(new()
+                    {
+                        Name = name,
+                        Description = description,
+                        Status = status
+                    });
+                    break;
+
                 case "Civil Status":
                     CivilStatusService.CivilStatus AddForCivilStatus = new()
                     {
-                        Name = txtName.Text.ToUpper().Trim(),
-                        Description = txtDescription.Text.ToUpper().Trim(),
-                        Status = cmbStatus.Text
+                        Name = name,
+                        Description = description,
+                        Status = status
                     };
                     isAdded = await CivilStatusService.Add(AddForCivilStatus);
                     break;
@@ -173,10 +200,10 @@ namespace LBPRDC.Source.Views.Categories
                 case "Department":
                     DepartmentService.Department AddForDepartment = new()
                     {
-                        Code = txtCode.Text.ToUpper().Trim(),
-                        Name = txtName.Text.Trim(),
-                        Description = txtDescription.Text.ToUpper().Trim(),
-                        Status = cmbStatus.Text
+                        Code = code,
+                        Name = name,
+                        Description = description,
+                        Status = status
                     };
                     isAdded = await DepartmentService.Add(AddForDepartment);
                     break;
@@ -184,9 +211,9 @@ namespace LBPRDC.Source.Views.Categories
                 case "Employment Status":
                     EmploymentStatusService.EmploymentStatus AddForEmploymentStatus = new()
                     {
-                        Name = txtName.Text.ToUpper().Trim(),
-                        Description = txtDescription.Text.ToUpper().Trim(),
-                        Status = cmbStatus.Text
+                        Name = name,
+                        Description = description,
+                        Status = status
                     };
                     isAdded = await EmploymentStatusService.Add(AddForEmploymentStatus);
                     break;
@@ -194,25 +221,25 @@ namespace LBPRDC.Source.Views.Categories
                 case "Location":
                     LocationService.Location AddForLocation = new()
                     {
-                        Name = txtName.Text.Trim(),
-                        Description = txtDescription.Text.ToUpper().Trim(),
-                        Status = cmbStatus.Text,
+                        Name = name,
+                        Description = description,
+                        Status = status,
                         DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue)
                     };
                     isAdded = await LocationService.Add(AddForLocation);
                     break;
 
                 case "Position":
-                    PositionService.Position AddForPosition = new()
+                    isAdded = await PositionService.Add(new()
                     {
-                        Name = txtName.Text.ToUpper().Trim(),
-                        Description = txtDescription.Text.ToUpper().Trim(),
-                        Status = cmbStatus.Text,
-                        Code = txtCode.Text.ToUpper().Trim(),
+                        Name = name,
+                        ClientID = Convert.ToInt32(cmbClient.SelectedValue),
+                        Description = description,
+                        Status = status,
+                        Code = code,
                         SalaryRate = Convert.ToDecimal(txtSalaryRate.Text),
                         BillingRate = Convert.ToDecimal(txtBillingRate.Text)
-                    };
-                    isAdded = await PositionService.Add(AddForPosition);
+                    });
                     break;
 
                 default:
@@ -225,6 +252,10 @@ namespace LBPRDC.Source.Views.Categories
                 MessageBox.Show("You have successfully added a new item in this category.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ParentControl?.PopulateTableAndFields();
                 this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Addition of item has failed, please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

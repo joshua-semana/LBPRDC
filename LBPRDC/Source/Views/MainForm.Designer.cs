@@ -47,12 +47,12 @@
             btnSignOut = new Button();
             flowSideNavTop = new FlowLayoutPanel();
             btnNavHome = new Button();
+            btnBilling = new Button();
             btnNavEmployees = new Button();
             btnCategories = new Button();
             btnLogs = new Button();
             btnAccounts = new Button();
             pnlLine3 = new Panel();
-            btnBilling = new Button();
             pnlHeader.SuspendLayout();
             flowHeaderLeft.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)picLogo).BeginInit();
@@ -279,6 +279,20 @@
             btnNavHome.Tag = "Home";
             btnNavHome.UseVisualStyleBackColor = true;
             // 
+            // btnBilling
+            // 
+            btnBilling.Cursor = Cursors.Hand;
+            btnBilling.FlatAppearance.BorderSize = 0;
+            btnBilling.FlatStyle = FlatStyle.Flat;
+            btnBilling.Image = (Image)resources.GetObject("btnBilling.Image");
+            btnBilling.Location = new Point(0, 50);
+            btnBilling.Margin = new Padding(0);
+            btnBilling.Name = "btnBilling";
+            btnBilling.Size = new Size(50, 50);
+            btnBilling.TabIndex = 13;
+            btnBilling.Tag = "Billing";
+            btnBilling.UseVisualStyleBackColor = true;
+            // 
             // btnNavEmployees
             // 
             btnNavEmployees.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -346,20 +360,6 @@
             pnlLine3.Size = new Size(1264, 1);
             pnlLine3.TabIndex = 3;
             // 
-            // btnBilling
-            // 
-            btnBilling.Cursor = Cursors.Hand;
-            btnBilling.FlatAppearance.BorderSize = 0;
-            btnBilling.FlatStyle = FlatStyle.Flat;
-            btnBilling.Image = (Image)resources.GetObject("btnBilling.Image");
-            btnBilling.Location = new Point(0, 50);
-            btnBilling.Margin = new Padding(0);
-            btnBilling.Name = "btnBilling";
-            btnBilling.Size = new Size(50, 50);
-            btnBilling.TabIndex = 13;
-            btnBilling.Tag = "Billing";
-            btnBilling.UseVisualStyleBackColor = true;
-            // 
             // frmMain
             // 
             AutoScaleMode = AutoScaleMode.None;
@@ -409,12 +409,12 @@
         private Button btnSignOut;
         private Panel pnlLine3;
         private Button btnLogs;
-        private Panel pnlSideNav;
         private FlowLayoutPanel flowSideNavBottom;
         private Panel pnlContent;
         private Label lblPageName;
         private Button btnCategories;
         private Button btnProfile;
         private Button btnBilling;
+        public Panel pnlSideNav;
     }
 }

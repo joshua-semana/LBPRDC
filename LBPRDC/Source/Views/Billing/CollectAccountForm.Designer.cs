@@ -35,17 +35,12 @@
             btnCancel = new Button();
             pnlBody = new Panel();
             label8 = new Label();
-            label7 = new Label();
-            label6 = new Label();
-            txtRemarks = new TextBox();
             label5 = new Label();
             txtBillingValue = new TextBox();
             dtpCollectionDate = new DateTimePicker();
             label4 = new Label();
             txtReceiptNumber = new TextBox();
             label3 = new Label();
-            label2 = new Label();
-            txtAmountCollected = new TextBox();
             pnlLine2 = new Panel();
             panel1 = new Panel();
             label1 = new Label();
@@ -69,7 +64,7 @@
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Controls.Add(flowLayoutPanel2);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 377);
+            pnlFooter.Location = new Point(0, 251);
             pnlFooter.Name = "pnlFooter";
             pnlFooter.Size = new Size(373, 46);
             pnlFooter.TabIndex = 1;
@@ -115,24 +110,19 @@
             // pnlBody
             // 
             pnlBody.Controls.Add(label8);
-            pnlBody.Controls.Add(label7);
-            pnlBody.Controls.Add(label6);
-            pnlBody.Controls.Add(txtRemarks);
             pnlBody.Controls.Add(label5);
             pnlBody.Controls.Add(txtBillingValue);
             pnlBody.Controls.Add(dtpCollectionDate);
             pnlBody.Controls.Add(label4);
             pnlBody.Controls.Add(txtReceiptNumber);
             pnlBody.Controls.Add(label3);
-            pnlBody.Controls.Add(label2);
-            pnlBody.Controls.Add(txtAmountCollected);
             pnlBody.Controls.Add(pnlLine2);
             pnlBody.Controls.Add(label1);
             pnlBody.Dock = DockStyle.Fill;
             pnlBody.Location = new Point(0, 1);
             pnlBody.Name = "pnlBody";
             pnlBody.Padding = new Padding(16);
-            pnlBody.Size = new Size(373, 376);
+            pnlBody.Size = new Size(373, 250);
             pnlBody.TabIndex = 2;
             // 
             // label8
@@ -141,47 +131,12 @@
             label8.AutoSize = true;
             label8.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             label8.ForeColor = Color.Red;
-            label8.Location = new Point(167, 184);
+            label8.Location = new Point(167, 122);
             label8.Margin = new Padding(0);
             label8.Name = "label8";
             label8.Size = new Size(12, 16);
             label8.TabIndex = 25;
             label8.Text = "*";
-            // 
-            // label7
-            // 
-            label7.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            label7.AutoSize = true;
-            label7.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label7.ForeColor = Color.Red;
-            label7.Location = new Point(130, 122);
-            label7.Margin = new Padding(0);
-            label7.Name = "label7";
-            label7.Size = new Size(12, 16);
-            label7.TabIndex = 24;
-            label7.Text = "*";
-            // 
-            // label6
-            // 
-            label6.AutoSize = true;
-            label6.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label6.Location = new Point(16, 308);
-            label6.Margin = new Padding(0, 0, 0, 4);
-            label6.Name = "label6";
-            label6.Size = new Size(63, 16);
-            label6.TabIndex = 19;
-            label6.Text = "Remarks";
-            // 
-            // txtRemarks
-            // 
-            txtRemarks.AccessibleName = "Official Receipt Number";
-            txtRemarks.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            txtRemarks.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            txtRemarks.Location = new Point(16, 328);
-            txtRemarks.Margin = new Padding(0, 0, 0, 16);
-            txtRemarks.Name = "txtRemarks";
-            txtRemarks.Size = new Size(341, 26);
-            txtRemarks.TabIndex = 18;
             // 
             // label5
             // 
@@ -215,7 +170,7 @@
             dtpCollectionDate.CustomFormat = "MM-dd-yyyy";
             dtpCollectionDate.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             dtpCollectionDate.Format = DateTimePickerFormat.Custom;
-            dtpCollectionDate.Location = new Point(16, 266);
+            dtpCollectionDate.Location = new Point(16, 204);
             dtpCollectionDate.Margin = new Padding(0, 0, 0, 16);
             dtpCollectionDate.Name = "dtpCollectionDate";
             dtpCollectionDate.Size = new Size(341, 26);
@@ -225,7 +180,7 @@
             // 
             label4.AutoSize = true;
             label4.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label4.Location = new Point(16, 184);
+            label4.Location = new Point(16, 122);
             label4.Margin = new Padding(0, 0, 0, 4);
             label4.Name = "label4";
             label4.Size = new Size(155, 16);
@@ -237,7 +192,7 @@
             txtReceiptNumber.AccessibleName = "Official Receipt Number";
             txtReceiptNumber.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtReceiptNumber.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            txtReceiptNumber.Location = new Point(16, 204);
+            txtReceiptNumber.Location = new Point(16, 142);
             txtReceiptNumber.Margin = new Padding(0, 0, 0, 16);
             txtReceiptNumber.Name = "txtReceiptNumber";
             txtReceiptNumber.Size = new Size(341, 26);
@@ -248,35 +203,12 @@
             // 
             label3.AutoSize = true;
             label3.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label3.Location = new Point(16, 246);
+            label3.Location = new Point(16, 184);
             label3.Margin = new Padding(0, 0, 0, 4);
             label3.Name = "label3";
             label3.Size = new Size(119, 16);
             label3.TabIndex = 12;
             label3.Text = "Date of Collection";
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label2.Location = new Point(16, 122);
-            label2.Margin = new Padding(0, 0, 0, 4);
-            label2.Name = "label2";
-            label2.Size = new Size(118, 16);
-            label2.TabIndex = 11;
-            label2.Text = "Amount Collected";
-            // 
-            // txtAmountCollected
-            // 
-            txtAmountCollected.AccessibleName = "Description";
-            txtAmountCollected.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            txtAmountCollected.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            txtAmountCollected.Location = new Point(16, 142);
-            txtAmountCollected.Margin = new Padding(0, 0, 0, 16);
-            txtAmountCollected.Name = "txtAmountCollected";
-            txtAmountCollected.Size = new Size(341, 26);
-            txtAmountCollected.TabIndex = 10;
-            txtAmountCollected.KeyPress += ValidateInputIfNumber_KeyPress;
             // 
             // pnlLine2
             // 
@@ -314,7 +246,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(373, 423);
+            ClientSize = new Size(373, 297);
             ControlBox = false;
             Controls.Add(pnlBody);
             Controls.Add(pnlFooter);
@@ -342,8 +274,6 @@
         private FlowLayoutPanel flowLayoutPanel2;
         private Button btnConfirm;
         private Button btnCancel;
-        private Label label2;
-        private TextBox txtAmountCollected;
         private Panel pnlLine2;
         private Panel panel1;
         private Label label1;
@@ -353,9 +283,6 @@
         private DateTimePicker dtpCollectionDate;
         private Label label5;
         private TextBox txtBillingValue;
-        private Label label6;
-        private TextBox txtRemarks;
         private Label label8;
-        private Label label7;
     }
 }

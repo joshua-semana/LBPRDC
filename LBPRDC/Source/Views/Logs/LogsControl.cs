@@ -1,5 +1,4 @@
-﻿
-using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using LBPRDC.Source.Views.Shared;
 using static LBPRDC.Source.Views.Shared.DynamicCheckedListBoxControl;
@@ -52,7 +51,7 @@ namespace LBPRDC.Source.Views.Logs
             );
         }
 
-        private void InitializeFilter(DynamicCheckedListBoxControl control, List<CheckedListBoxItems> items)
+        private static void InitializeFilter(DynamicCheckedListBoxControl control, List<CheckedListBoxItems> items)
         {
             if (items.Count > 0)
             {
@@ -77,10 +76,10 @@ namespace LBPRDC.Source.Views.Logs
 
         private void ApplySettingsToTable()
         {
-            ControlUtils.AddColumn(dgvLogs, "Timestamp", "Date & Time", "Timestamp");
-            ControlUtils.AddColumn(dgvLogs, "FullName", "Full Name", "FullName");
-            ControlUtils.AddColumn(dgvLogs, "ActivityType", "Type", "ActivityType");
-            ControlUtils.AddColumn(dgvLogs, "ActivityDetails", "Details", "ActivityDetails");
+            ControlUtils.AddColumn(dgvLogs, "Timestamp", "Date & Time", "Timestamp", true, true);
+            ControlUtils.AddColumn(dgvLogs, "FullName", "Full Name", "FullName", true, true);
+            ControlUtils.AddColumn(dgvLogs, "ActivityType", "Type", "ActivityType", true, true);
+            ControlUtils.AddColumn(dgvLogs, "ActivityDetails", "Details", "ActivityDetails", true, true);
         }
 
         private void ShowLoadingProgressBar(bool state)

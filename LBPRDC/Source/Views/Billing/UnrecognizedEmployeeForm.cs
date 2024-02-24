@@ -23,8 +23,8 @@ namespace LBPRDC.Source.Views.Billing
 
         private void ApplySettingsToTable()
         {
-            ControlUtils.AddColumn(dgvEmployees, "EmployeeID", "ID", "EmployeeID");
-            ControlUtils.AddColumn(dgvEmployees, "FullName", "Full Name", "FullName");
+            ControlUtils.AddColumn(dgvEmployees, "EmployeeID", "ID", "EmployeeID", true, true);
+            ControlUtils.AddColumn(dgvEmployees, "FullName", "Full Name", "FullName", true, true);
         }
 
         private void btnClose_Click(object sender, EventArgs e)

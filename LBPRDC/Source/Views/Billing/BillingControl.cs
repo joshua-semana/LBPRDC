@@ -1,17 +1,30 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
-using OfficeOpenXml.Drawing.Chart;
+using System.Windows.Forms;
 
 namespace LBPRDC.Source.Views.Billing
 {
     public partial class BillingControl : UserControl
     {
+        UserControl loadingControl = new ucLoading() { Dock = DockStyle.Fill };
+
         private string? OfficerName = "";
         private string? OfficerPosition = "";
+
+        private readonly string NOT_RELEASED = "Not Yet Released";
+        private readonly string NOT_COLLECTED = "Not Yet Collected";
+        private readonly string COLLECTING = "Still Collecting";
+        private readonly string COLLECTED = "Collected";
+
+        private string selectedBillingName = "";
+        private bool isBillingReleased = false;
+        
 
         public BillingControl()
         {
             InitializeComponent();
+            this.Controls.Add(loadingControl);
+            loadingControl.BringToFront();
         }
 
         public void ApplySearchThenPopulate()
@@ -30,40 +43,15 @@ namespace LBPRDC.Source.Views.Billing
         {
             pnlLeft.Enabled = true;
             pnlRight.Visible = false;
+            ClearInputs();
+        }
+
+        private void ClearInputs()
+        {
             ControlUtils.ClearInputs(pnlRightBody);
             ControlUtils.ClearInputs(grpBillingInformation);
             ControlUtils.ClearInputs(grpStatementOfAccounts);
-        }
-
-        public void FetchAccountAndPopulate()
-        {
-            if (cmbStatementOfAccounts.Text != "Nothing Found")
-            {
-                string? billingName = dgvBillings.SelectedRows[0].Cells["Name"].Value.ToString();
-                string? accountNumber = cmbStatementOfAccounts.Text.ToString();
-
-                frmLoading form = new()
-                {
-                    BillingAccountProcess = Task.Run(() => BillingService.GetAccountDetails(accountNumber, billingName))
-                };
-
-                var output = form.ShowDialog();
-
-                if (output == DialogResult.OK)
-                {
-                    PopulateAccountInformation(form.BillingAccountResult, true);
-                    btnUpdateAccount.Enabled = true;
-                }
-                else if (output == DialogResult.Abort)
-                {
-                    MessageBox.Show("There's a problem retrieving the information of this statement of account, please try again.", "Error Retrieving Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    btnUpdateAccount.Enabled = false;
-                }
-            }
-            else
-            {
-                PopulateAccountInformation(null, false);
-            }
+            ControlUtils.ClearInputs(grpPurpose);
         }
 
         private void BillingControl_VisibleChanged(object sender, EventArgs e)
@@ -76,7 +64,7 @@ namespace LBPRDC.Source.Views.Billing
 
         private async void PopulateTableWithSearch(string searchWord)
         {
-            //ShowLoadingProgressBar(true);
+            ShowLoadingProgressBar(true);
             var (Items, TotalCount) = await Task.Run(() => BillingService.GetFilteredItems(searchWord));
 
             dgvBillings.Columns.Clear();
@@ -85,20 +73,51 @@ namespace LBPRDC.Source.Views.Billing
             lblRowCounter.Text = ControlUtils.GetTableRowCount(Items.Count, TotalCount, "billing");
             dgvBillings.DataSource = Items;
 
-            //ShowLoadingProgressBar(false);
+            if (dgvBillings.Rows.Count > 0)
+            {
+                dgvBillings.CurrentCell = dgvBillings.Rows[0].Cells[0];
+            }
+
+            ShowLoadingProgressBar(false);
         }
 
         private void ApplySettingsToTable()
         {
-            ControlUtils.AddColumn(dgvBillings, "LockStatus", "", "LockStatus");
-            ControlUtils.AddColumn(dgvBillings, "Name", "Billing Name", "Name");
-            ControlUtils.AddColumn(dgvBillings, "QuarterName", "Quarter", "QuarterName");
-            ControlUtils.AddColumn(dgvBillings, "FormattedStartDate", "Start Date", "FormattedStartDate");
-            ControlUtils.AddColumn(dgvBillings, "FormattedEndDate", "End Date", "FormattedEndDate");
-            ControlUtils.AddColumn(dgvBillings, "ConstantJSON", "Timekeep", "ConstantJSON");
-            ControlUtils.AddColumn(dgvBillings, "VerificationStatus", "Verified", "VerificationStatus");
-            ControlUtils.AddColumn(dgvBillings, "AccrualsJSON", "Accruals", "AccrualsJSON");
+            ControlUtils.AddColumn(dgvBillings, "LockStatus", "", "LockStatus", true, true);
+            ControlUtils.AddColumn(dgvBillings, "Name", "Billing Name", "Name", true, true);
+            ControlUtils.AddColumn(dgvBillings, "QuarterName", "Quarter", "QuarterName", true, true);
+            ControlUtils.AddColumn(dgvBillings, "FormattedStartDate", "Start Date", "FormattedStartDate", true, true);
+            ControlUtils.AddColumn(dgvBillings, "FormattedEndDate", "End Date", "FormattedEndDate", true, true);
+            ControlUtils.AddColumn(dgvBillings, "ConstantJSON", "Timekeep", "ConstantJSON", true, true);
+            ControlUtils.AddColumn(dgvBillings, "VerificationStatus", "Verified", "VerificationStatus", true, true);
+            ControlUtils.AddColumn(dgvBillings, "AccrualsJSON", "Accruals", "AccrualsJSON", true, true);
+            ControlUtils.AddColumn(dgvBillings, "Year", "Year", "Year", false, true);
+            ControlUtils.AddColumn(dgvBillings, "Month", "Month", "Month", false, true);
             //dgvBillings.Columns[dgvBillings.Columns["VerificationStatus"].Index].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+        }
+
+        private void dgvBillings_SelectionChanged(object sender, EventArgs e)
+        {
+            bool hasNameColumn = dgvBillings.Columns.Cast<DataGridViewColumn>().Any(column => column.Name == "Name");
+            bool hasLockStatusColumn = dgvBillings.Columns.Cast<DataGridViewColumn>().Any(column => column.Name == "LockStatus");
+
+            if (dgvBillings.Rows.Count > 0 && dgvBillings.SelectedRows.Count > 0 && dgvBillings.Columns.Count > 0)
+            {
+                if (hasNameColumn)
+                {
+                    selectedBillingName = dgvBillings.SelectedRows[0].Cells["Name"].Value.ToString() ?? "";
+                }
+                if (hasLockStatusColumn)
+                {
+                    object status = dgvBillings.SelectedRows[0].Cells["LockStatus"].Value;
+                    isBillingReleased = ((string)status == "🔒");
+                }
+            }
+        }
+
+        private void ShowLoadingProgressBar(bool state)
+        {
+            loadingControl.Visible = state;
         }
 
         private void btnNew_Click(object sender, EventArgs e)
@@ -125,41 +144,35 @@ namespace LBPRDC.Source.Views.Billing
 
         private void dgvBillings_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
+            if (e.Button == MouseButtons.Right && e.RowIndex >= 0)
             {
-                if (e.RowIndex >= 0)
-                {
-                    dgvBillings.Rows[e.RowIndex].Selected = true;
-                    var location = dgvBillings.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false).Location;
+                dgvBillings.Rows[e.RowIndex].Selected = true;
+                var location = dgvBillings.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false).Location;
 
-                    string? lockStatusValue = dgvBillings.SelectedRows[0].Cells["LockStatus"].Value.ToString();
-                    string? timekeepValue = dgvBillings.SelectedRows[0].Cells["ConstantJSON"].Value.ToString();
-                    string? verifiedValue = dgvBillings.SelectedRows[0].Cells["VerificationStatus"].Value.ToString();
-                    string? accrualsValue = dgvBillings.SelectedRows[0].Cells["AccrualsJSON"].Value.ToString();
+                string? timekeepValue = dgvBillings.SelectedRows[0].Cells["ConstantJSON"].Value.ToString();
+                string? verifiedValue = dgvBillings.SelectedRows[0].Cells["VerificationStatus"].Value.ToString();
+                string? accrualsValue = dgvBillings.SelectedRows[0].Cells["AccrualsJSON"].Value.ToString();
 
-                    cntxtMenuViewVerify.Enabled = !string.IsNullOrEmpty(timekeepValue);
-                    cntxtMenuRelease.Enabled = lockStatusValue == "🔓" && (!string.IsNullOrEmpty(timekeepValue) && !string.IsNullOrEmpty(verifiedValue) && !string.IsNullOrEmpty(accrualsValue));
-                    cntxtMenuUpload.Enabled = lockStatusValue == "🔓";
+                cntxtMenuViewVerify.Enabled = !string.IsNullOrEmpty(timekeepValue);
+                cntxtMenuRelease.Enabled = !isBillingReleased && (!string.IsNullOrEmpty(timekeepValue) && !string.IsNullOrEmpty(verifiedValue) && !string.IsNullOrEmpty(accrualsValue));
+                cntxtMenuUpload.Enabled = !isBillingReleased;
 
-                    menuExportBilling.Enabled = !string.IsNullOrEmpty(verifiedValue);
-                    menuExportBalancing.Enabled = !string.IsNullOrEmpty(verifiedValue) && !string.IsNullOrEmpty(accrualsValue);
-                    menuExportLetter.Enabled = !string.IsNullOrEmpty(accrualsValue);
+                menuExportBilling.Enabled = !string.IsNullOrEmpty(verifiedValue);
+                menuExportBalancing.Enabled = !string.IsNullOrEmpty(verifiedValue) && !string.IsNullOrEmpty(accrualsValue);
+                menuExportLetter.Enabled = !string.IsNullOrEmpty(accrualsValue);
 
-                    cntxtMenuArchive.Enabled = lockStatusValue == "🔓";
+                cntxtMenuArchive.Enabled = !isBillingReleased;
 
-                    cntxtBillingActions.Show(dgvBillings, location);
-                }
+                cntxtBillingActions.Show(dgvBillings, location);
             }
         }
 
         private void cntxtMenuViewVerify_Click(object sender, EventArgs e)
         {
-            var (constantEntries, editableEntries) = BillingService.GetConstantAndEditableJSON(dgvBillings.SelectedRows[0].Cells["Name"].Value.ToString());
+            var (constantEntries, editableEntries) = BillingService.GetConstantAndEditableJSON(selectedBillingName);
 
             if (constantEntries.Count == 0 || editableEntries.Count == 0) return;
 
-            string? lockStatusValue = dgvBillings.SelectedRows[0].Cells["LockStatus"].Value.ToString();
-            string? billingName = dgvBillings.SelectedRows[0].Cells["Name"].Value.ToString();
             string? dateQuarter = dgvBillings.SelectedRows[0].Cells["QuarterName"].Value.ToString();
             string? startDate = dgvBillings.SelectedRows[0].Cells["FormattedStartDate"].Value.ToString();
             string? endDate = dgvBillings.SelectedRows[0].Cells["FormattedEndDate"].Value.ToString();
@@ -169,30 +182,66 @@ namespace LBPRDC.Source.Views.Billing
                 ConstantEntries = constantEntries,
                 EditableEntries = editableEntries,
                 ParentControl = this,
-                BillingName = billingName,
+                BillingName = selectedBillingName,
                 DateQuarter = dateQuarter,
                 DateCoverage = $"{startDate} - {endDate}",
-                LockStatus = (lockStatusValue == "🔓") ? "Unlock" : "Lock"
+                LockStatus = (isBillingReleased) ? "Lock" : "Unlock"
             };
             form.ShowDialog();
         }
 
         private void cntxtMenuDuplicate_Click(object sender, EventArgs e)
         {
-            BillingInformationForm form = new()
+            if (!string.IsNullOrEmpty(selectedBillingName))
             {
-                BillingName = dgvBillings.SelectedRows[0].Cells["Name"].Value.ToString(),
-                Type = "Duplicate",
-                ParentControl = this,
-            };
-            form.ShowDialog();
+                frmLoading form = new()
+                {
+                    EquipmentDetailsProcess = Task.Run(() => BillingAccountService.GetEquipmentDetails(selectedBillingName))
+                };
+
+                DialogResult result = form.ShowDialog();
+
+                if (result == DialogResult.OK)
+                {
+                    if (form.EquipmentDetailsResult != null)
+                    {
+                        var equipmentAccount = form.EquipmentDetailsResult;
+
+                        BillingInformationForm billingInformationForm = new()
+                        {
+                            IsEquipmentIncluded = true,
+                            EquipmentAccountNumber = equipmentAccount.AccountNumber,
+                            EquipmentsAmount = equipmentAccount.BilledValue,
+                            BillingName = selectedBillingName,
+                            Type = "Duplicate",
+                            ParentControl = this,
+                        };
+                        billingInformationForm.ShowDialog();
+                    }
+                    else
+                    {
+                        BillingInformationForm billingInformationForm = new()
+                        {
+                            IsEquipmentIncluded = false,
+                            BillingName = selectedBillingName,
+                            Type = "Duplicate",
+                            ParentControl = this,
+                        };
+                        billingInformationForm.ShowDialog();
+                    }
+                }
+                else if (result == DialogResult.Abort)
+                {
+                    MessageBox.Show("There's a problem retrieving the information of this billing, please try again.", "Error Retrieving Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         private void cntxtMenuRelease_Click(object sender, EventArgs e)
         {
             ReleaseBillingForm form = new()
             {
-                BillingName = dgvBillings.SelectedRows[0].Cells["Name"].Value.ToString(),
+                BillingName = selectedBillingName,
                 ParentControl = this,
             };
             form.ShowDialog();
@@ -216,7 +265,7 @@ namespace LBPRDC.Source.Views.Billing
 
             UploadFileForm uploadFileForm = new()
             {
-                BillingName = Convert.ToString(dgvBillings.SelectedRows[0].Cells["Name"].Value),
+                BillingName = selectedBillingName,
                 UploadType = uploadType,
                 ParentControl = this,
             };
@@ -241,7 +290,7 @@ namespace LBPRDC.Source.Views.Billing
 
             UploadAccrualsForm form = new()
             {
-                BillingName = Convert.ToString(dgvBillings.SelectedRows[0].Cells["Name"].Value),
+                BillingName = selectedBillingName,
                 UploadType = uploadType,
                 ParentControl = this,
             };
@@ -262,8 +311,7 @@ namespace LBPRDC.Source.Views.Billing
                 return;
             }
 
-            string? billingName = dgvBillings.SelectedRows[0].Cells["Name"].Value.ToString();
-            var (constantEntries, editableEntries) = BillingService.GetConstantAndEditableJSON(dgvBillings.SelectedRows[0].Cells["Name"].Value.ToString());
+            var (constantEntries, editableEntries) = BillingService.GetConstantAndEditableJSON(selectedBillingName);
 
             if (constantEntries.Count == 0 || editableEntries.Count == 0)
             {
@@ -271,14 +319,14 @@ namespace LBPRDC.Source.Views.Billing
                 return;
             }
 
-            var filePath = FileManager.ChooseSavingPath($"{billingName} Register Report");
+            var filePath = FileManager.ChooseSavingPath($"{selectedBillingName} Register Report");
             if (filePath == null) return;
 
-            string exportType = (dgvBillings.SelectedRows[0].Cells[0].Value.ToString() == "🔓") ? "Unreleased" : "Released";
+            string exportType = (isBillingReleased) ? "Released" : "Unreleased";
 
             frmLoading loadingForm = new()
             {
-                BooleanProcess = Task.Run(() => ExcelService.ExportBilling(editableEntries, billingName, filePath, exportType, new List<Guid>())),
+                BooleanProcess = Task.Run(() => ExcelService.ExportBilling(editableEntries, selectedBillingName, filePath, exportType, new List<Guid>())),
                 Description = "Generating a report, please wait ..."
             };
 
@@ -286,7 +334,7 @@ namespace LBPRDC.Source.Views.Billing
 
             if (result == DialogResult.OK)
             {
-                MessageBox.Show($"Export of '{billingName}' billing register report is complete.", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Export of '{selectedBillingName}' billing register report is complete.", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else if (result == DialogResult.Abort)
             {
@@ -296,14 +344,12 @@ namespace LBPRDC.Source.Views.Billing
 
         private void menuExportBalancing_Click(object sender, EventArgs e)
         {
-            string? billingName = dgvBillings.SelectedRows[0].Cells["Name"].Value.ToString();
-
-            var filePath = FileManager.ChooseSavingPath($"{billingName} Balancing Report");
+            var filePath = FileManager.ChooseSavingPath($"{selectedBillingName} Balancing Report");
             if (filePath == null) return;
 
             frmLoading loadingForm = new()
             {
-                BooleanProcess = Task.Run(() => ExcelService.ExportBalancing(billingName, filePath)),
+                BooleanProcess = Task.Run(() => ExcelService.ExportBalancing(selectedBillingName, filePath)),
                 Description = "Generating a report, please wait ..."
             };
 
@@ -311,7 +357,30 @@ namespace LBPRDC.Source.Views.Billing
 
             if (result == DialogResult.OK)
             {
-                MessageBox.Show($"Export of '{billingName}' balancing report is complete.", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Export of '{selectedBillingName}' balancing report is complete.", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else if (result == DialogResult.Abort)
+            {
+                MessageBox.Show($"There seems to be a problem exporting this file. If you are overwriting this to an existing file, make sure that the selected file is not currently open.", "Export Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void menuExportTransmittal_Click(object sender, EventArgs e)
+        {
+            var filePath = FileManager.ChooseSavingPath($"{selectedBillingName} Transmittal Report");
+            if (filePath == null) return;
+
+            frmLoading loadingForm = new()
+            {
+                BooleanProcess = Task.Run(() => TransmittalService.ExportSummary(selectedBillingName, filePath)),
+                Description = "Generating a report, please wait ..."
+            };
+
+            var result = loadingForm.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                MessageBox.Show($"Export of '{selectedBillingName}' transmittal report is complete.", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else if (result == DialogResult.Abort)
             {
@@ -321,19 +390,18 @@ namespace LBPRDC.Source.Views.Billing
 
         private async void cntxtMenuArchive_Click(object sender, EventArgs e)
         {
-            string? billingName = dgvBillings.SelectedRows[0].Cells["Name"].Value.ToString();
             var output = MessageBox.Show("Are you sure you want to archive this billing record?", "Archive Billing Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (output == DialogResult.No) return;
-            if (await Task.Run(() => BillingService.UpdateStatus(billingName, "Inactive")))
+            if (await Task.Run(() => BillingService.UpdateStatus(selectedBillingName, "Inactive")))
             {
-                MessageBox.Show($"You have successfully archived the {billingName} billing.", "Archive Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"You have successfully archived the {selectedBillingName} billing.", "Archive Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 if (UserService.CurrentUser != null)
                 {
                     LoggingService.Log newLog = new()
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = "Archive",
-                        ActivityDetails = $"This user has archive a billing with a name of {billingName}."
+                        ActivityDetails = $"This user has archive a billing with a name of {selectedBillingName}."
                     };
                     LoggingService.LogActivity(newLog);
                 }
@@ -341,61 +409,11 @@ namespace LBPRDC.Source.Views.Billing
             }
         }
 
-        private void PopulateBillingDetails(Services.Billing billingDetails)
-        {
-            if (billingDetails == null) { return; }
-
-            OfficerName = billingDetails.OfficerName;
-            OfficerPosition = billingDetails.OfficerPosition;
-
-            txtCreationDate.Text = billingDetails.Timestamp.ToString("MMMM dd, yyyy");
-            txtReleaseDate.Text = (billingDetails.ReleaseDate.HasValue) ? billingDetails.ReleaseDate.Value.ToString("MMMM dd, yyyy") : "Not Yet Released";
-            txtDescription.Text = billingDetails.Description;
-            txtOICandPosition.Text = billingDetails.OfficerName + " / " + billingDetails.OfficerPosition;
-        }
-
-        private void PopulateStatementOfAccountsCollection(List<string> collection)
-        {
-            cmbStatementOfAccounts.Items.Clear();
-            btnViewAccountRecord.Enabled = cmbStatementOfAccounts.Enabled = collection.Count > 0;
-            if (collection.Count > 0)
-            {
-                cmbStatementOfAccounts.Items.AddRange(collection.ToArray());
-            }
-            else
-            {
-                cmbStatementOfAccounts.Items.Add("Nothing Found");
-            }
-            cmbStatementOfAccounts.SelectedIndex = 0;
-
-            btnUpdateAccount.Enabled = (cmbStatementOfAccounts.Text != "Nothing Found");
-        }
-
         private void btnView_Click(object sender, EventArgs e)
         {
-            if (dgvBillings.SelectedRows.Count > 0)
+            if (!string.IsNullOrEmpty(selectedBillingName))
             {
-                string? billingName = dgvBillings.SelectedRows[0].Cells["Name"].Value.ToString();
-                frmLoading form = new()
-                {
-                    BillingProcess = Task.Run(() => BillingService.GetSpecificBillingDetailsByName(billingName)),
-                    StringListProcess = Task.Run(() => BillingService.GetAccountNumbersByName(billingName)),
-                    Description = "Retrieving information, please wait ..."
-                };
-
-                var output = form.ShowDialog();
-
-                if (output == DialogResult.OK)
-                {
-                    pnlLeft.Enabled = false;
-                    PopulateBillingDetails(form.BillingResult);
-                    PopulateStatementOfAccountsCollection(form.StringListResult);
-                    pnlRight.Visible = true;
-                }
-                else if (output == DialogResult.Abort)
-                {
-                    MessageBox.Show("There is a problem retrieving the information of this billing, please try again.", "Error Retreiving Billing Details", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                ViewBillingDetails(selectedBillingName);
             }
         }
 
@@ -408,15 +426,21 @@ namespace LBPRDC.Source.Views.Billing
         {
             BillingInformationForm form = new()
             {
-                BillingName = dgvBillings.SelectedRows[0].Cells["Name"].Value.ToString(),
+                IsReleased = isBillingReleased,
+                BillingName = selectedBillingName,
                 Type = "Update",
                 ParentControl = this,
                 BillingInformation = new Services.Billing
                 {
                     Description = txtDescription.Text,
                     OfficerName = OfficerName,
-                    OfficerPosition = OfficerPosition
-                }
+                    OfficerPosition = OfficerPosition,
+                    Year = (int)dgvBillings.SelectedRows[0].Cells["Year"].Value,
+                    Month = (int)dgvBillings.SelectedRows[0].Cells["Month"].Value,
+                },
+                IsEquipmentIncluded = (txtSuppliesAndEquipmentsAccount.Text != "None"),
+                EquipmentAccountNumber = (txtSuppliesAndEquipmentsAccount.Text != "None") ? txtSuppliesAndEquipmentsAccount.Text : "",
+                EquipmentsAmount = string.IsNullOrEmpty(txtSuppliesAndEquipmentsAmount.Text) ? 0 : Convert.ToDecimal(txtSuppliesAndEquipmentsAmount.Text)
             };
             form.ShowDialog();
         }
@@ -428,13 +452,11 @@ namespace LBPRDC.Source.Views.Billing
                 CollectAccountForm form = new()
                 {
                     ParentControl = this,
-                    BillingName = dgvBillings.SelectedRows[0].Cells["Name"].Value?.ToString(),
+                    BillingName = selectedBillingName,
                     AccountNumber = cmbStatementOfAccounts.Text,
                     BillingValue = (txtBilledValue.Text != "") ? Convert.ToDecimal(txtBilledValue.Text) : 0,
-                    AmountCollected = (txtAmountCollected.Text != "") ? Convert.ToDecimal(txtAmountCollected.Text) : 0,
-                    OfficialReceiptNumber = (txtReceiptNumber.Text != "") ? Convert.ToInt32(txtReceiptNumber.Text) : -1,
-                    CollectionDate = (txtCollectionDate.Text != "Not Yet Collected") ? Convert.ToDateTime(txtCollectionDate.Text) : DateTime.Now,
-                    Remarks = txtRemarks.Text
+                    OfficialReceiptNumber = txtReceiptNumber.Text,
+                    CollectionDate = (txtCollectionDate.Text != NOT_COLLECTED) ? Convert.ToDateTime(txtCollectionDate.Text) : DateTime.Now,
                 };
                 form.ShowDialog();
             }
@@ -444,69 +466,252 @@ namespace LBPRDC.Source.Views.Billing
             }
         }
 
-        private void cmbStatementOfAccounts_SelectedIndexChanged(object sender, EventArgs e)
+        private void btnViewAccountRecord_Click(object sender, EventArgs e)
         {
-            FetchAccountAndPopulate();
+            if (cmbStatementOfAccounts.Text == "Nothing Found") { return; }
+
+            object lockStatus = dgvBillings.SelectedRows[0].Cells["LockStatus"].Value;
+            string? accountNumber = cmbStatementOfAccounts.Text.ToString();
+            bool isCollected = txtCollectionDate.Text != NOT_COLLECTED;
+            bool isInCollectionMode = txtStatus.Text == COLLECTING || txtStatus.Text == COLLECTED;
+
+            ViewAccountBillings accountsForm = new()
+            {
+                ParentControl = this,
+                AccountNumber = accountNumber,
+                BillingName = selectedBillingName,
+                IsReleased = (string)lockStatus == "🔒" && isCollected && isInCollectionMode,
+                AccountType = cmbStatementOfAccounts.Tag.ToString() ?? string.Empty,
+            };
+
+            accountsForm.ShowDialog();
         }
 
-        private void PopulateAccountInformation(BillingAccount? account, bool hasBillingRecord)
+        private void btnAddAccount_Click(object sender, EventArgs e)
         {
-            if (account != null)
+            AddAccountForm form = new()
             {
-                txtBilledValue.Text = $"{account.BilledValue:N2}";
-                txtNetBilling.Text = $"{account.NetBilling:N2}";
-                txtCollectionDate.Text = (account.CollectionDate == null) ? "Not Yet Collected" : account.CollectionDate.Value.ToString("MMMM dd, yyyy");
-                txtReceiptNumber.Text = (account.OfficialReceiptNumber == -1) ? "" : account.OfficialReceiptNumber.ToString();
-                txtAmountCollected.Text = (account.CollectedValue == -1) ? "" : account.CollectedValue.ToString();
-                txtRemarks.Text = account.Remarks;
-                btnUpdateAccount.Enabled = true;
+                ParentControl = this,
+                BillingName = selectedBillingName
+            };
+
+            form.ShowDialog();
+        }
+
+        private void PopulateBillingDetails(BillingWithEquipment billingDetails)
+        {
+            ControlUtils.ClearInputs(pnlRightBody);
+            ControlUtils.ClearInputs(grpBillingInformation);
+            if (billingDetails == null)
+            {
+                txtCreationDate.Text = "Error retrieving data ...";
+                txtReleaseDate.Text = "Error retrieving data ...";
+                txtDescription.Text = "Error retrieving data ...";
+                txtOICandPosition.Text = "Error retrieving data ...";
             }
             else
             {
-                txtBilledValue.Text = (hasBillingRecord) ? "Not Yet Released" : "";
-                btnUpdateAccount.Enabled = false;
+                OfficerName = billingDetails.OfficerName;
+                OfficerPosition = billingDetails.OfficerPosition;
+
+                txtCreationDate.Text = billingDetails.Timestamp.ToString("MMMM dd, yyyy");
+                txtReleaseDate.Text = (billingDetails.ReleaseDate.HasValue) ? billingDetails.ReleaseDate.Value.ToString("MMMM dd, yyyy") : NOT_RELEASED;
+                txtDescription.Text = billingDetails.Description;
+                txtOICandPosition.Text = billingDetails.OfficerName + " / " + billingDetails.OfficerPosition;
+
+                string equipmentAccountNumber = billingDetails.EquipmentAccountNumber;
+
+                txtSuppliesAndEquipmentsAccount.Text = equipmentAccountNumber;
+                txtSuppliesAndEquipmentsAmount.Text = (equipmentAccountNumber != "None") ? $"{billingDetails.EquipmentBilledValue:N2}" : "";
+
+            }
+            btnUpdateBillingInformation.Enabled = billingDetails != null;
+        }
+
+        private void ViewBillingDetails(string billingName) // WHEN USER CLICKS THE VIEW DETAILS OF A BILLING
+        {
+            frmLoading form = new()
+            {
+                BillingWithEquipmentProcess = Task.Run(() => BillingService.GetSpecificBillingDetailsByName(billingName)),
+                StringListProcess = Task.Run(() => BillingRecordService.GetAccountNumbersByName(billingName)),
+                AccountsCollectionProcess = Task.Run(() => BillingAccountService.GetCustomEntryForComboBox(billingName)),
+                Description = "Retrieving information, please wait ..."
+            };
+
+            var output = form.ShowDialog();
+
+            if (output == DialogResult.OK)
+            {
+                PopulateBillingDetails(form.BillingWithEquipmentResult);
+                cmbStatementOfAccounts.Items.Clear();
+
+                if (form.StringListResult.Any())
+                {
+                    foreach (var accountName in form.StringListResult)
+                    {
+                        cmbStatementOfAccounts.Items.Add(new
+                        {
+                            Text = accountName,
+                            Tag = "Regular Entry"
+                        });
+                    }
+                }
+
+                if (form.AccountsCollectionResult.Any())
+                {
+                    foreach (var account in form.AccountsCollectionResult)
+                    {
+                        cmbStatementOfAccounts.Items.Add(new
+                        {
+                            Text = account.AccountNumber,
+                            Tag = account.EntryType // Custom Entry
+                        });
+                    }
+                }
+
+                if (cmbStatementOfAccounts.Items.Count < 1)
+                {
+                    cmbStatementOfAccounts.Items.Add(new
+                    {
+                        Text = "Nothing Found",
+                        Tag = "Nothing"
+                    });
+                }
+
+                cmbStatementOfAccounts.DisplayMember = "Text";
+                cmbStatementOfAccounts.ValueMember = "Tag";
+
+                pnlLeft.Enabled = false;
+                pnlRight.Visible = true;
+
+                cmbStatementOfAccounts.SelectedIndex = 0;
+            }
+            else if (output == DialogResult.Abort)
+            {
+                MessageBox.Show("There is a problem retrieving the information of this billing, please try again.", "Error Retreiving Billing Details", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                pnlLeft.Enabled = true;
+                pnlRight.Visible = false;
             }
         }
 
-        private void btnViewAccountRecord_Click(object sender, EventArgs e)
+        private void cmbStatementOfAccounts_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (pnlRight.Visible == true)
+            {
+                FetchAccountDetailsAndPopulate();
+            }
+            UpdateAccountComboBoxTag();
+        }
+
+        private void UpdateAccountComboBoxTag()
+        {
+            if (cmbStatementOfAccounts.SelectedItem != null)
+            {
+                var selectedItem = (dynamic)cmbStatementOfAccounts.SelectedItem;
+                cmbStatementOfAccounts.Tag = selectedItem.Tag;
+            }
+        }
+
+        public void FetchAccountDetailsAndPopulate()
         {
             if (cmbStatementOfAccounts.Text != "Nothing Found")
             {
-                string? billingName = dgvBillings.SelectedRows[0].Cells["Name"].Value.ToString();
                 string? accountNumber = cmbStatementOfAccounts.Text.ToString();
 
                 frmLoading form = new()
                 {
-                    BillingRecordProcess = Task.Run(() => BillingService.GetBillingRecordsByAccount(billingName, accountNumber)),
-                    AccountsTotalValuesProcess = Task.Run(() => BillingService.GetGrossBillingAndDepartmentByName(billingName)),
-                    Description = "Retrieving information, please wait..."
+                    BillingAccountProcess = Task.Run(() => BillingAccountService.GetDetails(accountNumber, selectedBillingName))
                 };
 
                 var output = form.ShowDialog();
 
                 if (output == DialogResult.OK)
                 {
-                    if (form.BillingRecordResult == null)
-                    {
-                        MessageBox.Show("There is a problem retrieving the billing records of this account. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    ViewAccountBillings accountsForm = new()
-                    {
-                        ParentControl = this,
-                        AccountNumber = accountNumber,
-                        BillingName = billingName ?? "Billing Records",
-                        BillingRecords = form.BillingRecordResult,
-                        AccountsTotalValues = form.AccountsTotalValuesResult
-                    };
-
-                    accountsForm.ShowDialog();
+                    PopulateAccountInformation(form.BillingAccountResult, true);
                 }
                 else if (output == DialogResult.Abort)
                 {
-                    MessageBox.Show("There is a problem retrieving the billing records of this account. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("There's a problem retrieving the information of this statement of account, please try again.", "Error Retrieving Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    btnCollectAccount.Enabled = false;
                 }
+            }
+            else
+            {
+                PopulateAccountInformation(null, false);
+            }
+        }
+
+        private void PopulateAccountInformation(BillingAccount? account, bool hasBillingRecord)
+        {
+            //ControlUtils.ClearInputs(grpStatementOfAccounts);
+            ControlUtils.ClearInputs(grpPurpose);
+
+            if (account != null)
+            {
+                txtAccountRemarks.Text = account.Remarks;
+
+                if (!isBillingReleased)
+                {
+                    txtBilledValue.Text = NOT_RELEASED;
+                }
+                else
+                {
+                    txtBilledValue.Text = $"{account.BilledValue:N2}";
+                    txtNetBilling.Text = $"{account.NetBilling:N2}";
+                    txtCollectionDate.Text = (account.CollectionDate == null) ? NOT_COLLECTED : account.CollectionDate.Value.ToString("MMMM dd, yyyy");
+                    txtReceiptNumber.Text = account.OfficialReceiptNumber?.ToString();
+                    txtAmountCollected.Text = (account.CollectedValue > 0) ? $"{account.CollectedValue:N2}" : "";
+                    txtBalance.Text = $"{account.Balance:N2}";
+                    txtStatus.Text = account.Purpose;
+                    btnCollectAccount.Enabled = true;
+                    txtAccountRemarks.ReadOnly = false;
+                    btnUpdateRemarks.Enabled = true;
+                    btnCollectAccount.Text = (txtCollectionDate.Text == NOT_COLLECTED) ? "Collect" : "Update";
+                }
+            }
+            else
+            {
+                txtBilledValue.Text = (hasBillingRecord) ? NOT_RELEASED : "";
+                txtAccountRemarks.ReadOnly = true;
+                btnUpdateRemarks.Enabled = false;
+                btnCollectAccount.Enabled = false;
+            }
+
+            bool isStatusUpdateEnabled = txtStatus.Text == COLLECTING;
+            btnForAdjustment.Enabled = btnForRebilling.Enabled = isStatusUpdateEnabled;
+        }
+
+        private void btnUpdateRemarks_Click(object sender, EventArgs e)
+        {
+            BillingAccount newAccountInformation = new()
+            {
+                BillingName = selectedBillingName,
+                AccountNumber = cmbStatementOfAccounts.Text,
+                Remarks = txtAccountRemarks.Text
+            };
+
+            frmLoading form = new()
+            {
+                BooleanProcess = Task.Run(() => BillingAccountService.UpdateRemarks(newAccountInformation))
+            };
+
+            DialogResult result = form.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                MessageBox.Show("You have successfully updated this account's remarks information.", "Update Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else if (result == DialogResult.Abort)
+            {
+                MessageBox.Show("There is a problem updating this account's remarks information.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void pnlLeftBody_EnabledChanged(object sender, EventArgs e)
+        {
+            if (FindForm() is frmMain FrmMain)
+            {
+                FrmMain.pnlSideNav.Enabled = pnlLeftBody.Enabled;
             }
         }
     }

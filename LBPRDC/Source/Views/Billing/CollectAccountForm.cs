@@ -9,10 +9,9 @@ namespace LBPRDC.Source.Views.Billing
         public string? BillingName { get; set; }
         public string? AccountNumber { get; set; }
         public decimal BillingValue { get; set; }
-        public decimal AmountCollected { get; set; }
-        public int OfficialReceiptNumber { get; set; }
+        //public decimal AmountCollected { get; set; }
+        public string? OfficialReceiptNumber { get; set; }
         public DateTime CollectionDate { get; set; }
-        public string? Remarks { get; set; }
 
         public List<Control> RequiredFields;
 
@@ -22,7 +21,6 @@ namespace LBPRDC.Source.Views.Billing
 
             RequiredFields = new()
             {
-                txtAmountCollected,
                 txtReceiptNumber
             };
         }
@@ -32,17 +30,15 @@ namespace LBPRDC.Source.Views.Billing
             Text = AccountNumber;
 
             txtBillingValue.Text = BillingValue.ToString();
-            txtAmountCollected.Text = AmountCollected.ToString();
-            txtReceiptNumber.Text = OfficialReceiptNumber.ToString();
+            txtReceiptNumber.Text = OfficialReceiptNumber?.ToString();
             dtpCollectionDate.Value = CollectionDate;
-            txtRemarks.Text = Remarks;
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
             if (ControlUtils.AreRequiredFieldsFilled(RequiredFields))
             {
-                if (Convert.ToInt32(txtReceiptNumber.Text) < 0)
+                if (string.IsNullOrEmpty(txtReceiptNumber.Text))
                 {
                     MessageBox.Show("Invalid entry for Receipt Number.", "Invalid Entry", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -51,30 +47,54 @@ namespace LBPRDC.Source.Views.Billing
             }
         }
 
-        private void UpdateAccountCollectionInformation()
+        private async void UpdateAccountCollectionInformation()
         {
             BillingAccount accountInformation = new()
             {
                 BillingName = BillingName,
                 AccountNumber = AccountNumber,
-                CollectedValue = Convert.ToDecimal(txtAmountCollected.Text),
                 CollectionDate = dtpCollectionDate.Value,
-                OfficialReceiptNumber = Convert.ToInt32(txtReceiptNumber.Text),
-                Remarks = txtRemarks.Text
+                OfficialReceiptNumber = txtReceiptNumber.Text,
+                Purpose = "Still Collecting",
             };
+
+            BillingRecord recordInformation = new();
+            string transactionType = string.Empty;
+
+
+            if (!AccountNumber.Contains("OT"))
+            {
+                transactionType = "Regular";
+                recordInformation = new()
+                {
+                    BillingName = BillingName,
+                    RegularAccountNumber = AccountNumber,
+                    RegularCollectedDate = dtpCollectionDate.Value,
+                };
+            }
+            else
+            {
+                transactionType = "Overtime";
+                recordInformation = new()
+                {
+                    BillingName = BillingName,
+                    OvertimeAccountNumber = AccountNumber,
+                    OvertimeCollectedDate = dtpCollectionDate.Value,
+                };
+            }
 
             frmLoading form = new()
             {
-                BooleanProcess = Task.Run(() => BillingService.UpdateBillingAccountInformation(accountInformation)),
+                BooleanProcess = Task.Run(() => BillingAccountService.UpdateInformation(accountInformation)),
                 Description = "Updating information, please wait..."
             };
 
             var result = form.ShowDialog();
 
-            if (result == DialogResult.OK)
+            if (result == DialogResult.OK && await Task.Run(() => BillingRecordService.UpdateCollectionDates(recordInformation, transactionType)))
             {
                 MessageBox.Show("You have successfully updated the information of this billing's statement of account.", "Update Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ParentControl?.FetchAccountAndPopulate();
+                ParentControl?.FetchAccountDetailsAndPopulate();
                 Close();
             }
             else if (result == DialogResult.Abort)
@@ -89,13 +109,6 @@ namespace LBPRDC.Source.Views.Billing
             Close();
         }
 
-        private void ValidateInputIfNumber_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsDigit(e.KeyChar) && (e.KeyChar != '.' || (e.KeyChar == '.' && (sender as TextBox)?.Text.Contains('.') == true)) && e.KeyChar != (char)Keys.Back)
-            {
-                e.Handled = true;
-            }
-        }
         private void ValidateInputIfNumber1_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back)

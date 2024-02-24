@@ -30,10 +30,10 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ucEmployees));
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
             flowControls = new FlowLayoutPanel();
             btnAddBatch = new Button();
             btnAddEmployee = new Button();
@@ -66,6 +66,11 @@
             dgvEmployees = new DataGridView();
             cntxtEmployeeActions = new ContextMenuStrip(components);
             cntxtMenuView = new ToolStripMenuItem();
+            cntxtMenuHistory = new ToolStripMenuItem();
+            menuHistoryPosition = new ToolStripMenuItem();
+            menuHistoryCivilStatus = new ToolStripMenuItem();
+            menuHistoryEmploymentStatus = new ToolStripMenuItem();
+            menuHistoryDepartmentLocation = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
             cntxtMenuEdit = new ToolStripMenuItem();
             cntxtMenuUpdate = new ToolStripMenuItem();
@@ -74,12 +79,8 @@
             menuUpdateEmploymentStatus = new ToolStripMenuItem();
             menuUpdateDepartmentLocation = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
-            cntxtMenuHistory = new ToolStripMenuItem();
-            menuHistoryPosition = new ToolStripMenuItem();
-            menuHistoryCivilStatus = new ToolStripMenuItem();
-            menuHistoryEmploymentStatus = new ToolStripMenuItem();
-            menuHistoryDepartmentLocation = new ToolStripMenuItem();
             cntxtMenuArchive = new ToolStripMenuItem();
+            cntxtMenuViewBillings = new ToolStripMenuItem();
             flowControls.SuspendLayout();
             pnlContainerHeader.SuspendLayout();
             pnlFilterContainer.SuspendLayout();
@@ -464,32 +465,32 @@
             dgvEmployees.AllowUserToDeleteRows = false;
             dgvEmployees.AllowUserToOrderColumns = true;
             dgvEmployees.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.SelectionBackColor = Color.SeaGreen;
-            dgvEmployees.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.SelectionBackColor = Color.SeaGreen;
+            dgvEmployees.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle5;
             dgvEmployees.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dgvEmployees.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvEmployees.BackgroundColor = SystemColors.Window;
             dgvEmployees.BorderStyle = BorderStyle.Fixed3D;
             dgvEmployees.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             dgvEmployees.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.Padding = new Padding(0, 2, 0, 2);
-            dataGridViewCellStyle2.SelectionBackColor = Color.MediumSeaGreen;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            dgvEmployees.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = SystemColors.Control;
+            dataGridViewCellStyle6.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle6.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle6.Padding = new Padding(0, 2, 0, 2);
+            dataGridViewCellStyle6.SelectionBackColor = Color.MediumSeaGreen;
+            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.True;
+            dgvEmployees.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle6;
             dgvEmployees.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = SystemColors.Window;
-            dataGridViewCellStyle3.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle3.ForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
-            dgvEmployees.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = SystemColors.Window;
+            dataGridViewCellStyle7.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle7.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle7.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = DataGridViewTriState.False;
+            dgvEmployees.DefaultCellStyle = dataGridViewCellStyle7;
             dgvEmployees.EditMode = DataGridViewEditMode.EditOnF2;
             dgvEmployees.GridColor = SystemColors.Control;
             dgvEmployees.Location = new Point(255, 83);
@@ -497,15 +498,15 @@
             dgvEmployees.MultiSelect = false;
             dgvEmployees.Name = "dgvEmployees";
             dgvEmployees.ReadOnly = true;
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = SystemColors.Control;
-            dataGridViewCellStyle4.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle4.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle4.Padding = new Padding(4);
-            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.True;
-            dgvEmployees.RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle8.BackColor = SystemColors.Control;
+            dataGridViewCellStyle8.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle8.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle8.Padding = new Padding(4);
+            dataGridViewCellStyle8.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = DataGridViewTriState.True;
+            dgvEmployees.RowHeadersDefaultCellStyle = dataGridViewCellStyle8;
             dgvEmployees.RowHeadersVisible = false;
             dgvEmployees.RowTemplate.DefaultCellStyle.Padding = new Padding(4, 8, 4, 8);
             dgvEmployees.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
@@ -519,9 +520,9 @@
             // cntxtEmployeeActions
             // 
             cntxtEmployeeActions.Font = new Font("Arial", 9F, FontStyle.Regular, GraphicsUnit.Point);
-            cntxtEmployeeActions.Items.AddRange(new ToolStripItem[] { cntxtMenuView, cntxtMenuHistory, toolStripSeparator1, cntxtMenuEdit, cntxtMenuUpdate, toolStripSeparator2, cntxtMenuArchive });
+            cntxtEmployeeActions.Items.AddRange(new ToolStripItem[] { cntxtMenuView, cntxtMenuViewBillings, cntxtMenuHistory, toolStripSeparator1, cntxtMenuEdit, cntxtMenuUpdate, toolStripSeparator2, cntxtMenuArchive });
             cntxtEmployeeActions.Name = "cntxtEmployeeActions";
-            cntxtEmployeeActions.Size = new Size(181, 148);
+            cntxtEmployeeActions.Size = new Size(145, 148);
             // 
             // cntxtMenuView
             // 
@@ -530,6 +531,41 @@
             cntxtMenuView.Size = new Size(180, 22);
             cntxtMenuView.Text = "View Details";
             cntxtMenuView.Click += cntxtMenuView_Click;
+            // 
+            // cntxtMenuHistory
+            // 
+            cntxtMenuHistory.DropDownItems.AddRange(new ToolStripItem[] { menuHistoryPosition, menuHistoryCivilStatus, menuHistoryEmploymentStatus, menuHistoryDepartmentLocation });
+            cntxtMenuHistory.Name = "cntxtMenuHistory";
+            cntxtMenuHistory.Size = new Size(180, 22);
+            cntxtMenuHistory.Text = "History";
+            // 
+            // menuHistoryPosition
+            // 
+            menuHistoryPosition.Name = "menuHistoryPosition";
+            menuHistoryPosition.Size = new Size(213, 22);
+            menuHistoryPosition.Text = "Position";
+            menuHistoryPosition.Click += menuHistoryPosition_Click;
+            // 
+            // menuHistoryCivilStatus
+            // 
+            menuHistoryCivilStatus.Name = "menuHistoryCivilStatus";
+            menuHistoryCivilStatus.Size = new Size(213, 22);
+            menuHistoryCivilStatus.Text = "Civil Status";
+            menuHistoryCivilStatus.Click += menuHistoryCivilStatus_Click;
+            // 
+            // menuHistoryEmploymentStatus
+            // 
+            menuHistoryEmploymentStatus.Name = "menuHistoryEmploymentStatus";
+            menuHistoryEmploymentStatus.Size = new Size(213, 22);
+            menuHistoryEmploymentStatus.Text = "Employment Status";
+            menuHistoryEmploymentStatus.Click += menuHistoryEmploymentStatus_Click;
+            // 
+            // menuHistoryDepartmentLocation
+            // 
+            menuHistoryDepartmentLocation.Name = "menuHistoryDepartmentLocation";
+            menuHistoryDepartmentLocation.Size = new Size(213, 22);
+            menuHistoryDepartmentLocation.Text = "Department and Location";
+            menuHistoryDepartmentLocation.Click += menuHistoryDepartmentLocation_Click;
             // 
             // toolStripSeparator1
             // 
@@ -583,47 +619,19 @@
             toolStripSeparator2.Name = "toolStripSeparator2";
             toolStripSeparator2.Size = new Size(177, 6);
             // 
-            // cntxtMenuHistory
-            // 
-            cntxtMenuHistory.DropDownItems.AddRange(new ToolStripItem[] { menuHistoryPosition, menuHistoryCivilStatus, menuHistoryEmploymentStatus, menuHistoryDepartmentLocation });
-            cntxtMenuHistory.Name = "cntxtMenuHistory";
-            cntxtMenuHistory.Size = new Size(180, 22);
-            cntxtMenuHistory.Text = "History";
-            // 
-            // menuHistoryPosition
-            // 
-            menuHistoryPosition.Name = "menuHistoryPosition";
-            menuHistoryPosition.Size = new Size(213, 22);
-            menuHistoryPosition.Text = "Position";
-            menuHistoryPosition.Click += menuHistoryPosition_Click;
-            // 
-            // menuHistoryCivilStatus
-            // 
-            menuHistoryCivilStatus.Name = "menuHistoryCivilStatus";
-            menuHistoryCivilStatus.Size = new Size(213, 22);
-            menuHistoryCivilStatus.Text = "Civil Status";
-            menuHistoryCivilStatus.Click += menuHistoryCivilStatus_Click;
-            // 
-            // menuHistoryEmploymentStatus
-            // 
-            menuHistoryEmploymentStatus.Name = "menuHistoryEmploymentStatus";
-            menuHistoryEmploymentStatus.Size = new Size(213, 22);
-            menuHistoryEmploymentStatus.Text = "Employment Status";
-            menuHistoryEmploymentStatus.Click += menuHistoryEmploymentStatus_Click;
-            // 
-            // menuHistoryDepartmentLocation
-            // 
-            menuHistoryDepartmentLocation.Name = "menuHistoryDepartmentLocation";
-            menuHistoryDepartmentLocation.Size = new Size(213, 22);
-            menuHistoryDepartmentLocation.Text = "Department and Location";
-            menuHistoryDepartmentLocation.Click += menuHistoryDepartmentLocation_Click;
-            // 
             // cntxtMenuArchive
             // 
             cntxtMenuArchive.Name = "cntxtMenuArchive";
             cntxtMenuArchive.Size = new Size(180, 22);
             cntxtMenuArchive.Text = "Archive";
             cntxtMenuArchive.Click += cntxtMenuArchive_Click;
+            // 
+            // cntxtMenuViewBillings
+            // 
+            cntxtMenuViewBillings.Name = "cntxtMenuViewBillings";
+            cntxtMenuViewBillings.Size = new Size(180, 22);
+            cntxtMenuViewBillings.Text = "View Billings";
+            cntxtMenuViewBillings.Click += cntxtMenuViewBillings_Click;
             // 
             // ucEmployees
             // 
@@ -699,5 +707,6 @@
         private Panel pnlLine2;
         private Button button1;
         private ToolStripMenuItem cntxtMenuArchive;
+        private ToolStripMenuItem cntxtMenuViewBillings;
     }
 }
