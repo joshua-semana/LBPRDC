@@ -174,7 +174,6 @@
             cmbClient.AccessibleName = "Client";
             cmbClient.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbClient.FormattingEnabled = true;
-            cmbClient.Items.AddRange(new object[] { "(Choose Status)", "Active", "Inactive" });
             cmbClient.Location = new Point(22, 149);
             cmbClient.Margin = new Padding(6, 3, 3, 12);
             cmbClient.Name = "cmbClient";

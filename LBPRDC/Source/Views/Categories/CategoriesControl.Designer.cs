@@ -175,6 +175,7 @@
             btnSelect.TabIndex = 26;
             btnSelect.Text = "Select";
             btnSelect.UseVisualStyleBackColor = true;
+            btnSelect.Visible = false;
             btnSelect.Click += btnSelect_Click;
             // 
             // cmbCategories
@@ -187,6 +188,7 @@
             cmbCategories.Name = "cmbCategories";
             cmbCategories.Size = new Size(215, 26);
             cmbCategories.TabIndex = 0;
+            cmbCategories.SelectedIndexChanged += cmbCategories_SelectedIndexChanged;
             // 
             // pnlRight
             // 

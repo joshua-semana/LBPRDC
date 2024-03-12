@@ -1,12 +1,24 @@
 ﻿using LBPRDC.Source.Utilities;
 using System.Data.SqlClient;
+using Dapper;
+using LBPRDC.Source.Data;
+using static LBPRDC.Source.Services.CivilStatusService;
+using static LBPRDC.Source.Services.DepartmentService;
 using static LBPRDC.Source.Services.EmployeeService;
+using static LBPRDC.Source.Services.EmploymentStatusService;
+using static LBPRDC.Source.Services.LocationService;
+using static LBPRDC.Source.Services.PositionService;
+using static LBPRDC.Source.Services.SuffixService;
+using System.Collections.Generic;
+using System.Net.Mail;
+using System.Transactions;
 
 namespace LBPRDC.Source.Services
 {
     public class EmployeeBase
     {
         public string? EmployeeID { get; set; }
+        public int ClientID { get; set; }
         public string? LastName { get; set; }
         public string? FirstName { get; set; }
         public string? MiddleName { get; set; }
@@ -82,6 +94,8 @@ namespace LBPRDC.Source.Services
         {
             public int DepartmentID { get; set; }
             public int LocationID { get; set; }
+            public string DepartmentName { get; set; } = "";
+            public string LocationName { get; set; } = "";
         }
 
         public class EmployeeCivilStatusUpdate : EmployeeUpdateBase
@@ -158,6 +172,7 @@ namespace LBPRDC.Source.Services
                             Employee emp = new()
                             {
                                 EmployeeID = Convert.ToString(reader["EmployeeID"]),
+                                ClientID = Convert.ToInt32(reader["ClientID"]),
                                 LastName = Utilities.StringFormat.ToSentenceCase(Convert.ToString(reader["LastName"])),
                                 FirstName = Utilities.StringFormat.ToSentenceCase(Convert.ToString(reader["FirstName"])),
                                 MiddleName = Utilities.StringFormat.ToSentenceCase(Convert.ToString(reader["MiddleName"])),
@@ -262,111 +277,146 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static async Task<bool> AddNewEmployee(EmployeeHistory employee)
+        public static async Task<bool> AddNewEmployee(EmployeeHistory data)
         {
             try
             {
-                string query = "INSERT INTO Employee (EmployeeID, LastName, FirstName, MiddleName, SuffixID, Gender, Birthday, Education, DepartmentID, LocationID, EmailAddress1, EmailAddress2, ContactNumber1, ContactNumber2, CivilStatusID, PositionID, EmploymentStatusID, Remarks) " +
-                               "VALUES (@EmployeeID, @LastName, @FirstName, @MiddleName, @SuffixID, @Gender, @Birthday, @Education, @DepartmentID, @LocationID, @EmailAddress1, @EmailAddress2, @ContactNumber1, @ContactNumber2, @CivilStatusID, @PositionID, @EmploymentStatusID, @Remarks)";
+                using var connection = Database.Connect();
+                using var transaction = connection?.BeginTransaction();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
+                try
                 {
-                    command.Parameters.AddWithValue("@EmployeeID", employee.EmployeeID);
-                    command.Parameters.AddWithValue("@LastName", employee.LastName);
-                    command.Parameters.AddWithValue("@FirstName", employee.FirstName);
-                    command.Parameters.AddWithValue("@MiddleName", employee.MiddleName);
-                    command.Parameters.AddWithValue("@SuffixID", employee.SuffixID);
-                    command.Parameters.AddWithValue("@Gender", employee.Gender);
-                    command.Parameters.AddWithValue("@Birthday", employee.Birthday);
-                    command.Parameters.AddWithValue("@Education", employee.Education);
-                    command.Parameters.AddWithValue("@DepartmentID", employee.DepartmentID);
-                    command.Parameters.AddWithValue("@LocationID", employee.LocationID);
-                    command.Parameters.AddWithValue("@EmailAddress1", employee.EmailAddress1);
-                    command.Parameters.AddWithValue("@EmailAddress2", employee.EmailAddress2);
-                    command.Parameters.AddWithValue("@ContactNumber1", employee.ContactNumber1);
-                    command.Parameters.AddWithValue("@ContactNumber2", employee.ContactNumber2);
-                    command.Parameters.AddWithValue("@CivilStatusID", employee.CivilStatusID);
-                    command.Parameters.AddWithValue("@PositionID", employee.PositionID);
-                    command.Parameters.AddWithValue("@EmploymentStatusID", employee.EmploymentStatusID);
-                    command.Parameters.AddWithValue("@Remarks", employee.Remarks);
+                    string QueryInsert = @"
+                    INSERT INTO Employee (
+                        EmployeeID,
+                        ClientID,
+                        LastName,
+                        FirstName,
+                        MiddleName,
+                        SuffixID,
+                        Gender,
+                        Birthday,
+                        Education,
+                        DepartmentID,
+                        LocationID,
+                        EmailAddress1,
+                        EmailAddress2,
+                        ContactNumber1,
+                        ContactNumber2,
+                        CivilStatusID,
+                        PositionID,
+                        EmploymentStatusID,
+                        Remarks
+                    ) VALUES (
+                        @EmployeeID,
+                        @ClientID,
+                        @LastName,
+                        @FirstName,
+                        @MiddleName,
+                        @SuffixID,
+                        @Gender,
+                        @Birthday,
+                        @Education,
+                        @DepartmentID,
+                        @LocationID,
+                        @EmailAddress1,
+                        @EmailAddress2,
+                        @ContactNumber1,
+                        @ContactNumber2,
+                        @CivilStatusID,
+                        @PositionID,
+                        @EmploymentStatusID,
+                        @Remarks)";
 
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
-                }
+                    int affectedRows = await connection.ExecuteAsync(QueryInsert, data, transaction);
 
-                PositionService.History newPosition = new()
-                {
-                    EmployeeID = employee.EmployeeID,
-                    PositionID = employee.PositionID,
-                    PositionTitle = employee.PositionTitle,
-                    SalaryRate = 0,
-                    BillingRate = 0,
-                    Timestamp = employee.StartDate,
-                    Remarks = "Initial Status",
-                    Status = "Active"
-                };
-
-                CivilStatusService.History newCivilStatus = new()
-                {
-                    EmployeeID = employee.EmployeeID,
-                    CivilStatusID = employee.CivilStatusID,
-                    Timestamp = employee.StartDate,
-                    Remarks = "Initial Status",
-                    Status = "Active"
-                };
-
-                DepartmentService.History newDepartmentLocation = new()
-                { 
-                    EmployeeID = employee.EmployeeID,
-                    DepartmentID = employee.DepartmentID,
-                    LocationID = employee.LocationID,
-                    Timestamp = employee.StartDate,
-                    Remarks = "Initial Status",
-                    Status = "Active"
-                };
-
-                EmploymentStatusService.History newEmploymentStatus = new()
-                {
-                    EmployeeID = employee.EmployeeID,
-                    EmploymentStatusID = employee.EmploymentStatusID,
-                    Timestamp = employee.StartDate,
-                    Remarks = "Initial Status",
-                    Status = "Active"
-                };
-
-                PositionService.AddNewHistory(newPosition);
-                CivilStatusService.AddNewHistory(newCivilStatus);
-                DepartmentService.AddNewHistory(newDepartmentLocation);
-                EmploymentStatusService.AddNewHistory(newEmploymentStatus);
-
-                if (Convert.ToBoolean(employee.isPreviousEmployee))
-                {
-                    PreviousEmployeeService.PreviousEmployee entry = new()
+                    if (affectedRows > 0)
                     {
-                        EmployeeID = employee.EmployeeID,
-                        Position = employee.PreviousPosition,
-                        StartDate = employee.PreviousFrom,
-                        EndDate = employee.PreviousTo,
-                        Information = employee.OtherInformation
-                    };
+                        List<Department> departmentList = DepartmentService.GetAllItems();
+                        List<Location> locationList = LocationService.GetAllItems();
 
-                    PreviousEmployeeService.AddRecord(entry);
+                        const string REMARKS_INITIAL = "Initial Status";
+                        const string STATUS_ACTIVE = "Active";
+
+                        PositionService.History newPosition = new()
+                        {
+                            EmployeeID = data.EmployeeID,
+                            PositionID = data.PositionID,
+                            PositionTitle = data.PositionTitle,
+                            SalaryRate = 0,
+                            BillingRate = 0,
+                            Timestamp = data.StartDate,
+                            Remarks = REMARKS_INITIAL,
+                            Status = STATUS_ACTIVE
+                        };
+
+                        CivilStatusService.History newCivilStatus = new()
+                        {
+                            EmployeeID = data.EmployeeID,
+                            CivilStatusID = data.CivilStatusID,
+                            Timestamp = data.StartDate,
+                            Remarks = REMARKS_INITIAL,
+                            Status = STATUS_ACTIVE
+                        };
+
+                        DepartmentService.History newDepartmentLocation = new()
+                        {
+                            EmployeeID = data.EmployeeID,
+                            DepartmentName = departmentList.First(w => w.ID == data.DepartmentID).Name ?? "",
+                            LocationName = locationList.First(w => w.ID == data.LocationID).Name ?? "",
+                            Timestamp = data.StartDate,
+                            Remarks = REMARKS_INITIAL,
+                            Status = STATUS_ACTIVE
+                        };
+
+                        EmploymentStatusService.History newEmploymentStatus = new()
+                        {
+                            EmployeeID = data.EmployeeID,
+                            EmploymentStatusID = data.EmploymentStatusID,
+                            Timestamp = data.StartDate,
+                            Remarks = REMARKS_INITIAL,
+                            Status = STATUS_ACTIVE
+                        };
+
+                        PositionService.AddNewHistory(newPosition);
+                        CivilStatusService.AddNewHistory(newCivilStatus);
+                        DepartmentService.AddNewHistory(newDepartmentLocation);
+                        EmploymentStatusService.AddNewHistory(newEmploymentStatus);
+
+                        if (Convert.ToBoolean(data.isPreviousEmployee))
+                        {
+                            PreviousEmployeeService.PreviousEmployee entry = new()
+                            {
+                                EmployeeID = data.EmployeeID,
+                                Position = data.PreviousPosition,
+                                StartDate = data.PreviousFrom,
+                                EndDate = data.PreviousTo,
+                                Information = data.OtherInformation
+                            };
+
+                            PreviousEmployeeService.AddRecord(entry);
+                        }
+
+                        if (UserService.CurrentUser != null)
+                        {
+                            LoggingService.Log newLog = new()
+                            {
+                                UserID = UserService.CurrentUser.UserID,
+                                ActivityType = "Add",
+                                ActivityDetails = $"This user added a new employee with ID of {data.EmployeeID}."
+                            };
+
+                            LoggingService.LogActivity(newLog);
+                        }
+                    }
+                    transaction?.Commit();
+                    return (affectedRows > 0);
                 }
-
-                if (UserService.CurrentUser != null)
+                catch (Exception)
                 {
-                    LoggingService.Log newLog = new()
-                    { 
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Add",
-                        ActivityDetails = $"This user added a new employee with ID of {employee.EmployeeID}."
-                    };
-
-                    LoggingService.LogActivity(newLog);
+                    transaction?.Rollback();
+                    return false;
                 }
-
-                return true;
             } 
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
@@ -375,123 +425,111 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string updateQuery = "UPDATE Employee SET " +
-                    "LastName = @LastName, " +
-                    "FirstName = @FirstName, " +
-                    "MiddleName = @MiddleName, " +
-                    "SuffixID = @SuffixID, " +
-                    "Gender = @Gender, " +
-                    "Birthday = @Birthday, " +
-                    "Education = @Education, " +
-                    "DepartmentID = @DepartmentID, " +
-                    "LocationID = @LocationID, " +
-                    "EmailAddress1 = @EmailAddress1, " +
-                    "EmailAddress2 = @EmailAddress2, " +
-                    "ContactNumber1 = @ContactNumber1, " +
-                    "ContactNumber2 = @ContactNumber2, " +
-                    "CivilStatusID = @CivilStatusID, " +
-                    "PositionID = @PositionID, " +
-                    "EmploymentStatusId = @EmploymentStatusId, " +
-                    "Remarks = @Remarks " +
-                    "WHERE EmployeeID = @EmployeeID";
+                using var connection = Database.Connect();
+                using var transaction = connection?.BeginTransaction();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
+                try
                 {
-                    command.Parameters.AddWithValue("@LastName", employee.LastName);
-                    command.Parameters.AddWithValue("@FirstName", employee.FirstName);
-                    command.Parameters.AddWithValue("@MiddleName", employee.MiddleName);
-                    command.Parameters.AddWithValue("@SuffixID", employee.SuffixID);
-                    command.Parameters.AddWithValue("@Gender", employee.Gender);
-                    command.Parameters.AddWithValue("@Birthday", employee.Birthday);
-                    command.Parameters.AddWithValue("@Education", employee.Education);
-                    command.Parameters.AddWithValue("@DepartmentID", employee.DepartmentID);
-                    command.Parameters.AddWithValue("@LocationID", employee.LocationID);
-                    command.Parameters.AddWithValue("@EmailAddress1", employee.EmailAddress1);
-                    command.Parameters.AddWithValue("@EmailAddress2", employee.EmailAddress2);
-                    command.Parameters.AddWithValue("@ContactNumber1", employee.ContactNumber1);
-                    command.Parameters.AddWithValue("@ContactNumber2", employee.ContactNumber2);
-                    command.Parameters.AddWithValue("@CivilStatusID", employee.CivilStatusID);
-                    command.Parameters.AddWithValue("@PositionID", employee.PositionID);
-                    command.Parameters.AddWithValue("@EmploymentStatusID", employee.EmploymentStatusID);
-                    command.Parameters.AddWithValue("@Remarks", employee.Remarks);
-                    command.Parameters.AddWithValue("@EmployeeID", employee.EmployeeID);
+                    string QueryUpdate = @"
+                        UPDATE Employee SET
+                            LastName = @LastName,
+                            FirstName = @FirstName,
+                            MiddleName = @MiddleName,
+                            SuffixID = @SuffixID,
+                            Gender = @Gender,
+                            Birthday = @Birthday,
+                            Education = @Education,
+                            DepartmentID = @DepartmentID,
+                            LocationID = @LocationID,
+                            EmailAddress1 = @EmailAddress1,
+                            EmailAddress2 = @EmailAddress2,
+                            ContactNumber1 = @ContactNumber1,
+                            ContactNumber2 = @ContactNumber2,
+                            CivilStatusID = @CivilStatusID,
+                            PositionID = @PositionID,
+                            EmploymentStatusId = @EmploymentStatusId,
+                            Remarks = @Remarks
+                        WHERE 
+                            EmployeeID = @EmployeeID;";
 
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
-                }
+                    int affectedRows = await connection.ExecuteAsync(QueryUpdate, employee, transaction);
 
-                int positionHistoryID = PositionService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
-                int civilStatusHistoryID = CivilStatusService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
-                int departmentlocationHistoryID = DepartmentService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
-                int employmentStatusHistoryID = EmploymentStatusService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
-                bool hasRecord = PreviousEmployeeService.RecordExists(employee.EmployeeID);
-
-                PositionService.HistoryUpdate updatedPosition = new()
-                {
-                    HistoryID = positionHistoryID,
-                    PositionID = employee.PositionID,
-                    PositionTitle = employee.PositionTitle,
-                    Timestamp = employee.PositionEffectiveDate,
-                };
-
-                CivilStatusService.HistoryUpdate updatedCivilStatus = new()
-                {
-                    HistoryID = civilStatusHistoryID,
-                    CivilStatusID = employee.CivilStatusID
-                };
-
-                DepartmentService.HistoryUpdate updatedDepartmentLocation = new()
-                {
-                    HistoryID = departmentlocationHistoryID,
-                    DepartmentID = employee.DepartmentID,
-                    LocationID = employee.LocationID
-                };
-
-                EmploymentStatusService.HistoryUpdate updatedEmploymentStatus = new()
-                {
-                    HistoryID = employmentStatusHistoryID,
-                    EmploymentStatusID = employee.EmploymentStatusID,
-                    Timestamp = employee.StatusEffectiveDate
-                };
-
-                PreviousEmployeeService.PreviousEmployee updatedPreviousEmployee = new()
-                {
-                    EmployeeID = employee.EmployeeID,
-                    Position = employee.PreviousPosition,
-                    StartDate = employee.PreviousFrom,
-                    EndDate = employee.PreviousTo,
-                    Information = employee.OtherInformation
-                };
-
-                if (!hasRecord && Convert.ToBoolean(employee.isPreviousEmployee))
-                {
-                    PreviousEmployeeService.AddRecord(updatedPreviousEmployee);
-                }
-                else if (hasRecord && Convert.ToBoolean(employee.isPreviousEmployee))
-                {
-                    PreviousEmployeeService.UpdateRecord(updatedPreviousEmployee);
-                }
-                else if (hasRecord && Convert.ToBoolean(!employee.isPreviousEmployee))
-                {
-                    PreviousEmployeeService.DeleteRecord(employee.EmployeeID);
-                }
-
-                PositionService.UpdateHistory(updatedPosition);
-                CivilStatusService.UpdateHistory(updatedCivilStatus);
-                DepartmentService.UpdateHistory(updatedDepartmentLocation);
-                EmploymentStatusService.UpdateHistory(updatedEmploymentStatus);
-
-                if (UserService.CurrentUser != null)
-                {
-                    LoggingService.Log newLog = new()
+                    if (affectedRows > 0)
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Edit",
-                        ActivityDetails = $"This user has edited the information of an employee with the ID {employee.EmployeeID}."
-                    };
+                        transaction?.Commit();
+                        int positionHistoryID = PositionService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
+                        int civilStatusHistoryID = CivilStatusService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
+                        int departmentlocationHistoryID = DepartmentService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
+                        int employmentStatusHistoryID = EmploymentStatusService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
+                        bool hasRecord = PreviousEmployeeService.RecordExists(employee.EmployeeID);
 
-                    LoggingService.LogActivity(newLog);
+                        PositionService.UpdateHistory(new()
+                        {
+                            HistoryID = positionHistoryID,
+                            PositionID = employee.PositionID,
+                            PositionTitle = employee.PositionTitle,
+                            Timestamp = employee.PositionEffectiveDate,
+                        });
+
+                        CivilStatusService.UpdateHistory(new()
+                        {
+                            HistoryID = civilStatusHistoryID,
+                            CivilStatusID = employee.CivilStatusID
+                        });
+
+                        DepartmentService.UpdateHistory(new()
+                        {
+                            HistoryID = departmentlocationHistoryID,
+                            DepartmentName = employee.Department ?? "",
+                            LocationName = employee.Location ?? ""
+                        });
+
+                        EmploymentStatusService.UpdateHistory(new()
+                        {
+                            HistoryID = employmentStatusHistoryID,
+                            EmploymentStatusID = employee.EmploymentStatusID,
+                            Timestamp = employee.StatusEffectiveDate
+                        });
+
+                        PreviousEmployeeService.PreviousEmployee updatedPreviousEmployee = new()
+                        {
+                            EmployeeID = employee.EmployeeID,
+                            Position = employee.PreviousPosition,
+                            StartDate = employee.PreviousFrom,
+                            EndDate = employee.PreviousTo,
+                            Information = employee.OtherInformation
+                        };
+
+                        if (!hasRecord && Convert.ToBoolean(employee.isPreviousEmployee))
+                        {
+                            PreviousEmployeeService.AddRecord(updatedPreviousEmployee);
+                        }
+                        else if (hasRecord && Convert.ToBoolean(employee.isPreviousEmployee))
+                        {
+                            PreviousEmployeeService.UpdateRecord(updatedPreviousEmployee);
+                        }
+                        else if (hasRecord && Convert.ToBoolean(!employee.isPreviousEmployee))
+                        {
+                            PreviousEmployeeService.DeleteRecord(employee.EmployeeID);
+                        }                        
+
+                        if (UserService.CurrentUser != null)
+                        {
+                            LoggingService.Log newLog = new()
+                            {
+                                UserID = UserService.CurrentUser.UserID,
+                                ActivityType = "Edit",
+                                ActivityDetails = $"This user has edited the information of an employee with the ID {employee.EmployeeID}."
+                            };
+
+                            LoggingService.LogActivity(newLog);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    transaction?.Rollback();
+                    return false;
                 }
 
                 return true;
@@ -572,8 +610,8 @@ namespace LBPRDC.Source.Services
                 DepartmentService.History newHistory = new()
                 {
                     EmployeeID = data.EmployeeID,
-                    DepartmentID = data.DepartmentID,
-                    LocationID = data.LocationID,
+                    DepartmentName = data.DepartmentName,
+                    LocationName = data.LocationName,
                     Timestamp = data.Date,
                     Remarks = data.Remarks,
                     Status = "Active"

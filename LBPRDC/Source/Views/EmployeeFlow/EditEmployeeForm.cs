@@ -225,7 +225,9 @@ namespace LBPRDC.Source.Views.EmployeeFlow
                 Birthday = dtpBirthday.Value,
                 Education = txtEducation.Text,
                 DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue),
+                Department = cmbDepartment.Text,
                 LocationID = Convert.ToInt32(cmbLocation.SelectedValue),
+                Location = cmbLocation.Text,
                 EmailAddress1 = txtEmailAddress1.Text,
                 EmailAddress2 = txtEmailAddress2.Text,
                 ContactNumber1 = txtContactNumber1.Text,
@@ -242,7 +244,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
                 PreviousFrom = dtpFromDate.Value,
                 PreviousTo = dtpToDate.Value,
                 PreviousPosition = txtPreviousPosition.Text,
-                OtherInformation = txtOtherInformation.Text
+                OtherInformation = txtOtherInformation.Text,
             };
 
             bool isUpdated = await EmployeeService.UpdateEmployee(data);

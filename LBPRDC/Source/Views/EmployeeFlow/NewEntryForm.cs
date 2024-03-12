@@ -6,6 +6,10 @@ namespace LBPRDC.Source.Views
     public partial class frmNewEntryEmployee : Form
     {
         public ucEmployees? ParentControl { get; set; }
+        public int ClientID { get; set; }
+
+        public string ClientName { get; set; } = "";
+
         private readonly List<Control> requiredFields;
 
         public frmNewEntryEmployee()
@@ -27,6 +31,15 @@ namespace LBPRDC.Source.Views
 
         private void frmEmployeeDataEntry_Load(object sender, EventArgs e)
         {
+            if (ClientID == -1)
+            {
+                MessageBox.Show("There is a problem retrieving client information; therefore, it is unable to continue to process a new employee.");
+                this.Close();
+                return;
+            }
+
+            this.Text = $"New Employee Form for Client: {ClientName}";
+
             InitializePositionComboBoxItems();
             InitializeCivilStatusComboBoxItems();
             InitializeEmploymentStatusComboBoxItems();
@@ -123,6 +136,7 @@ namespace LBPRDC.Source.Views
             EmployeeService.EmployeeHistory newEmployee = new()
             {
                 EmployeeID = txtEmployeeID.Text.ToUpper().Trim(),
+                ClientID = ClientID,
                 LastName = txtLastName.Text.ToUpper().Trim(),
                 FirstName = txtFirstName.Text.ToUpper().Trim(),
                 MiddleName = txtMiddleName.Text.ToUpper().Trim(),

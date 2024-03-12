@@ -1,5 +1,6 @@
-﻿using System.Data.SqlClient;
-using static LBPRDC.Source.Services.DepartmentService;
+﻿using Dapper;
+using LBPRDC.Source.Data;
+using System.Data.SqlClient;
 
 namespace LBPRDC.Source.Services
 {
@@ -44,6 +45,24 @@ namespace LBPRDC.Source.Services
             return items;
         }
 
+        public static List<EmploymentStatus> GetAllItemsByStatus(string status)
+        {
+            List<EmploymentStatus> items = new();
+
+            try
+            {
+                using var connection = Database.Connect();
+                string QuerySelect = "SELECT * FROM EmploymentStatus WHERE Status = @Status";
+                items = connection.Query<EmploymentStatus>(QuerySelect, new
+                {
+                    Status = status
+                }).ToList();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
+        }
+
         public static List<EmploymentStatus> GetAllItemsForComboBox()
         {
             List<EmploymentStatus> items = new();
@@ -79,6 +98,37 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
+        }
+
+        public static List<string> GetExistenceByID(int employmentStatusID)
+        {
+            List<string> databaseTableNames = new();
+
+            try
+            {
+                using var connection = Database.Connect();
+
+                string QueryCheckExistense = "";
+                List<string> tableNames = new()
+                {
+                    "Employee"
+                };
+
+                List<string> selectQueries = tableNames.Select(name =>
+                    $"SELECT DISTINCT '{name}' AS TableName FROM {name} WHERE EmploymentStatusID = @EmploymentStatusID"
+                ).ToList();
+
+                QueryCheckExistense = string.Join(" UNION ALL ", selectQueries);
+
+                databaseTableNames = connection.Query<string>(QueryCheckExistense, new
+                {
+                    EmploymentStatusID = employmentStatusID
+                }).ToList();
+
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return databaseTableNames;
         }
 
         public static async Task <bool> Add(EmploymentStatus data)
@@ -175,51 +225,89 @@ namespace LBPRDC.Source.Services
             public string? StatusName { get; set; }
         }
 
-        public static void AddNewHistory(History history)
+        public static async void AddNewHistory(History history)
         {
             try
             {
-                string query = "SELECT HistoryID FROM EmployeeEmploymentHistory WHERE EmployeeID = @EmployeeID AND Status = 'Active'";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
-                    connection.Open();
+                using var connection = Database.Connect();
 
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            int historyID = Convert.ToInt32(reader["HistoryID"]);
-                            UpdateStatusToInactiveByID(historyID);
-                        }
-                        AddToHistory(history);
-                    }
+                string QuerySelect = @"
+                    SELECT
+                        HistoryID
+                    FROM
+                        EmployeeEmploymentHistory
+                    WHERE
+                        EmployeeID = @EmployeeID
+                    AND
+                        Status = @Status";
+
+                List<History> matchingHistory = connection.Query<History>(QuerySelect, new
+                {
+                    history.EmployeeID,
+                    Status = "Active"
+                }).ToList();
+
+                if (matchingHistory.Count > 0)
+                {
+                    int historyID = matchingHistory.Select(s => s.HistoryID).First();
+                    UpdateStatusToInactiveByID(historyID);
+                }
+
+                bool isSuccessful = await AddToHistory(history);
+
+                if (!isSuccessful)
+                {
+                    MessageBox.Show("Unable to add a history for civil status of this specific individual.");
                 }
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
-        public static void AddToHistory(History history)
+        public static async Task<bool> AddToHistory(History history)
         {
             try
             {
-                string query = "INSERT INTO EmployeeEmploymentHistory (EmployeeID, EmploymentStatusID, Timestamp, Remarks, Status)" +
-                    "VALUES (@EmployeeID, @EmploymentStatusID, @Timestamp, @Remarks, @Status)";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
-                    command.Parameters.AddWithValue("@EmploymentStatusID", history.EmploymentStatusID);
-                    command.Parameters.AddWithValue("@Timestamp", history.Timestamp);
-                    command.Parameters.AddWithValue("@Remarks", history.Remarks);
-                    command.Parameters.AddWithValue("@Status", history.Status);
+                using var connection = Database.Connect();
+                using var transaction = connection?.BeginTransaction();
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                try
+                {
+                    string QuerySelect = @"
+                        INSERT INTO EmployeeEmploymentHistory (
+                            EmployeeID,
+                            EmploymentStatusID,
+                            Timestamp,
+                            Remarks,
+                            Status
+                        ) VALUES (
+                            @EmployeeID,
+                            @EmploymentStatusID,
+                            @Timestamp,
+                            @Remarks,
+                            @Status
+                        )";
+
+                    int affectedRows = await connection.ExecuteAsync(QuerySelect, history, transaction);
+
+                    if (affectedRows > 0)
+                    {
+                        transaction?.Commit();
+                    }
+                    else
+                    {
+                        transaction?.Rollback();
+                        return false;
+                    }
                 }
+                catch (Exception)
+                {
+                    transaction?.Rollback();
+                    return false;
+                }
+
+                return true;
             }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
         private static void UpdateStatusToInactiveByID(int historyID)

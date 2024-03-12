@@ -16,6 +16,8 @@ namespace LBPRDC.Source.Views
         private UserPreference preference;
         private string EmployeeID;
 
+        private int ClientID = -1;
+
         public ucEmployees()
         {
             InitializeComponent();
@@ -25,12 +27,15 @@ namespace LBPRDC.Source.Views
 
         public void ApplyFilterAndSearchThenPopulate()
         {
-            List<int> deparmentIDs = dchkListFilterDepartments.GetCheckedItems().Select(s => s.ID).ToList();
-            List<int> positionIDs = dchkListFilterPositions.GetCheckedItems().Select(s => s.ID).ToList();
-            List<int> employmentStatusIDs = dchkListFilterEmploymentStatus.GetCheckedItems().Select(s => s.ID).ToList();
-            string searchWord = txtSearch.Text.Trim().ToLower();
+            if (ClientID != -1)
+            {
+                List<int> deparmentIDs = dchkListFilterDepartments.GetCheckedItems().Select(s => s.ID).ToList();
+                List<int> positionIDs = dchkListFilterPositions.GetCheckedItems().Select(s => s.ID).ToList();
+                List<int> employmentStatusIDs = dchkListFilterEmploymentStatus.GetCheckedItems().Select(s => s.ID).ToList();
+                string searchWord = txtSearch.Text.Trim().ToLower();
 
-            PopulateTableWithFilterAndSearch(deparmentIDs, positionIDs, employmentStatusIDs, searchWord);
+                PopulateTableWithFilterAndSearch(deparmentIDs, positionIDs, employmentStatusIDs, searchWord, ClientID);
+            }
         }
 
         public void ResetTableSearchFilter()
@@ -44,9 +49,19 @@ namespace LBPRDC.Source.Views
         {
             if (this.Visible == true)
             {
+                InitializeClientComboBoxItems();
+                ClientID = Convert.ToInt32(cmbClient.SelectedValue);
+
                 ApplyFilterAndSearchThenPopulate();
                 PopulateFilters();
             }
+        }
+
+        private void InitializeClientComboBoxItems()
+        {
+            cmbClient.DataSource = ClientService.GetClientsForComboBoxByStatus("Active", false);
+            cmbClient.DisplayMember = "Name";
+            cmbClient.ValueMember = "ID";
         }
 
         private void PopulateFilters()
@@ -54,21 +69,21 @@ namespace LBPRDC.Source.Views
             InitializeFilter(
                 lblFilterDepartments,
                 dchkListFilterDepartments,
-                DepartmentService.GetAllItems()
+                DepartmentService.GetAllItemsByStatusAndClientID("Active", ClientID)
                     .Select(s => new CheckedListBoxItems(s.ID, s.Name))
                     .ToList()
             );
             InitializeFilter(
                 lblFilterPositions,
                 dchkListFilterPositions,
-                PositionService.GetAllItems()
+                PositionService.GetAllItemsByStatusAndClientID("Active", ClientID)
                     .Select(s => new CheckedListBoxItems(s.ID, Utilities.StringFormat.ToSentenceCase(s.Name)))
                     .ToList()
             );
             InitializeFilter(
                 lblFilterEmploymentStatus,
                 dchkListFilterEmploymentStatus,
-                EmploymentStatusService.GetAllItems()
+                EmploymentStatusService.GetAllItemsByStatus("Active")
                     .Select(s => new CheckedListBoxItems(s.ID, Utilities.StringFormat.ToSentenceCase(s.Name)))
                     .ToList()
             );
@@ -80,14 +95,12 @@ namespace LBPRDC.Source.Views
 
         private static void InitializeFilter(Label label, DynamicCheckedListBoxControl control, List<CheckedListBoxItems> items)
         {
-            if (items.Count > 0)
-            {
-                control.SetItems(items);
-                control.DisplayItems();
-            }
+            label.Visible = items.Count > 0;
+            control.SetItems(items);
+            control.DisplayItems();
         }
 
-        private async void PopulateTableWithFilterAndSearch(List<int> departmentIDs, List<int> positionIDs, List<int> employmentStatusIDs, string searchWord)
+        private async void PopulateTableWithFilterAndSearch(List<int> departmentIDs, List<int> positionIDs, List<int> employmentStatusIDs, string searchWord, int clientID)
         {
             ShowLoadingProgressBar(true);
             preference = UserPreferenceManager.LoadPreference();
@@ -101,6 +114,10 @@ namespace LBPRDC.Source.Views
 
                 List<EmployeeService.Employee> filteredEmployees = employees;
 
+                if (clientID != 0)
+                {
+                    filteredEmployees = filteredEmployees.Where(employee => clientID.Equals(employee.ClientID)).ToList();
+                }
                 if (departmentIDs != null && departmentIDs.Count > 0)
                 {
                     filteredEmployees = filteredEmployees.Where(employee => departmentIDs.Contains(employee.DepartmentID)).ToList();
@@ -128,6 +145,10 @@ namespace LBPRDC.Source.Views
                 ApplySettingsToTable();
                 lblRowCounter.Text = ControlUtils.GetTableRowCount(filteredEmployees.Count, employees.Count, "employee");
                 dgvEmployees.DataSource = filteredEmployees;
+            }
+            else
+            {
+                lblRowCounter.Text = "No record found.";
             }
 
             ShowLoadingProgressBar(false);
@@ -177,8 +198,18 @@ namespace LBPRDC.Source.Views
 
         private void btnAddEmployee_Click(object sender, EventArgs e)
         {
-            frmNewEntryEmployee newEntryForm = new();
-            newEntryForm.ParentControl = this;
+            if (ClientID == -1)
+            {
+                MessageBox.Show("You must first add a client in order to add an employee.");
+                return;
+            }
+
+            frmNewEntryEmployee newEntryForm = new()
+            {
+                ParentControl = this,
+                ClientID = ClientID,
+                ClientName = cmbClient.Text
+            };
             newEntryForm.ShowDialog();
         }
 
@@ -371,6 +402,22 @@ namespace LBPRDC.Source.Views
         private void btnSearch_Click(object sender, EventArgs e)
         {
             ApplyFilterAndSearchThenPopulate();
+        }
+
+        private void cmbClient_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbClient.Items.Count > 0)
+            {
+                var selectedClient = (Client)cmbClient.SelectedItem;
+                ClientID = selectedClient.ID;
+            }
+            else
+            {
+                ClientID = -1;
+            }
+
+            ApplyFilterAndSearchThenPopulate();
+            PopulateFilters();
         }
     }
 }

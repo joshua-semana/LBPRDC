@@ -48,7 +48,9 @@ namespace LBPRDC.Source.Views.Categories
             DepartmentSpecificFields = new()
             {
                 lblCode,
-                txtCode
+                txtCode,
+                lblClient,
+                cmbClient,
             };
 
             RequiredFields = new();
@@ -77,6 +79,7 @@ namespace LBPRDC.Source.Views.Categories
 
                 case "Department":
                     ControlUtils.ToggleControlVisibility(DepartmentSpecificFields, true);
+                    InitializeClientComboBoxItems();
                     break;
 
                 case "Civil Status":
@@ -103,7 +106,7 @@ namespace LBPRDC.Source.Views.Categories
 
         private void InitializeClientComboBoxItems()
         {
-            cmbClient.DataSource = ClientService.GetClientsForComboBoxByStatus("Active");
+            cmbClient.DataSource = ClientService.GetClientsForComboBoxByStatus("Active", true);
             cmbClient.DisplayMember = "Name";
             cmbClient.ValueMember = "ID";
         }
@@ -132,11 +135,7 @@ namespace LBPRDC.Source.Views.Categories
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result == DialogResult.Yes)
-            {
-                this.Close();
-            }
+            this.Close();
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -201,6 +200,7 @@ namespace LBPRDC.Source.Views.Categories
                     DepartmentService.Department AddForDepartment = new()
                     {
                         Code = code,
+                        ClientID = Convert.ToInt32(cmbClient.SelectedValue),
                         Name = name,
                         Description = description,
                         Status = status
@@ -223,6 +223,7 @@ namespace LBPRDC.Source.Views.Categories
                     {
                         Name = name,
                         Description = description,
+                        Type = "USER_ENTRY",
                         Status = status,
                         DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue)
                     };

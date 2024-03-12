@@ -89,6 +89,8 @@ namespace LBPRDC.Source.Views.EmployeeFlow
                 EmployeeID = txtEmployeeID.Text,
                 DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue),
                 LocationID = Convert.ToInt32(cmbLocation.SelectedValue),
+                DepartmentName = cmbDepartment.Text,
+                LocationName = cmbLocation.Text,
                 Remarks = txtRemarks.Text,
                 Date = DateTime.Now,
             };

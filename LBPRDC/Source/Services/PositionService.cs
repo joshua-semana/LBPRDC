@@ -38,6 +38,43 @@ namespace LBPRDC.Source.Services
             return items;
         }
 
+        public static List<Position> GetAllItemsByStatus(string status)
+        {
+            List<Position> items = new();
+
+            try
+            {
+                using var connection = Database.Connect();
+                string QuerySelect = "SELECT * FROM Position WHERE Status = @Status";
+                items = connection.Query<Position>(QuerySelect, new
+                {
+                    Status = status
+                }).ToList();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
+        }
+
+        public static List<Position> GetAllItemsByStatusAndClientID(string status, int clientID)
+        {
+            List<Position> items = new();
+
+            try
+            {
+                using var connection = Database.Connect();
+                string QuerySelect = "SELECT * FROM Position WHERE Status = @Status AND ClientID = @ClientID";
+                items = connection.Query<Position>(QuerySelect, new
+                {
+                    Status = status,
+                    ClientID = clientID
+                }).ToList();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
+        }
+
         //public static List<PositionWithReferenceValues> GetAllItemsWithReferenceValues()
         //{
         //    List<PositionWithReferenceValues> items = new();
@@ -95,6 +132,37 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
+        }
+
+        public static List<string> GetExistenceByID(int positionID)
+        {
+            List<string> databaseTableNames = new();
+
+            try
+            {
+                using var connection = Database.Connect();
+
+                string QueryCheckExistense = "";
+                List<string> tableNames = new()
+                {
+                    "Employee"
+                };
+
+                List<string> selectQueries = tableNames.Select(name =>
+                    $"SELECT DISTINCT '{name}' AS TableName FROM {name} WHERE PositionID = @PositionID"
+                ).ToList();
+
+                QueryCheckExistense = string.Join(" UNION ALL ", selectQueries);
+
+                databaseTableNames = connection.Query<string>(QueryCheckExistense, new
+                {
+                    PositionID = positionID
+                }).ToList();
+
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return databaseTableNames;
         }
 
         public static async Task<bool> Add(Position data)
@@ -217,55 +285,95 @@ namespace LBPRDC.Source.Services
             public string? StatusName { get; set; }
         }
 
-        public static void AddNewHistory(History history)
+        public static async void AddNewHistory(History history)
         {
             try
             {
-                string query = "SELECT HistoryID FROM EmployeePositionHistory WHERE EmployeeID = @EmployeeID AND Status = 'Active'";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
-                    connection.Open();
+                using var connection = Database.Connect();
 
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            int historyID = Convert.ToInt32(reader["HistoryID"]);
-                            UpdateStatusToInactiveByID(historyID);
-                            UpdateRatesByID(history.OldPositionID, historyID);
-                        }
-                        AddToHistory(history);
-                    }
+                string QuerySelect = @"
+                    SELECT
+                        HistoryID
+                    FROM
+                        EmployeePositionHistory
+                    WHERE
+                        EmployeeID = @EmployeeID
+                    AND
+                        Status = @Status";
+
+                List<History> matchingHistory = connection.Query<History>(QuerySelect, new
+                {
+                    history.EmployeeID,
+                    Status = "Active"
+                }).ToList();
+
+                if (matchingHistory.Count > 0)
+                {
+                    int historyID = matchingHistory.Select(s => s.HistoryID).First();
+                    UpdateStatusToInactiveByID(historyID);
+                    UpdateRatesByID(history.OldPositionID, historyID);
+                }
+
+                bool isSuccessful = await AddToHistory(history);
+
+                if (!isSuccessful)
+                {
+                    MessageBox.Show("Unable to add a history for position of this specific individual.");
                 }
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
-        public static void AddToHistory(History history)
+        public static async Task<bool> AddToHistory(History history)
         {
             try
             {
-                string query = "INSERT INTO EmployeePositionHistory (EmployeeID, PositionID, PositionTitle, SalaryRate, BillingRate, Timestamp, Remarks, Status)" +
-                    "VALUES (@EmployeeID, @PositionID, @PositionTitle, @SalaryRate, @BillingRate, @Timestamp, @Remarks, @Status)";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
-                    command.Parameters.AddWithValue("@PositionID", history.PositionID);
-                    command.Parameters.AddWithValue("@PositionTitle", history.PositionTitle);
-                    command.Parameters.AddWithValue("@SalaryRate", history.SalaryRate);
-                    command.Parameters.AddWithValue("@BillingRate", history.BillingRate);
-                    command.Parameters.AddWithValue("@Timestamp", history.Timestamp);
-                    command.Parameters.AddWithValue("@Remarks", history.Remarks);
-                    command.Parameters.AddWithValue("@Status", history.Status);
+                using var connection = Database.Connect();
+                using var transaction = connection?.BeginTransaction();
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                try
+                {
+                    string QueryInsert = @"
+                        INSERT INTO EmployeePositionHistory (
+                            EmployeeID,
+                            PositionID,
+                            PositionTitle,
+                            SalaryRate,
+                            BillingRate,
+                            Timestamp,
+                            Remarks,
+                            Status
+                        ) VALUES (
+                            @EmployeeID,
+                            @PositionID,
+                            @PositionTitle,
+                            @SalaryRate,
+                            @BillingRate,
+                            @Timestamp,
+                            @Remarks,
+                            @Status)";
+
+                    int affectedRows = await connection.ExecuteAsync(QueryInsert, history, transaction);
+
+                    if (affectedRows > 0)
+                    {
+                        transaction?.Commit();
+                    }
+                    else
+                    {
+                        transaction?.Rollback();
+                        return false;
+                    }
                 }
+                catch (Exception)
+                {
+                    transaction?.Rollback();
+                    return false;
+                }
+
+                return true;
             }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
         private static void UpdateStatusToInactiveByID(int historyID)

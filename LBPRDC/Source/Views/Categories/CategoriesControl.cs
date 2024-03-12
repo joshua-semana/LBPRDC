@@ -1,6 +1,5 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
-using static OfficeOpenXml.ExcelErrorValue;
 
 namespace LBPRDC.Source.Views.Categories
 {
@@ -70,7 +69,9 @@ namespace LBPRDC.Source.Views.Categories
             DepartmentSpecificFields = new()
             {
                 lblCode,
-                txtCode
+                txtCode,
+                lblClient,
+                cmbClient
             };
 
             CurrentCategory = Categories[0];
@@ -86,6 +87,7 @@ namespace LBPRDC.Source.Views.Categories
 
             ControlUtils.ToggleControlsVisibilityInContainer(flowRightContent, false);
             ControlUtils.ToggleControlVisibility(CommonFields, true);
+            cmbDepartment.Enabled = txtDescription.Enabled = cmbStatus.Enabled = true; // Hardcoded because of Location Item Selection change when Type is Default
             btnHistory.Visible = false;
 
             dgvCategory.Columns.Clear();
@@ -108,8 +110,9 @@ namespace LBPRDC.Source.Views.Categories
                     break;
 
                 case "Location":
-                    dgvCategory.DataSource = LocationService.GetAllItemsForCategories()
-                        .Where(w => w.ID != 1 && w.DepartmentName != NoneDepartmentName).ToList();
+                    //dgvCategory.DataSource = LocationService.GetAllItemsForCategories()
+                    //    .Where(w => w.ID != 1 && w.DepartmentName != NoneDepartmentName).ToList();
+                    dgvCategory.DataSource = LocationService.GetAllItemsForCategories();
                     ControlUtils.ToggleControlVisibility(LocationSpecificFields, true);
                     break;
 
@@ -132,9 +135,10 @@ namespace LBPRDC.Source.Views.Categories
             {
                 flowRightContent.Enabled = true;
                 flowFooterActions.Enabled = true;
+                UpdateRequiredFields();
+                UpdateOriginalValues();
             }
-            UpdateRequiredFields();
-            UpdateOriginalValues();
+
             ShowLoadingProgressBar(false);
         }
 
@@ -176,8 +180,6 @@ namespace LBPRDC.Source.Views.Categories
         {
             if (this.Visible && dgvCategory.SelectedRows.Count > 0)
             {
-                btnUpdate.Enabled = false;
-
                 foreach (var kv in OriginalValues)
                 {
                     kv.Key.TextChanged -= ControlValue_Changed;
@@ -200,7 +202,8 @@ namespace LBPRDC.Source.Views.Categories
                         break;
                 }
                 //UpdateRequiredFields();
-                //UpdateOriginalValues();
+                UpdateOriginalValues();
+                btnUpdate.Enabled = false;
             }
         }
 
@@ -222,6 +225,8 @@ namespace LBPRDC.Source.Views.Categories
 
         private void PopulateLocationSpecificTextFieldData(DataGridViewRow data)
         {
+            bool isDefault = data.Cells["Type"].Value.ToString() == "DEFAULT";
+            cmbDepartment.Enabled = txtDescription.Enabled = cmbStatus.Enabled = !isDefault;
             GetDeparmentComboBoxValue(Convert.ToInt32(data.Cells["DepartmentID"].Value));
         }
 
@@ -235,7 +240,7 @@ namespace LBPRDC.Source.Views.Categories
 
         private void GetClientComboBoxValue(int value)
         {
-            cmbClient.DataSource = ClientService.GetClientsForComboBoxByStatus("Active");
+            cmbClient.DataSource = ClientService.GetClientsForComboBoxByStatus("Active", true);
             cmbClient.DisplayMember = "Name";
             cmbClient.ValueMember = "ID";
             cmbClient.SelectedValue = value;
@@ -243,6 +248,7 @@ namespace LBPRDC.Source.Views.Categories
 
         private void PopulateDepartmentSpecificTextFieldDate(DataGridViewRow data)
         {
+            GetClientComboBoxValue(Convert.ToInt32(data.Cells["ClientID"].Value));
             txtCode.Text = data.Cells["Code"].Value.ToString();
         }
 
@@ -304,6 +310,8 @@ namespace LBPRDC.Source.Views.Categories
                 switch (CurrentCategory)
                 {
                     case "Clients":
+                        if (IsCategoryItemInUse()) { return; }
+
                         ClientService.Update(new()
                         {
                             ID = ID,
@@ -311,18 +319,20 @@ namespace LBPRDC.Source.Views.Categories
                             Description = description,
                             Status = status
                         });
+
                         break;
 
                     case "Civil Status":
+                        if (IsCategoryItemInUse()) { return; }
 
-                        CivilStatusService.CivilStatus UpdateForCivilStatus = new()
+                        CivilStatusService.Update(new()
                         {
                             ID = ID,
                             Name = name,
                             Description = description,
                             Status = status
-                        };
-                        CivilStatusService.Update(UpdateForCivilStatus);
+                        });
+
                         break;
 
                     case "Department":
@@ -331,44 +341,53 @@ namespace LBPRDC.Source.Views.Categories
                             MessageBox.Show("The code 'OT' cannot be used; please try another code.", "Invalid Code Entry", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
                         }
+
                         var similarDepartmentCodes = DepartmentService.GetAllItems().Where(w => txtCode.Text.ToUpper().Equals(w.Code)).ToList();
                         if (similarDepartmentCodes.Count > 0 && txtCode.Text != OriginalValues[txtCode])
                         {
                             MessageBox.Show("This code has already been used. Please enter another code to continue.", "Duplicate Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
                         };
-                        DepartmentService.Department UpdateForDepartment = new()
+
+                        if (IsCategoryItemInUse()) { return; }
+
+                        DepartmentService.Update(new()
                         {
                             ID = ID,
+                            ClientID = Convert.ToInt32(cmbClient.SelectedValue),
                             Code = txtCode.Text.ToUpper().Trim(),
                             Name = name,
                             Description = description,
                             Status = status
-                        };
-                        DepartmentService.Update(UpdateForDepartment);
+                        });
+
                         break;
 
                     case "Employment Status":
-                        EmploymentStatusService.EmploymentStatus UpdateForEmploymentStatus = new()
+                        if (IsCategoryItemInUse()) { return; }
+
+                        EmploymentStatusService.Update(new()
                         {
                             ID = ID,
                             Name = name,
                             Description = description,
                             Status = status
-                        };
-                        EmploymentStatusService.Update(UpdateForEmploymentStatus);
+                        });
+
                         break;
 
                     case "Location":
-                        LocationService.Location UpdateForLocation = new()
+                        if (IsCategoryItemInUse()) { return; }
+
+                        LocationService.Update(new()
                         {
                             ID = ID,
                             Name = name,
                             Description = description,
                             Status = status,
                             DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue)
-                        };
-                        LocationService.Update(UpdateForLocation);
+                        });
+
                         break;
 
                     case "Position":
@@ -378,6 +397,8 @@ namespace LBPRDC.Source.Views.Categories
                             MessageBox.Show("This code has already been used. Please enter another code to continue.", "Duplicate Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             return;
                         };
+
+                        if (IsCategoryItemInUse()) { return; }
 
                         PositionService.Position UpdateForPosition = new()
                         {
@@ -413,9 +434,51 @@ namespace LBPRDC.Source.Views.Categories
             }
         }
 
+        private bool IsCategoryItemInUse()
+        {
+            int ID = Convert.ToInt32(txtID.Text);
+            string status = cmbStatus.Text;
+            var originalStatus = OriginalValues[cmbStatus].ToString();
+
+            if (status != originalStatus && status == "Inactive")
+            {
+                frmLoading form = new()
+                {
+                    StringListProcess = CurrentCategory switch
+                    {
+                        "Clients" => Task.Run(() => ClientService.GetExistenceByID(ID)),
+                        "Department" => Task.Run(() => DepartmentService.GetExistenceByID(ID)),
+                        "Location" => Task.Run(() => LocationService.GetExistenceByID(ID)),
+                        "Position" => Task.Run(() => PositionService.GetExistenceByID(ID)),
+                        "Civil Status" => Task.Run(() => CivilStatusService.GetExistenceByID(ID)),
+                        "Employment Status" => Task.Run(() => EmploymentStatusService.GetExistenceByID(ID)),
+                        _ => throw new NotImplementedException(),
+                    }
+                };
+
+                DialogResult result = form.ShowDialog();
+
+                if (result == DialogResult.OK)
+                {
+                    bool clientInUse = form.StringListResult?.Count > 0;
+                    if (clientInUse)
+                    {
+                        string tableNames = string.Join("\n", form.StringListResult);
+                        MessageBox.Show($"This client is being used and cannot be updated to inactive. These are the categories it is being used:\n{tableNames}", "Update Invalid", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return true;
+                    }
+                }
+                else if (result == DialogResult.Abort)
+                {
+                    MessageBox.Show("There is a problem retrieving information if this client is being used on other categories. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return true; // Precautionary measure to make sure it will not continue to add the item
+                }
+            }
+            return false;
+        }
+
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            var CurrentVisibleControls = ControlUtils.GetVisibleControls(flowRightContent);
             AddCategoryItemForm addCategoryItemForm = new()
             {
                 ParentControl = this,
@@ -445,6 +508,12 @@ namespace LBPRDC.Source.Views.Categories
                 };
                 positionRatesHistory.ShowDialog();
             }
+        }
+
+        private void cmbCategories_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            CurrentCategory = cmbCategories.Text.ToString();
+            PopulateTableAndFields();
         }
     }
 }

@@ -11,6 +11,11 @@ namespace LBPRDC.Source.Services
         public string Status { get; set; } = "Active";
     }
 
+    public class ClientExistence
+    {
+        public string TableName { get; set; } = "";
+    }
+
     internal class ClientService
     {
         public static List<Client> GetClients()
@@ -45,17 +50,20 @@ namespace LBPRDC.Source.Services
             return clientDetails;
         }
 
-        public static List<Client> GetClientsForComboBoxByStatus(string status)
+        public static List<Client> GetClientsForComboBoxByStatus(string status, bool withDefault)
         {
             List<Client> items = new();
 
             try
             {
-                items.Add(new Client
+                if (withDefault)
                 {
-                    ID = 0,
-                    Name = "(Choose Client)"
-                });
+                    items.Add(new Client
+                    {
+                        ID = 0,
+                        Name = "(Choose Client)"
+                    });
+                }
 
                 using var connection = Database.Connect();
                 string QuerySelect = "SELECT ID, Name FROM Clients WHERE Status = @Status";
@@ -72,6 +80,42 @@ namespace LBPRDC.Source.Services
             return items;
         }
 
+        public static List<string> GetExistenceByID(int clientID)
+        {
+            List<string> clients = new();
+
+            try
+            {
+                using var connection = Database.Connect();
+
+                string QueryCheckExistense = "";
+                List<string> tableNames = new()
+                {
+                    "Billing",
+                    "BillingAccounts",
+                    "BillingRecord",
+                    "Position",
+                    "Departments",
+                    "Employee"
+                };
+
+                List<string> selectQueries = tableNames.Select(name =>
+                    $"SELECT DISTINCT '{name}' AS TableName FROM {name} WHERE ClientID = @ClientID"
+                ).ToList();
+
+                QueryCheckExistense = string.Join(" UNION ALL ", selectQueries);
+
+                clients = connection.Query<string>(QueryCheckExistense, new
+                {
+                    ClientID = clientID
+                }).ToList();
+
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return clients;
+        }
+
         public static async Task<bool> AddClient(Client client)
         {
             try
@@ -81,7 +125,7 @@ namespace LBPRDC.Source.Services
 
                 try
                 {
-                    string QuerySelect = @"
+                    string QueryInsert = @"
                         INSERT INTO Clients (
                             Name,
                             Description,
@@ -92,7 +136,7 @@ namespace LBPRDC.Source.Services
                             @Status
                         )";
 
-                    var affectedRows = await connection.ExecuteAsync(QuerySelect, client, transaction);
+                    var affectedRows = await connection.ExecuteAsync(QueryInsert, client, transaction);
                     transaction?.Commit();
 
                     if (affectedRows > 0)
