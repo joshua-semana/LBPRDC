@@ -1,4 +1,6 @@
-﻿namespace LBPRDC.Source.Views.Billing
+﻿using LBPRDC.Source.Config;
+
+namespace LBPRDC.Source.Views.Billing
 {
     partial class ViewAccountBillings
     {
@@ -73,17 +75,17 @@
             flowLayoutPanel1.Controls.Add(btnClose);
             flowLayoutPanel1.Dock = DockStyle.Right;
             flowLayoutPanel1.FlowDirection = FlowDirection.RightToLeft;
-            flowLayoutPanel1.Location = new Point(920, 0);
+            flowLayoutPanel1.Location = new Point(730, 0);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Padding = new Padding(16, 9, 0, 0);
-            flowLayoutPanel1.Size = new Size(191, 46);
+            flowLayoutPanel1.Size = new Size(381, 46);
             flowLayoutPanel1.TabIndex = 6;
             // 
             // btnUpdate
             // 
             btnUpdate.AutoSize = true;
             btnUpdate.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnUpdate.Location = new Point(100, 9);
+            btnUpdate.Location = new Point(290, 9);
             btnUpdate.Margin = new Padding(8, 0, 0, 0);
             btnUpdate.Name = "btnUpdate";
             btnUpdate.Size = new Size(75, 28);
@@ -96,7 +98,7 @@
             // 
             btnClose.AutoSize = true;
             btnClose.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnClose.Location = new Point(17, 9);
+            btnClose.Location = new Point(207, 9);
             btnClose.Margin = new Padding(8, 0, 0, 0);
             btnClose.Name = "btnClose";
             btnClose.Size = new Size(75, 28);

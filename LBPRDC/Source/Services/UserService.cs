@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using LBPRDC.Source.Config;
+using System.Data.SqlClient;
 
 namespace LBPRDC.Source.Services
 {
@@ -93,7 +94,7 @@ namespace LBPRDC.Source.Services
                     command.Parameters.AddWithValue("@FirstName", newUser.FirstName);
                     command.Parameters.AddWithValue("@LastName", newUser.LastName);
                     command.Parameters.AddWithValue("@Role", "Standard");
-                    command.Parameters.AddWithValue("@Status", "Active");
+                    command.Parameters.AddWithValue("@Status", StringConstants.Status.ACTIVE);
                     command.Parameters.AddWithValue("@RegistrationDate", DateTime.Now);
                     command.Parameters.AddWithValue("@LastLoginDate", DateTime.Now);
                     command.Parameters.AddWithValue("@MiddleName", newUser.MiddleName);
@@ -107,7 +108,7 @@ namespace LBPRDC.Source.Services
                         LoggingService.Log newLog = new()
                         {
                             UserID = CurrentUser.UserID,
-                            ActivityType = "Add",
+                            ActivityType = MessagesConstants.Add.TITLE,
                             ActivityDetails = $"This user added a new user account with username of {newUser.Username}."
                         };
 
@@ -163,7 +164,7 @@ namespace LBPRDC.Source.Services
                         LoggingService.Log newLog = new()
                         {
                             UserID = CurrentUser.UserID,
-                            ActivityType = "Update",
+                            ActivityType = MessagesConstants.UPDATE,
                             ActivityDetails = $"This user updated a user's status and/or role with a username of {user.Username}."
                         };
 

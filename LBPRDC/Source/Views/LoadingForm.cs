@@ -1,4 +1,6 @@
-﻿namespace LBPRDC.Source.Views
+﻿using LBPRDC.Source.Config;
+
+namespace LBPRDC.Source.Views
 {
     public partial class frmLoading : Form
     {
@@ -9,6 +11,8 @@
         public Task<int>? IntegerProcess { get; set; } = null;
         public int? IntegerResult { get; set; } = null;
         public Task<bool>? BooleanProcess { get; set; } = null;
+        public Task<(bool, int)>? BooleanIntProcess { get; set; } = null;
+        public (bool, int)? BooleanIntResult { get; set; } = null;
         public Task<Services.Billing>? BillingProcess { get; set; } = null;
         public Services.Billing? BillingResult { get; set; } = null;
         public Task<Services.BillingWithEquipment>? BillingWithEquipmentProcess { get; set; } = null;
@@ -27,6 +31,8 @@
         public List<Services.AccountsComboBoxDetails>? AccountsCollectionResult { get; set; } = null;
         public string? Description { get; set; }
         public Services.Billing? Billing { get; set; }
+
+        // Entity Framework
 
         public frmLoading()
         {
@@ -54,6 +60,10 @@
                     if (result) { DialogResult = DialogResult.OK; }
                     else { DialogResult = DialogResult.Abort; }
                     return;
+                }
+                if (BooleanIntProcess != null)
+                {
+                    BooleanIntResult = await Task.Run(() => BooleanIntProcess, cancellationTokenSource.Token);
                 }
                 if (BillingWithEquipmentProcess != null)
                 {
@@ -95,7 +105,8 @@
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.DialogResult = DialogResult.Abort;
             }
             finally
             {

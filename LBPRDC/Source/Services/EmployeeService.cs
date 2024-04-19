@@ -1,24 +1,20 @@
-﻿using LBPRDC.Source.Utilities;
-using System.Data.SqlClient;
-using Dapper;
+﻿using Dapper;
+using LBPRDC.Source.Config;
 using LBPRDC.Source.Data;
-using static LBPRDC.Source.Services.CivilStatusService;
-using static LBPRDC.Source.Services.DepartmentService;
-using static LBPRDC.Source.Services.EmployeeService;
-using static LBPRDC.Source.Services.EmploymentStatusService;
+using LBPRDC.Source.Utilities;
+using Microsoft.EntityFrameworkCore;
+using System.Data.SqlClient;
+using static LBPRDC.Source.Data.Database;
 using static LBPRDC.Source.Services.LocationService;
-using static LBPRDC.Source.Services.PositionService;
-using static LBPRDC.Source.Services.SuffixService;
-using System.Collections.Generic;
-using System.Net.Mail;
-using System.Transactions;
 
 namespace LBPRDC.Source.Services
 {
     public class EmployeeBase
     {
+        public int ID { get; set; }
         public string? EmployeeID { get; set; }
         public int ClientID { get; set; }
+        public string ClientName { get; set; } = "";
         public string? LastName { get; set; }
         public string? FirstName { get; set; }
         public string? MiddleName { get; set; }
@@ -53,6 +49,7 @@ namespace LBPRDC.Source.Services
             public int EmploymentStatusID { get; set; }
             public int SuffixID { get; set; }
             public string? Remarks { get; set; }
+            public int WageID { get; set; }
 
             public string? EmailAddress { get; set; }
             public string? ContactNumber { get; set; }
@@ -78,7 +75,7 @@ namespace LBPRDC.Source.Services
 
         public class EmployeeUpdateBase
         {
-            public string? EmployeeID { get; set; }
+            public int EmployeeID { get; set; }
             public DateTime Date { get; set; }
             public string? Remarks { get; set; }
         }
@@ -108,26 +105,233 @@ namespace LBPRDC.Source.Services
             public int EmploymentStatusID { get; set; }
         }
 
-        public static List<EmployeeBase> GetAllEmployeesBase()
+        // Entity Framework
+
+        public static async Task<List<Models.Employee.Identifier>> GetAllIdentifiersByClientID(int ClientID)
+        {
+            List<Models.Employee.Identifier> employees = new();
+
+            try
+            {
+                using var context = new Context();
+                employees = await context.Employee
+                    .Where(e => e.ClientID == ClientID)
+                    .Select(e => new Models.Employee.Identifier
+                    {
+                        ID = e.ID,
+                        EmployeeID = e.EmployeeID,
+                    })
+                    .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return employees;
+        }
+
+        public static async Task<List<Models.Employee.View>> GetAllEmployeeInfoByClientID(int ClientID, int? EmployeeID = null)
+        {
+            List<Models.Employee.View> employees = new();
+
+            try
+            {
+                using var context = new Context();
+                var query = context.Employee.Where(e => e.ClientID == ClientID);
+
+                if (EmployeeID.HasValue)
+                {
+                    query = query.Where(e => e.ID == EmployeeID);
+                }
+
+                employees = await query.Select(e => new Models.Employee.View
+                {
+                    ID = e.ID,
+                    EmployeeID = e.EmployeeID,
+                    ClientID = e.ClientID,
+                    LastName = e.LastName,
+                    FirstName = e.FirstName,
+                    MiddleName = e.MiddleName,
+                    Gender = e.Gender,
+                    Birthday = e.Birthday,
+                    Education = e.Education,
+                    EmailAddress1 = e.EmailAddress1,
+                    EmailAddress2 = e.EmailAddress2,
+                    ContactNumber1 = e.ContactNumber1,
+                    ContactNumber2 = e.ContactNumber2,
+                    SuffixID = e.SuffixID,
+                    DepartmentID = e.DepartmentID,
+                    LocationID = e.LocationID,
+                    CivilStatusID = e.CivilStatusID,
+                    PositionID = e.PositionID,
+                    EmploymentStatusID = e.EmploymentStatusID,
+                    Remarks = e.Remarks,
+                    WageID = e.WageID,
+                    ClientName = e.Client.Description,
+                    FullName = $"{e.LastName}, {e.FirstName} {e.MiddleName} {(e.Suffix.Name.Equals(StringConstants.Status.NONE) ? "" : e.Suffix.Name)}",
+                    SuffixName = e.Suffix.Name,
+                    DepartmentName = e.Department.Name,
+                    LocationName = e.Location.Name,
+                    CivilStatusName = e.CivilStatus.Name,
+                    PositionName = e.Position.Name,
+                    EmploymentStatusName = e.EmploymentStatus.Name,
+                    WageName = e.Wage.Name
+                })
+                .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return employees;
+        }
+
+        public static async Task<List<Models.Employee.TableView>> GetEmployeesWithPreferenceByClientID(int ClientID)
+        {
+            var preference = UserPreferenceManager.LoadPreference();
+            List<Models.Employee.TableView> employees = new();
+
+            try
+            {
+                using var context = new Context();
+                employees = await context.Employee
+                    .Include(e => e.Suffix)
+                    .Include(e => e.Position)
+                    .Include(e => e.Wage)
+                    .Where(e => e.ClientID == ClientID)
+                    .Select(e => new Models.Employee.TableView
+                    {
+                        ID = e.ID,
+                        EmployeeID = e.EmployeeID,
+                        ClientID = e.ClientID,
+                        LastName = e.LastName,
+                        FirstName = e.FirstName,
+                        MiddleName = e.MiddleName,
+                        Gender = e.Gender,
+                        Birthday = e.Birthday,
+                        Education = e.Education,
+                        EmailAddress1 = e.EmailAddress1,
+                        EmailAddress2 = e.EmailAddress2,
+                        ContactNumber1 = e.ContactNumber1,
+                        ContactNumber2 = e.ContactNumber2,
+                        SuffixID = e.SuffixID,
+                        DepartmentID = e.DepartmentID,
+                        LocationID = e.LocationID,
+                        CivilStatusID = e.CivilStatusID,
+                        PositionID = e.PositionID,
+                        EmploymentStatusID = e.EmploymentStatusID,
+                        WageID = e.WageID,
+                        Remarks = e.Remarks,
+                        ClientName = e.Client.Description,
+                        SuffixName = e.Suffix.Name,
+                        DepartmentName = e.Department.Name,
+                        LocationName = e.Location.Name,
+                        CivilStatusName = e.CivilStatus.Name,
+                        PositionName = e.Position.Name,
+                        EmploymentStatusName = e.EmploymentStatus.Name,
+                        WageName = e.Wage.Name,
+                        FullName = GetPreferenceFullNameFormat(e, preference),
+                        PositionInfo = GetPreferencePosition(e, preference),
+                        JoinedEmailAddress = GetPreferenceEmailFormat(e, preference),
+                        JoinedContactNumber = GetPreferenceContactNumber(e, preference),
+                        BillingRate = e.Position.BillingRate,
+                        SalaryRate = e.Position.SalaryRate,
+                    })
+                    .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return employees;
+        }
+
+        private static string GetPreferenceFullNameFormat(Models.Employee e, UserPreference preference)
+        {
+            string middleInitial = string.IsNullOrWhiteSpace(e.MiddleName) ? "" : $"{e.MiddleName[0]}.";
+            string suffix = e.Suffix.Name == "None" ? "" : e.Suffix.Name;
+
+            return preference.SelectedNameFormat switch
+            {
+                NameFormat.Full1 => $"{e.FirstName} {middleInitial} {e.LastName} {suffix}".Trim(),
+                NameFormat.Full2 => $"{e.LastName}, {e.FirstName} {middleInitial} {suffix}".Trim(),
+                NameFormat.FirstAndLastOnly => $"{e.FirstName} {e.LastName}".Trim(),
+                NameFormat.LastNameOnly => e.LastName,
+                _ => MessagesConstants.Error.TITLE
+            };
+        }
+        private static string GetPreferencePosition(Models.Employee e, UserPreference preference)
+        {
+            return preference.SelectedPositionFormat switch
+            {
+                PositionFormat.NameOnly => e.Position.Name,
+                PositionFormat.CodeOnly => e.Position.Code,
+                PositionFormat.Both => string.Join(" - ", e.Position.Code, e.Position.Name),
+                _ => MessagesConstants.Error.TITLE
+            };
+        }
+
+        private static string GetPreferenceEmailFormat(Models.Employee e, UserPreference preference)
+        {
+            string?[] emailAddresses = new[] { e.EmailAddress1, e.EmailAddress2 };
+
+            return preference.SelectedEmailFormat switch
+            {
+                EmailFormat.FirstOnly => e.EmailAddress1,
+                EmailFormat.Both => string.Join(" / ", emailAddresses.Where(email => !string.IsNullOrWhiteSpace(email))),
+                _ => MessagesConstants.Error.TITLE
+            };
+        }
+
+        private static string GetPreferenceContactNumber(Models.Employee e, UserPreference preference)
+        {
+            string?[] contactNumbers = new[] { e.ContactNumber1, e.ContactNumber2 };
+
+            return preference.SelectedContactFormat switch
+            {
+                ContactFormat.FirstOnly => e.ContactNumber1,
+                ContactFormat.Both => string.Join(" / ", contactNumbers.Where(number => !string.IsNullOrWhiteSpace(number))),
+                _ => MessagesConstants.Error.TITLE
+            };
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public static async Task<List<EmployeeBase>> GetAllEmployeesBase()
         {
             List<EmployeeBase> employees = new();
 
             try
             {
-                string querySelect = "SELECT EmployeeID, LastName, FirstName, MiddleName, DepartmentID, PositionID, LocationID FROM Employee";
+                string querySelect = "SELECT ID, EmployeeID, LastName, FirstName, MiddleName, DepartmentID, PositionID, LocationID FROM Employee";
                 using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
                 using SqlCommand command = new(querySelect, connection);
                 connection.Open();
                 using SqlDataReader reader = command.ExecuteReader();
 
-                var Department = DepartmentService.GetAllItems();
+                var Department = await DepartmentService.GetAllItems();
                 var Location = LocationService.GetAllItems();
-                var Position = PositionService.GetAllItems();
+                var Position = await PositionService.GetAllItems();
 
                 while (reader.Read())
                 {
                     EmployeeBase employee = new()
                     {
+                        ID = Convert.ToInt32(reader["ID"]),
                         EmployeeID = Convert.ToString(reader["EmployeeID"]),
                         LastName = Convert.ToString(reader["LastName"]),
                         FirstName = Convert.ToString(reader["FirstName"]),
@@ -145,11 +349,12 @@ namespace LBPRDC.Source.Services
             return employees;
         }
 
-        private static UserPreference preference;
-        public static List<Employee> GetAllEmployees()
+        //private static UserPreference preference;
+
+        public static async Task<List<Employee>> GetAllEmployees()
         {
             List<Employee> employees = new();
-            preference = UserPreferenceManager.LoadPreference();
+            var preference = UserPreferenceManager.LoadPreference();
             try
             {
                 string query = "SELECT * FROM Employee";
@@ -163,14 +368,15 @@ namespace LBPRDC.Source.Services
                         var CivilStatus = CivilStatusService.GetAllItems();
                         var EmploymentStatus = EmploymentStatusService.GetAllItems();
                         var Suffix = SuffixService.GetAllItems();
-                        var Department = DepartmentService.GetAllItems();
+                        var Department = await DepartmentService.GetAllItems();
                         var Location = LocationService.GetAllItems();
-                        var Position = PositionService.GetAllItems();
+                        var Position = await PositionService.GetAllItems();
 
                         while (reader.Read())
                         {
                             Employee emp = new()
                             {
+                                ID = Convert.ToInt32(reader["ID"]),
                                 EmployeeID = Convert.ToString(reader["EmployeeID"]),
                                 ClientID = Convert.ToInt32(reader["ClientID"]),
                                 LastName = Utilities.StringFormat.ToSentenceCase(Convert.ToString(reader["LastName"])),
@@ -213,7 +419,7 @@ namespace LBPRDC.Source.Services
                                     NameFormat.Full2 => $"{emp.LastName}, {emp.FirstName} {middleInitial} {suffix}".Trim(),
                                     NameFormat.FirstAndLastOnly => $"{emp.FirstName} {emp.LastName}".Trim(),
                                     NameFormat.LastNameOnly => emp.LastName,
-                                    _ => "Error"
+                                    _ => MessagesConstants.Error.TITLE
                                 };
                             }
 
@@ -224,7 +430,7 @@ namespace LBPRDC.Source.Services
                                 {
                                     EmailFormat.FirstOnly => emp.EmailAddress1,
                                     EmailFormat.Both => string.Join(" / ", emailAddresses.Where(email => !string.IsNullOrWhiteSpace(email))),
-                                    _ => "Error"
+                                    _ => MessagesConstants.Error.TITLE
                                 };
                             }
 
@@ -235,7 +441,7 @@ namespace LBPRDC.Source.Services
                                 {
                                     ContactFormat.FirstOnly => emp.ContactNumber1,
                                     ContactFormat.Both => string.Join(" / ", contactNumbers.Where(number => !string.IsNullOrWhiteSpace(number))),
-                                    _ => "Error"
+                                    _ => MessagesConstants.Error.TITLE
                                 };
                             }
 
@@ -246,7 +452,7 @@ namespace LBPRDC.Source.Services
                                     PositionFormat.NameOnly => emp.PositionName,
                                     PositionFormat.CodeOnly => emp.PositionCode,
                                     PositionFormat.Both => string.Join(" - ", emp.PositionCode, emp.PositionName),
-                                    _ => "Error"
+                                    _ => MessagesConstants.Error.TITLE
                                 };
                             }
 
@@ -260,19 +466,29 @@ namespace LBPRDC.Source.Services
             return employees;
         }
 
-        public static bool IDExists(string ID)
+        public static bool IDExists(int ClientID, string EmployeeID)
         {
             try
             {
-                string query = "SELECT COUNT(*) FROM Employee WHERE EmployeeID = @ID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
+                using var connection = Database.Connect();
+
+                string QueryCount = @"
+                    SELECT 
+                        COUNT(*) 
+                    FROM 
+                        Employee 
+                    WHERE
+                        ClientID = @ClientID
+                    AND
+                        EmployeeID = @EmployeeID";
+
+                int totalCount = connection.QueryFirstOrDefault<int>(QueryCount, new
                 {
-                    command.Parameters.AddWithValue("@ID", ID);
-                    connection.Open();
-                    int count = (int)command.ExecuteScalar();
-                    return count > 0;
-                }
+                    ClientID,
+                    EmployeeID
+                });
+
+                return totalCount > 0;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
@@ -287,95 +503,110 @@ namespace LBPRDC.Source.Services
                 try
                 {
                     string QueryInsert = @"
-                    INSERT INTO Employee (
-                        EmployeeID,
-                        ClientID,
-                        LastName,
-                        FirstName,
-                        MiddleName,
-                        SuffixID,
-                        Gender,
-                        Birthday,
-                        Education,
-                        DepartmentID,
-                        LocationID,
-                        EmailAddress1,
-                        EmailAddress2,
-                        ContactNumber1,
-                        ContactNumber2,
-                        CivilStatusID,
-                        PositionID,
-                        EmploymentStatusID,
-                        Remarks
-                    ) VALUES (
-                        @EmployeeID,
-                        @ClientID,
-                        @LastName,
-                        @FirstName,
-                        @MiddleName,
-                        @SuffixID,
-                        @Gender,
-                        @Birthday,
-                        @Education,
-                        @DepartmentID,
-                        @LocationID,
-                        @EmailAddress1,
-                        @EmailAddress2,
-                        @ContactNumber1,
-                        @ContactNumber2,
-                        @CivilStatusID,
-                        @PositionID,
-                        @EmploymentStatusID,
-                        @Remarks)";
+                        INSERT INTO Employee (
+                            EmployeeID,
+                            ClientID,
+                            LastName,
+                            FirstName,
+                            MiddleName,
+                            SuffixID,
+                            Gender,
+                            Birthday,
+                            Education,
+                            DepartmentID,
+                            LocationID,
+                            EmailAddress1,
+                            EmailAddress2,
+                            ContactNumber1,
+                            ContactNumber2,
+                            CivilStatusID,
+                            PositionID,
+                            EmploymentStatusID,
+                            Remarks,
+                            WageID
+                        ) VALUES (
+                            @EmployeeID,
+                            @ClientID,
+                            @LastName,
+                            @FirstName,
+                            @MiddleName,
+                            @SuffixID,
+                            @Gender,
+                            @Birthday,
+                            @Education,
+                            @DepartmentID,
+                            @LocationID,
+                            @EmailAddress1,
+                            @EmailAddress2,
+                            @ContactNumber1,
+                            @ContactNumber2,
+                            @CivilStatusID,
+                            @PositionID,
+                            @EmploymentStatusID,
+                            @Remarks,
+                            @WageID)";
 
                     int affectedRows = await connection.ExecuteAsync(QueryInsert, data, transaction);
 
                     if (affectedRows > 0)
                     {
-                        List<Department> departmentList = DepartmentService.GetAllItems();
-                        List<Location> locationList = LocationService.GetAllItems();
+                        transaction?.Commit();
 
-                        const string REMARKS_INITIAL = "Initial Status";
-                        const string STATUS_ACTIVE = "Active";
+                        string QueryMax = @"
+                            SELECT
+                                MAX(ID)
+                            FROM
+                                Employee";
+
+                        int lastInsertedID = connection.QueryFirstOrDefault<int>(QueryMax);
+
+                        if (lastInsertedID == 0)
+                        {
+                            transaction?.Rollback();
+                            return false;
+                        }
+
+                        var departmentList = await DepartmentService.GetAllItems();
+                        List<Location> locationList = LocationService.GetAllItems();
 
                         PositionService.History newPosition = new()
                         {
-                            EmployeeID = data.EmployeeID,
+                            EmployeeID = lastInsertedID,
                             PositionID = data.PositionID,
                             PositionTitle = data.PositionTitle,
                             SalaryRate = 0,
                             BillingRate = 0,
                             Timestamp = data.StartDate,
-                            Remarks = REMARKS_INITIAL,
-                            Status = STATUS_ACTIVE
+                            Remarks = StringConstants.Status.INITIAL,
+                            Status = StringConstants.Status.ACTIVE
                         };
 
                         CivilStatusService.History newCivilStatus = new()
                         {
-                            EmployeeID = data.EmployeeID,
+                            EmployeeID = lastInsertedID,
                             CivilStatusID = data.CivilStatusID,
                             Timestamp = data.StartDate,
-                            Remarks = REMARKS_INITIAL,
-                            Status = STATUS_ACTIVE
+                            Remarks = StringConstants.Status.INITIAL,
+                            Status = StringConstants.Status.ACTIVE
                         };
 
                         DepartmentService.History newDepartmentLocation = new()
                         {
-                            EmployeeID = data.EmployeeID,
+                            EmployeeID = lastInsertedID,
                             DepartmentName = departmentList.First(w => w.ID == data.DepartmentID).Name ?? "",
                             LocationName = locationList.First(w => w.ID == data.LocationID).Name ?? "",
                             Timestamp = data.StartDate,
-                            Remarks = REMARKS_INITIAL,
-                            Status = STATUS_ACTIVE
+                            Remarks = StringConstants.Status.INITIAL,
+                            Status = StringConstants.Status.ACTIVE
                         };
 
                         EmploymentStatusService.History newEmploymentStatus = new()
                         {
-                            EmployeeID = data.EmployeeID,
+                            EmployeeID = lastInsertedID,
                             EmploymentStatusID = data.EmploymentStatusID,
                             Timestamp = data.StartDate,
-                            Remarks = REMARKS_INITIAL,
-                            Status = STATUS_ACTIVE
+                            Remarks = StringConstants.Status.INITIAL,
+                            Status = StringConstants.Status.ACTIVE
                         };
 
                         PositionService.AddNewHistory(newPosition);
@@ -387,7 +618,7 @@ namespace LBPRDC.Source.Services
                         {
                             PreviousEmployeeService.PreviousEmployee entry = new()
                             {
-                                EmployeeID = data.EmployeeID,
+                                EmployeeID = lastInsertedID,
                                 Position = data.PreviousPosition,
                                 StartDate = data.PreviousFrom,
                                 EndDate = data.PreviousTo,
@@ -402,19 +633,19 @@ namespace LBPRDC.Source.Services
                             LoggingService.Log newLog = new()
                             {
                                 UserID = UserService.CurrentUser.UserID,
-                                ActivityType = "Add",
+                                ActivityType = MessagesConstants.Add.TITLE,
                                 ActivityDetails = $"This user added a new employee with ID of {data.EmployeeID}."
                             };
 
                             LoggingService.LogActivity(newLog);
                         }
                     }
-                    transaction?.Commit();
-                    return (affectedRows > 0);
+                    return true;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     transaction?.Rollback();
+                    MessageBox.Show(e.Message);
                     return false;
                 }
             } 
@@ -432,6 +663,7 @@ namespace LBPRDC.Source.Services
                 {
                     string QueryUpdate = @"
                         UPDATE Employee SET
+                            EmployeeID = @EmployeeID,
                             LastName = @LastName,
                             FirstName = @FirstName,
                             MiddleName = @MiddleName,
@@ -448,20 +680,21 @@ namespace LBPRDC.Source.Services
                             CivilStatusID = @CivilStatusID,
                             PositionID = @PositionID,
                             EmploymentStatusId = @EmploymentStatusId,
-                            Remarks = @Remarks
+                            Remarks = @Remarks,
+                            WageID = @WageID
                         WHERE 
-                            EmployeeID = @EmployeeID;";
+                            ID = @ID;";
 
                     int affectedRows = await connection.ExecuteAsync(QueryUpdate, employee, transaction);
 
                     if (affectedRows > 0)
                     {
                         transaction?.Commit();
-                        int positionHistoryID = PositionService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
-                        int civilStatusHistoryID = CivilStatusService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
-                        int departmentlocationHistoryID = DepartmentService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
-                        int employmentStatusHistoryID = EmploymentStatusService.GetAllHistory().First(w => w.EmployeeID == employee.EmployeeID && w.Status == "Active").HistoryID;
-                        bool hasRecord = PreviousEmployeeService.RecordExists(employee.EmployeeID);
+                        int positionHistoryID = PositionService.GetAllHistory().First(w => w.EmployeeID == employee.ID && w.Status == StringConstants.Status.ACTIVE).HistoryID;
+                        int civilStatusHistoryID = CivilStatusService.GetAllHistory().First(w => w.EmployeeID == employee.ID && w.Status == StringConstants.Status.ACTIVE).HistoryID;
+                        int departmentlocationHistoryID = DepartmentService.GetAllHistory().First(w => w.EmployeeID == employee.ID && w.Status == StringConstants.Status.ACTIVE).HistoryID;
+                        int employmentStatusHistoryID = EmploymentStatusService.GetAllHistory().First(w => w.EmployeeID == employee.ID && w.Status == StringConstants.Status.ACTIVE).HistoryID;
+                        bool hasRecord = PreviousEmployeeService.RecordExists(employee.ID);
 
                         PositionService.UpdateHistory(new()
                         {
@@ -493,7 +726,7 @@ namespace LBPRDC.Source.Services
 
                         PreviousEmployeeService.PreviousEmployee updatedPreviousEmployee = new()
                         {
-                            EmployeeID = employee.EmployeeID,
+                            EmployeeID = employee.ID,
                             Position = employee.PreviousPosition,
                             StartDate = employee.PreviousFrom,
                             EndDate = employee.PreviousTo,
@@ -510,7 +743,7 @@ namespace LBPRDC.Source.Services
                         }
                         else if (hasRecord && Convert.ToBoolean(!employee.isPreviousEmployee))
                         {
-                            PreviousEmployeeService.DeleteRecord(employee.EmployeeID);
+                            PreviousEmployeeService.DeleteRecord(employee.ID);
                         }                        
 
                         if (UserService.CurrentUser != null)
@@ -541,45 +774,49 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string updateQuery = "UPDATE Employee SET " +
-                    "PositionID = @PositionID " +
-                    "WHERE EmployeeID = @EmployeeID";
+                using var context = new Context();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
+                var employee = await context.Employee.FindAsync(data.EmployeeID);
+
+                if (employee == null)
                 {
-                    command.Parameters.AddWithValue("@PositionID", data.PositionID);
-                    command.Parameters.AddWithValue("@EmployeeID", data.EmployeeID);
-
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
+                    return false;
                 }
 
-                PositionService.History newHistory = new()
-                {
-                    EmployeeID = data.EmployeeID,
-                    OldPositionID = data.OldPositionID,
-                    PositionID = data.PositionID,
-                    PositionTitle = data.PositionTitle,
-                    SalaryRate = 0,
-                    BillingRate = 0,
-                    Timestamp = data.Date,
-                    Remarks = data.Remarks,
-                    Status = "Active"
-                };
+                employee.PositionID = data.PositionID;
 
-                PositionService.AddNewHistory(newHistory);
+                int affectedRows = await context.SaveChangesAsync();
 
-                if (UserService.CurrentUser != null)
+                if (affectedRows > 0)
                 {
-                    LoggingService.Log newLog = new()
+                    PositionService.History newHistory = new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Update",
-                        ActivityDetails = $"This user has promoted/demoted the position of employee with the ID {data.EmployeeID}."
+                        EmployeeID = data.EmployeeID,
+                        OldPositionID = data.OldPositionID,
+                        PositionID = data.PositionID,
+                        PositionTitle = data.PositionTitle,
+                        SalaryRate = 0,
+                        BillingRate = 0,
+                        Timestamp = data.Date,
+                        Remarks = data.Remarks,
+                        Status = StringConstants.Status.ACTIVE
                     };
 
-                    LoggingService.LogActivity(newLog);
+                    PositionService.AddNewHistory(newHistory);
+
+                    if (UserService.CurrentUser != null)
+                    {
+                        LoggingService.LogActivity(new()
+                        {
+                            UserID = UserService.CurrentUser.UserID,
+                            ActivityType = MessagesConstants.UPDATE,
+                            ActivityDetails = $"This user has promoted/demoted the position of employee with the ID {data.EmployeeID}."
+                        });
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
 
                 return true;
@@ -591,44 +828,44 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string updateQuery = "UPDATE Employee SET " +
-                    "DepartmentID = @DepartmentID, " +
-                    "LocationID = @LocationID " +
-                    "WHERE EmployeeID = @EmployeeID";
+                using var context = new Context();
+                var employee = await context.Employee.FindAsync(data.EmployeeID);
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
+                if (employee == null)
                 {
-                    command.Parameters.AddWithValue("@DepartmentID", data.DepartmentID);
-                    command.Parameters.AddWithValue("@LocationID", data.LocationID);
-                    command.Parameters.AddWithValue("@EmployeeID", data.EmployeeID);
-
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
+                    return false;
                 }
 
-                DepartmentService.History newHistory = new()
-                {
-                    EmployeeID = data.EmployeeID,
-                    DepartmentName = data.DepartmentName,
-                    LocationName = data.LocationName,
-                    Timestamp = data.Date,
-                    Remarks = data.Remarks,
-                    Status = "Active"
-                };
+                employee.DepartmentID = data.DepartmentID;
+                employee.LocationID = data.LocationID;
 
-                DepartmentService.AddNewHistory(newHistory);
+                int affectedRows = await context.SaveChangesAsync();
 
-                if (UserService.CurrentUser != null)
+                if (affectedRows > 0)
                 {
-                    LoggingService.Log newLog = new()
+                    DepartmentService.History newHistory = new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Update",
-                        ActivityDetails = $"This user has updated the department and location of employee with the ID {data.EmployeeID}."
+                        EmployeeID = data.EmployeeID,
+                        DepartmentName = data.DepartmentName,
+                        LocationName = data.LocationName,
+                        Timestamp = data.Date,
+                        Remarks = data.Remarks,
+                        Status = StringConstants.Status.ACTIVE
                     };
 
-                    LoggingService.LogActivity(newLog);
+                    DepartmentService.AddNewHistory(newHistory);
+
+                    if (UserService.CurrentUser != null)
+                    {
+                        LoggingService.Log newLog = new()
+                        {
+                            UserID = UserService.CurrentUser.UserID,
+                            ActivityType = MessagesConstants.UPDATE,
+                            ActivityDetails = $"This user has updated the department and location of employee with the ID {data.EmployeeID}."
+                        };
+
+                        LoggingService.LogActivity(newLog);
+                    }
                 }
 
                 return true;
@@ -640,41 +877,42 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string updateQuery = "UPDATE Employee SET " +
-                    "CivilStatusID = @CivilStatusID " +
-                    "WHERE EmployeeID = @EmployeeID";
+                using var context = new Context();
+                var employee = await context.Employee.FindAsync(data.EmployeeID);
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
+                if (employee == null)
                 {
-                    command.Parameters.AddWithValue("@CivilStatusID", data.CivilStatusID);
-                    command.Parameters.AddWithValue("@EmployeeID", data.EmployeeID);
-
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
+                    return false;
                 }
 
-                CivilStatusService.History newHistory = new()
-                {
-                    EmployeeID = data.EmployeeID,
-                    CivilStatusID = data.CivilStatusID,
-                    Timestamp = data.Date,
-                    Remarks = data.Remarks,
-                    Status = "Active"
-                };
+                employee.CivilStatusID = data.CivilStatusID;
 
-                CivilStatusService.AddNewHistory(newHistory);
+                int affectedRows = await context.SaveChangesAsync();
 
-                if (UserService.CurrentUser != null)
+                if (affectedRows > 0)
                 {
-                    LoggingService.Log newLog = new()
+                    CivilStatusService.History newHistory = new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Update",
-                        ActivityDetails = $"This user has updated the civil status of employee with the ID {data.EmployeeID}."
+                        EmployeeID = data.EmployeeID,
+                        CivilStatusID = data.CivilStatusID,
+                        Timestamp = data.Date,
+                        Remarks = data.Remarks,
+                        Status = StringConstants.Status.ACTIVE
                     };
 
-                    LoggingService.LogActivity(newLog);
+                    CivilStatusService.AddNewHistory(newHistory);
+
+                    if (UserService.CurrentUser != null)
+                    {
+                        LoggingService.Log newLog = new()
+                        {
+                            UserID = UserService.CurrentUser.UserID,
+                            ActivityType = MessagesConstants.UPDATE,
+                            ActivityDetails = $"This user has updated the civil status of employee with the ID {data.EmployeeID}."
+                        };
+
+                        LoggingService.LogActivity(newLog);
+                    }
                 }
 
                 return true;
@@ -686,160 +924,153 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string updateQuery = "UPDATE Employee SET " +
-                    "EmploymentStatusID = @EmploymentStatusID " +
-                    "WHERE EmployeeID = @EmployeeID";
+                using var context = new Context();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
+                var employee = await context.Employee.FindAsync(data.EmployeeID);
+
+                if (employee == null)
                 {
-                    command.Parameters.AddWithValue("@EmploymentStatusID", data.EmploymentStatusID);
-                    command.Parameters.AddWithValue("@EmployeeID", data.EmployeeID);
-
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
+                    return false;
                 }
 
-                EmploymentStatusService.History newHistory = new()
-                {
-                    EmployeeID = data.EmployeeID,
-                    EmploymentStatusID = data.EmploymentStatusID,
-                    Timestamp = data.Date,
-                    Remarks = data.Remarks,
-                    Status = "Active"
-                };
+                employee.EmploymentStatusID = data.EmploymentStatusID;
+                int affectedRows = await context.SaveChangesAsync();
 
-                EmploymentStatusService.AddNewHistory(newHistory);
-
-                if (UserService.CurrentUser != null)
+                if (affectedRows > 0)
                 {
-                    LoggingService.Log newLog = new()
+                    EmploymentStatusService.History newHistory = new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Update",
-                        ActivityDetails = $"This user has updated the employment status of employee with the ID {data.EmployeeID}."
+                        EmployeeID = data.EmployeeID,
+                        EmploymentStatusID = data.EmploymentStatusID,
+                        Timestamp = data.Date,
+                        Remarks = data.Remarks,
+                        Status = StringConstants.Status.ACTIVE
                     };
 
-                    LoggingService.LogActivity(newLog);
-                }
-
-                return true;
-            }
-            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        public static bool ArchiveEmployee(string EmployeeID)
-        {
-            try
-            {
-                var Suffix = SuffixService.GetAllItems();
-                var Department = DepartmentService.GetAllItems();
-                var Location = LocationService.GetAllItems();
-                var CivilStatus = CivilStatusService.GetAllItems();
-                var Position = PositionService.GetAllItems();
-                var EmploymentStatus = EmploymentStatusService.GetAllItems();
-
-                string QuerySelect = $"SELECT * FROM Employee WHERE EmployeeID = '{EmployeeID}'";
-                using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
-                using SqlCommand commandSelect = new(QuerySelect, connection);
-                connection.Open();
-                using SqlDataReader reader = commandSelect.ExecuteReader();
-
-                if (reader.Read())
-                {
-                    Employee employee = new()
-                    {
-                        EmployeeID = Convert.ToString(reader["EmployeeID"]),
-                        LastName = Convert.ToString(reader["LastName"]),
-                        FirstName = Convert.ToString(reader["FirstName"]),
-                        MiddleName = Convert.ToString(reader["MiddleName"]),
-                        Suffix = Suffix.First(f => f.ID == Convert.ToInt32(reader["SuffixID"])).Name,
-                        Gender = Convert.ToString(reader["Gender"]),
-                        Birthday = Convert.ToDateTime(reader["Birthday"]),
-                        Education = Convert.ToString(reader["Education"]),
-                        Department = Department.First(f => f.ID == Convert.ToInt32(reader["DepartmentID"])).Name,
-                        Location = Location.First(f => f.ID == Convert.ToInt32(reader["LocationID"])).Name,
-                        EmailAddress1 = Convert.ToString(reader["EmailAddress1"]),
-                        EmailAddress2 = Convert.ToString(reader["EmailAddress2"]),
-                        ContactNumber1 = Convert.ToString(reader["ContactNumber1"]),
-                        ContactNumber2 = Convert.ToString(reader["ContactNumber2"]),
-                        CivilStatus = CivilStatus.First(f => f.ID == Convert.ToInt32(reader["CivilStatusID"])).Name,
-                        Position = Position.First(f => f.ID == Convert.ToInt32(reader["PositionID"])).Name,
-                        EmploymentStatus = EmploymentStatus.First(f => f.ID == Convert.ToInt32(reader["EmploymentStatusID"])).Name,
-                        Remarks = Convert.ToString(reader["Remarks"])
-                    };
-
-                    AddToArchive(employee);
-                    RemoveEmployeeRecord(EmployeeID);
+                    EmploymentStatusService.AddNewHistory(newHistory);
 
                     if (UserService.CurrentUser != null)
                     {
                         LoggingService.Log newLog = new()
                         {
                             UserID = UserService.CurrentUser.UserID,
-                            ActivityType = "Archive",
-                            ActivityDetails = $"This user has archived an employee with the ID {EmployeeID}."
+                            ActivityType = MessagesConstants.UPDATE,
+                            ActivityDetails = $"This user has updated the employment status of employee with the ID {data.EmployeeID}."
                         };
 
                         LoggingService.LogActivity(newLog);
                     }
                 }
-                else
-                {
-                    MessageBox.Show("There seems to be a problem archiving this employee. Please contact support");
-                    return false;
-                }
+
                 return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        private static void AddToArchive(Employee employee)
+        public static async Task<bool> ArchiveEmployee(int EmployeeID, int ClientID)
         {
             try
             {
-                string QueryInsert = "INSERT INTO Archive_Employee (EmployeeID, LastName, FirstName, MiddleName, Suffix, Gender, Birthday, Education, Department, Location, EmailAddress1, EmailAddress2, ContactNumber1, ContactNumber2, CivilStatus, Position, EmploymentStatus, Remarks) " +
-                                "VALUES (@EmployeeID, @LastName, @FirstName, @MiddleName, @Suffix, @Gender, @Birthday, @Education, @Department, @Location, @EmailAddress1, @EmailAddress2, @ContactNumber1, @ContactNumber2, @CivilStatus, @Position, @EmploymentStatus, @Remarks)";
-                using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
-                using SqlCommand commandInsert = new(QueryInsert, connection);
-                commandInsert.Parameters.AddWithValue("@EmployeeID", employee.EmployeeID);
-                commandInsert.Parameters.AddWithValue("@LastName", employee.LastName);
-                commandInsert.Parameters.AddWithValue("@FirstName", employee.FirstName);
-                commandInsert.Parameters.AddWithValue("@MiddleName", employee.MiddleName);
-                commandInsert.Parameters.AddWithValue("@Suffix", employee.Suffix);
-                commandInsert.Parameters.AddWithValue("@Gender", employee.Gender);
-                commandInsert.Parameters.AddWithValue("@Birthday", employee.Birthday);
-                commandInsert.Parameters.AddWithValue("@Education", employee.Education);
-                commandInsert.Parameters.AddWithValue("@Department", employee.Department);
-                commandInsert.Parameters.AddWithValue("@Location", employee.Location);
-                commandInsert.Parameters.AddWithValue("@EmailAddress1", employee.EmailAddress1);
-                commandInsert.Parameters.AddWithValue("@EmailAddress2", employee.EmailAddress2);
-                commandInsert.Parameters.AddWithValue("@ContactNumber1", employee.ContactNumber1);
-                commandInsert.Parameters.AddWithValue("@ContactNumber2", employee.ContactNumber2);
-                commandInsert.Parameters.AddWithValue("@CivilStatus", employee.CivilStatus);
-                commandInsert.Parameters.AddWithValue("@Position", employee.Position);
-                commandInsert.Parameters.AddWithValue("@EmploymentStatus", employee.EmploymentStatus);
-                commandInsert.Parameters.AddWithValue("@Remarks", employee.Remarks);
-                connection.Open();
-                commandInsert.ExecuteNonQuery();
+                using var context = new Context();
+                bool isRemoved = false;
+                var employees = await GetAllEmployeeInfoByClientID(ClientID);
+                var employee = employees.FirstOrDefault(e => e.ID == EmployeeID);
+
+                if (employee == null)
+                {
+                    return false;
+                }
+
+                Models.EmployeeArchive employeeArchive = new()
+                {
+                    ClientID = employee.ClientID,
+                    ClientName = employee.ClientName,
+                    EmployeeID = employee.EmployeeID,
+                    LastName = employee.LastName,
+                    FirstName = employee.FirstName,
+                    MiddleName = employee.MiddleName,
+                    Suffix = employee.SuffixName,
+                    Gender = employee.Gender,
+                    Birthday = employee.Birthday,
+                    Education = employee.Education,
+                    Department = employee.DepartmentName,
+                    Location = employee.LocationName,
+                    EmailAddress1 = employee.EmailAddress1,
+                    EmailAddress2 = employee.EmailAddress2,
+                    ContactNumber1 = employee.ContactNumber1,
+                    ContactNumber2 = employee.ContactNumber2,
+                    CivilStatus = employee.CivilStatusName,
+                    Position = employee.PositionName,
+                    EmploymentStatus = employee.EmploymentStatusName,
+                    Remarks = employee.Remarks
+                };
+
+                context.EmployeeArchives.Add(employeeArchive);
+                int result = await context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    isRemoved = await RemoveEmployeeRecord(EmployeeID);
+                }
+
+                if (isRemoved && UserService.CurrentUser != null)
+                {
+                    LoggingService.LogActivity(new()
+                    {
+                        UserID = UserService.CurrentUser.UserID,
+                        ActivityType = MessagesConstants.Archive.TITLE,
+                        ActivityDetails = $"This user has archived an employee with the ID: {EmployeeID}."
+                    });
+                }
+
+                return isRemoved;
             }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        private static void RemoveEmployeeRecord(string EmployeeID)
+        private static async Task<bool> RemoveEmployeeRecord(int EmployeeID)
         {
             try
             {
-                string QueryDelete = $"DELETE FROM EmployeeCivilStatusHistory WHERE EmployeeID = '{EmployeeID}';" +
-                            $"DELETE FROM EmployeeDepartmentLocationHistory WHERE EmployeeID = '{EmployeeID}';" +
-                            $"DELETE FROM EmployeeEmploymentHistory WHERE EmployeeID = '{EmployeeID}';" +
-                            $"DELETE FROM EmployeePositionHistory WHERE EmployeeID = '{EmployeeID}';" +
-                            $"DELETE FROM EmployeePreviousRecord WHERE EmployeeID = '{EmployeeID}';" +
-                            $"DELETE FROM Employee WHERE EmployeeID = '{EmployeeID}';";
-                using SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
-                using SqlCommand commandDelete = new(QueryDelete, connection);
-                connection.Open();
-                commandDelete.ExecuteNonQuery();
+                using var context = new Context();
+
+                await CivilStatusService.RemoveHistoryByEmployeeID(EmployeeID);
+                await DepartmentService.RemoveHistoryByEmployeeID(EmployeeID);
+                await EmploymentStatusService.RemoveHistoryByEmployeeID(EmployeeID);
+                await PositionService.RemoveHistoryByEmployeeID(EmployeeID);
+                await RemoveHistoryByEmployeeID(EmployeeID);
+
+                var employeeToRemove = await context.Employee.FindAsync(EmployeeID);
+
+                if (employeeToRemove != null)
+                {
+                    context.Employee.Remove(employeeToRemove);
+                    await context.SaveChangesAsync();
+                }
+                else
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task RemoveHistoryByEmployeeID(int EmployeeID)
+        {
+            try
+            {
+                using var context = new Context();
+                var historiesToRemove = await context.EmployeePreviousRecord
+                    .Where(h => h.EmployeeID == EmployeeID)
+                    .ToListAsync();
+
+                if (historiesToRemove.Any())
+                {
+                    context.EmployeePreviousRecord.RemoveRange(historiesToRemove);
+                    await context.SaveChangesAsync();
+                }
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }

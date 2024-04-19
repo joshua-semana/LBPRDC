@@ -1,4 +1,5 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using LBPRDC.Source.Views.Employee;
 using LBPRDC.Source.Views.EmployeeFlow;
@@ -13,10 +14,14 @@ namespace LBPRDC.Source.Views
     {
         UserControl loadingControl = new ucLoading() { Dock = DockStyle.Fill };
 
-        private UserPreference preference;
-        private string EmployeeID;
+        private UserPreference? preference;
+        private int EmployeeID;
+        private string strEmployeeID = "";
 
-        private int ClientID = -1;
+        private int ClientID;
+
+        private const int COLUMN_ID = 0;
+        private const int COLUMN_EMPLOYEE_ID = 1;
 
         public ucEmployees()
         {
@@ -27,14 +32,15 @@ namespace LBPRDC.Source.Views
 
         public void ApplyFilterAndSearchThenPopulate()
         {
-            if (ClientID != -1)
+            if (ClientID != 0)
             {
                 List<int> deparmentIDs = dchkListFilterDepartments.GetCheckedItems().Select(s => s.ID).ToList();
                 List<int> positionIDs = dchkListFilterPositions.GetCheckedItems().Select(s => s.ID).ToList();
                 List<int> employmentStatusIDs = dchkListFilterEmploymentStatus.GetCheckedItems().Select(s => s.ID).ToList();
+                List<int> wageIDs = dchkListFilterWageType.GetCheckedItems().Select(s => s.ID).ToList();
                 string searchWord = txtSearch.Text.Trim().ToLower();
 
-                PopulateTableWithFilterAndSearch(deparmentIDs, positionIDs, employmentStatusIDs, searchWord, ClientID);
+                PopulateTableWithFilterAndSearch(deparmentIDs, positionIDs, employmentStatusIDs, wageIDs, searchWord, ClientID);
             }
         }
 
@@ -52,38 +58,51 @@ namespace LBPRDC.Source.Views
                 InitializeClientComboBoxItems();
                 ClientID = Convert.ToInt32(cmbClient.SelectedValue);
 
-                ApplyFilterAndSearchThenPopulate();
-                PopulateFilters();
+                //ApplyFilterAndSearchThenPopulate();
+                //PopulateFilters();
             }
         }
 
         private void InitializeClientComboBoxItems()
         {
-            cmbClient.DataSource = ClientService.GetClientsForComboBoxByStatus("Active", false);
-            cmbClient.DisplayMember = "Name";
+            cmbClient.DataSource = ClientService.GetClientsForComboBoxByStatus(StringConstants.Status.ACTIVE, false);
+            cmbClient.DisplayMember = "Description";
             cmbClient.ValueMember = "ID";
+            cmbClient.MouseWheel += ComboBoxUtils.HandleMouseWheel;
+            cmbClient.KeyDown += ComboBoxUtils.HandleKeyDown;
         }
 
-        private void PopulateFilters()
+        private async void PopulateFilters()
         {
+            var positions = await PositionService.GetAllItemsForComboBoxByClientID(ClientID, false);
+            var wages = await WageService.GetWagesAsync();
+
             InitializeFilter(
                 lblFilterDepartments,
                 dchkListFilterDepartments,
-                DepartmentService.GetAllItemsByStatusAndClientID("Active", ClientID)
+                DepartmentService.GetAllItemsByStatusAndClientID(StringConstants.Status.ACTIVE, ClientID)
                     .Select(s => new CheckedListBoxItems(s.ID, s.Name))
                     .ToList()
             );
             InitializeFilter(
                 lblFilterPositions,
                 dchkListFilterPositions,
-                PositionService.GetAllItemsByStatusAndClientID("Active", ClientID)
+                positions
                     .Select(s => new CheckedListBoxItems(s.ID, Utilities.StringFormat.ToSentenceCase(s.Name)))
                     .ToList()
             );
             InitializeFilter(
                 lblFilterEmploymentStatus,
                 dchkListFilterEmploymentStatus,
-                EmploymentStatusService.GetAllItemsByStatus("Active")
+                EmploymentStatusService.GetAllItemsByStatus(StringConstants.Status.ACTIVE)
+                    .Select(s => new CheckedListBoxItems(s.ID, Utilities.StringFormat.ToSentenceCase(s.Name)))
+                    .ToList()
+            );
+            InitializeFilter(
+                lblFilterWageType,
+                dchkListFilterWageType,
+                wages
+                    .Where(w => w.Status == StringConstants.Status.ACTIVE)
                     .Select(s => new CheckedListBoxItems(s.ID, Utilities.StringFormat.ToSentenceCase(s.Name)))
                     .ToList()
             );
@@ -100,11 +119,11 @@ namespace LBPRDC.Source.Views
             control.DisplayItems();
         }
 
-        private async void PopulateTableWithFilterAndSearch(List<int> departmentIDs, List<int> positionIDs, List<int> employmentStatusIDs, string searchWord, int clientID)
+        private async void PopulateTableWithFilterAndSearch(List<int> departmentIDs, List<int> positionIDs, List<int> employmentStatusIDs, List<int> wageIDs, string searchWord, int clientID)
         {
             ShowLoadingProgressBar(true);
             preference = UserPreferenceManager.LoadPreference();
-            List<EmployeeService.Employee> employees = await Task.Run(() => EmployeeService.GetAllEmployees());
+            var employees = await Task.Run(() => EmployeeService.GetEmployeesWithPreferenceByClientID(ClientID));
 
             dgvEmployees.Columns.Clear();
 
@@ -112,11 +131,11 @@ namespace LBPRDC.Source.Views
             {
                 dgvEmployees.AutoGenerateColumns = false;
 
-                List<EmployeeService.Employee> filteredEmployees = employees;
+                var filteredEmployees = employees;
 
-                if (clientID != 0)
+                if (wageIDs != null && wageIDs.Count > 0)
                 {
-                    filteredEmployees = filteredEmployees.Where(employee => clientID.Equals(employee.ClientID)).ToList();
+                    filteredEmployees = filteredEmployees.Where(employee => wageIDs.Contains(employee.WageID)).ToList();
                 }
                 if (departmentIDs != null && departmentIDs.Count > 0)
                 {
@@ -156,39 +175,35 @@ namespace LBPRDC.Source.Views
 
         private void ApplySettingsToTable()
         {
-            if (preference.ShowEmployeeID) { ControlUtils.AddColumn(dgvEmployees, "EmployeeID", "ID", "EmployeeID", true, true); }
+            ControlUtils.AddColumn(dgvEmployees, "ID", "ID", "ID", true, true);
+            ControlUtils.AddColumn(dgvEmployees, "EmployeeID", "Employee ID", "EmployeeID", preference.ShowEmployeeID, true);
             if (preference.ShowName)
             {
-                if (preference.SelectedNameFormat == NameFormat.Full1 ||
-                    preference.SelectedNameFormat == NameFormat.Full2 ||
-                    preference.SelectedNameFormat == NameFormat.FirstAndLastOnly)
-                {
-                    ControlUtils.AddColumn(dgvEmployees, "FullName", "Full Name", "FullName", true, true);
-                }
-                else if (preference.SelectedNameFormat == NameFormat.LastNameOnly)
-                {
-                    ControlUtils.AddColumn(dgvEmployees, "LastName", "Last Name", "LastName", true, true);
-                }
-                else if (preference.SelectedNameFormat == NameFormat.Separated)
+                if (preference.SelectedNameFormat == NameFormat.Separated)
                 {
                     ControlUtils.AddColumn(dgvEmployees, "FirstName", "First Name", "FirstName", true, true);
                     ControlUtils.AddColumn(dgvEmployees, "MiddleName", "Middle Name", "MiddleName", true, true);
                     ControlUtils.AddColumn(dgvEmployees, "LastName", "Last Name", "LastName", true, true);
-                    ControlUtils.AddColumn(dgvEmployees, "Suffix", "Suffix", "Suffix", true, true);
+                    ControlUtils.AddColumn(dgvEmployees, "SuffixName", "Suffix", "SuffixName", true, true);
+                }
+                else
+                {
+                    ControlUtils.AddColumn(dgvEmployees, "FullName", "Name", "FullName", true, true);
                 }
             }
-            if (preference.ShowGender) { ControlUtils.AddColumn(dgvEmployees, "Gender", "Gender", "Gender", true, true); }
-            if (preference.ShowBirthday) { ControlUtils.AddColumn(dgvEmployees, "Birthday", "Birthday", "Birthday", true, true); }
-            if (preference.ShowEducation) { ControlUtils.AddColumn(dgvEmployees, "Education", "Education", "Education", true, true); }
-            if (preference.ShowCivilStatus) { ControlUtils.AddColumn(dgvEmployees, "CivilStatus", "Civil Status", "CivilStatus", true, true); }
-            if (preference.ShowEmailAddress) { ControlUtils.AddColumn(dgvEmployees, "EmailAddress", "Email Address", "EmailAddress", true, true); }
-            if (preference.ShowContactNumber) { ControlUtils.AddColumn(dgvEmployees, "ContactNumber", "Contact Number", "ContactNumber", true, true); }
-            if (preference.ShowDepartment) { ControlUtils.AddColumn(dgvEmployees, "Department", "Department", "Department", true, true); }
-            if (preference.ShowLocation) { ControlUtils.AddColumn(dgvEmployees, "Location", "Location", "Location", true, true); }
-            if (preference.ShowPosition) { ControlUtils.AddColumn(dgvEmployees, "Position", "Position", "Position", true, true); }
-            if (preference.ShowSalaryRate) { ControlUtils.AddColumn(dgvEmployees, "SalaryRate", "Salary Rate", "SalaryRate", true, true); }
-            if (preference.ShowBillingRate) { ControlUtils.AddColumn(dgvEmployees, "BillingRate", "Billing Rate", "BillingRate", true, true); }
-            if (preference.ShowEmploymentStatus) { ControlUtils.AddColumn(dgvEmployees, "EmploymentStatus", "Status", "EmploymentStatus", true, true); }
+            ControlUtils.AddColumn(dgvEmployees, "Gender", "Gender", "Gender", preference.ShowGender, true);
+            ControlUtils.AddColumn(dgvEmployees, "Birthday", "Birthday", "Birthday", preference.ShowBirthday, true);
+            ControlUtils.AddColumn(dgvEmployees, "Education", "Education", "Education", preference.ShowEducation, true);
+            ControlUtils.AddColumn(dgvEmployees, "CivilStatusName", "Civil Status", "CivilStatusName", preference.ShowCivilStatus, true);
+            ControlUtils.AddColumn(dgvEmployees, "JoinedEmailAddress", "Email Address", "JoinedEmailAddress", preference.ShowEmailAddress, true);
+            ControlUtils.AddColumn(dgvEmployees, "JoinedContactNumber", "Contact Number", "JoinedContactNumber", preference.ShowContactNumber, true);
+            ControlUtils.AddColumn(dgvEmployees, "DepartmentName", "Department", "DepartmentName", preference.ShowDepartment, true);
+            ControlUtils.AddColumn(dgvEmployees, "LocationName", "Location", "LocationName", preference.ShowLocation, true);
+            ControlUtils.AddColumn(dgvEmployees, "PositionInfo", "Position", "PositionInfo", preference.ShowPosition, true);
+            ControlUtils.AddColumn(dgvEmployees, "WageName", "Wage Type", "WageName", preference.ShowWageType, true);
+            ControlUtils.AddColumn(dgvEmployees, "SalaryRate", "Salary Rate", "SalaryRate", preference.ShowSalaryRate, true);
+            ControlUtils.AddColumn(dgvEmployees, "BillingRate", "Billing Rate", "BillingRate", preference.ShowBillingRate, true);
+            ControlUtils.AddColumn(dgvEmployees, "EmploymentStatusName", "Status", "EmploymentStatusName", preference.ShowEmploymentStatus, true);
         }
 
         private void ShowLoadingProgressBar(bool state)
@@ -198,7 +213,7 @@ namespace LBPRDC.Source.Views
 
         private void btnAddEmployee_Click(object sender, EventArgs e)
         {
-            if (ClientID == -1)
+            if (ClientID == 0)
             {
                 MessageBox.Show("You must first add a client in order to add an employee.");
                 return;
@@ -253,43 +268,48 @@ namespace LBPRDC.Source.Views
 
         private void cntxtMenuView_Click(object sender, EventArgs e)
         {
-            EmployeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
             ViewEmployeeDataForm frmViewEmployeeData = new()
             {
-                EmployeeId = EmployeeID
+                ClientID = ClientID,
+                EmployeeID = EmployeeID
             };
             frmViewEmployeeData.ShowDialog();
         }
 
         private void cntxtMenuViewBillings_Click(object sender, EventArgs e)
         {
-            EmployeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
+            if (strEmployeeID == "")
+            {
+                return;
+            }
+
             ViewBillingsForm form = new()
             {
-                EmployeeID = EmployeeID
+                EmployeeID = strEmployeeID,
+                ClientID = ClientID,
             };
             form.ShowDialog();
         }
 
         private void cntxtMenuEdit_Click(object sender, EventArgs e)
         {
-            EmployeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
             EditEmployeeForm frmEditEmployee = new()
             {
                 ParentControl = this,
-                EmployeeId = EmployeeID
+                EmployeeID = EmployeeID,
+                ClientID = ClientID
             };
             frmEditEmployee.ShowDialog();
         }
 
         private async void cntxtMenuArchive_Click(object sender, EventArgs e)
         {
+            if (EmployeeID == 0 || ClientID == 0) return;
             var output = MessageBox.Show("Are you sure you want to archive this employee?", "Archive Employee", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (output == DialogResult.Yes)
             {
                 Cursor = Cursors.WaitCursor;
-                EmployeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
-                if (await Task.Run(() => EmployeeService.ArchiveEmployee(EmployeeID)))
+                if (await Task.Run(() => EmployeeService.ArchiveEmployee(EmployeeID, ClientID)))
                 {
                     MessageBox.Show("You have successfully archived this employee.", "Archive Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     ApplyFilterAndSearchThenPopulate();
@@ -300,44 +320,42 @@ namespace LBPRDC.Source.Views
 
         private void menuUpdatePosition_Click(object sender, EventArgs e)
         {
-            EmployeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
             UpdatePositionForm frmUpdatePosition = new()
             {
                 ParentControl = this,
-                EmployeeId = EmployeeID
+                EmployeeID = EmployeeID,
+                ClientID = ClientID
             };
             frmUpdatePosition.ShowDialog();
         }
 
         private void menuUpdateCivilStatus_Click(object sender, EventArgs e)
         {
-            EmployeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
             UpdateCivilStatusForm frmUpdateCivilStatus = new()
             {
                 ParentControl = this,
-                EmployeeId = EmployeeID
+                EmployeeID = EmployeeID
             };
             frmUpdateCivilStatus.ShowDialog();
         }
 
         private void menuUpdateEmploymentStatus_Click(object sender, EventArgs e)
         {
-            string employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
             UpdateEmploymentStatusForm frmUpdateEmploymentStatus = new()
             {
                 ParentControl = this,
-                EmployeeId = employeeID
+                EmployeeID = EmployeeID
             };
             frmUpdateEmploymentStatus.ShowDialog();
         }
 
         private void menuUpdateDepartmentLocation_Click(object sender, EventArgs e)
         {
-            string employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
             UpdateDepartmentLocationForm frmUpdateDepartmentLocation = new()
             {
                 ParentControl = this,
-                EmployeeId = employeeID
+                EmployeeID = EmployeeID,
+                ClientID = ClientID
             };
             frmUpdateDepartmentLocation.ShowDialog();
         }
@@ -370,11 +388,10 @@ namespace LBPRDC.Source.Views
 
         private void ViewEmployeeHistory(string type)
         {
-            string employeeID = dgvEmployees.SelectedRows[0].Cells[0].Value.ToString();
             ViewHistory frmViewHistory = new()
             {
                 HistoryType = type,
-                EmployeeId = employeeID
+                EmployeeID = EmployeeID
             };
             frmViewHistory.ShowDialog();
         }
@@ -410,14 +427,27 @@ namespace LBPRDC.Source.Views
             {
                 var selectedClient = (Client)cmbClient.SelectedItem;
                 ClientID = selectedClient.ID;
+                ApplyFilterAndSearchThenPopulate();
+                PopulateFilters();
             }
             else
             {
-                ClientID = -1;
+                ClientID = 0;
             }
+        }
 
-            ApplyFilterAndSearchThenPopulate();
-            PopulateFilters();
+        private void dgvEmployees_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dgvEmployees.Columns.Count > 1 && dgvEmployees.Rows.Count > 0 && dgvEmployees.SelectedRows.Count > 0)
+            {
+                EmployeeID = Convert.ToInt32(dgvEmployees.SelectedRows[0].Cells[COLUMN_ID].Value);
+                strEmployeeID = Convert.ToString(dgvEmployees.SelectedRows[0].Cells[COLUMN_EMPLOYEE_ID].Value) ?? "";
+            }
+            else
+            {
+                EmployeeID = 0;
+                strEmployeeID = "";
+            }
         }
     }
 }

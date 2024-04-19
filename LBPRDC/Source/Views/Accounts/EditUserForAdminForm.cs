@@ -1,4 +1,5 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views.Accounts
@@ -64,7 +65,7 @@ namespace LBPRDC.Source.Views.Accounts
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show(MessagesConstants.Cancel.QUESTION, MessagesConstants.Cancel.TITLE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
                 this.Close();

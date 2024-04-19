@@ -61,7 +61,7 @@
             pnlLine1.Dock = DockStyle.Top;
             pnlLine1.Location = new Point(0, 0);
             pnlLine1.Name = "pnlLine1";
-            pnlLine1.Size = new Size(334, 1);
+            pnlLine1.Size = new Size(322, 1);
             pnlLine1.TabIndex = 0;
             // 
             // pnlFooter
@@ -69,9 +69,9 @@
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Controls.Add(flowLayoutPanel2);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 308);
+            pnlFooter.Location = new Point(0, 307);
             pnlFooter.Name = "pnlFooter";
-            pnlFooter.Size = new Size(334, 46);
+            pnlFooter.Size = new Size(322, 46);
             pnlFooter.TabIndex = 1;
             // 
             // flowLayoutPanel2
@@ -80,7 +80,7 @@
             flowLayoutPanel2.Controls.Add(btnCancel);
             flowLayoutPanel2.Dock = DockStyle.Right;
             flowLayoutPanel2.FlowDirection = FlowDirection.RightToLeft;
-            flowLayoutPanel2.Location = new Point(143, 0);
+            flowLayoutPanel2.Location = new Point(131, 0);
             flowLayoutPanel2.Name = "flowLayoutPanel2";
             flowLayoutPanel2.Padding = new Padding(16, 9, 0, 0);
             flowLayoutPanel2.Size = new Size(191, 46);
@@ -129,7 +129,7 @@
             pnlBody.Location = new Point(0, 1);
             pnlBody.Name = "pnlBody";
             pnlBody.Padding = new Padding(16);
-            pnlBody.Size = new Size(334, 307);
+            pnlBody.Size = new Size(322, 306);
             pnlBody.TabIndex = 2;
             // 
             // pnlEquipmentsGroup
@@ -140,7 +140,7 @@
             pnlEquipmentsGroup.Location = new Point(16, 246);
             pnlEquipmentsGroup.Margin = new Padding(0);
             pnlEquipmentsGroup.Name = "pnlEquipmentsGroup";
-            pnlEquipmentsGroup.Size = new Size(302, 46);
+            pnlEquipmentsGroup.Size = new Size(294, 46);
             pnlEquipmentsGroup.TabIndex = 25;
             // 
             // chkIncludeEquipments
@@ -164,8 +164,9 @@
             txtEquipmentsBilledValue.MaxLength = 100;
             txtEquipmentsBilledValue.Name = "txtEquipmentsBilledValue";
             txtEquipmentsBilledValue.PlaceholderText = "Enter Amount";
-            txtEquipmentsBilledValue.Size = new Size(302, 26);
+            txtEquipmentsBilledValue.Size = new Size(294, 26);
             txtEquipmentsBilledValue.TabIndex = 8;
+            txtEquipmentsBilledValue.KeyPress += ValidateInputIfNumber_KeyPress;
             // 
             // label7
             // 
@@ -212,7 +213,7 @@
             txtOfficerPosition.Location = new Point(16, 204);
             txtOfficerPosition.Margin = new Padding(0, 0, 0, 16);
             txtOfficerPosition.Name = "txtOfficerPosition";
-            txtOfficerPosition.Size = new Size(302, 26);
+            txtOfficerPosition.Size = new Size(290, 26);
             txtOfficerPosition.TabIndex = 10;
             // 
             // label3
@@ -234,7 +235,7 @@
             txtOfficerName.Location = new Point(16, 142);
             txtOfficerName.Margin = new Padding(0, 0, 0, 16);
             txtOfficerName.Name = "txtOfficerName";
-            txtOfficerName.Size = new Size(302, 26);
+            txtOfficerName.Size = new Size(290, 26);
             txtOfficerName.TabIndex = 8;
             // 
             // label2
@@ -256,7 +257,7 @@
             txtDescription.Location = new Point(16, 80);
             txtDescription.Margin = new Padding(0, 0, 0, 16);
             txtDescription.Name = "txtDescription";
-            txtDescription.Size = new Size(302, 26);
+            txtDescription.Size = new Size(290, 26);
             txtDescription.TabIndex = 6;
             // 
             // pnlLine2
@@ -267,7 +268,7 @@
             pnlLine2.Location = new Point(16, 43);
             pnlLine2.Margin = new Padding(0, 0, 0, 16);
             pnlLine2.Name = "pnlLine2";
-            pnlLine2.Size = new Size(302, 1);
+            pnlLine2.Size = new Size(290, 1);
             pnlLine2.TabIndex = 5;
             // 
             // panel1
@@ -277,7 +278,7 @@
             panel1.Location = new Point(-1, 0);
             panel1.Margin = new Padding(0, 0, 0, 16);
             panel1.Name = "panel1";
-            panel1.Size = new Size(524, 1);
+            panel1.Size = new Size(512, 1);
             panel1.TabIndex = 2;
             // 
             // label1
@@ -295,7 +296,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(334, 354);
+            ClientSize = new Size(322, 353);
             ControlBox = false;
             Controls.Add(pnlBody);
             Controls.Add(pnlFooter);

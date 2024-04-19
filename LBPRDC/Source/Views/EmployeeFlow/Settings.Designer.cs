@@ -58,6 +58,7 @@
             rdbPosition1 = new RadioButton();
             rdbPosition2 = new RadioButton();
             rdbPosition3 = new RadioButton();
+            chkWageType = new CheckBox();
             chkSalaryRate = new CheckBox();
             chkBillingRate = new CheckBox();
             chkEmploymentStatus = new CheckBox();
@@ -118,6 +119,7 @@
             flowLayoutPanel1.Controls.Add(flowRadioGroupForContact);
             flowLayoutPanel1.Controls.Add(chkPosition);
             flowLayoutPanel1.Controls.Add(flowRadioGroupForPosition);
+            flowLayoutPanel1.Controls.Add(chkWageType);
             flowLayoutPanel1.Controls.Add(chkSalaryRate);
             flowLayoutPanel1.Controls.Add(chkBillingRate);
             flowLayoutPanel1.Controls.Add(chkEmploymentStatus);
@@ -125,7 +127,7 @@
             flowLayoutPanel1.Location = new Point(11, 29);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Padding = new Padding(0, 8, 0, 0);
-            flowLayoutPanel1.Size = new Size(321, 739);
+            flowLayoutPanel1.Size = new Size(321, 774);
             flowLayoutPanel1.TabIndex = 1;
             // 
             // chkEmployeeID
@@ -438,10 +440,20 @@
             rdbPosition3.Text = "Show both";
             rdbPosition3.UseVisualStyleBackColor = true;
             // 
+            // chkWageType
+            // 
+            chkWageType.AutoSize = true;
+            chkWageType.Location = new Point(3, 655);
+            chkWageType.Name = "chkWageType";
+            chkWageType.Size = new Size(105, 22);
+            chkWageType.TabIndex = 31;
+            chkWageType.Text = "Wage Type";
+            chkWageType.UseVisualStyleBackColor = true;
+            // 
             // chkSalaryRate
             // 
             chkSalaryRate.AutoSize = true;
-            chkSalaryRate.Location = new Point(3, 655);
+            chkSalaryRate.Location = new Point(3, 683);
             chkSalaryRate.Name = "chkSalaryRate";
             chkSalaryRate.Size = new Size(108, 22);
             chkSalaryRate.TabIndex = 28;
@@ -451,7 +463,7 @@
             // chkBillingRate
             // 
             chkBillingRate.AutoSize = true;
-            chkBillingRate.Location = new Point(3, 683);
+            chkBillingRate.Location = new Point(3, 711);
             chkBillingRate.Name = "chkBillingRate";
             chkBillingRate.Size = new Size(106, 22);
             chkBillingRate.TabIndex = 29;
@@ -461,7 +473,7 @@
             // chkEmploymentStatus
             // 
             chkEmploymentStatus.AutoSize = true;
-            chkEmploymentStatus.Location = new Point(3, 711);
+            chkEmploymentStatus.Location = new Point(3, 739);
             chkEmploymentStatus.Name = "chkEmploymentStatus";
             chkEmploymentStatus.Size = new Size(161, 22);
             chkEmploymentStatus.TabIndex = 22;
@@ -592,5 +604,6 @@
         private Label label6;
         private Label label7;
         private CheckBox chkLocation;
+        private CheckBox chkWageType;
     }
 }

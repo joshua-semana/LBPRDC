@@ -1,5 +1,9 @@
 ﻿using Dapper;
+using LBPRDC.Source.Config;
 using LBPRDC.Source.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Immutable;
+using static LBPRDC.Source.Data.Database;
 
 namespace LBPRDC.Source.Services
 {
@@ -42,6 +46,201 @@ namespace LBPRDC.Source.Services
 
     internal class BillingAccountService
     {
+        // Entity Framework
+
+        public static async Task<List<Models.Billing.Account>> GetItemsByBillingID(int BillingID)
+        {
+            List<Models.Billing.Account> accountsList = new();
+
+            try
+            {
+                using var context = new Context();
+                accountsList = await context.BillingAccounts.Where(ba => ba.BillingID == BillingID).ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return accountsList;
+        }
+
+        public static async Task<List<Models.Billing.AccountsWithType>> GetAccountsWithTypeByBillingIdAndType(int BillingID, string EntryType)
+        {
+            List<Models.Billing.AccountsWithType> accountsWithTypeList = new();
+
+            try
+            {
+                using var context = new Context();
+                accountsWithTypeList = await context.BillingAccounts
+                    .Where(b => b.BillingID == BillingID && b.EntryType == EntryType)
+                    .Select(b => new Models.Billing.AccountsWithType
+                    {
+                        AccountNumber = b.AccountNumber,
+                        EntryType = b.EntryType,
+                    })
+                    .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return accountsWithTypeList;
+        }
+
+        public static async Task<Models.Billing.Account> GetAccountDetailsByNumberAndBillingID(string AccountNumber, int BillingID)
+        {
+            Models.Billing.Account accountDetails = new();
+
+            try
+            {
+                using var context = new Context();
+                var selectedAccount = await context.BillingAccounts
+                    .Where(b => b.BillingID == BillingID && b.AccountNumber == AccountNumber)
+                    .FirstOrDefaultAsync();
+
+                if (selectedAccount != null)
+                {
+                    accountDetails = selectedAccount;
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return accountDetails;
+        }
+
+        public static async Task<Models.Billing.Account> GetEquipmentAccountByBillingID(int BillingID)
+        {
+            Models.Billing.Account accountDetails = new();
+
+            try
+            {
+                using var context = new Context();
+                var selectedAccount = await context.BillingAccounts
+                    .Where(b => b.BillingID == BillingID && b.EntryType == StringConstants.Type.EQUIPMENT)
+                    .FirstOrDefaultAsync();
+
+                if (selectedAccount != null)
+                {
+                    accountDetails = selectedAccount;
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return accountDetails;
+        }
+
+        public static async Task<bool> AddManyAsync(List<Models.Billing.Account> Accounts)
+        {
+            try
+            {
+                using var context = new Context();
+                context.BillingAccounts.AddRange(Accounts);
+                int affectedRows = await context.SaveChangesAsync();
+                return (affectedRows > 0);
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> AddSingleAsync(Models.Billing.Account Account)
+        {
+            try
+            {
+                using var context = new Context();
+                context.BillingAccounts.Add(Account);
+                int affectedRows = await context.SaveChangesAsync();
+                return (affectedRows > 0);
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> UpdateBillingValue(int AccountID, decimal Value)
+        {
+            try
+            {
+                using var context = new Context();
+                var account = await context.BillingAccounts.FindAsync(AccountID);
+                if (account == null)
+                {
+                    return false;
+                }
+                account.BilledValue = Value;
+                account.Balance = Value;
+                account.NetBilling = Value - NumericConstants.GetNetBilling(Value);
+
+                int result = await context.SaveChangesAsync();
+
+                return (result > 0);
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> RemoveByID(int AccountID)
+        {
+            try
+            {
+                using var context = new Context();
+
+                var accountToDelete = await context.BillingAccounts.FindAsync(AccountID);
+
+                if (accountToDelete != null)
+                {
+                    context.BillingAccounts.Remove(accountToDelete);
+                    await context.SaveChangesAsync();
+                }
+
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+
+
+
+        //public static Models.Billing.Account GetDetailsAsync(int BillingID, string AccountNumber)
+        //{
+        //    Models.Billing.Account account = new();
+
+        //    try
+        //    {
+        //        using var context = new Context();
+
+
+
+
+        //        using var connection = Database.Connect();
+
+        //        string QuerySelect = @"
+        //            SELECT * 
+        //            FROM 
+        //                BillingAccounts 
+        //            WHERE 
+        //                AccountNumber = @AccountNumber AND BillingName = @BillingName";
+
+        //        billingAccount = connection.QueryFirst<BillingAccount>(QuerySelect, new
+        //        {
+        //            AccountNumber = accountNumber,
+        //            BillingName = billingName
+        //        });
+        //    }
+        //    catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+        //    return account;
+        //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public static List<BillingAccount> GetAllByBillingName(string billingName)
         {
             List<BillingAccount> accounts = new();
@@ -66,6 +265,8 @@ namespace LBPRDC.Source.Services
 
             return accounts;
         }
+
+        // TODO
 
         public static BillingAccount GetDetails(string accountNumber, string billingName)
         {
@@ -141,7 +342,7 @@ namespace LBPRDC.Source.Services
                 customAccounts = connection.Query<AccountsComboBoxDetails>(QuerySelect, new
                 {
                     BillingName = billingName,
-                    EntryType = "Custom Entry"
+                    EntryType = StringConstants.Type.CUSTOM
                 }).ToList();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
@@ -172,6 +373,18 @@ namespace LBPRDC.Source.Services
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
             return value;
+        }
+
+        public static async Task<bool> AddSingle(Models.Billing.Account data)
+        {
+            try
+            {
+                using var context = new Context();
+                context.BillingAccounts.Add(data);
+                int affectedRows = await context.SaveChangesAsync();
+                return (affectedRows > 0);
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex);  }
         }
 
         public static bool Add(List<BillingAccount> accounts, string billingName)
@@ -239,7 +452,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateCollectedValue(string accountNumber, string billingName, decimal value)
+        public static bool UpdateCollectedValue(string accountNumber, int BillingID, decimal value)
         {
             try
             {
@@ -249,13 +462,13 @@ namespace LBPRDC.Source.Services
                     UPDATE BillingAccounts SET
                         CollectedValue = @CollectedValue
                     WHERE
-                        AccountNumber = @AccountNumber AND BillingName = @BillingName";
+                        AccountNumber = @AccountNumber AND BillingID = @BillingID";
 
                 int affectedRows = connection.Execute(QueryUpdate, new
                 {
                     CollectedValue = value,
                     AccountNumber = accountNumber,
-                    BillingName = billingName
+                    BillingID
                 });
 
                 return (affectedRows > 0);
@@ -263,7 +476,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateBalance(string accountNumber, string billingName, decimal value)
+        public static bool UpdateBalance(string accountNumber, int BillingID, decimal value)
         {
             try
             {
@@ -273,13 +486,12 @@ namespace LBPRDC.Source.Services
                     UPDATE BillingAccounts SET
                         Balance = @Balance
                     WHERE
-                        AccountNumber = @AccountNumber AND BillingName = @BillingName";
+                        AccountNumber = @AccountNumber AND BillingID = @BillingID";
 
                 int affectedRows = connection.Execute(QueryUpdate, new
                 {
                     Balance = value,
-                    AccountNumber = accountNumber,
-                    BillingName = billingName
+                    AccountNumber = accountNumber,BillingID
                 });
 
                 return (affectedRows > 0);
@@ -287,7 +499,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdatePurpose(string accountNumber, string billingName, string purpose)
+        public static bool UpdatePurpose(string accountNumber, int BillingID, string purpose)
         {
             try
             {
@@ -297,13 +509,13 @@ namespace LBPRDC.Source.Services
                     UPDATE BillingAccounts SET
                         Purpose = @Purpose
                     WHERE
-                        AccountNumber = @AccountNumber AND BillingName = @BillingName";
+                        AccountNumber = @AccountNumber AND BillingID = @BillingID";
 
                 int affectedRows = connection.Execute(QueryUpdate, new
                 {
                     Purpose = purpose,
                     AccountNumber = accountNumber,
-                    BillingName = billingName
+                    BillingID
                 });
 
                 return (affectedRows > 0);
@@ -311,21 +523,26 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateInformation(BillingAccount accountInfo)
+        public static async Task<bool> UpdateInformationAsync(Models.Billing.Account Account)
         {
             try
             {
-                using var connection = Database.Connect();
+                using var context = new Context();
 
-                string QueryUpdate = @"
-                    UPDATE BillingAccounts SET
-                        OfficialReceiptNumber = @OfficialReceiptNumber,
-                        CollectionDate = @CollectionDate,
-                        Purpose = @Purpose
-                    WHERE
-                        BillingName = @BillingName AND AccountNumber = @AccountNumber";
+                var account = await context.BillingAccounts
+                    .Where(ba => ba.BillingID == Account.BillingID && ba.AccountNumber == Account.AccountNumber)
+                    .FirstAsync();
 
-                int affectedRows = connection.Execute(QueryUpdate, accountInfo);
+                if (account == null)
+                {
+                    return false;
+                }
+
+                account.OfficialReceiptNumber = Account.OfficialReceiptNumber;
+                account.CollectionDate = Account.CollectionDate;
+                account.Purpose = Account.Purpose;
+
+                int affectedRows = await context.SaveChangesAsync();
 
                 if (affectedRows > 0)
                 {
@@ -333,7 +550,7 @@ namespace LBPRDC.Source.Services
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = "Collect SOA",
-                        ActivityDetails = $"User has updated the information of a statement of account: {accountInfo.AccountNumber} under billing: {accountInfo.BillingName}"
+                        ActivityDetails = $"User has updated the information of a statement of account: {Account.AccountNumber} under billing ID: {Account.BillingID}"
                     });
                 }
 
@@ -342,31 +559,28 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateRemarks(BillingAccount accountInfo)
+        public static async Task<bool> UpdateRemarks(Models.Billing.Account accountInfo)
         {
             try
             {
-                using var connection = Database.Connect();
+                using var context = new Context();
 
-                string QueryUpdate = @"
-                    UPDATE BillingAccounts SET
-                        Remarks = @Remarks
-                    WHERE
-                        BillingName = @BillingName AND AccountNumber = @AccountNumber";
+                var account = await context.BillingAccounts
+                    .Where(ba => ba.BillingID == accountInfo.BillingID && ba.AccountNumber == accountInfo.AccountNumber)
+                    .FirstAsync();
 
-                int affectedRows = connection.Execute(QueryUpdate, accountInfo);
+                if (account == null) { return false; }
+                account.Remarks = accountInfo.Remarks;
+                await context.SaveChangesAsync();
 
-                if (affectedRows > 0)
+                LoggingService.LogActivity(new()
                 {
-                    LoggingService.LogActivity(new()
-                    {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Collect SOA",
-                        ActivityDetails = $"User has updated the information of a statement of account: {accountInfo.AccountNumber} under billing: {accountInfo.BillingName}"
-                    });
-                }
+                    UserID = UserService.CurrentUser.UserID,
+                    ActivityType = "Update",
+                    ActivityDetails = $"User has updated the information of a statement of account: {accountInfo.AccountNumber} under billing ID: {accountInfo.BillingID}"
+                });
 
-                return (affectedRows > 0);
+                return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }

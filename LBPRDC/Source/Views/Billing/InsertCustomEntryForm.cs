@@ -1,9 +1,11 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 
 namespace LBPRDC.Source.Views.Billing
 {
     public partial class InsertCustomEntryForm : Form
     {
+        public int ClientID { get; set; }
         public Entry? NewEntry { get; private set; }
         public List<Entry>? EditableEntries { get; set; }
         public string? BillingName { get; set; }
@@ -12,13 +14,10 @@ namespace LBPRDC.Source.Views.Billing
         public InsertCustomEntryForm()
         {
             InitializeComponent();
-            InitializeDepartmentComboBoxItems();
-            InitializePositionComboBoxItems();
 
             RequiredFields = new()
             {
                 txtFirstName,
-                txtMiddleName,
                 txtLastName,
                 txtSalaryRate,
                 txtBillingRate,
@@ -29,31 +28,39 @@ namespace LBPRDC.Source.Views.Billing
 
         private void InsertCustomEntryForm_Load(object sender, EventArgs e)
         {
+            if (ClientID == 0)
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_CLIENT, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+            }
+
+            InitializeDepartmentComboBoxItems();
+            InitializePositionComboBoxItems();
+
             Text = $"Insert custom entry for {BillingName}";
         }
 
-        private void InitializePositionComboBoxItems()
+        private async void InitializePositionComboBoxItems()
         {
-            var positions = PositionService.GetAllItemsForComboBox();
-            cmbPosition.DataSource = PositionService.GetAllItemsForComboBox();
+            cmbPosition.DataSource = await PositionService.GetAllItemsForComboBoxByClientID(ClientID);
             cmbPosition.DisplayMember = "Name";
             cmbPosition.ValueMember = "ID";
         }
 
-        private void InitializeDepartmentComboBoxItems()
+        private async void InitializeDepartmentComboBoxItems()
         {
-            cmbDepartment.DataSource = DepartmentService.GetAllItemsForComboBox();
+            cmbDepartment.DataSource = await DepartmentService.GetAllItemsForComboBoxByClientID(ClientID);
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
         }
 
-        private void GetLocationComboBoxItems()
+        private async void GetLocationComboBoxItems()
         {
             if (cmbDepartment.SelectedIndex != 0)
             {
                 cmbLocation.Enabled = true;
                 int DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue);
-                cmbLocation.DataSource = LocationService.GetAllItemsForComboBoxByID(DepartmentID);
+                cmbLocation.DataSource = await LocationService.GetAllItemsForComboBoxByID(DepartmentID);
                 cmbLocation.DisplayMember = "Name";
                 cmbLocation.ValueMember = "ID";
             }
@@ -112,8 +119,8 @@ namespace LBPRDC.Source.Views.Billing
                     UnderTime = TimeSpan.Zero,
                     Absent = TimeSpan.Zero,
                 },
-                EntryType = "Custom Entry",
-                VerificationStatus = "Unverified",
+                EntryType = StringConstants.Type.CUSTOM,
+                VerificationStatus = StringConstants.Status.UNVERIFIED,
                 ExportIncluded = true
             };
             EditableEntries.Add(NewEntry);
@@ -131,7 +138,7 @@ namespace LBPRDC.Source.Views.Billing
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show(MessagesConstants.Cancel.QUESTION, MessagesConstants.Cancel.TITLE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
                 Close();
@@ -153,8 +160,17 @@ namespace LBPRDC.Source.Views.Billing
 
         private void chkCustomPosition_CheckedChanged(object sender, EventArgs e)
         {
-            if (chkCustomPosition.Checked) RequiredFields.Remove(cmbPosition);
-            else RequiredFields.Add(cmbPosition);
+            if (chkCustomPosition.Checked)
+            {
+                RequiredFields.Remove(cmbPosition);
+                cmbPosition.SelectedIndex = 0;
+                RequiredFields.Add(txtCustomPosition);
+            }
+            else
+            {
+                RequiredFields.Add(cmbPosition);
+                RequiredFields.Remove(txtCustomPosition);
+            }
 
             pnlGroup8.Enabled = !chkCustomPosition.Checked;
             txtCustomPosition.Enabled = lblCustomPositionAsterisk.Visible = chkCustomPosition.Checked;

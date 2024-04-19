@@ -1,4 +1,6 @@
-﻿namespace LBPRDC.Source.Views.Categories
+﻿using LBPRDC.Source.Config;
+
+namespace LBPRDC.Source.Views.Categories
 {
     partial class AddCategoryItemForm
     {
@@ -303,7 +305,7 @@
             cmbStatus.AccessibleName = "Status";
             cmbStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbStatus.FormattingEnabled = true;
-            cmbStatus.Items.AddRange(new object[] { "(Choose Status)", "Active", "Inactive" });
+            cmbStatus.Items.AddRange(new object[] { "(Choose Status)", StringConstants.Status.ACTIVE, StringConstants.Status.INACTIVE });
             cmbStatus.Location = new Point(22, 431);
             cmbStatus.Margin = new Padding(6, 3, 3, 12);
             cmbStatus.Name = "cmbStatus";
@@ -342,7 +344,7 @@
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(75, 28);
             btnAdd.TabIndex = 8;
-            btnAdd.Text = "Add";
+            btnAdd.Text = MessagesConstants.Add.TITLE;
             btnAdd.UseVisualStyleBackColor = true;
             btnAdd.Click += btnAdd_Click;
             // 
@@ -374,7 +376,7 @@
             Name = "AddCategoryItemForm";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Add";
+            Text = MessagesConstants.Add.TITLE;
             Load += AddCategoryItemForm_Load;
             pnlHeader.ResumeLayout(false);
             flowBody.ResumeLayout(false);

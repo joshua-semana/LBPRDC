@@ -4,7 +4,7 @@ using LBPRDC.Source.Views.Accounts;
 using LBPRDC.Source.Views.Profile;
 using LBPRDC.Source.Views.Categories;
 using LBPRDC.Source.Views.Billing;
-using LBPRDC.Source.Utilities;
+using LBPRDC.Source.Config;
 
 namespace LBPRDC.Source.Views
 {

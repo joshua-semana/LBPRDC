@@ -1,4 +1,5 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views.Profile
@@ -129,13 +130,13 @@ namespace LBPRDC.Source.Views.Profile
 
             if (!AuthenticationService.ValidateCredentials(user.Username, txtOldPassword.Text))
             {
-                MessageBox.Show("Your current password do not match to your entered old password.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Your current password do not match to your entered old password.", MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             if (txtNewPassword.Text != txtConfirmPassword.Text)
             {
-                MessageBox.Show("Passwords do not match.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Passwords do not match.", MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 

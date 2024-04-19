@@ -25,7 +25,8 @@ namespace LBPRDC.Source.Utilities
         public PositionFormat SelectedPositionFormat { get; set; }
         public bool ShowSalaryRate { get; set; }
         public bool ShowBillingRate { get; set; }
-        
+        public bool ShowWageType { get; set; }
+
     }
 
     public enum NameFormat

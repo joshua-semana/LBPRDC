@@ -35,7 +35,8 @@ namespace LBPRDC.Source.Utilities
                     ShowPosition = true,
                     SelectedPositionFormat = PositionFormat.NameOnly,
                     ShowSalaryRate = true,
-                    ShowBillingRate = true
+                    ShowBillingRate = true,
+                    ShowWageType = true
                 };
             }
         }

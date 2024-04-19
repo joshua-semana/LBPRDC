@@ -4,7 +4,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 {
     public partial class ViewHistory : Form
     {
-        public string? EmployeeId { get; set; }
+        public int EmployeeID { get; set; } = -1;
         public string? HistoryType { get; set; }
 
         public ViewHistory()
@@ -14,7 +14,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void ViewHistory_Load(object sender, EventArgs e)
         {
-            if (EmployeeId != null)
+            if (EmployeeID != -1)
             {
                 switch (HistoryType)
                 {
@@ -41,17 +41,17 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             }
         }
 
-        private void InitializeEmployeeInformation()
+        private async void InitializeEmployeeInformation()
         {
-            var employees = EmployeeService.GetAllEmployees();
-            var employee = employees.First(e => e.EmployeeID == EmployeeId);
-            txtEmployeeID.Text = EmployeeId;
+            var employees = await EmployeeService.GetAllEmployees();
+            var employee = employees.First(e => e.ID == EmployeeID);
+            txtEmployeeID.Text = employee.EmployeeID;
             txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
         }
 
         private async void PopulateTableWithPositions()
         {
-            var records = await Task.Run(() => PositionService.GetAllHistoryByID(EmployeeId));
+            var records = await Task.Run(() => PositionService.GetAllHistoryByID(EmployeeID));
             records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;
@@ -67,7 +67,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void PopulateTableWithCivilStatus()
         {
-            var records = await Task.Run(() => CivilStatusService.GetAllHistoryByID(EmployeeId));
+            var records = await Task.Run(() => CivilStatusService.GetAllHistoryByID(EmployeeID));
             records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;
@@ -80,7 +80,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void PopulateTableWithEmploymentStatus()
         {
-            var records = await Task.Run(() => EmploymentStatusService.GetAllHistoryByID(EmployeeId));
+            var records = await Task.Run(() => EmploymentStatusService.GetAllHistoryByID(EmployeeID));
             records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;
@@ -93,7 +93,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void PopulateTableWithDepartmentLocation()
         {
-            var records = await Task.Run(() => DepartmentService.GetAllHistoryByID(EmployeeId));
+            var records = await Task.Run(() => DepartmentService.GetAllHistoryByID(EmployeeID));
             records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;

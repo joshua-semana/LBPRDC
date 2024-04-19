@@ -1,4 +1,5 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using System.Globalization;
 
 namespace LBPRDC.Source.Views.Billing
@@ -171,7 +172,7 @@ namespace LBPRDC.Source.Views.Billing
                 ID = AdjustmentListCount++,
                 Type = cmbCategory.Text,
                 Operation = cmbOperation.Text,
-                InputValue = (cmbOperation.Text == "Add") ? $"+{txtInputValue.Text}" : $"-{txtInputValue.Text}",
+                InputValue = (cmbOperation.Text == MessagesConstants.Add.TITLE) ? $"+{txtInputValue.Text}" : $"-{txtInputValue.Text}",
                 Units = InputFormat,
                 AppliedDate = SelectedDays,
                 Remarks = (chkSIL.Checked) ? $"[SIL] {txtRemarks.Text}" : txtRemarks.Text

@@ -1,4 +1,5 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using static LBPRDC.Source.Services.EmployeeService;
 
@@ -21,7 +22,7 @@ namespace LBPRDC.Source.Views.Billing
 
         private void SummaryViewForm_Load(object sender, EventArgs e)
         {
-            UnverifiedEmployees = Employees.Where(w => w.VerificationStatus == "Unverified").ToList();
+            UnverifiedEmployees = Employees.Where(w => w.VerificationStatus == StringConstants.Status.UNVERIFIED).ToList();
             BookmarkedEmployees = Employees.Where(w => w.BookmarkRemarks != null && w.BookmarkRemarks != "").ToList();
             SILEmployees = Employees.Where(w => w.Adjustments != null && w.Adjustments.Any(a => a.Remarks.Contains("[SIL]"))).ToList();
 
@@ -44,7 +45,7 @@ namespace LBPRDC.Source.Views.Billing
             ApplySettingsToTable();
             dgvEmployees.DataSource = category switch
             {
-                "Unverified" => UnverifiedEmployees,
+                StringConstants.Status.UNVERIFIED => UnverifiedEmployees,
                 "Bookmarked" => BookmarkedEmployees,
                 "On Service Incentive Leave" => SILEmployees,
                 _ => Employees,

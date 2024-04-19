@@ -1,4 +1,5 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 
 namespace LBPRDC.Source.Views.Billing
 {
@@ -31,9 +32,9 @@ namespace LBPRDC.Source.Views.Billing
             DisplayEmployeeList();
         }
 
-        private void GetLatestEmployeeInformation()
+        private async void GetLatestEmployeeInformation()
         {
-            var employees = EmployeeService.GetAllEmployeesBase();
+            var employees = await EmployeeService.GetAllEmployeesBase();
             foreach (var entry in EditableEntries)
             {
                 var emp = employees.First(f => f.EmployeeID == entry.EmployeeID);
@@ -123,7 +124,7 @@ namespace LBPRDC.Source.Views.Billing
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show(MessagesConstants.Cancel.QUESTION, MessagesConstants.Cancel.TITLE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
                 this.Close();

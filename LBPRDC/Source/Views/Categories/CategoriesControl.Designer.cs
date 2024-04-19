@@ -1,4 +1,6 @@
-﻿namespace LBPRDC.Source.Views.Categories
+﻿using LBPRDC.Source.Config;
+
+namespace LBPRDC.Source.Views.Categories
 {
     partial class CategoriesControl
     {
@@ -61,6 +63,7 @@
             pnlRightFooter = new Panel();
             flowFooterActions = new FlowLayoutPanel();
             btnUpdate = new Button();
+            btnDelete = new Button();
             btnHistory = new Button();
             pnlRightHeader = new Panel();
             label2 = new Label();
@@ -485,21 +488,21 @@
             // flowFooterActions
             // 
             flowFooterActions.Controls.Add(btnUpdate);
+            flowFooterActions.Controls.Add(btnDelete);
             flowFooterActions.Controls.Add(btnHistory);
             flowFooterActions.Dock = DockStyle.Right;
             flowFooterActions.FlowDirection = FlowDirection.RightToLeft;
-            flowFooterActions.Location = new Point(157, 0);
+            flowFooterActions.Location = new Point(35, 0);
             flowFooterActions.Name = "flowFooterActions";
             flowFooterActions.Padding = new Padding(15, 16, 0, 16);
-            flowFooterActions.Size = new Size(203, 60);
+            flowFooterActions.Size = new Size(325, 60);
             flowFooterActions.TabIndex = 3;
             // 
             // btnUpdate
             // 
             btnUpdate.AutoSize = true;
-            btnUpdate.Enabled = false;
             btnUpdate.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnUpdate.Location = new Point(113, 16);
+            btnUpdate.Location = new Point(235, 16);
             btnUpdate.Margin = new Padding(8, 0, 0, 0);
             btnUpdate.Name = "btnUpdate";
             btnUpdate.Size = new Size(75, 28);
@@ -508,11 +511,24 @@
             btnUpdate.UseVisualStyleBackColor = true;
             btnUpdate.Click += btnUpdate_Click;
             // 
+            // btnDelete
+            // 
+            btnDelete.AutoSize = true;
+            btnDelete.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnDelete.Location = new Point(152, 16);
+            btnDelete.Margin = new Padding(8, 0, 0, 0);
+            btnDelete.Name = "btnDelete";
+            btnDelete.Size = new Size(75, 28);
+            btnDelete.TabIndex = 10;
+            btnDelete.Text = "Delete";
+            btnDelete.UseVisualStyleBackColor = true;
+            btnDelete.Click += btnDelete_Click;
+            // 
             // btnHistory
             // 
             btnHistory.AutoSize = true;
             btnHistory.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnHistory.Location = new Point(30, 16);
+            btnHistory.Location = new Point(69, 16);
             btnHistory.Margin = new Padding(8, 0, 0, 0);
             btnHistory.Name = "btnHistory";
             btnHistory.Size = new Size(75, 28);
@@ -625,5 +641,6 @@
         private Button btnHistory;
         private Label lblClient;
         private ComboBox cmbClient;
+        private Button btnDelete;
     }
 }

@@ -1,9 +1,11 @@
 ﻿using Dapper;
+using LBPRDC.Source.Config;
 using LBPRDC.Source.Data;
-using System.Collections.Specialized;
 using System.Globalization;
 using System.Text.Json;
-using static LBPRDC.Source.Services.BillingAccountService;
+using Microsoft.EntityFrameworkCore;
+using static LBPRDC.Source.Data.Database;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace LBPRDC.Source.Services
 {
@@ -33,14 +35,10 @@ namespace LBPRDC.Source.Services
         public string? TimeType { get; set; }
         public string? Value { get; set; }
     }
-
-    public class BillingBase
+    public class Billing
     {
         public int ID { get; set; }
-    }
-
-    public class Billing : BillingBase
-    {
+        public int ClientID { get; set; }
         public int UserID { get; set; }
         public string? Name { get; set; }
         public string? OfficerName { get; set; }
@@ -80,6 +78,114 @@ namespace LBPRDC.Source.Services
             public string? FormattedStartDate { get; set; }
             public string? FormattedEndDate { get; set; }
         }
+
+        // Entity Framework
+
+        public static async Task<Models.Billing> GetBillingDetailsById(int BillingID)
+        {
+            Models.Billing billing = new();
+
+            try
+            {
+                using var context = new Context();
+                billing = await context.Billing
+                    .Where(b => b.ID == BillingID)
+                    .FirstAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return billing;
+        }
+
+        public static async Task<List<Models.Billing>> GetAllBillingByClientID(int ClientID)
+        {
+            List<Models.Billing> billing = new();
+
+            try
+            {
+                using var context = new Context();
+                billing = await context.Billing
+                    .Where(b => b.ClientID == ClientID)
+                    .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return billing;
+        }
+
+        public static async Task<bool> Update(Models.Billing Data)
+        {
+            try
+            {
+                using var context = new Context();
+                var billing = await context.Billing.FindAsync(Data.ID);
+                if (billing == null)
+                {
+                    return false;
+                }
+                billing.Description = Data.Description;
+                billing.OfficerName = Data.OfficerName;
+                billing.OfficerPosition = Data.OfficerPosition;
+                billing.IsEquipmentIncluded = Data.IsEquipmentIncluded;
+                int affectedRows = await context.SaveChangesAsync();
+
+                if (affectedRows > 0)
+                {
+                    LoggingService.LogActivity(new()
+                    {
+                        UserID = UserService.CurrentUser.UserID,
+                        ActivityType = MessagesConstants.UPDATE,
+                        ActivityDetails = $"User updated the information of billing '{billing.Name}'."
+                    });
+                }
+
+                return (affectedRows > 0);
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<string> GetNewBillingNameForDuplication(string name)
+        {
+            string newName = name;
+
+            try
+            {
+                using var context = new Context();
+
+                var namesList = await context.Billing
+                    .Select(s => s.Name)
+                    .ToListAsync();
+
+                int count = namesList.Where(w => w == name).Count();
+
+                if (count > 0)
+                {
+                    int counter = count;
+
+                    do
+                    {
+                        newName = $"{name} ({counter})";
+                        counter++;
+                        count = namesList.Where(w => w == newName).Count();
+                    } while (count > 0);
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return newName;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
 
         public static Billing GetAllBillingDetailsByName(string billingName)
         {
@@ -164,65 +270,18 @@ namespace LBPRDC.Source.Services
             return billing;
         }
 
-        public static int GetItemCountByName(string name)
+        public static async Task<bool> CheckExistence(string BillingName, int ClientID)
         {
-            int totalCount = 0;
-
             try
             {
-                using var connection = Database.Connect();
-
-                string QueryCount = @"
-                    SELECT 
-                        COUNT(*) 
-                    FROM 
-                        Billing 
-                    WHERE 
-                        Name LIKE @Name";
-
-                totalCount = connection.QueryFirstOrDefault<int>(QueryCount, new { Name = name });
+                using var context = new Context();
+                var count = await context.Billing.Where(b => b.Name == BillingName && b.ClientID == ClientID).CountAsync();
+                return (count > 0);
             }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-
-            return totalCount;
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static string GetNewBillingNameForDuplication(string name)
-        {
-            string newName = "";
-
-            try
-            {
-                using var connection = Database.Connect();
-
-                string QuerySelect = @"
-                    SELECT 
-                        Name 
-                    FROM 
-                        Billing";
-
-                List<string> namesList = connection.Query<string>(QuerySelect).ToList();
-
-                int count = namesList.Where(w => w == name).Count();
-
-                if (count > 0)
-                {
-                    int counter = count;
-
-                    do
-                    {
-                        newName = $"{name} ({counter})";
-                        counter++;
-                        count = namesList.Where(w => w == newName).Count();
-                    } while (count > 0);
-                }
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-
-            return newName;
-        }
-
-        public static (List<BillingView>, int TotalCount) GetFilteredItems(string searchWord)
+        public static (List<BillingView>, int TotalCount) GetFilteredItems(string searchWord, int ClientID)
         {
             List<BillingView> billings = new();
             int totalCount = 0;
@@ -237,9 +296,13 @@ namespace LBPRDC.Source.Services
                     FROM 
                         Billing 
                     WHERE 
-                        Status = 'Active'";
+                        Status = @Status AND ClientID = @ClientID";
 
-                totalCount = connection.QueryFirstOrDefault<int>(QueryCount);
+                totalCount = connection.QueryFirstOrDefault<int>(QueryCount, new
+                {
+                    Status = StringConstants.Status.ACTIVE,
+                    ClientID
+                });
 
                 string QuerySelect = @"
                     SELECT 
@@ -253,7 +316,9 @@ namespace LBPRDC.Source.Services
                     ON 
                         Billing.UserID = Users.UserID 
                     WHERE 
-                        Billing.Status = 'Active'";
+                        Billing.Status = @Status
+                    AND
+                        Billing.ClientID = @ClientID";
 
                 if (!string.IsNullOrEmpty(searchWord))
                 {
@@ -262,7 +327,11 @@ namespace LBPRDC.Source.Services
 
                 QuerySelect += " ORDER BY Timestamp DESC";
 
-                billings = connection.Query<BillingView>(QuerySelect, new { SearchWord = $"%{searchWord}%" }).ToList();
+                billings = connection.Query<BillingView>(QuerySelect, new {
+                    Status = StringConstants.Status.ACTIVE,
+                    ClientID,
+                    SearchWord = $"%{searchWord}%"
+                }).ToList();
 
                 string[] monthNames = DateTimeFormatInfo.CurrentInfo.MonthNames;
 
@@ -276,8 +345,8 @@ namespace LBPRDC.Source.Services
                         billing.FullName = $"{billing.FirstName} {billing.LastName}";
                         billing.MonthName = monthNames[billing.Month - 1];
                         billing.QuarterName = (billing.Quarter == 1) ? "1st" : "2nd";
-                        billing.FormattedStartDate = billing.StartDate.ToString("MMMM dd, yyyy");
-                        billing.FormattedEndDate = billing.EndDate.ToString("MMMM dd, yyyy");
+                        billing.FormattedStartDate = billing.StartDate.ToString(StringConstants.Date.DEFAULT);
+                        billing.FormattedEndDate = billing.EndDate.ToString(StringConstants.Date.DEFAULT);
                         billing.LockStatus = (billing.LockStatus == "Lock") ? "🔒" : "🔓";
                     }
                 }
@@ -287,7 +356,7 @@ namespace LBPRDC.Source.Services
             return (billings, totalCount);
         }
 
-        public static (List<Entry>, List<Entry>) GetConstantAndEditableJSON(string billingName)
+        public static (List<Entry>, List<Entry>) GetConstantAndEditableJSON(int BillingID)
         {
             List<Entry> constantEntries = new();
             List<Entry> editableEntries = new();
@@ -302,11 +371,11 @@ namespace LBPRDC.Source.Services
                     FROM
                         Billing
                     WHERE
-                        Name = @BillingName";
+                        ID = @BillingID";
 
                 var billing = connection.QueryFirstOrDefault<Billing>(QuerySelect, new
                 {
-                    BillingName = billingName
+                    BillingID
                 });
 
                 if (billing != null)
@@ -345,86 +414,33 @@ namespace LBPRDC.Source.Services
             return accrualsEntries;
         }
 
-        public static bool Add(Billing data)
+        public static async Task<(bool Success, int LatestInsertedID)> Add(Models.Billing data)
         {
             try
             {
-                using var connection = Database.Connect();
-                using var transaction = connection?.BeginTransaction();
-                
-                try
+                using var context = new Context();
+
+                context.Billing.Add(data);
+                int affectedRows = await context.SaveChangesAsync();
+
+                if (affectedRows > 0)
                 {
-                    string QueryInsert = @"
-                    INSERT INTO Billing (
-                        UserID, 
-                        Name, 
-                        OfficerName,
-                        OfficerPosition,
-                        Month,
-                        Year,
-                        Quarter,
-                        StartDate,
-                        EndDate,
-                        Timestamp,
-                        ReleaseDate,
-                        ConstantJSON,
-                        EditableJSON,
-                        AccrualsJSON,
-                        VerificationStatus,
-                        IsEquipmentIncluded,
-                        Description, 
-                        Status,
-                        LockStatus
-                    ) 
-                    VALUES (
-                        @UserID, 
-                        @Name, 
-                        @OfficerName,
-                        @OfficerPosition,
-                        @Month,
-                        @Year,
-                        @Quarter,
-                        @StartDate,
-                        @EndDate,
-                        @Timestamp,
-                        @ReleaseDate,
-                        @ConstantJSON,
-                        @EditableJSON,
-                        @AccrualsJSON,
-                        @VerificationStatus,
-                        @IsEquipmentIncluded,
-                        @Description, 
-                        @Status,
-                        @LockStatus
-                    )";
-
-                    int affectedRows = connection.Execute(QueryInsert, data, transaction);
-
-                    transaction?.Commit();
-
-                    if (affectedRows > 0)
+                    LoggingService.LogActivity(new()
                     {
-                        LoggingService.LogActivity(new()
-                        {
-                            UserID = UserService.CurrentUser.UserID,
-                            ActivityType = "New Billing",
-                            ActivityDetails = $"User added a new billing record with a name of {data.Name}."
-                        });
-                    }
+                        UserID = UserService.CurrentUser.UserID,
+                        ActivityType = MessagesConstants.Logs.TITLE_NEW_BILLING,
+                        ActivityDetails = $"{MessagesConstants.Logs.NEW_BILLING}{data.Name}."
+                    });
 
-                    return (affectedRows > 0);
+                    return (true, data.ID);
                 }
 
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    return false;
-                }
+                return (false, -1);
             }
-            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+            catch (Exception ex) { return (ExceptionHandler.HandleException(ex), -1); }
         }
 
-        public static bool UpdateConstantAndEditableJSON(List<Entry> entries, string billingName)
+        public static bool UpdateConstantAndEditableJSON(List<Entry> entries, int BillingID)
         {
             try
             {
@@ -434,12 +450,12 @@ namespace LBPRDC.Source.Services
                         ConstantJSON = @ConstantJSON,
                         EditableJSON = @EditableJSON
                     WHERE
-                        Name = @BillingName";
+                        ID = @ID";
 
                 int affectedRows = connection.Execute(QueryUpdate, new { 
                     ConstantJSON = JsonSerializer.Serialize(entries), 
                     EditableJSON = JsonSerializer.Serialize(entries),
-                    BillingName = billingName
+                    ID = BillingID
                 });
 
                 if (affectedRows > 0)
@@ -448,7 +464,7 @@ namespace LBPRDC.Source.Services
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = "Upload",
-                        ActivityDetails = $"User uploaded a report and timekeep data to a billing named as {billingName}."
+                        ActivityDetails = $"User uploaded a report and timekeep data to a billing with ID of {BillingID}."
                     });
                 }
 
@@ -489,7 +505,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateAccrualsJSON(List<AccrualsEntry> accruals, string billingName)
+        public static bool UpdateAccrualsJSON(List<AccrualsEntry> accruals, int BillingID)
         {
             try
             {
@@ -498,12 +514,12 @@ namespace LBPRDC.Source.Services
                     UPDATE Billing SET
                         AccrualsJSON = @AccrualsJSON
                     WHERE
-                        Name = @BillingName";
+                        ID = @ID";
 
                 int affectedRows = connection.Execute(QueryUpdate, new
                 {
                     AccrualsJSON = JsonSerializer.Serialize(accruals),
-                    BillingName = billingName
+                    ID = BillingID
                 });
 
                 if (affectedRows > 0)
@@ -512,7 +528,7 @@ namespace LBPRDC.Source.Services
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = "Upload",
-                        ActivityDetails = $"User uploaded accruals data to a billing named as {billingName}."
+                        ActivityDetails = $"User uploaded accruals data to a billing with ID of {BillingID}."
                     });
                 }
 
@@ -521,7 +537,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateStatus(string billingName, string status)
+        public static bool UpdateStatusByID(int BillingID, string status)
         {
             try
             {
@@ -530,12 +546,12 @@ namespace LBPRDC.Source.Services
                     UPDATE Billing SET
                         Status = @Status
                     WHERE
-                        Name = @BillingName";
+                        ID = @ID";
 
                 int affectedRows = connection.Execute(QueryUpdate, new
                 {
                     Status = status,
-                    BillingName = billingName
+                    ID = BillingID
                 });
 
                 if (affectedRows > 0)
@@ -543,8 +559,8 @@ namespace LBPRDC.Source.Services
                     LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Update",
-                        ActivityDetails = $"User updated the status of a billing named as {billingName} to {status}."
+                        ActivityType = MessagesConstants.UPDATE,
+                        ActivityDetails = $"User updated the status of a billing with ID of {BillingID} to {status}."
                     });
                 }
 
@@ -553,45 +569,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateInformation(Billing billing)
-        {
-            try
-            {
-                using var connection = Database.Connect();
-                string QueryUpdate = @"
-                    UPDATE Billing SET
-                        Description = @Description,
-                        OfficerName = @OfficerName,
-                        OfficerPosition = @OfficerPosition,
-                        IsEquipmentIncluded = @IsEquipmentIncluded
-                    WHERE
-                        Name = @BillingName";
-
-                int affectedRows = connection.Execute(QueryUpdate, new
-                {
-                    Description = billing.Description ?? "",
-                    OfficerName = billing.OfficerName ?? "",
-                    OfficerPosition = billing.OfficerPosition ?? "",
-                    billing.IsEquipmentIncluded,
-                    BillingName = billing.Name
-                });
-
-                if (affectedRows > 0)
-                {
-                    LoggingService.LogActivity( new()
-                    {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Update",
-                        ActivityDetails = $"User updated the information of billing '{billing.Name}'."
-                    });
-                }
-
-                return (affectedRows > 0);
-            }
-            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        public static bool UpdateVerificationStatus(string billingName, string status)
+        public static bool UpdateVerificationStatus(int BillingID, string status)
         {
             try
             {
@@ -600,11 +578,11 @@ namespace LBPRDC.Source.Services
                     UPDATE Billing SET
                         VerificationStatus = @VerificationStatus
                     WHERE
-                        Name = @BillingName";
+                        ID = @ID";
 
                 int affectedRows = connection.Execute(QueryUpdate, new { 
                     VerificationStatus = status,
-                    BillingName = billingName
+                    ID = BillingID
                 });
 
                 if (affectedRows > 0)
@@ -612,8 +590,8 @@ namespace LBPRDC.Source.Services
                     LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Update",
-                        ActivityDetails = $"User updated the verification status of a billing named as {billingName} to {status}."
+                        ActivityType = MessagesConstants.UPDATE,
+                        ActivityDetails = $"User updated the verification status of a billing with ID of {BillingID} to {status}."
                     });
                 }
 
@@ -622,104 +600,94 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateLockStatus(string billingName, string lockStatus, DateTime releaseDate)
+        public static async Task<bool> UpdateLockStatusByIDAsync(int BillingID, string Status, DateTime ReleaseDate)
         {
             try
             {
-                using var connection = Database.Connect();
-                string QueryUpdate = @"
-                    UPDATE Billing SET
-                        ReleaseDate = @ReleaseDate,
-                        LockStatus = @LockStatus
-                    WHERE
-                        Name = @BillingName";
+                using var context = new Context();
 
-                int affectedRows = connection.Execute(QueryUpdate, new
-                {
-                    ReleaseDate = releaseDate,
-                    LockStatus = lockStatus,
-                    BillingName = billingName
-                });
+                var billing = await context.Billing.FindAsync(BillingID);
 
-                if (affectedRows > 0)
-                {
-                    LoggingService.LogActivity(new()
-                    {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Update",
-                        ActivityDetails = $"User updated the lock status of a billing named as {billingName} to {lockStatus}."
-                    });
-                }
-
-                return (affectedRows > 0);
-            }
-            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        public static bool ReleaseBilling(string billingName, DateTime releaseDate)
-        {
-            try
-            {
-                List<BillingAccount> newBillingAccounts = new();
-                List<string> accountNumbers = BillingRecordService.GetAccountNumbersByName(billingName);
-                List<AccountsDetails> accountsTotalValues = BillingRecordService.GetGrossBillingAndDepartmentByName(billingName);
-
-                foreach (var account in accountNumbers)
-                {
-                    var matchedAccount = accountsTotalValues.First(f => f.AccountNumber == account);
-                    if (matchedAccount != null)
-                    {
-                        newBillingAccounts.Add(new()
-                        {
-                            BillingName = billingName,
-                            AccountNumber = account,
-                            EntryType = "Regular Entry",
-                            OfficialReceiptNumber = "",
-                            Classification = $"{matchedAccount.Department} {(account.Contains("OT") ? "OVERTIME" : string.Empty)}".Trim(),
-                            BilledValue = matchedAccount.GrossBilling,
-                            NetBilling = matchedAccount.GrossBilling - Convert.ToDecimal((double)matchedAccount.GrossBilling / 1.12 * 0.07),
-                            CollectedValue = 0,
-                            CollectionDate = null,
-                            Balance = matchedAccount.GrossBilling,
-                            Purpose = "",
-                            Timestamp = DateTime.Now,
-                            Remarks = ""
-                        });
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-
-                if (newBillingAccounts.Count > 0)
-                {
-                    bool hasAdded = BillingAccountService.Add(newBillingAccounts, billingName);
-
-                    if (hasAdded)
-                    {
-                        bool updateStatus = BillingRecordService.UpdateRecordsStatus(billingName, "Released");
-                        bool updateLockStatus = UpdateLockStatus(billingName, "Lock", releaseDate);
-
-                        if (updateStatus && updateLockStatus)
-                        {
-                            LoggingService.LogActivity(new()
-                            {
-                                UserID = UserService.CurrentUser.UserID,
-                                ActivityType = "Release",
-                                ActivityDetails = $"User released a billing named {billingName}."
-                            });
-                        }
-
-                        return updateStatus && updateLockStatus;
-                    }
-                }
-                else
+                if (billing == null)
                 {
                     return false;
                 }
 
-                return (newBillingAccounts.Count > 0);
+                billing.LockStatus = Status;
+                billing.ReleaseDate = ReleaseDate;
+
+                int affectedRows = await context.SaveChangesAsync();
+
+                if (affectedRows > 0)
+                {
+                    LoggingService.LogActivity(new()
+                    {
+                        UserID = UserService.CurrentUser.UserID,
+                        ActivityType = MessagesConstants.UPDATE,
+                        ActivityDetails = $"User locked a billing with an ID of {BillingID}"
+                    });
+                }
+
+                return (affectedRows > 0);
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> ReleaseBilling(int BillingID, int ClientID, DateTime releaseDate)
+        {
+            try
+            {
+                List<Models.Billing.Account> newBillingAccounts = new();
+                var accountNumbers = await BillingRecordService.GetAccountNumbersByIDAsync(BillingID);
+                var accountsTotalValues = await BillingRecordService.GetGrossBillingAndDepartmentByIDAsync(BillingID);
+
+                foreach (var account in accountNumbers)
+                {
+                    var matchedAccount = accountsTotalValues.First(f => f.AccountNumber == account);
+
+                    if (matchedAccount == null)
+                    {
+                        return false;
+                    }
+
+                    newBillingAccounts.Add(new()
+                    {
+                        ClientID = ClientID,
+                        BillingID = BillingID,
+                        AccountNumber = account,
+                        Classification = $"{matchedAccount.Department} {(account.Contains("OT") ? StringConstants.Type.OVERTIME : string.Empty)}".Trim(),
+                        BilledValue = matchedAccount.GrossBilling,
+                        NetBilling = matchedAccount.GrossBilling - NumericConstants.GetNetBilling(matchedAccount.GrossBilling),
+                        Balance = matchedAccount.GrossBilling,
+                    });
+                }
+
+                if (newBillingAccounts.Count == 0)
+                {
+                    return false;
+                }
+
+                bool hasAdded = await BillingAccountService.AddManyAsync(newBillingAccounts);
+
+                if (hasAdded)
+                {
+                    bool updateStatus = await BillingRecordService.UpdateStatusByIDAsync(BillingID, StringConstants.Status.RELEASED);
+                    bool updateLockStatus = await UpdateLockStatusByIDAsync(BillingID, StringConstants.Status.LOCK, releaseDate);
+
+                    if (updateStatus && updateLockStatus)
+                    {
+                        LoggingService.LogActivity(new()
+                        {
+                            UserID = UserService.CurrentUser.UserID,
+                            ActivityType = "Release",
+                            ActivityDetails = $"User released a billing with ID of {BillingID}."
+                        });
+                    }
+
+                    return updateStatus && updateLockStatus;
+                }
+
+                return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }

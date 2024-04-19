@@ -9,12 +9,5 @@ namespace LBPRDC.Source.Data
         {
             return ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString;
         }
-
-        public static SqlConnection DBConnect()
-        {
-            SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString());
-            connection.Open();
-            return connection;
-        }
     }
 }

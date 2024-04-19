@@ -1,5 +1,4 @@
-﻿using LBPRDC.Source.Services;
-using LBPRDC.Source.Utilities;
+﻿using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views.Employee
 {
@@ -30,6 +29,7 @@ namespace LBPRDC.Source.Views.Employee
             chkEmailAddress.Checked = preference.ShowEmailAddress;
             chkContactNumber.Checked = preference.ShowContactNumber;
             chkPosition.Checked = preference.ShowPosition;
+            chkWageType.Checked = preference.ShowWageType;
             chkSalaryRate.Checked = preference.ShowSalaryRate;
             chkBillingRate.Checked = preference.ShowBillingRate;
 
@@ -70,6 +70,7 @@ namespace LBPRDC.Source.Views.Employee
             preference.ShowEmailAddress = chkEmailAddress.Checked;
             preference.ShowContactNumber = chkContactNumber.Checked;
             preference.ShowPosition = chkPosition.Checked;
+            preference.ShowWageType = chkWageType.Checked;
             preference.ShowSalaryRate = chkSalaryRate.Checked;
             preference.ShowBillingRate = chkBillingRate.Checked;
             preference.SelectedNameFormat = Enum.Parse<NameFormat>(GetSelectedRadioButton(flowRadioGroupForName));

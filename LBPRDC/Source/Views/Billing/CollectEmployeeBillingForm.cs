@@ -1,4 +1,5 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views.Billing
@@ -6,6 +7,7 @@ namespace LBPRDC.Source.Views.Billing
     public partial class CollectEmployeeBillingForm : Form
     {
         public ViewAccountBillings? ParentControl { get; set; }
+        public int BillingID { get; set; }
         public string BillingName { get; set; } = string.Empty;
         public string AccountNumber { get; set; } = string.Empty;
         public Guid EmployeeGuid { get; set; }
@@ -72,7 +74,7 @@ namespace LBPRDC.Source.Views.Billing
 
             if (collectionDetails == null && string.IsNullOrEmpty(transactionType))
             {
-                MessageBox.Show("Unable to update billing collection information. Objects are empty.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Unable to update billing collection information. Objects are empty.", MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -100,8 +102,8 @@ namespace LBPRDC.Source.Views.Billing
             decimal newCollectedValue = (currentValue - Convert.ToDecimal(CollectedValue)) + Convert.ToDecimal(txtCollectedAmount.Text);
             decimal newBalanceValue = AccountGrossBillingValue - newCollectedValue;
 
-            bool hasCollectedValueUpdated = await Task.Run(() => BillingAccountService.UpdateCollectedValue(AccountNumber, BillingName, newCollectedValue));
-            bool hasBalanceValueUpdated = await Task.Run(() => BillingAccountService.UpdateBalance(AccountNumber, BillingName, newBalanceValue));
+            bool hasCollectedValueUpdated = await Task.Run(() => BillingAccountService.UpdateCollectedValue(AccountNumber, BillingID, newCollectedValue));
+            bool hasBalanceValueUpdated = await Task.Run(() => BillingAccountService.UpdateBalance(AccountNumber, BillingID, newBalanceValue));
             return hasCollectedValueUpdated && hasBalanceValueUpdated;
         }
 

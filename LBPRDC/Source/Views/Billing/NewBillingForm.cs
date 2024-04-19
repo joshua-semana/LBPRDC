@@ -1,14 +1,16 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using System.Globalization;
-using System.Transactions;
 
 namespace LBPRDC.Source.Views.Billing
 {
     public partial class NewBillingForm : Form
     {
         public BillingControl? ParentControl { get; set; }
+        public int ClientID { get; set; }
 
+        private Models.Client Client = new();
         private List<Control> RequiredFields;
 
         DateTime startDate, endDate;
@@ -25,6 +27,22 @@ namespace LBPRDC.Source.Views.Billing
                 txtOfficerInCharge,
                 txtOfficerPosition
             };
+        }
+
+        private async void NewBillingForm_Load(object sender, EventArgs e)
+        {
+            if (ClientID == 0)
+            {
+                MessageBox.Show(MessagesConstants.ERROR_RETRIEVE_CLIENT, MessagesConstants.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+                return;
+            }
+
+            Client = await ClientService.GetDetailsByID(ClientID);
+
+            this.Text = $"New Billing for Client: {Client.Description}";
+
+            btnPreviewDateRange.PerformClick();
         }
 
         private void InitializeMonthsComboBox()
@@ -62,8 +80,8 @@ namespace LBPRDC.Source.Views.Billing
                 endDate = new DateTime(selectedYear, selectedMonth, DateTime.DaysInMonth(selectedYear, selectedMonth));
             }
 
-            txtFromDatePreview.Text = startDate.ToString("MMMM dd, yyyy");
-            txtToDatePreview.Text = endDate.ToString("MMMM dd, yyyy");
+            txtFromDatePreview.Text = startDate.ToString(StringConstants.Date.DEFAULT);
+            txtToDatePreview.Text = endDate.ToString(StringConstants.Date.DEFAULT);
 
             SetBillingName();
         }
@@ -73,14 +91,14 @@ namespace LBPRDC.Source.Views.Billing
             UpdateDatePreviewRange();
         }
 
-        private void btnConfirm_Click(object sender, EventArgs e)
+        private async void btnConfirm_Click(object sender, EventArgs e)
         {
             if (ControlUtils.AreRequiredFieldsFilled(RequiredFields))
             {
-                int nameCount = BillingService.GetItemCountByName(txtBillingName.Text.Trim());
-                if (nameCount > 0)
+                
+                if (await BillingService.CheckExistence(txtBillingName.Text.Trim(), ClientID))
                 {
-                    MessageBox.Show("This billing name has already been used. Please enter another billing name to continue.", "Duplicate Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(MessagesConstants.Billing.EXIST, MessagesConstants.INVALID_INPUT, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -90,12 +108,13 @@ namespace LBPRDC.Source.Views.Billing
 
         private async void AddNewBillingRecord()
         {
-            List<BillingAccount> newAccount = new();
+            bool isAccountAdded = false;
 
             string billingName = Utilities.StringFormat.ToSentenceCase(txtBillingName.Text.Trim());
 
-            Services.Billing newBilling = new()
+            Models.Billing billing = new()
             {
+                ClientID = ClientID,
                 UserID = UserService.CurrentUser.UserID,
                 Name = billingName,
                 OfficerName = txtOfficerInCharge.Text.ToUpper().Trim(),
@@ -105,73 +124,71 @@ namespace LBPRDC.Source.Views.Billing
                 Quarter = (radFirst.Checked) ? 1 : 2,
                 StartDate = startDate,
                 EndDate = endDate,
-                Timestamp = DateTime.Now,
-                ReleaseDate = null,
-                ConstantJSON = String.Empty,
-                EditableJSON = String.Empty,
-                AccrualsJSON = String.Empty,
-                VerificationStatus = "Unverified",
                 IsEquipmentIncluded = chkIncludeEquipments.Checked,
                 Description = txtDescription.Text.Trim(),
-                Status = "Active",
-                LockStatus = "Unlock"
             };
 
-            using var transaction = new TransactionScope();
+            var (isBillingAdded, billingID) = await BillingService.Add(billing);
 
-            try
+            if (isBillingAdded)
             {
-                await Task.Run(() => BillingService.Add(newBilling));
-
                 if (chkIncludeEquipments.Checked)
                 {
-                    string accountYear = newBilling.Year.ToString();
-                    string accountMonth = newBilling.Month.ToString("D3");
+                    string accountYear = billing.Year.ToString();
+                    string accountMonth = billing.Month.ToString("D3");
                     decimal equipmentGrossAmount = Convert.ToDecimal(txtEquipmentsBilledValue.Text);
 
-                    newAccount.Add(new()
+                    Models.Billing.Account account = new()
                     {
-                        BillingName = newBilling.Name,
-                        AccountNumber = $"SHFCEquip{accountYear}-{accountMonth}",
-                        EntryType = "Custom Entry",
-                        OfficialReceiptNumber = "",
-                        Classification = "SHFC Equipment",
+                        ClientID = ClientID,
+                        BillingID = billingID,
+                        AccountNumber = $"{Client.Name}Equip{accountYear}-{accountMonth}",
+                        EntryType = StringConstants.Type.EQUIPMENT,
+                        Classification = $"{Client.Name} {StringConstants.Type.EQUIPMENT}",
                         BilledValue = equipmentGrossAmount,
-                        NetBilling = equipmentGrossAmount - Convert.ToDecimal((double)equipmentGrossAmount / 1.12 * 0.07),
-                        CollectedValue = 0,
-                        CollectionDate = null,
-                        Balance = equipmentGrossAmount,
-                        Purpose = "",
-                        Timestamp = DateTime.Now,
-                        Remarks = "Supplies and Equipment Billing"
-                    });
+                        NetBilling = equipmentGrossAmount - NumericConstants.GetNetBilling(equipmentGrossAmount),
+                        Balance = equipmentGrossAmount
+                    };
 
-                    await Task.Run(() => BillingAccountService.Add(newAccount, billingName));
+                    isAccountAdded = await BillingAccountService.AddSingleAsync(account);
                 }
-
-                transaction.Complete();
-
-                MessageBox.Show("You have successfully added a new billing.", "New Billing Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ParentControl?.ResetTableSearch();
-                this.Close();
             }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            if (isBillingAdded && !chkIncludeEquipments.Checked)
+            {
+                MessageBox.Show(MessagesConstants.Add.SUCCESS_BILLING, MessagesConstants.SUCCESS, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else if (isBillingAdded && chkIncludeEquipments.Checked)
+            {
+                if (isAccountAdded)
+                {
+                    MessageBox.Show(MessagesConstants.Add.SUCCESS_BILLING, MessagesConstants.SUCCESS, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("A billing is added but the equipment does not. Please add it later as custom entry.", MessagesConstants.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.ACTION, MessagesConstants.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            ParentControl?.ResetTableSearch();
+            ParentControl?.ResetView();
+            this.Close();
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtDescription.Text) || MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (string.IsNullOrEmpty(txtDescription.Text) || MessageBox.Show(MessagesConstants.CONFIRMATION_CANCEL_QUESTION, MessagesConstants.CONFIRMATION_CANCEL, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 this.Close();
             }
         }
 
         private void UpdateDateRange_ControlChanged(object sender, EventArgs e)
-        {
-            btnPreviewDateRange.PerformClick();
-        }
-
-        private void NewBillingForm_Load(object sender, EventArgs e)
         {
             btnPreviewDateRange.PerformClick();
         }

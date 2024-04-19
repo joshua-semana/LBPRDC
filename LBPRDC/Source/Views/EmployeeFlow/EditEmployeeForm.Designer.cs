@@ -33,6 +33,7 @@
             btnCancel = new Button();
             pnlLine1 = new Panel();
             panel1 = new Panel();
+            pnlLine2 = new Panel();
             label33 = new Label();
             grpJobData = new GroupBox();
             label30 = new Label();
@@ -96,7 +97,9 @@
             txtMiddleName = new TextBox();
             txtLastName = new TextBox();
             txtFirstName = new TextBox();
-            pnlLine2 = new Panel();
+            label34 = new Label();
+            cmbWageType = new ComboBox();
+            label35 = new Label();
             flowControls.SuspendLayout();
             panel1.SuspendLayout();
             grpJobData.SuspendLayout();
@@ -168,6 +171,16 @@
             panel1.Size = new Size(860, 805);
             panel1.TabIndex = 4;
             // 
+            // pnlLine2
+            // 
+            pnlLine2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            pnlLine2.BorderStyle = BorderStyle.FixedSingle;
+            pnlLine2.Location = new Point(16, 43);
+            pnlLine2.Margin = new Padding(0, 0, 0, 16);
+            pnlLine2.Name = "pnlLine2";
+            pnlLine2.Size = new Size(827, 1);
+            pnlLine2.TabIndex = 25;
+            // 
             // label33
             // 
             label33.AutoSize = true;
@@ -181,6 +194,9 @@
             // 
             // grpJobData
             // 
+            grpJobData.Controls.Add(label34);
+            grpJobData.Controls.Add(cmbWageType);
+            grpJobData.Controls.Add(label35);
             grpJobData.Controls.Add(label30);
             grpJobData.Controls.Add(label29);
             grpJobData.Controls.Add(label28);
@@ -471,11 +487,11 @@
             // 
             txtRemarks.AccessibleName = "Remarks";
             txtRemarks.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            txtRemarks.Location = new Point(10, 180);
+            txtRemarks.Location = new Point(213, 180);
             txtRemarks.Margin = new Padding(6, 3, 3, 16);
             txtRemarks.MaxLength = 100;
             txtRemarks.Name = "txtRemarks";
-            txtRemarks.Size = new Size(806, 26);
+            txtRemarks.Size = new Size(603, 26);
             txtRemarks.TabIndex = 19;
             // 
             // label15
@@ -483,7 +499,7 @@
             label15.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label15.AutoSize = true;
             label15.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label15.Location = new Point(6, 157);
+            label15.Location = new Point(209, 157);
             label15.Margin = new Padding(3, 0, 3, 4);
             label15.Name = "label15";
             label15.Size = new Size(63, 16);
@@ -968,15 +984,42 @@
             txtFirstName.Size = new Size(197, 26);
             txtFirstName.TabIndex = 0;
             // 
-            // pnlLine2
+            // label34
             // 
-            pnlLine2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            pnlLine2.BorderStyle = BorderStyle.FixedSingle;
-            pnlLine2.Location = new Point(16, 43);
-            pnlLine2.Margin = new Padding(0, 0, 0, 16);
-            pnlLine2.Name = "pnlLine2";
-            pnlLine2.Size = new Size(827, 1);
-            pnlLine2.TabIndex = 25;
+            label34.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label34.AutoSize = true;
+            label34.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label34.ForeColor = Color.Red;
+            label34.Location = new Point(79, 155);
+            label34.Margin = new Padding(0, 0, 0, 4);
+            label34.Name = "label34";
+            label34.Size = new Size(14, 18);
+            label34.TabIndex = 38;
+            label34.Text = "*";
+            // 
+            // cmbWageType
+            // 
+            cmbWageType.AccessibleName = "Wage Type";
+            cmbWageType.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            cmbWageType.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbWageType.FormattingEnabled = true;
+            cmbWageType.Location = new Point(10, 180);
+            cmbWageType.Margin = new Padding(3, 3, 3, 16);
+            cmbWageType.Name = "cmbWageType";
+            cmbWageType.Size = new Size(197, 26);
+            cmbWageType.TabIndex = 37;
+            // 
+            // label35
+            // 
+            label35.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label35.AutoSize = true;
+            label35.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label35.Location = new Point(6, 157);
+            label35.Margin = new Padding(3, 0, 3, 4);
+            label35.Name = "label35";
+            label35.Size = new Size(78, 16);
+            label35.TabIndex = 36;
+            label35.Text = "Wage Type";
             // 
             // EditEmployeeForm
             // 
@@ -1081,5 +1124,8 @@
         private Label label32;
         private Label label33;
         private Panel pnlLine2;
+        private Label label34;
+        private ComboBox cmbWageType;
+        private Label label35;
     }
 }

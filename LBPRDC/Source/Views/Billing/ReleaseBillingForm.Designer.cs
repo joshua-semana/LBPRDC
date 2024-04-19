@@ -53,7 +53,7 @@
             pnlLine1.Dock = DockStyle.Top;
             pnlLine1.Location = new Point(0, 0);
             pnlLine1.Name = "pnlLine1";
-            pnlLine1.Size = new Size(322, 1);
+            pnlLine1.Size = new Size(318, 1);
             pnlLine1.TabIndex = 0;
             // 
             // pnlFooter
@@ -61,9 +61,9 @@
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Controls.Add(flowLayoutPanel2);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 227);
+            pnlFooter.Location = new Point(0, 223);
             pnlFooter.Name = "pnlFooter";
-            pnlFooter.Size = new Size(322, 46);
+            pnlFooter.Size = new Size(318, 46);
             pnlFooter.TabIndex = 1;
             // 
             // flowLayoutPanel2
@@ -72,7 +72,7 @@
             flowLayoutPanel2.Controls.Add(btnCancel);
             flowLayoutPanel2.Dock = DockStyle.Right;
             flowLayoutPanel2.FlowDirection = FlowDirection.RightToLeft;
-            flowLayoutPanel2.Location = new Point(131, 0);
+            flowLayoutPanel2.Location = new Point(127, 0);
             flowLayoutPanel2.Name = "flowLayoutPanel2";
             flowLayoutPanel2.Padding = new Padding(16, 9, 0, 0);
             flowLayoutPanel2.Size = new Size(191, 46);
@@ -115,7 +115,7 @@
             pnlBody.Location = new Point(0, 1);
             pnlBody.Name = "pnlBody";
             pnlBody.Padding = new Padding(16);
-            pnlBody.Size = new Size(322, 226);
+            pnlBody.Size = new Size(318, 222);
             pnlBody.TabIndex = 2;
             // 
             // dtpReleaseDate
@@ -129,7 +129,7 @@
             dtpReleaseDate.Location = new Point(16, 185);
             dtpReleaseDate.Margin = new Padding(0);
             dtpReleaseDate.Name = "dtpReleaseDate";
-            dtpReleaseDate.Size = new Size(290, 23);
+            dtpReleaseDate.Size = new Size(286, 23);
             dtpReleaseDate.TabIndex = 10;
             // 
             // label3
@@ -151,7 +151,7 @@
             label2.Location = new Point(16, 60);
             label2.Margin = new Padding(0, 0, 0, 16);
             label2.Name = "label2";
-            label2.Size = new Size(290, 85);
+            label2.Size = new Size(286, 85);
             label2.TabIndex = 8;
             label2.Text = resources.GetString("label2.Text");
             // 
@@ -163,7 +163,7 @@
             pnlLine2.Location = new Point(16, 43);
             pnlLine2.Margin = new Padding(0, 0, 0, 16);
             pnlLine2.Name = "pnlLine2";
-            pnlLine2.Size = new Size(290, 1);
+            pnlLine2.Size = new Size(286, 1);
             pnlLine2.TabIndex = 7;
             // 
             // panel1
@@ -173,7 +173,7 @@
             panel1.Location = new Point(-1, 0);
             panel1.Margin = new Padding(0, 0, 0, 16);
             panel1.Name = "panel1";
-            panel1.Size = new Size(810, 1);
+            panel1.Size = new Size(806, 1);
             panel1.TabIndex = 2;
             // 
             // label1
@@ -191,7 +191,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(322, 273);
+            ClientSize = new Size(318, 269);
             ControlBox = false;
             Controls.Add(pnlBody);
             Controls.Add(pnlFooter);
@@ -202,6 +202,7 @@
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "Release of Billing";
+            Load += ReleaseBillingForm_Load;
             pnlFooter.ResumeLayout(false);
             flowLayoutPanel2.ResumeLayout(false);
             flowLayoutPanel2.PerformLayout();

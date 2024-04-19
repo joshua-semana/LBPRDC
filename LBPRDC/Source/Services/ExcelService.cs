@@ -1,7 +1,10 @@
-﻿using LBPRDC.Source.Utilities;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Utilities;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using System.Configuration;
 using System.Text.Json;
+using static LBPRDC.Source.Config.StringConstants;
 
 namespace LBPRDC.Source.Services
 {
@@ -64,14 +67,14 @@ namespace LBPRDC.Source.Services
 
     public class AccrualsEntry
     {
-        public string? EmployeeID { get; set; }
-        public string? EmployeeName { get; set; }
-        public string? EmployeePosition { get; set; }
-        public decimal? BillingRate { get; set; }
-        public decimal? RegularBillingValue { get; set; }
-        public decimal? OvertimeBillingValue { get; set; }
+        public string EmployeeID { get; set; } = "";
+        public string EmployeeName { get; set; } = "";
+        public string EmployeePosition { get; set; } = "";
+        public decimal BillingRate { get; set; }
+        public decimal RegularBillingValue { get; set; }
+        public decimal OvertimeBillingValue { get; set; }
         public bool HasAdded { get; set; } = false;
-        public string? Department { get; set; } = "";
+        public string Department { get; set; } = "";
     }
 
     internal class ExcelService
@@ -154,19 +157,22 @@ namespace LBPRDC.Source.Services
             return sheetNames.ToArray();
         }
 
-        public static Dictionary<string, string> GetAllIdentifiers(string filePath, string sheetName, int idColumn, int nameColumn)
+        public static Dictionary<string, string> GetAllIdentifiers(string filePath, string sheetName)
         {
+            int CONFIG_TIMEKEEP_ROW_START = Convert.ToInt32(ConfigurationManager.AppSettings["TimekeepRow_Start"]);
+            string CONFIG_TIMEKEEP_COLUMN_EMPLOYEEID = ConfigurationManager.AppSettings["TimekeepColumn_Identifier_EmployeeID"] ?? "A";
+            string CONFIG_TIMEKEEP_COLUMN_EMPLOYEENAME = ConfigurationManager.AppSettings["TimekeepColumn_Identifier_EmployeeName"] ?? "B";
+
             Dictionary<string, string> rowData = new();
 
             using var file = new ExcelPackage(new FileInfo(filePath));
             var sheet = file.Workbook.Worksheets[sheetName];
-
             int rowCount = sheet.Dimension.Rows;
 
-            for (int row = 2; row < rowCount; row++)
+            for (int row = CONFIG_TIMEKEEP_ROW_START; row < rowCount; row++)
             {
-                object idValue = sheet.Cells[row, idColumn].Value;
-                object nameValue = sheet.Cells[row, nameColumn].Value;
+                object idValue = sheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_EMPLOYEEID}{row}"].Value;
+                object nameValue = sheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_EMPLOYEENAME}{row}"].Value;
 
                 if (idValue == null || idValue.ToString() == "#REF!" || nameValue.ToString() == "#REF!" || nameValue.ToString() == "#N/A") continue;
 
@@ -236,10 +242,35 @@ namespace LBPRDC.Source.Services
             return "00:00";
         }
 
-        public static List<Entry> PreProcessEntries(string filePath, string reportSheetName, string timekeepSheetName)
+        public static async Task<List<Entry>> PreProcessEntries(int ClientID, string filePath, string reportSheetName, string timekeepSheetName)
         {
+            int CONFIG_TIMEKEEP_ROW_START = Convert.ToInt32(ConfigurationManager.AppSettings["TimekeepRow_Start"]);
+            string CONFIG_TIMEKEEP_COLUMN_EMPLOYEEID = ConfigurationManager.AppSettings["TimekeepColumn_EmployeeID"] ?? "A";
+            string CONFIG_TIMEKEEP_COLUMN_EMPLOYEENAME = ConfigurationManager.AppSettings["TimekeepColumn_EmployeeName"] ?? "B";
+            string CONFIG_TIMEKEEP_COLUMN_DATE = ConfigurationManager.AppSettings["TimekeepColumn_Date"] ?? "C";
+            string CONFIG_TIMEKEEP_COLUMN_REGULARHOURS = ConfigurationManager.AppSettings["TimekeepColumn_RegularHours"] ?? "F";
+            string CONFIG_TIMEKEEP_COLUMN_LEGALHOLIDAY_100 = ConfigurationManager.AppSettings["TimekeepColumn_LegalHoliday_100"] ?? "G";
+            string CONFIG_TIMEKEEP_COLUMN_REGOVERTIME_125 = ConfigurationManager.AppSettings["TimekeepColumn_RegOvertime_125"] ?? "H";
+            string CONFIG_TIMEKEEP_COLUMN_RESTDAYOVERTIME_130 = ConfigurationManager.AppSettings["TimekeepColumn_RestDayOvertime_130"] ?? "I";
+            string CONFIG_TIMEKEEP_COLUMN_RESTDAYOVERTIMEEXCESS_169 = ConfigurationManager.AppSettings["TimekeepColumn_RestDayOvertimeExcess_169"] ?? "J";
+            string CONFIG_TIMEKEEP_COLUMN_SPECIALHOLIDAYOVERTIME_130 = ConfigurationManager.AppSettings["TimekeepColumn_SpecialHolidayOvertime_130"] ?? "K";
+            string CONFIG_TIMEKEEP_COLUMN_SPECIALEXCESSOVERTIME_195 = ConfigurationManager.AppSettings["TimekeepColumn_SpecialExcessOvertime_195"] ?? "L";
+            string CONFIG_TIMEKEEP_COLUMN_LEGALHOLIDAYOVERTIME_200 = ConfigurationManager.AppSettings["TimekeepColumn_LegalHolidayOvertime_200"] ?? "M";
+            string CONFIG_TIMEKEEP_COLUMN_LEGALHOLIDAYOVERTIME_260 = ConfigurationManager.AppSettings["TimekeepColumn_LegalHolidayOvertime_260"] ?? "N";
+            string CONFIG_TIMEKEEP_COLUMN_RESTDAYOVERTIME_150 = ConfigurationManager.AppSettings["TimekeepColumn_RestDayOvertime_150"] ?? "O";
+            string CONFIG_TIMEKEEP_COLUMN_REGULARHOLIDAY = ConfigurationManager.AppSettings["TimekeepColumn_RegularHoliday"] ?? "P";
+            string CONFIG_TIMEKEEP_COLUMN_NIGHTDIFFERENTIAL_10 = ConfigurationManager.AppSettings["TimekeepColumn_NightDifferential_10"] ?? "R";
+            string CONFIG_TIMEKEEP_COLUMN_NIGHTDIFFERENTIAL_125 = ConfigurationManager.AppSettings["TimekeepColumn_NightDifferential_125"] ?? "S";
+            string CONFIG_TIMEKEEP_COLUMN_NIGHTDIFFERENTIAL_130 = ConfigurationManager.AppSettings["TimekeepColumn_NightDifferential_130"] ?? "T";
+            string CONFIG_TIMEKEEP_COLUMN_NIGHTDIFFERENTIAL_150 = ConfigurationManager.AppSettings["TimekeepColumn_NightDifferential_150"] ?? "U";
+            string CONFIG_TIMEKEEP_COLUMN_NIGHTDIFFERENTIAL_20 = ConfigurationManager.AppSettings["TimekeepColumn_NightDifferential_20"] ?? "V";
+            string CONFIG_TIMEKEEP_COLUMN_NIGHTDIFFERENTIAL_50 = ConfigurationManager.AppSettings["TimekeepColumn_NightDifferential_50"] ?? "W";
+            string CONFIG_TIMEKEEP_COLUMN_UNDERTIME = ConfigurationManager.AppSettings["TimekeepColumn_UnderTime"] ?? "Y";
+            string CONFIG_TIMEKEEP_COLUMN_ABSENT = ConfigurationManager.AppSettings["TimekeepColumn_Absent"] ?? "Z";
+
             List<Entry> entries = new();
             List<EntryReportRemarks> remarks = new();
+
             try
             {
                 using var file = new ExcelPackage(new FileInfo(filePath));
@@ -248,8 +279,6 @@ namespace LBPRDC.Source.Services
 
                 int reportRowCount = reportSheet.Dimension.Rows;
                 int timekeepRowCount = timekeepSheet.Dimension.Rows;
-
-                var employeeBase = EmployeeService.GetAllEmployeesBase();
 
                 // Getting the remarks from the report sheet
                 for (int row = 7; row < reportRowCount; row++)
@@ -272,12 +301,13 @@ namespace LBPRDC.Source.Services
                 }
 
                 // Getting data from Timekeep Sheet
+                var employees = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID);
                 var allPositionHistory = PositionService.GetAllHistory();
-                var positionAndRates = PositionService.GetAllItems();
+                var positionAndRates = await PositionService.GetItemsByClientID(ClientID);
 
                 var databaseGuids = new HashSet<Guid>(BillingRecordService.GetGuids());
 
-                for (int row = 2; row < timekeepRowCount; row++)
+                for (int row = CONFIG_TIMEKEEP_ROW_START; row < timekeepRowCount; row++)
                 {
                     Guid newGuid = Guid.NewGuid();
                     while (databaseGuids.Contains(newGuid))
@@ -285,33 +315,34 @@ namespace LBPRDC.Source.Services
                         newGuid = Guid.NewGuid();
                     }
 
-                    string idValue = timekeepSheet.Cells[row, 1].Value?.ToString();
-                    string nameValue = timekeepSheet.Cells[row, 2].Value?.ToString();
-                    string Date = timekeepSheet.Cells[row, 3].Text;
+                    string? idValue = timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_EMPLOYEEID}{row}"].Value?.ToString();
+                    string? nameValue = timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_EMPLOYEENAME}{row}"].Value?.ToString();
+                    string Date = timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_DATE}{row}"].Text;
 
                     if (idValue == null || idValue == "#REF!" || idValue == "#N/A" || nameValue == "#REF!" || nameValue == "#N/A" || Date == null || Date == string.Empty) continue;
 
-                    var RegularHours = ParseTime(GetTime(timekeepSheet.Cells[row, 6].Text));
-                    var LegalHoliday_100 = ParseTime(GetTime(timekeepSheet.Cells[row, 7].Text));
-                    var RegOT_125 = ParseTime(GetTime(timekeepSheet.Cells[row, 8].Text));
-                    var RestDayOT_130 = ParseTime(GetTime(timekeepSheet.Cells[row, 9].Text));
-                    var RestDayOTExcess_169 = ParseTime(GetTime(timekeepSheet.Cells[row, 10].Text));
-                    var SpecialHolidayOT_130 = ParseTime(GetTime(timekeepSheet.Cells[row, 11].Text));
-                    var SpecialExcessOT_195 = ParseTime(GetTime(timekeepSheet.Cells[row, 12].Text));
-                    var LegalHolidayOT_200 = ParseTime(GetTime(timekeepSheet.Cells[row, 13].Text));
-                    var LegalHolidayOT_260 = ParseTime(GetTime(timekeepSheet.Cells[row, 14].Text));
-                    var RestDayOT_150 = ParseTime(GetTime(timekeepSheet.Cells[row, 15].Text));
-                    var RegularHoliday_160 = ParseTime(GetTime(timekeepSheet.Cells[row, 16].Text));
-                    var NightDiff_10 = ParseTime(GetTime(timekeepSheet.Cells[row, 18].Text));
-                    var NightDiff_125 = ParseTime(GetTime(timekeepSheet.Cells[row, 19].Text));
-                    var NightDiff_130 = ParseTime(GetTime(timekeepSheet.Cells[row, 20].Text));
-                    var NightDiff_150 = ParseTime(GetTime(timekeepSheet.Cells[row, 21].Text));
-                    var NightDiff_20 = ParseTime(GetTime(timekeepSheet.Cells[row, 22].Text));
-                    var NightDiff_50 = ParseTime(GetTime(timekeepSheet.Cells[row, 23].Text));
-                    var UnderTime = ParseTime(GetTime(timekeepSheet.Cells[row, 25].Text));
-                    var Absent = ParseTime(GetTime(timekeepSheet.Cells[row, 26].Text));
+                    var RegularHours = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_REGULARHOURS}{row}"].Text));
+                    var LegalHoliday_100 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_LEGALHOLIDAY_100}{row}"].Text));
+                    var RegOT_125 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_REGOVERTIME_125}{row}"].Text));
+                    var RestDayOT_130 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_RESTDAYOVERTIME_130}{row}"].Text));
+                    var RestDayOTExcess_169 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_RESTDAYOVERTIMEEXCESS_169}{row}"].Text));
+                    var SpecialHolidayOT_130 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_SPECIALHOLIDAYOVERTIME_130}{row}"].Text));
+                    var SpecialExcessOT_195 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_SPECIALEXCESSOVERTIME_195}{row}"].Text));
+                    var LegalHolidayOT_200 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_LEGALHOLIDAYOVERTIME_200}{row}"].Text));
+                    var LegalHolidayOT_260 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_LEGALHOLIDAYOVERTIME_260}{row}"].Text));
+                    var RestDayOT_150 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_RESTDAYOVERTIME_150}{row}"].Text));
+                    var RegularHoliday_160 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_REGULARHOLIDAY}{row}"].Text));
+                    var NightDiff_10 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_NIGHTDIFFERENTIAL_10}{row}"].Text));
+                    var NightDiff_125 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_NIGHTDIFFERENTIAL_125}{row}"].Text));
+                    var NightDiff_130 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_NIGHTDIFFERENTIAL_130}{row}"].Text));
+                    var NightDiff_150 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_NIGHTDIFFERENTIAL_150}{row}"].Text));
+                    var NightDiff_20 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_NIGHTDIFFERENTIAL_20}{row}"].Text));
+                    var NightDiff_50 = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_NIGHTDIFFERENTIAL_50}{row}"].Text));
+                    var UnderTime = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_UNDERTIME}{row}"].Text));
+                    var Absent = ParseTime(GetTime(timekeepSheet.Cells[$"{CONFIG_TIMEKEEP_COLUMN_ABSENT}{row}"].Text));
 
-                    var positions = allPositionHistory.Where(w => w.EmployeeID == idValue).OrderByDescending(ob => ob.Timestamp).ToList();
+                    var employeeIntID = employees.First(f => f.EmployeeID == idValue).ID;
+                    var positions = allPositionHistory.Where(w => w.EmployeeID == employeeIntID).OrderByDescending(ob => ob.Timestamp).ToList();
                     int positionID = GetPositionIdByDate(positions, Convert.ToDateTime(Date));
 
                     if (entries.Any(e => e.EmployeeID == idValue.ToString() && e.PositionID == positionID))
@@ -338,16 +369,16 @@ namespace LBPRDC.Source.Services
                     }
                     else
                     {
-                        var currentEmployee = employeeBase.First(f => f.EmployeeID == idValue);
+                        var currentEmployee = employees.First(f => f.EmployeeID == idValue);
 
                         entries.Add(new Entry
                         {
                             Guid = newGuid,
                             EmployeeID = idValue.ToString(),
-                            FullName = $"{currentEmployee.LastName}, {currentEmployee.FirstName} {currentEmployee.MiddleName}".Trim(),
+                            FullName = currentEmployee.FullName,
                             PositionID = positionID,
-                            Department = currentEmployee.Department,
-                            Location = currentEmployee.Location,
+                            Department = currentEmployee.DepartmentName,
+                            Location = currentEmployee.LocationName,
                             BillingRate = positionAndRates.First(f => f.ID == positionID).BillingRate,
                             SalaryRate = positionAndRates.First(f => f.ID == positionID).SalaryRate,
                             TimeDetails = new EntryTimeDetails
@@ -371,8 +402,8 @@ namespace LBPRDC.Source.Services
                                 UnderTime = UnderTime,
                                 Absent = Absent,
                             },
-                            EntryType = "Regular Entry",
-                            VerificationStatus = "Unverified",
+                            EntryType = StringConstants.Type.REGULAR,
+                            VerificationStatus = StringConstants.Status.UNVERIFIED,
                             ExportIncluded = true
                         });
                     }
@@ -468,20 +499,27 @@ namespace LBPRDC.Source.Services
 
         private static List<BillingRecord> BillingRecords = new();
 
-        public static bool ExportBilling(List<Entry> entries, string billingName, string filePath, string exportType, List<Guid> removedEntries)
+        public static async Task<bool> ExportBilling(int BillingID, int ClientID, List<Entry> entries, string billingName, string filePath, string exportType, List<Guid> removedEntries)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            var billing = BillingService.GetAllBillingDetailsByName(billingName);
-            var departments = DepartmentService.GetAllItems();
-            var positionAndRates = PositionService.GetAllItems();
+            if (BillingID == 0 || ClientID == 0)
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_CLIENT_BILLING, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            var clientInfo = await ClientService.GetClientByID(ClientID);
+            var billing = await BillingService.GetBillingDetailsById(BillingID);
+            var departments = await DepartmentService.GetItemsByClientID(ClientID);
+            var positionAndRates = await PositionService.GetItemsByClientID(ClientID);
 
             try
             {
                 using var package = new ExcelPackage();
 
                 var groupedEntries = entries.GroupBy(entry => entry.Department);
-                var adjustmentSheet = package.Workbook.Worksheets.Add("ADJUSTMENTS");
+                var adjustmentSheet = package.Workbook.Worksheets.Add(StringConstants.SheetName.ADJUSTMENT.ToUpper());
 
                 int adjRow = 1;
                 
@@ -489,13 +527,13 @@ namespace LBPRDC.Source.Services
                 {
                     List<AdjustmentOvertimePair> overtimePairs = new();
 
-                    string departmentName = department.Key.ToString();
-                    string? departmentCode = departments.First(f => f.Name == department.Key).Code;
-                    var regularSheet = package.Workbook.Worksheets.Add(departmentName);
-                    var overtimeSheet = package.Workbook.Worksheets.Add($"{departmentName} OVERTIME");
+                    string departmentName = department.Key?.ToString() ?? StringConstants.SheetName.UNDEFINED;
+                    string? departmentCode = departments.First(f => f.Name == department.Key).Code ?? StringConstants.SheetName.UNDEFINED;
+                    var regularSheet = package.Workbook.Worksheets.Add(departmentName.ToUpper());
+                    var overtimeSheet = package.Workbook.Worksheets.Add($"{departmentName.ToUpper()} {StringConstants.Type.OVERTIME.ToUpper()}");
 
-                    (string dateCoverage, string regularAccountNumber) = SetReportHeadersRegular(regularSheet, departmentCode, billing.StartDate, billing.EndDate);
-                    string overtimeAccountNumber = SetReportHeadersOvertime(overtimeSheet, departmentCode, billing.Quarter, billing.StartDate, billing.EndDate);
+                    (string dateCoverage, string regularAccountNumber) = SetReportHeadersRegular(clientInfo, regularSheet, departmentCode, billing.StartDate, billing.EndDate);
+                    string overtimeAccountNumber = SetReportHeadersOvertime(clientInfo, overtimeSheet, departmentCode, billing.Quarter, billing.StartDate, billing.EndDate);
 
                     if (department.Any(a => a.AdjustmentRemarks != null && a.AdjustmentRemarks.Any(aa => aa.Type == "regular")))
                     {
@@ -509,8 +547,8 @@ namespace LBPRDC.Source.Services
                     {
                         // Addition of entries to regular and overtime department sheet
                         if (!entry.ExportIncluded) continue;
-                        (regIndex, regRow) = AddToRegularSheet(regularSheet, entry, regIndex, regRow, regularAccountNumber, billingName, exportType);
-                        if (HasContentInOvertime(entry)) (overIndex, overRow) = AddToOvertimeSheet(overtimeSheet, entry, overIndex, overRow, overtimeAccountNumber, billingName, exportType);
+                        (regIndex, regRow) = AddToRegularSheet(BillingID, ClientID, regularSheet, entry, regIndex, regRow, regularAccountNumber, billingName, exportType);
+                        if (HasContentInOvertime(entry)) (overIndex, overRow) = AddToOvertimeSheet(BillingID, ClientID, overtimeSheet, entry, overIndex, overRow, overtimeAccountNumber, billingName, exportType);
 
                         // Addition of Adjustment Rows
                         if (entry.AdjustmentRemarks == null) continue;
@@ -538,7 +576,7 @@ namespace LBPRDC.Source.Services
 
                     if (overtimePairs.Count > 0)
                     {
-                        adjRow = AddAdjustmentTitle(adjustmentSheet, adjRow, $"{departmentName} OVERTIME");
+                        adjRow = AddAdjustmentTitle(adjustmentSheet, adjRow, $"{departmentName.ToUpper()} {StringConstants.Type.OVERTIME.ToUpper()}");
                         foreach (var pair in overtimePairs)
                         {
                             adjRow = AddAdjustmentRow(adjustmentSheet, adjRow, $"{pair.FullName} | {pair.PositionCode}", pair.Value);
@@ -589,14 +627,14 @@ namespace LBPRDC.Source.Services
                     catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
                 }
 
-                if (exportType == "Unreleased")
+                if (exportType == StringConstants.Status.UNRELEASED)
                 {
                     if (removedEntries.Any())
                     {
-                        var result = BillingRecordService.RemoveRecordsByGuid(removedEntries);
+                        await BillingRecordService.RemoveRecordsByGuid(removedEntries, BillingID);
                     }
 
-                    var output = BillingRecordService.Add(billingName, BillingRecords);
+                    var output = BillingRecordService.Add(BillingID, billingName, BillingRecords);
                     if (output)
                     {
                         BillingRecords.Clear();
@@ -662,7 +700,7 @@ namespace LBPRDC.Source.Services
             }
         }
 
-        private static (string, string) SetReportHeadersRegular(ExcelWorksheet sheet, string departmentCode, DateTime startDate, DateTime endDate)
+        private static (string, string) SetReportHeadersRegular(Models.Client Client, ExcelWorksheet sheet, string departmentCode, DateTime startDate, DateTime endDate)
         {
             string headerStartDate = startDate.ToString("MMMM dd");
             string headerEndDate = endDate.ToString("yyyy");
@@ -676,10 +714,10 @@ namespace LBPRDC.Source.Services
 
             AddHeader(sheet, "A1:J1", "LBP RESOURCES AND DEVELOPMENT CORPORATION", 14, true);
             AddHeader(sheet, "A2:J2", "STATEMENT OF ACCOUNT", 14, true);
-            AddHeader(sheet, "A3:J3", "CLIENT: SOCIAL HOUSING FINANCE CORPORATION", 14, true);
+            AddHeader(sheet, "A3:J3", $"CLIENT: {Client.Description.ToUpper()}", 14, true);
             AddHeader(sheet, "A4:J4", $"FOR THE PERIOD OF {dateCoverage}", 14, true);
 
-            string accountNumber = $"SHFC-{departmentCode}-{soaStartDate}-{endDate.Day}-{soaEndDate}";
+            string accountNumber = $"{Client.Name.ToUpper()}-{departmentCode}-{soaStartDate}-{endDate.Day}-{soaEndDate}";
 
             AddAccountNumber(sheet, "H", "I", accountNumber);
 
@@ -698,7 +736,7 @@ namespace LBPRDC.Source.Services
             return (dateCoverage, accountNumber);
         }
 
-        private static (int, int) AddToRegularSheet(ExcelWorksheet sheet, Entry entry, int index, int row, string accountNumber, string billingName, string exportType)
+        private static (int, int) AddToRegularSheet(int BillingID, int ClientID, ExcelWorksheet sheet, Entry entry, int index, int row, string accountNumber, string billingName, string exportType)
         {
             sheet.Cells[$"A{row}"].Value = index;
             sheet.Cells[$"B{row}"].Value = $"{entry.FullName}{(entry.FinalReportRemarks != null && entry.FinalReportRemarks != "" ? " - " + entry.FinalReportRemarks : "")}";
@@ -729,12 +767,12 @@ namespace LBPRDC.Source.Services
             SetCellToCenter(sheet, $"A{row}");
             SetCellToCenter(sheet, $"C{row}");
 
-            if (exportType == "Unreleased")
+            if (exportType == StringConstants.Status.UNRELEASED)
             {
                 sheet.Calculate();
                 var billingValue = Convert.ToDecimal(sheet.Cells[$"J{row}"].Value);
 
-                AddToBillingRecordList(entry, billingName, accountNumber, billingValue, "regular");
+                AddToBillingRecordList(BillingID, ClientID, entry, accountNumber, billingValue, "regular");
             }
 
             return (index += 1, row += 2);
@@ -755,7 +793,7 @@ namespace LBPRDC.Source.Services
             AddDoubleBorders(sheet, $"F{row}:J{row}");
         }
 
-        private static string SetReportHeadersOvertime(ExcelWorksheet sheet, string departmentCode, int quarter, DateTime startDate, DateTime endDate)
+        private static string SetReportHeadersOvertime(Models.Client client, ExcelWorksheet sheet, string departmentCode, int quarter, DateTime startDate, DateTime endDate)
         {
             string headerStartDate = startDate.ToString("MMMM dd");
             string headerEndDate = endDate.ToString("yyyy");
@@ -768,10 +806,10 @@ namespace LBPRDC.Source.Services
 
             AddHeader(sheet, "A1:U1", "LBP RESOURCES AND DEVELOPMENT CORPORATION", 14, true);
             AddHeader(sheet, "A2:U2", "STATEMENT OF ACCOUNT", 14, true);
-            AddHeader(sheet, "A3:U3", "CLIENT: SOCIAL HOUSING FINANCE CORPORATION", 14, true);
+            AddHeader(sheet, "A3:U3", $"CLIENT: {client.Description.ToUpper()}", 14, true);
             AddHeader(sheet, "A4:U4", $"FOR THE PERIOD OF {headerStartDate.ToUpper()}-{endDate.Day}, {headerEndDate}", 14, true);
 
-            string accountNumber = $"SHFC-{departmentCode}-OT-{soaStartDate}-{endDate.Day}-{soaEndDate}";
+            string accountNumber = $"{client.Name}-{departmentCode}-OT-{soaStartDate}-{endDate.Day}-{soaEndDate}";
 
             AddAccountNumber(sheet, "S", "T", accountNumber);
 
@@ -803,7 +841,7 @@ namespace LBPRDC.Source.Services
 
         static decimal ComputeTime(decimal billingRate, double percent, TimeSpan time) => Math.Round((billingRate / 8) * Convert.ToDecimal(percent) * Convert.ToDecimal(time.TotalHours), 2, MidpointRounding.AwayFromZero);
 
-        private static (int, int) AddToOvertimeSheet(ExcelWorksheet sheet, Entry entry, int index, int row, string accountNumber, string billingName, string exportType)
+        private static (int, int) AddToOvertimeSheet(int BillingID, int ClientID, ExcelWorksheet sheet, Entry entry, int index, int row, string accountNumber, string billingName, string exportType)
         {
             var time = entry.TimeDetails;
             decimal convertedRate = Convert.ToDecimal(entry.BillingRate);
@@ -861,7 +899,7 @@ namespace LBPRDC.Source.Services
             SetCellToCenter(sheet, $"A{row}");
             SetCellToCenter(sheet, $"C{row}");
 
-            if (exportType == "Unreleased")
+            if (exportType == StringConstants.Status.UNRELEASED)
             {
                 decimal regot_125 = ComputeTime(convertedRate, 1.25, time.RegOT_125);
                 decimal rdshot_130 = ComputeTime(convertedRate, 1.30, time.RestDaySpecialOT_130);
@@ -881,7 +919,7 @@ namespace LBPRDC.Source.Services
                 decimal billingValue = regot_125 + rdshot_130 + rdot_150 + rhot_excess_169 + shot_excess_195 + lhot_200 +
                       lhot_260 + rhot_160 + ndot_10 + ndot_20 + ndot_50 + ndot_125 + ndot_130 + ndot_150;
 
-                AddToBillingRecordList(entry, billingName, accountNumber, billingValue, "overtime");
+                AddToBillingRecordList(BillingID, ClientID, entry, accountNumber, billingValue, "overtime");
             }
 
             return (index += 1, row += 2);
@@ -1037,7 +1075,7 @@ namespace LBPRDC.Source.Services
             sheet.Cells[cell].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
-        private static void AddToBillingRecordList(Entry entry, string billingName, string accountNumber, decimal billingValue, string timeType)
+        private static void AddToBillingRecordList(int BillingID, int ClientID, Entry entry, string accountNumber, decimal billingValue, string timeType)
         {
             try
             {
@@ -1049,6 +1087,8 @@ namespace LBPRDC.Source.Services
                     
                     BillingRecords.Add(new()
                     {
+                        ClientID = ClientID,
+                        BillingID = BillingID,
                         Guid = entry.Guid,
                         EmployeeID = entry.EmployeeID,
                         FullName = entry.FullName,
@@ -1058,7 +1098,7 @@ namespace LBPRDC.Source.Services
                         TimeDetailJSON = timeJSON,
                         SalaryRate = entry.SalaryRate,
                         BillingRate = entry.BillingRate,
-                        BillingName = billingName,
+                        //BillingName = billingName,
                         RegularAccountNumber = accountNumber,
                         OvertimeAccountNumber = "",
                         RegularBillingValue = billingValue,
@@ -1138,35 +1178,46 @@ namespace LBPRDC.Source.Services
 
         // BALANCING
 
-        public static bool ExportBalancing(string billingName, string filePath)
+        public static async Task<bool> ExportBalancing(int ClientID, int BillingID, string filePath)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            var employees = EmployeeService.GetAllEmployeesBase();
-            var departments = DepartmentService.GetAllItems();
-            var positions = PositionService.GetAllItems();
-
-            var billingDetails = BillingService.GetAllBillingDetailsByName(billingName);
-            var accrualsEntries = BillingService.GetAccrualsJSON(billingName);
-            var billingRecordEntries = BillingRecordService.GetRecordsByBillingName(billingName);
-            var groupedBillingRecordEntries = billingRecordEntries.GroupBy(gb => gb.Department);
-
-            foreach (var entry in accrualsEntries)
+            if (BillingID == 0 || ClientID == 0)
             {
-                var matchedEmployee = employees.FirstOrDefault(f => entry.EmployeeID.Contains(f.EmployeeID));
-                if (matchedEmployee != null)
-                {
-                    entry.Department = matchedEmployee.Department?.ToUpper();
-                }
+                MessageBox.Show(MessagesConstants.Error.MISSING_CLIENT_BILLING, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
 
             try
             {
-                string startDate = billingDetails.StartDate.ToString("MMMM dd");
-                string endDate = billingDetails.EndDate.ToString("dd, yyyy");
+                var billing = await BillingService.GetBillingDetailsById(BillingID);
+                var employeesList = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID);
+                var departmentsList = await DepartmentService.GetItemsByClientID(ClientID);
+                var positionsList = await PositionService.GetItemsByClientID(ClientID);
+                var billingRecords = await BillingRecordService.GetRecordsByBillingId(BillingID);
+                var groupedRecords = billingRecords.GroupBy(gb => gb.Department).ToList();
+                var uploadedAccruals = JsonSerializer.Deserialize<List<AccrualsEntry>>(billing.AccrualsJSON);
+
+                if (!uploadedAccruals.Any())
+                {
+                    MessageBox.Show(MessagesConstants.Error.MISSING_ACCRUALS, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
+                foreach (var entry in uploadedAccruals)
+                {
+                    var matchedEntry = employeesList.FirstOrDefault(f => entry.EmployeeID.Contains(f.EmployeeID));
+                    if (matchedEntry != null)
+                    {
+                        entry.Department = matchedEntry.DepartmentName.ToUpper();
+                    }
+                }
+
+                string startDate = billing.StartDate.ToString("MMMM dd");
+                string endDate = billing.EndDate.ToString("dd, yyyy");
 
                 using var package = new ExcelPackage();
-                var balancingSheet = package.Workbook.Worksheets.Add("Balancing");
+                var balancingSheet = package.Workbook.Worksheets.Add(StringConstants.SheetName.BALANCING);
 
                 int row = 1;
                 int startRow = 0;
@@ -1176,44 +1227,43 @@ namespace LBPRDC.Source.Services
 
                 row += 1;
 
-                foreach (var department in groupedBillingRecordEntries)
+                foreach (var department in groupedRecords)
                 {
-                    startRow = row = SetBalancingHeaders(balancingSheet, department.Key, row);
+                    startRow = row = SetBalancingHeaders(balancingSheet, department.Key.ToUpper(), row);
 
                     List<BalancingRowDetails> regularDetailsList = new();
                     List<BalancingRowDetails> overtimeDetailsList = new();
 
-                    foreach (var billingEntry in department)
+                    foreach (var record in department)
                     {
-                        var accrualsEntry = accrualsEntries.FirstOrDefault(a => a.EmployeeID.Contains(billingEntry.EmployeeID) && a.EmployeePosition == billingEntry.Position);
-
-                        var billingPosition = positions.FirstOrDefault(f => f.Name == billingEntry.Position);
-                        string userRemarks = billingEntry.UserRemarks ?? "";
-                        string billing = $"{billingEntry.FullName} - {billingPosition?.Code}{(string.IsNullOrEmpty(userRemarks) ? "" : $" - {userRemarks}")}";
+                        var accrualsEntry = uploadedAccruals.FirstOrDefault(a => a.EmployeeID.Contains(record.EmployeeID) && a.EmployeePosition == record.Position.ToUpper());
+                        var position = positionsList.FirstOrDefault(f => f.Name == record.Position);
+                        string remarks = record.UserRemarks ?? "";
+                        string recordIdentity = $"{record.FullName} ({position?.Code}){(string.IsNullOrEmpty(remarks) ? "" : $" - {remarks}")}";
 
                         if (accrualsEntry != null)
                         {
-                            var accrualsPosition = positions.FirstOrDefault(f => f.Name == accrualsEntry.EmployeePosition);
-                            string accruals = (accrualsPosition != null) ? $"{accrualsEntry.EmployeeName} - {accrualsPosition?.Code}" : $"{accrualsEntry.EmployeeName} - {accrualsEntry.EmployeePosition}";
+                            var accrualsPosition = positionsList.FirstOrDefault(f => f.Name == accrualsEntry.EmployeePosition);
+                            string accrualsIdentity = $"{accrualsEntry.EmployeeName} ({((accrualsPosition != null) ? accrualsPosition?.Code : accrualsEntry.EmployeePosition)})";
                             
                             accrualsEntry.HasAdded = true;
 
                             regularDetailsList.Add(new()
                             {
-                                AccrualsFullName = accruals,
+                                AccrualsFullName = accrualsIdentity,
                                 AccrualsValue = accrualsEntry.RegularBillingValue,
-                                BillingFullName = billing,
-                                BillingValue = billingEntry.RegularBillingValue,
-                                BillingRemarks = billingEntry.RegularAdjustmentRemarks
+                                BillingFullName = recordIdentity,
+                                BillingValue = record.RegularBillingValue,
+                                BillingRemarks = record.RegularAdjustmentRemarks
                             });
 
                             overtimeDetailsList.Add(new()
                             {
-                                AccrualsFullName = accruals,
+                                AccrualsFullName = accrualsIdentity,
                                 AccrualsValue = accrualsEntry.OvertimeBillingValue,
-                                BillingFullName = billing,
-                                BillingValue = billingEntry.OvertimeBillingValue,
-                                BillingRemarks = billingEntry.OvertimeAdjustmentRemarks
+                                BillingFullName = recordIdentity,
+                                BillingValue = record.OvertimeBillingValue,
+                                BillingRemarks = record.OvertimeAdjustmentRemarks
                             });
                         }
                         else
@@ -1222,52 +1272,41 @@ namespace LBPRDC.Source.Services
                             {
                                 AccrualsFullName = "",
                                 AccrualsValue = 0,
-                                BillingFullName = billing,
-                                BillingValue = billingEntry.RegularBillingValue,
-                                BillingRemarks = billingEntry.RegularAdjustmentRemarks
+                                BillingFullName = recordIdentity,
+                                BillingValue = record.RegularBillingValue,
+                                BillingRemarks = record.RegularAdjustmentRemarks
                             });
 
                             overtimeDetailsList.Add(new()
                             {
                                 AccrualsFullName = "",
                                 AccrualsValue = 0,
-                                BillingFullName = billing,
-                                BillingValue = billingEntry.OvertimeBillingValue,
-                                BillingRemarks = billingEntry.OvertimeAdjustmentRemarks
+                                BillingFullName = recordIdentity,
+                                BillingValue = record.OvertimeBillingValue,
+                                BillingRemarks = record.OvertimeAdjustmentRemarks
                             });
                         }
                     }
 
-                    foreach (var skippedAccrual in accrualsEntries.Where(w => w.Department == department.Key.ToUpper() && !w.HasAdded))
+                    foreach (var skippedAccrual in uploadedAccruals.Where(w => w.Department == department.Key.ToUpper() && !w.HasAdded))
                     {
-                        var accrualsPosition = positions.FirstOrDefault(f => f.Name == skippedAccrual.EmployeePosition);
-                        string accruals = (accrualsPosition != null) ? $"{skippedAccrual.EmployeeName} - {accrualsPosition?.Code}" : $"{skippedAccrual.EmployeeName} - {skippedAccrual.EmployeePosition}";
+                        var accrualsPosition = positionsList.FirstOrDefault(f => f.Name == skippedAccrual.EmployeePosition);
+                        string accrualsIdentity = $"{skippedAccrual.EmployeeName} ({((accrualsPosition != null) ? accrualsPosition?.Code : skippedAccrual.EmployeePosition)})";
+
+                        skippedAccrual.HasAdded = true;
+
                         regularDetailsList.Add(new()
                         {
-                            AccrualsFullName = accruals,
+                            AccrualsFullName = accrualsIdentity,
                             AccrualsValue = skippedAccrual.RegularBillingValue,
                             BillingFullName = "",
                             BillingValue = 0,
                             BillingRemarks = ""
                         });
 
-                        skippedAccrual.HasAdded = true;
-
-                        //if (skippedAccrual.OvertimeBillingValue > 0)
-                        //{
-                        //    overtimeDetailsList.Add(new()
-                        //    {
-                        //        AccrualsFullName = accruals,
-                        //        AccrualsValue = skippedAccrual.OvertimeBillingValue,
-                        //        BillingFullName = "",
-                        //        BillingValue = 0,
-                        //        BillingRemarks = ""
-                        //    });
-                        //}
-
                         overtimeDetailsList.Add(new()
                         {
-                            AccrualsFullName = accruals,
+                            AccrualsFullName = accrualsIdentity,
                             AccrualsValue = skippedAccrual.OvertimeBillingValue,
                             BillingFullName = "",
                             BillingValue = 0,
@@ -1288,7 +1327,7 @@ namespace LBPRDC.Source.Services
                     SetCellToBold(balancingSheet, $"B{row}, E{row}");
                     row += 1;
 
-                    startRow = row = SetBalancingHeaders(balancingSheet, $"{department.Key} OVERTIME", row);
+                    startRow = row = SetBalancingHeaders(balancingSheet, $"{department.Key.ToUpper()} {StringConstants.Type.OVERTIME.ToUpper()}", row);
 
                     if (overtimeDetailsList.Any())
                     {
@@ -1308,22 +1347,22 @@ namespace LBPRDC.Source.Services
                 AddHeader(balancingSheet, $"A{row}:B{row}", "UNCATEGORIZED ACCRUALS REGULAR", 12, true);
                 row += 1;
 
-                foreach (var entry in accrualsEntries.Where(w => !w.HasAdded))
+                foreach (var entry in uploadedAccruals.Where(w => !w.HasAdded))
                 {
-                    var accrualsPosition = positions.FirstOrDefault(f => f.Name == entry.EmployeePosition);
-                    string accruals = (accrualsPosition != null) ? $"{entry.EmployeeName} - {accrualsPosition?.Code}" : $"{entry.EmployeeName} - {entry.EmployeePosition}";
-                    row = AddBalancingRow(balancingSheet, accruals, entry.RegularBillingValue, "", 0, "", row);
+                    var accrualsPosition = positionsList.FirstOrDefault(f => f.Name == entry.EmployeePosition);
+                    string accrualsIdentity = $"{entry.EmployeeName} ({((accrualsPosition != null) ? accrualsPosition?.Code : entry.EmployeePosition)})";
+                    row = AddBalancingRow(balancingSheet, accrualsIdentity, entry.RegularBillingValue, "", 0, "", row);
                 }
 
                 row += 1;
                 AddHeader(balancingSheet, $"A{row}:B{row}", "UNCATEGORIZED ACCRUALS OVERTIME", 12, true);
                 row += 1;
 
-                foreach (var entry in accrualsEntries.Where(w => !w.HasAdded))
+                foreach (var entry in uploadedAccruals.Where(w => !w.HasAdded))
                 {
-                    var accrualsPosition = positions.FirstOrDefault(f => f.Name == entry.EmployeePosition);
-                    string accruals = (accrualsPosition != null) ? $"{entry.EmployeeName} - {accrualsPosition?.Code}" : $"{entry.EmployeeName} - {entry.EmployeePosition}";
-                    row = AddBalancingRow(balancingSheet, accruals, entry.OvertimeBillingValue, "", 0, "", row);
+                    var accrualsPosition = positionsList.FirstOrDefault(f => f.Name == entry.EmployeePosition);
+                    string accrualsIdentity = $"{entry.EmployeeName} ({((accrualsPosition != null) ? accrualsPosition?.Code : entry.EmployeePosition)})";
+                    row = AddBalancingRow(balancingSheet, accrualsIdentity, entry.OvertimeBillingValue, "", 0, "", row);
                 }
 
                 ConvertToMoney(balancingSheet, "B");
@@ -1335,7 +1374,10 @@ namespace LBPRDC.Source.Services
                 {
                     package.SaveAs(new FileInfo(filePath));
                 }
-                catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+                catch {
+                    MessageBox.Show($"There seems to be a problem exporting this file. If you are overwriting this to an existing file, make sure that the selected file is not currently open.", "Export Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false; 
+                }
 
                 return true;
             }

@@ -1,4 +1,6 @@
-﻿namespace LBPRDC.Source.Views.Billing
+﻿using LBPRDC.Source.Config;
+
+namespace LBPRDC.Source.Views.Billing
 {
     partial class SummaryView
     {

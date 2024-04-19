@@ -1,18 +1,18 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
+using static LBPRDC.Source.Config.MessagesConstants;
+using static LBPRDC.Source.Models.Billing;
 
 namespace LBPRDC.Source.Views.Billing
 {
     public partial class BillingInformationForm : Form
     {
-        public bool IsReleased { get; set; } = false;
-        public string? BillingName { get; set; }
-        public string? Type { get; set; }
         public BillingControl? ParentControl { get; set; }
-        public Services.Billing BillingInformation { get; set; } = new();
-        public bool IsEquipmentIncluded { get; set; }
-        public string EquipmentAccountNumber { get; set; } = string.Empty;
-        public decimal EquipmentsAmount { get; set; }
+        public int ClientID { get; set; }
+        public Models.Billing BillingCompleteInfo { get; set; } = new();
+        public Models.Billing.Account AccountEquipmentInfo { get; set; } = new();
+        public string? Type { get; set; }
 
         readonly List<Control> RequiredFields;
 
@@ -29,206 +29,219 @@ namespace LBPRDC.Source.Views.Billing
 
         private void BillingInformationForm_Load(object sender, EventArgs e)
         {
-            Text = (Type == "Update") ? $"Update of {BillingName}" : $"Duplicate {BillingName}";
-            txtDescription.Text = BillingInformation?.Description ?? "";
-            txtOfficerName.Text = BillingInformation?.OfficerName ?? "";
-            txtOfficerPosition.Text = BillingInformation?.OfficerPosition ?? "";
+            if (ClientID == 0 || BillingCompleteInfo == null)
+            {
+                MessageBox.Show(Error.MISSING_BILLING, ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+                return;
+            }
 
-            pnlEquipmentsGroup.Enabled = !IsReleased;
+            var billing = BillingCompleteInfo;
+            var account = AccountEquipmentInfo;
 
-            chkIncludeEquipments.Checked = IsEquipmentIncluded;
-            txtEquipmentsBilledValue.Text = (IsEquipmentIncluded) ? $"{EquipmentsAmount:N2}" : "";
+            Text = (Type == StringConstants.Operations.UPDATE) ? $"Update of {billing.Name}" : $"Duplicate {billing.Name}";
+            txtDescription.Text = (Type == StringConstants.Operations.UPDATE) ? billing.Description : "Billing Duplicate";
+            txtOfficerName.Text = Utilities.StringFormat.ToSentenceCase(billing.OfficerName);
+            txtOfficerPosition.Text = Utilities.StringFormat.ToSentenceCase(billing.OfficerPosition);
 
-            txtDescription.Text = (Type == "Update") ? "" : "Billing Duplicate";
+            if (Type == StringConstants.Operations.UPDATE)
+            {
+                pnlEquipmentsGroup.Enabled = billing.ReleaseDate == null;
+            }
+            else if (Type == StringConstants.Operations.DUPLICATE)
+            {
+                pnlEquipmentsGroup.Enabled = true;
+            }
+
+            chkIncludeEquipments.Checked = billing.IsEquipmentIncluded;
+
+            if (billing.IsEquipmentIncluded && account != null)
+            {
+                txtEquipmentsBilledValue.Text = $"{account.BilledValue:N2}";
+            }
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)
         {
             if (ControlUtils.AreRequiredFieldsFilled(RequiredFields))
             {
-                if (Type == "Update") { UpdateBillingInformation(); }
-                else if (Type == "Duplicate") { DuplicateBilling(); }
+                if (Type == StringConstants.Operations.UPDATE) { UpdateBillingInformation(); }
+                else if (Type == StringConstants.Operations.DUPLICATE) { DuplicateBilling(); }
             }
         }
 
         private async void UpdateBillingInformation()
         {
-            if (chkIncludeEquipments.Checked != IsEquipmentIncluded)
+            try
             {
-                if (chkIncludeEquipments.Checked)
+                var clientInfo = await ClientService.GetClientByID(ClientID);
+
+                if (clientInfo == null)
                 {
-                    List<BillingAccount> newAccount = new();
+                    MessageBox.Show(Error.MISSING_CLIENT, ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
-                    string accountYear = BillingInformation.Year.ToString();
-                    string accountMonth = BillingInformation.Month.ToString("D3");
-                    decimal equipmentGrossAmount = Convert.ToDecimal(txtEquipmentsBilledValue.Text);
+                var billing = BillingCompleteInfo;
+                var account = AccountEquipmentInfo;
 
-                    newAccount.Add(new()
+                bool isInformationTaskDone = false;
+                bool isEquipmentTaskDone = false;
+
+                isInformationTaskDone = await BillingService.Update(new Models.Billing
+                {
+                    ID = billing.ID,
+                    Description = txtDescription.Text.Trim(),
+                    OfficerName = txtOfficerName.Text.ToUpper().Trim(),
+                    OfficerPosition = txtOfficerPosition.Text.ToUpper().Trim(),
+                    IsEquipmentIncluded = chkIncludeEquipments.Checked
+                });
+
+                if (chkIncludeEquipments.Checked != billing.IsEquipmentIncluded)
+                {
+                    if (chkIncludeEquipments.Checked)
                     {
-                        BillingName = BillingName,
-                        AccountNumber = $"SHFCEquip{accountYear}-{accountMonth}",
-                        EntryType = "Custom Entry",
-                        OfficialReceiptNumber = "",
-                        Classification = "SHFC Equipment",
-                        BilledValue = equipmentGrossAmount,
-                        NetBilling = equipmentGrossAmount - Convert.ToDecimal((double)equipmentGrossAmount / 1.12 * 0.07),
-                        CollectedValue = 0,
-                        CollectionDate = null,
-                        Balance = equipmentGrossAmount,
-                        Purpose = "",
-                        Timestamp = DateTime.Now,
-                        Remarks = "Supplies and Equipment Billing"
-                    });
+                        string accountYear = billing.Year.ToString();
+                        string accountMonth = billing.Month.ToString("D3");
+                        decimal amount = Convert.ToDecimal(txtEquipmentsBilledValue.Text);
 
-                    await Task.Run(() => BillingAccountService.Add(newAccount, BillingInformation.Name));
+                        Models.Billing.Account equipmentAccount = new()
+                        {
+                            ClientID = billing.ClientID,
+                            BillingID = billing.ID,
+                            AccountNumber = $"{clientInfo.Name}Equip{accountYear}-{accountMonth}",
+                            EntryType = StringConstants.Type.EQUIPMENT,
+                            Classification = $"{clientInfo.Name} {StringConstants.Type.EQUIPMENT}",
+                            BilledValue = amount,
+                            NetBilling = amount - NumericConstants.GetNetBilling(amount),
+                            Balance = amount,
+                            Timestamp = DateTime.Now,
+                            Remarks = StringConstants.Remarks.DEFAULT_BILLING_EQUIPMENT
+                        };
+
+                        isEquipmentTaskDone = await BillingAccountService.AddSingleAsync(equipmentAccount);
+                    }
+                    else
+                    {
+                        if (account != null)
+                        {
+                            isEquipmentTaskDone = await BillingAccountService.RemoveByID(account.ID);
+                        }
+                    }
+                }
+                else if (billing.IsEquipmentIncluded && account != null && Convert.ToDecimal(txtEquipmentsBilledValue.Text) != account.BilledValue)
+                {
+                    decimal value = Convert.ToDecimal(txtEquipmentsBilledValue.Text);
+                    isEquipmentTaskDone = await BillingAccountService.UpdateBillingValue(account.ID, value);
                 }
                 else
                 {
-                    await Task.Run(() => BillingAccountService.Remove(BillingName, EquipmentAccountNumber));
+                    isEquipmentTaskDone = true;
+                }
+
+                if (isEquipmentTaskDone || isInformationTaskDone)
+                {
+                    ParentControl?.ResetView();
+                    ParentControl?.ApplySearchThenPopulate();
+                    Close();
                 }
             }
-            else if (IsEquipmentIncluded && Convert.ToDecimal(txtEquipmentsBilledValue.Text) != EquipmentsAmount)
+            catch (Exception ex)
             {
-                decimal billingValue = Convert.ToDecimal(txtEquipmentsBilledValue.Text);
-                decimal netValue = Convert.ToDecimal((double)billingValue / 1.12 * 0.07);
-
-                await Task.Run(() => BillingAccountService.UpdateEquipmentValue(EquipmentAccountNumber, BillingName, billingValue, netValue));
-            }
-
-            Services.Billing billingInformation = new()
-            {
-                Name = BillingName,
-                Description = txtDescription.Text.Trim(),
-                OfficerName = txtOfficerName.Text.ToUpper().Trim(),
-                OfficerPosition = txtOfficerPosition.Text.ToUpper().Trim(),
-                IsEquipmentIncluded = chkIncludeEquipments.Checked
-            };
-
-            frmLoading form = new()
-            {
-                BooleanProcess = Task.Run(() => BillingService.UpdateInformation(billingInformation)),
-                Description = "Updating new billing information..."
-            };
-
-            var output = form.ShowDialog();
-
-            if (output == DialogResult.OK)
-            {
-                MessageBox.Show("You have successfully updated the information of this billing. ", "Update Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ParentControl?.CloseDetails();
-                ParentControl?.ApplySearchThenPopulate();
-                Close();
-            }
-            else if (output == DialogResult.Abort)
-            {
-                MessageBox.Show("There is a problem updating the information of this billing, please try again.", "Update Not Successful", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                ExceptionHandler.HandleException(ex);
             }
         }
 
         private async void DuplicateBilling()
         {
-            frmLoading form = new()
+            try
             {
-                BillingProcess = Task.Run(() => BillingService.GetAllBillingDetailsByName(BillingName)),
-                StringProcess = Task.Run(() => BillingService.GetNewBillingNameForDuplication(BillingName)),
-                Description = "Retrieving billing information..."
-            };
+                var clientInfo = await ClientService.GetClientByID(ClientID);
 
-            var output = form.ShowDialog();
-
-            if (output == DialogResult.OK)
-            {
-                Services.Billing defaultBilling = new();
-                bool hasData = !Equals(defaultBilling, form.BillingResult);
-
-                if (hasData && !string.IsNullOrEmpty(form.StringResult))
+                if (clientInfo == null)
                 {
-                    string newBillingName = form.StringResult;
+                    MessageBox.Show(Error.MISSING_CLIENT, ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
-                    Services.Billing parentBilling = form.BillingResult;
-                    Services.Billing newBilling = new()
+                var billing = BillingCompleteInfo;
+
+                bool isAccountAdded = false;
+                string newBillingName = await BillingService.GetNewBillingNameForDuplication(billing.Name);
+
+                Models.Billing newBilling = new()
+                {
+                    ClientID = ClientID,
+                    UserID = UserService.CurrentUser.UserID,
+                    Name = newBillingName,
+                    OfficerName = txtOfficerName.Text.ToUpper().Trim(),
+                    OfficerPosition = txtOfficerPosition.Text.ToUpper().Trim(),
+                    Month = billing.Month,
+                    Year = billing.Year,
+                    Quarter = billing.Quarter,
+                    StartDate = billing.StartDate,
+                    EndDate = billing.EndDate,
+                    ConstantJSON = billing.ConstantJSON,
+                    EditableJSON = billing.EditableJSON,
+                    AccrualsJSON = billing.AccrualsJSON,
+                    Description = txtDescription.Text.Trim(),
+                    IsEquipmentIncluded = chkIncludeEquipments.Checked
+                };
+
+                var (isBillingAdded, LatestInsertedID) = await BillingService.Add(newBilling);
+
+                if (isBillingAdded)
+                {
+                    if (chkIncludeEquipments.Checked)
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        Name = newBillingName,
-                        OfficerName = txtOfficerName.Text.ToUpper().Trim(),
-                        OfficerPosition = txtOfficerPosition.Text.ToUpper().Trim(),
-                        Month = parentBilling.Month,
-                        Year = parentBilling.Year,
-                        Quarter = parentBilling.Quarter,
-                        StartDate = parentBilling.StartDate,
-                        EndDate = parentBilling.EndDate,
-                        Timestamp = DateTime.Now,
-                        ReleaseDate = null,
-                        ConstantJSON = parentBilling.ConstantJSON,
-                        EditableJSON = parentBilling.EditableJSON,
-                        AccrualsJSON = parentBilling.AccrualsJSON,
-                        VerificationStatus = "Unverified",
-                        Description = txtDescription.Text.Trim(),
-                        IsEquipmentIncluded = chkIncludeEquipments.Checked,
-                        Status = "Active",
-                        LockStatus = "Unlock"
-                    };
+                        string accountYear = billing.Year.ToString();
+                        string accountMonth = billing.Month.ToString("D3");
+                        decimal equipmentGrossAmount = Convert.ToDecimal(txtEquipmentsBilledValue.Text);
 
-                    frmLoading form2 = new()
-                    {
-                        BooleanProcess = Task.Run(() => BillingService.Add(newBilling)),
-                        Description = "Duplicating the billing, please wait..."
-                    };
-
-                    var output2 = form2.ShowDialog();
-
-                    if (output2 == DialogResult.OK)
-                    {
-                        if (chkIncludeEquipments.Checked)
+                        Models.Billing.Account account = new()
                         {
-                            List<BillingAccount> newAccount = new();
+                            ClientID = ClientID,
+                            BillingID = LatestInsertedID,
+                            AccountNumber = $"{clientInfo.Name}Equip{accountYear}-{accountMonth}",
+                            EntryType = StringConstants.Type.EQUIPMENT,
+                            Classification = $"{clientInfo.Name} {StringConstants.Type.EQUIPMENT}",
+                            BilledValue = equipmentGrossAmount,
+                            NetBilling = equipmentGrossAmount - NumericConstants.GetNetBilling(equipmentGrossAmount),
+                            Balance = equipmentGrossAmount
+                        };
 
-                            string accountYear = parentBilling.Year.ToString();
-                            string accountMonth = parentBilling.Month.ToString("D3");
-                            decimal equipmentGrossAmount = Convert.ToDecimal(txtEquipmentsBilledValue.Text);
-
-                            newAccount.Add(new()
-                            {
-                                BillingName = newBillingName,
-                                AccountNumber = $"SHFCEquip{accountYear}-{accountMonth}",
-                                EntryType = "Custom Entry",
-                                OfficialReceiptNumber = "",
-                                Classification = "SHFC Equipment",
-                                BilledValue = equipmentGrossAmount,
-                                NetBilling = equipmentGrossAmount - Convert.ToDecimal((double)equipmentGrossAmount / 1.12 * 0.07),
-                                CollectedValue = 0,
-                                CollectionDate = null,
-                                Balance = equipmentGrossAmount,
-                                Purpose = "",
-                                Timestamp = DateTime.Now,
-                                Remarks = "Supplies and Equipment Billing"
-                            });
-
-                            await Task.Run(() => BillingAccountService.Add(newAccount, parentBilling.Name));
-                        }
-
-                        MessageBox.Show("You have successfully duplicated this billing.", "Duplicate Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        ParentControl?.CloseDetails();
-                        ParentControl?.ApplySearchThenPopulate();
-                        Close();
+                        isAccountAdded = await BillingAccountService.AddSingleAsync(account);
                     }
-                    else if (output2 == DialogResult.Abort)
+                }
+
+                if (isBillingAdded && !chkIncludeEquipments.Checked)
+                {
+                    MessageBox.Show(Add.SUCCESS_BILLING, SUCCESS, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else if (isBillingAdded && chkIncludeEquipments.Checked)
+                {
+                    if (isAccountAdded)
                     {
-                        MessageBox.Show("There is a problem duplicating the billing; the system can't duplicate this billing.", "Duplicate Billing Not Successful", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
+                        MessageBox.Show(Add.SUCCESS_BILLING, SUCCESS, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("A billing is duplicated but the equipment does not. Please add it later as custom entry.", ERROR, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
                 else
                 {
-                    MessageBox.Show("There is a problem retrieving the information about the billing; the system can't duplicate this billing.", "Duplicate Billing Not Successful", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(Error.ACTION, ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
+
+                ParentControl?.ResetTableSearch();
+                ParentControl?.ResetView();
+                this.Close();
             }
-            else if (output == DialogResult.Abort)
+            catch (Exception ex)
             {
-                MessageBox.Show("There is a problem retrieving the information about the billing; the system can't duplicate this billing.", "Duplicate Billing Not Successful", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                ExceptionHandler.HandleException(ex);
             }
         }
 
@@ -247,6 +260,14 @@ namespace LBPRDC.Source.Views.Billing
             else
             {
                 RequiredFields.Remove(txtEquipmentsBilledValue);
+            }
+        }
+
+        private void ValidateInputIfNumber_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsDigit(e.KeyChar) && (e.KeyChar != '.' || (e.KeyChar == '.' && (sender as TextBox)?.Text.Contains('.') == true)) && e.KeyChar != (char)Keys.Back)
+            {
+                e.Handled = true;
             }
         }
     }

@@ -1,14 +1,27 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 namespace LBPRDC.Source.Views.Billing
 {
     public partial class ReleaseBillingForm : Form
     {
         public BillingControl? ParentControl { get; set; }
         public string? BillingName { get; set; }
+        public int BillingID { get; set; }
+        public int ClientID { get; set; }
 
         public ReleaseBillingForm()
         {
             InitializeComponent();
+        }
+
+        private void ReleaseBillingForm_Load(object sender, EventArgs e)
+        {
+            if (BillingID == 0 || ClientID == 0)
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_CLIENT_BILLING, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
+            }
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)
@@ -18,7 +31,7 @@ namespace LBPRDC.Source.Views.Billing
             {
                 frmLoading form = new()
                 {
-                    BooleanProcess = Task.Run(() => BillingService.ReleaseBilling(BillingName, dtpReleaseDate.Value)),
+                    BooleanProcess = Task.Run(() => BillingService.ReleaseBilling(BillingID, ClientID, dtpReleaseDate.Value)),
                     Description = "Releasing this billing, please wait..."
                 };
 
@@ -32,7 +45,7 @@ namespace LBPRDC.Source.Views.Billing
                 }
                 else if (result == DialogResult.Abort)
                 {
-                    MessageBox.Show("There is a problem releasing this billing, please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("There is a problem releasing this billing, please try again.", MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
             }

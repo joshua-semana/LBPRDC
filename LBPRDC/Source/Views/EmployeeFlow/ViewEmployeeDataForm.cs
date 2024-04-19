@@ -1,11 +1,12 @@
-﻿
+﻿using LBPRDC.Source.Config;
 using LBPRDC.Source.Services;
 
 namespace LBPRDC.Source.Views.EmployeeFlow
 {
     public partial class ViewEmployeeDataForm : Form
     {
-        public string? EmployeeId { get; set; }
+        public int ClientID { get; set; }
+        public int EmployeeID { get; set; }
         public ViewEmployeeDataForm()
         {
             InitializeComponent();
@@ -13,42 +14,56 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void ViewEmployeeDataForm_Load(object sender, EventArgs e)
         {
-            if (EmployeeId != null)
+            if (ClientID == 0 || EmployeeID == 0)
             {
-                InitializeEmployeeInformation(EmployeeId);
+                MessageBox.Show(MessagesConstants.Error.MISSING, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
             }
+
+            InitializeEmployeeInformation();
         }
 
-        private void InitializeEmployeeInformation(string employeeId)
+        private async void InitializeEmployeeInformation()
         {
-            List<EmployeeService.Employee> employees = EmployeeService.GetAllEmployees();
-            List<PositionService.History> positions = PositionService.GetAllHistory();
-            PreviousEmployeeService.PreviousEmployee record = PreviousEmployeeService.GetRecordByEmployeeID(employeeId);
+            var employeeList = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
 
-            var employee = employees.First(e => e.EmployeeID == employeeId);
-            var initialPosition = positions.First(p => p.EmployeeID == employeeId && p.Remarks == "Initial Status");
-            var currentPosition = positions.First(f => f.EmployeeID == employeeId && f.Status == "Active");
+            if (employeeList == null && !employeeList.Any())
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_EMPLOYEE, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
+            }
+
+            var employee = employeeList.First();
+
+            var positions = await PositionService.GetAllEmployeeHistory(EmployeeID);
+            var record = await PreviousEmployeeService.GetEmployeeHistory(EmployeeID);
+
+            var initialPosition = positions.First(p => p.Remarks == StringConstants.Status.INITIAL);
+            var currentPosition = positions.First(p => p.Status == StringConstants.Status.ACTIVE);
             string noContent = "-";
 
             lblFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
             lblGender.Text = Utilities.StringFormat.ToSentenceCase(employee.Gender);
-            lblBirthday.Text = employee.Birthday?.ToString("MMMM dd, yyyy") ?? noContent;
-            lblEducation.Text = string.IsNullOrWhiteSpace(employee.Education) ? noContent : employee.Education;
-            lblCivilStatus.Text = Utilities.StringFormat.ToSentenceCase(employee.CivilStatus);
-            lblEmailAddress1.Text = string.IsNullOrWhiteSpace(employee.EmailAddress1) ? noContent : employee.EmailAddress1;
-            lblEmailAddress2.Text = string.IsNullOrWhiteSpace(employee.EmailAddress2) ? noContent : employee.EmailAddress2;
-            lblContactNumber1.Text = string.IsNullOrWhiteSpace(employee.ContactNumber1) ? noContent : employee.ContactNumber1;
-            lblContactNumber2.Text = string.IsNullOrWhiteSpace(employee.ContactNumber2) ? noContent : employee.ContactNumber2;
-            lblIdentificationCode.Text = employeeId.ToString();
-            lblStartDate.Text = initialPosition.Timestamp?.ToString("MMMM dd, yyyy") ?? noContent;
-            lblPosition.Text = $"{employee.PositionCode} - {Utilities.StringFormat.ToSentenceCase(employee.PositionName)}";
-            lblEffectiveDate.Text = currentPosition.Timestamp?.ToString("MMMM dd, yyyy") ?? noContent;
-            lblDepartment.Text = employee.Department;
-            lblLocation.Text = employee.Location;
-            lblStatus.Text = Utilities.StringFormat.ToSentenceCase(employee.EmploymentStatus);
-            lblRemarks.Text = string.IsNullOrWhiteSpace(employee.Remarks) ? noContent : employee.Remarks;
+            lblBirthday.Text = employee.Birthday.ToString(StringConstants.Date.DEFAULT) ?? noContent;
+            lblEducation.Text = employee.Education ?? noContent;
+            lblCivilStatus.Text = Utilities.StringFormat.ToSentenceCase(employee.CivilStatusName);
+            lblEmailAddress1.Text = employee.EmailAddress1 ?? noContent;
+            lblEmailAddress2.Text = employee.EmailAddress2 ?? noContent;
+            lblContactNumber1.Text = employee.ContactNumber1 ?? noContent;
+            lblContactNumber2.Text = employee.ContactNumber2 ?? noContent;
+            lblIdentificationCode.Text = employee.EmployeeID.ToString();
+            lblStartDate.Text = initialPosition.Timestamp.ToString(StringConstants.Date.DEFAULT) ?? noContent;
+            lblWageType.Text = employee.WageName;
+            lblPosition.Text = Utilities.StringFormat.ToSentenceCase(employee.PositionName);
+            lblEffectiveDate.Text = currentPosition.Timestamp.ToString(StringConstants.Date.DEFAULT) ?? noContent;
+            lblDepartment.Text = employee.DepartmentName;
+            lblLocation.Text = employee.LocationName;
+            lblStatus.Text = Utilities.StringFormat.ToSentenceCase(employee.EmploymentStatusName);
+            lblRemarks.Text = employee.Remarks ?? noContent;
             lblPreviousEmployee.Text = (record.HasRecord) ? "Yes" : "No";
-            lblPeriod.Text = (record.HasRecord) ? $"{record.StartDate?.ToString("MMMM dd, yyyy")} to {record.EndDate?.ToString("MMMM dd, yyyy")}" : "N/A";
+            lblPeriod.Text = (record.HasRecord) ? $"{record.StartDate.ToString(StringConstants.Date.DEFAULT)} to {record.EndDate.ToString(StringConstants.Date.DEFAULT)}" : "N/A";
             lblInformation.Text = (record.HasRecord) ? $"({record.Position}) {record.Information}" : "N/A";
         }
 
@@ -59,11 +74,10 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void btnViewPositionHistory_Click(object sender, EventArgs e)
         {
-            string employeeID = lblIdentificationCode.Text;
             ViewHistory frmViewHistory = new()
             {
                 HistoryType = "Position",
-                EmployeeId = employeeID
+                EmployeeID = EmployeeID
             };
             frmViewHistory.ShowDialog();
         }

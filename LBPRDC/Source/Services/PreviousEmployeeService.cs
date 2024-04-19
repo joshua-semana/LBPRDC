@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Dapper;
+using LBPRDC.Source.Data;
+using Microsoft.EntityFrameworkCore;
+using static LBPRDC.Source.Data.Database;
 
 namespace LBPRDC.Source.Services
 {
@@ -13,72 +11,104 @@ namespace LBPRDC.Source.Services
         {
             public int ID { get; set; }
             public bool HasRecord { get; set; }
-            public string? EmployeeID { get; set; }
+            public int EmployeeID { get; set; }
             public string? Position { get; set; }
             public DateTime? StartDate { get; set; }
             public DateTime? EndDate { get; set; }
             public string? Information { get; set; }
         }
 
-        public static void AddRecord(PreviousEmployee employee)
+        // Entity Framework
+
+        public static async Task<Models.Employee.History> GetEmployeeHistory(int EmployeeID)
+        {
+            Models.Employee.History record = new();
+
+            try
+            {
+                using var context = new Context();
+                var output = await context.EmployeePreviousRecord
+                    .Where(h => h.EmployeeID == EmployeeID)
+                    .Select(h => new Models.Employee.History 
+                    {
+                        ID = h.ID,
+                        EmployeeID = h.EmployeeID,
+                        Position = h.Position,
+                        StartDate = h.StartDate,
+                        EndDate = h.EndDate,
+                        Information = h.Information,
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (output != null)
+                {
+                    output.HasRecord = true;
+                    record = output;
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return record;
+        }
+
+        public static async void AddRecord(PreviousEmployee data)
         {
             try
             {
-                string query = "INSERT INTO EmployeePreviousRecord (EmployeeID, Position, StartDate, EndDate, Information) " +
-                               "VALUES (@EmployeeID, @Position, @StartDate, @EndDate, @Information)";
+                using var connection = Database.Connect();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeID", employee.EmployeeID);
-                    command.Parameters.AddWithValue("@Position", employee.Position);
-                    command.Parameters.AddWithValue("@StartDate", employee.StartDate);
-                    command.Parameters.AddWithValue("@EndDate", employee.EndDate);
-                    command.Parameters.AddWithValue("@Information", employee.Information);
+                string QueryInsert = @"
+                    INSERT INTO EmployeePreviousRecord (
+                        EmployeeID, 
+                        Position, 
+                        StartDate, 
+                        EndDate, 
+                        Information
+                    ) VALUES (
+                        @EmployeeID, 
+                        @Position, 
+                        @StartDate, 
+                        @EndDate, 
+                        @Information
+                    )";
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                await connection.ExecuteAsync(QueryInsert, data);
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
-        public static PreviousEmployee GetRecordByEmployeeID(string ID)
+        public static PreviousEmployee GetRecordByEmployeeID(int EmployeeID)
         {
             PreviousEmployee record = new();
 
             try
             {
-                string query = "SELECT * FROM EmployeePreviousRecord WHERE EmployeeID = @EmployeeID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeID", ID);
-                    connection.Open();
+                using var connection = Database.Connect();
 
-                    using (SqlDataReader reader = command.ExecuteReader())
+                string QuerySelect = @"
+                    SELECT
+                        *
+                    FROM
+                        EmployeePreviousRecord
+                    WHERE
+                        EmployeeID = @EmployeeID";
+
+                var output = connection.QueryFirstOrDefault<PreviousEmployee>(QuerySelect, new
+                {
+                    EmployeeID
+                });
+
+                if (output != null)
+                {
+                    output.HasRecord = true;
+                    record = output;
+                }
+                else
+                {
+                    record = new()
                     {
-                        if (reader.Read())
-                        {
-                            record = new()
-                            {
-                                HasRecord = true,
-                                ID = Convert.ToInt32(reader["ID"]),
-                                EmployeeID = reader["EmployeeID"].ToString(),
-                                Position = reader["Position"].ToString(),
-                                StartDate = reader["StartDate"] as DateTime?,
-                                EndDate = reader["EndDate"] as DateTime?,
-                                Information = reader["Information"].ToString(),
-                            };
-                        }
-                        else
-                        {
-                            record = new()
-                            {
-                                HasRecord = false
-                            };
-                        }
-                    }
+                        HasRecord = false
+                    };
                 }
             }
             catch (Exception ex) { ExceptionHandler.HandleException (ex); }
@@ -86,62 +116,67 @@ namespace LBPRDC.Source.Services
             return record;
         }
 
-        public static bool RecordExists(string ID)
+        public static bool RecordExists(int EmployeeID)
         {
             try
             {
-                string query = "SELECT COUNT(*) FROM EmployeePreviousRecord WHERE EmployeeID = @EmployeeID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
+                using var connection = Database.Connect();
+
+                string QueryCount = @"
+                    SELECT 
+                        COUNT(*) 
+                    FROM 
+                        EmployeePreviousRecord 
+                    WHERE 
+                        EmployeeID = @EmployeeID";
+
+                int totalCount = connection.ExecuteScalar<int>(QueryCount, new
                 {
-                    command.Parameters.AddWithValue("@EmployeeID", ID);
-                    connection.Open();
-                    int count = (int)command.ExecuteScalar();
-                    return count > 0;
-                }
+                    EmployeeID
+                });
+
+                return totalCount > 0;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static void UpdateRecord(PreviousEmployee data)
+        public static async void UpdateRecord(PreviousEmployee data)
         {
             try
             {
-                string updateQuery = "UPDATE EmployeePreviousRecord SET " +
-                    "Position = @Position," +
-                    "StartDate = @StartDate," +
-                    "EndDate = @EndDate," +
-                    "Information = @Information " +
-                    "WHERE EmployeeID = @EmployeeID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
-                {
-                    command.Parameters.AddWithValue("@Position", data.Position);
-                    command.Parameters.AddWithValue("@StartDate", data.StartDate);
-                    command.Parameters.AddWithValue("@EndDate", data.EndDate);
-                    command.Parameters.AddWithValue("@Information", data.Information);
-                    command.Parameters.AddWithValue("@EmployeeID", data.EmployeeID);
+                using var connection = Database.Connect();
+                
+                string QueryUpdate = @"
+                    UPDATE EmployeePreviousRecord SET 
+                        Position = @Position,
+                        StartDate = @StartDate,
+                        EndDate = @EndDate,
+                        Information = @Information 
+                    WHERE 
+                        ID = @ID";
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                await connection.ExecuteAsync(QueryUpdate, data);
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
-        public static void DeleteRecord(string EmployeeID)
+        public static async void DeleteRecord(int EmployeeID)
         {
             try
             {
-                string updateQuery = "DELETE FROM EmployeePreviousRecord WHERE EmployeeID = @EmployeeID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeID", EmployeeID);
+                using var connection = Database.Connect();
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                string QueryDelete = @"
+                    DELETE 
+                    FROM 
+                        EmployeePreviousRecord 
+                    WHERE 
+                        EmployeeID = @EmployeeID";
+
+                await connection.ExecuteAsync(QueryDelete, new
+                {
+                    EmployeeID
+                });
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }

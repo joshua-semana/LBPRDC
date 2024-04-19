@@ -1,17 +1,21 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using OfficeOpenXml;
+using static LBPRDC.Source.Config.MessagesConstants;
 
 namespace LBPRDC.Source.Views.Billing
 {
     public partial class UploadFileForm : Form
     {
         public BillingControl? ParentControl { get; set; }
-        public string BillingName { get; set; }
-        public string UploadType { get; set; }
+        public int ClientID { get; set; }
+        public int BillingID { get; set; }
+        public string Type { get; set; } = "";
+        public bool IsVerified { get; set; }
+        public string BillingName { get; set; } = "";
 
         private readonly List<Control> RequiredFields;
-
         private string filePath = "", reportSheetName = "", timekeepSheetName = "";
 
         public UploadFileForm()
@@ -26,6 +30,13 @@ namespace LBPRDC.Source.Views.Billing
 
         private void UploadFileForm_Load(object sender, EventArgs e)
         {
+            if (ClientID == 0 || BillingID == 0)
+            {
+                MessageBox.Show(Error.MISSING_BILLING, ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+                return;
+            }
+
             this.Text = BillingName;
         }
 
@@ -65,7 +76,7 @@ namespace LBPRDC.Source.Views.Billing
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show(MessagesConstants.Cancel.QUESTION, MessagesConstants.Cancel.TITLE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
                 Close();
@@ -101,9 +112,9 @@ namespace LBPRDC.Source.Views.Billing
                     return;
                 }
 
-                if (UploadType == "Overwrite")
+                if (Type == StringConstants.Operations.OVERWRITE)
                 {
-                    var recordsAreRemoved = await Task.Run(() => BillingRecordService.RemoveRecordsByBillingName(BillingName));
+                    var recordsAreRemoved = await Task.Run(() => BillingRecordService.RemoveRecordsByID(BillingID));
                     if (!recordsAreRemoved)
                     {
                         MessageBox.Show("There's a problem overwriting the timekeeping file of this billing; please try again. If the error still persists, please call for support.", "Error Overwriting Timekeep File", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -111,10 +122,15 @@ namespace LBPRDC.Source.Views.Billing
                     }
                 }
 
-                var entries = await Task.Run(() => ExcelService.PreProcessEntries(txtFilePath.Text, reportSheetName, timekeepSheetName));
+                var entries = await Task.Run(() => ExcelService.PreProcessEntries(ClientID, txtFilePath.Text, reportSheetName, timekeepSheetName));
 
-                if (entries.Count > 0 && await Task.Run(() => BillingService.UpdateConstantAndEditableJSON(entries, BillingName)) && await Task.Run(() => BillingService.UpdateVerificationStatus(BillingName, "Unverified")))
+                if (entries.Count > 0 && await Task.Run(() => BillingService.UpdateConstantAndEditableJSON(entries, BillingID)))
                 {
+                    if (IsVerified)
+                    {
+                        await Task.Run(() => BillingService.UpdateVerificationStatus(BillingID, StringConstants.Status.UNVERIFIED));
+                    }
+
                     MessageBox.Show("You have successfully uploaded a timekeep file to this billing.", "Upload Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     ParentControl?.ResetTableSearch();
                     Close();
@@ -128,16 +144,17 @@ namespace LBPRDC.Source.Views.Billing
             }
         }
 
-        private List<EmployeeBase> CheckEmployeeExistense()
+        private async Task<List<EmployeeBase>> CheckEmployeeExistense()
         {
             List<EmployeeBase> nonExistingEmployees = new();
 
-            var employeeList = EmployeeService.GetAllEmployeesBase();
-            var identifiersDictionary = ExcelService.GetAllIdentifiers(filePath, timekeepSheetName, 1, 2);
+            var employeeIdentifiers = await EmployeeService.GetAllIdentifiersByClientID(ClientID);
+            var timekeepIdentifiers = ExcelService.GetAllIdentifiers(filePath, timekeepSheetName);
 
-            foreach (var (id, name) in identifiersDictionary)
+            foreach (var (id, name) in timekeepIdentifiers)
             {
-                if (!employeeList.Any(emp => emp.EmployeeID.EndsWith(id.Substring(id.Length - 4))))
+                //if (!employeeList.Any(emp => emp.EmployeeID.EndsWith(id.Substring(id.Length - 4)))) // This matches LB-M1-1234 with 1234 only
+                if (!employeeIdentifiers.Any(emp => emp.EmployeeID.Equals(id)))
                 {
                     EmployeeBase emp = new()
                     {

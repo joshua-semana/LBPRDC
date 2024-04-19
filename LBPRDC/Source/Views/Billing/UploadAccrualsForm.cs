@@ -1,14 +1,15 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using OfficeOpenXml;
+using static LBPRDC.Source.Config.MessagesConstants;
 
 namespace LBPRDC.Source.Views.Billing
 {
     public partial class UploadAccrualsForm : Form
     {
         public BillingControl? ParentControl { get; set; } = null;
-        public string? BillingName { get; set; } = null;
-        public string? UploadType { get; set; } = null;
+        public int BillingID { get; set; }
+        public string BillingName { get; set; } = "";
 
         private readonly List<Control> RequiredFields;
 
@@ -24,6 +25,13 @@ namespace LBPRDC.Source.Views.Billing
 
         private void UploadAccrualsForm_Load(object sender, EventArgs e)
         {
+            if (BillingID == 0)
+            {
+                MessageBox.Show(Error.MISSING_BILLING, ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+                return;
+            }
+
             this.Text = $"Upload accruals file to '{BillingName}'";
         }
 
@@ -76,7 +84,7 @@ namespace LBPRDC.Source.Views.Billing
                 string selectedSheetName = cmbWorksheet.Text;
 
                 var accrualsEntries = await Task.Run(() => ExcelService.FetchAccruals(txtFilePath.Text, selectedSheetName));
-                if (accrualsEntries.Count > 0 && await Task.Run(() => BillingService.UpdateAccrualsJSON(accrualsEntries, BillingName)))
+                if (accrualsEntries.Count > 0 && await Task.Run(() => BillingService.UpdateAccrualsJSON(accrualsEntries, BillingID)))
                 {
                     MessageBox.Show("You have successfully uploaded an accruals file to this billing.", "Upload Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     ParentControl?.ResetTableSearch();

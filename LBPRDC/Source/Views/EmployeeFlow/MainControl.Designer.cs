@@ -1,4 +1,6 @@
-﻿namespace LBPRDC.Source.Views
+﻿using LBPRDC.Source.Config;
+
+namespace LBPRDC.Source.Views
 {
     partial class ucEmployees
     {
@@ -51,6 +53,8 @@
             dchkListFilterLocations = new Shared.DynamicCheckedListBoxControl();
             lblFilterPositions = new Label();
             dchkListFilterPositions = new Shared.DynamicCheckedListBoxControl();
+            lblFilterWageType = new Label();
+            dchkListFilterWageType = new Shared.DynamicCheckedListBoxControl();
             lblFilterCivilStatus = new Label();
             dchkListFilterCivilStatus = new Shared.DynamicCheckedListBoxControl();
             lblFilterGender = new Label();
@@ -238,6 +242,8 @@
             flowFilters.Controls.Add(dchkListFilterLocations);
             flowFilters.Controls.Add(lblFilterPositions);
             flowFilters.Controls.Add(dchkListFilterPositions);
+            flowFilters.Controls.Add(lblFilterWageType);
+            flowFilters.Controls.Add(dchkListFilterWageType);
             flowFilters.Controls.Add(lblFilterCivilStatus);
             flowFilters.Controls.Add(dchkListFilterCivilStatus);
             flowFilters.Controls.Add(lblFilterGender);
@@ -248,7 +254,7 @@
             flowFilters.Location = new Point(0, 0);
             flowFilters.Name = "flowFilters";
             flowFilters.Padding = new Padding(4, 0, 0, 0);
-            flowFilters.Size = new Size(196, 330);
+            flowFilters.Size = new Size(196, 360);
             flowFilters.TabIndex = 6;
             // 
             // lblFilterDepartments
@@ -322,12 +328,35 @@
             dchkListFilterPositions.Size = new Size(180, 18);
             dchkListFilterPositions.TabIndex = 10;
             // 
+            // lblFilterWageType
+            // 
+            lblFilterWageType.AutoSize = true;
+            lblFilterWageType.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            lblFilterWageType.ForeColor = SystemColors.ControlDarkDark;
+            lblFilterWageType.Location = new Point(5, 158);
+            lblFilterWageType.Margin = new Padding(1, 8, 0, 6);
+            lblFilterWageType.Name = "lblFilterWageType";
+            lblFilterWageType.Size = new Size(78, 16);
+            lblFilterWageType.TabIndex = 17;
+            lblFilterWageType.Text = "Wage Type";
+            // 
+            // dchkListFilterWageType
+            // 
+            dchkListFilterWageType.AutoSize = true;
+            dchkListFilterWageType.BackColor = Color.White;
+            dchkListFilterWageType.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dchkListFilterWageType.Location = new Point(16, 180);
+            dchkListFilterWageType.Margin = new Padding(12, 0, 0, 2);
+            dchkListFilterWageType.Name = "dchkListFilterWageType";
+            dchkListFilterWageType.Size = new Size(180, 18);
+            dchkListFilterWageType.TabIndex = 18;
+            // 
             // lblFilterCivilStatus
             // 
             lblFilterCivilStatus.AutoSize = true;
             lblFilterCivilStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblFilterCivilStatus.ForeColor = SystemColors.ControlDarkDark;
-            lblFilterCivilStatus.Location = new Point(5, 158);
+            lblFilterCivilStatus.Location = new Point(5, 208);
             lblFilterCivilStatus.Margin = new Padding(1, 8, 0, 6);
             lblFilterCivilStatus.Name = "lblFilterCivilStatus";
             lblFilterCivilStatus.Size = new Size(77, 16);
@@ -340,7 +369,7 @@
             dchkListFilterCivilStatus.AutoSize = true;
             dchkListFilterCivilStatus.BackColor = Color.White;
             dchkListFilterCivilStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dchkListFilterCivilStatus.Location = new Point(16, 180);
+            dchkListFilterCivilStatus.Location = new Point(16, 230);
             dchkListFilterCivilStatus.Margin = new Padding(12, 0, 0, 2);
             dchkListFilterCivilStatus.Name = "dchkListFilterCivilStatus";
             dchkListFilterCivilStatus.Size = new Size(180, 18);
@@ -352,7 +381,7 @@
             lblFilterGender.AutoSize = true;
             lblFilterGender.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblFilterGender.ForeColor = SystemColors.ControlDarkDark;
-            lblFilterGender.Location = new Point(5, 208);
+            lblFilterGender.Location = new Point(5, 258);
             lblFilterGender.Margin = new Padding(1, 8, 0, 6);
             lblFilterGender.Name = "lblFilterGender";
             lblFilterGender.Size = new Size(55, 16);
@@ -365,7 +394,7 @@
             dchkListFilterGender.AutoSize = true;
             dchkListFilterGender.BackColor = Color.White;
             dchkListFilterGender.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dchkListFilterGender.Location = new Point(16, 230);
+            dchkListFilterGender.Location = new Point(16, 280);
             dchkListFilterGender.Margin = new Padding(12, 0, 0, 2);
             dchkListFilterGender.Name = "dchkListFilterGender";
             dchkListFilterGender.Size = new Size(180, 18);
@@ -377,7 +406,7 @@
             lblFilterEmploymentStatus.AutoSize = true;
             lblFilterEmploymentStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             lblFilterEmploymentStatus.ForeColor = SystemColors.ControlDarkDark;
-            lblFilterEmploymentStatus.Location = new Point(5, 258);
+            lblFilterEmploymentStatus.Location = new Point(5, 308);
             lblFilterEmploymentStatus.Margin = new Padding(1, 8, 0, 6);
             lblFilterEmploymentStatus.Name = "lblFilterEmploymentStatus";
             lblFilterEmploymentStatus.Size = new Size(128, 16);
@@ -389,7 +418,7 @@
             dchkListFilterEmploymentStatus.AutoSize = true;
             dchkListFilterEmploymentStatus.BackColor = Color.White;
             dchkListFilterEmploymentStatus.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            dchkListFilterEmploymentStatus.Location = new Point(16, 280);
+            dchkListFilterEmploymentStatus.Location = new Point(16, 330);
             dchkListFilterEmploymentStatus.Margin = new Padding(12, 0, 0, 8);
             dchkListFilterEmploymentStatus.Name = "dchkListFilterEmploymentStatus";
             dchkListFilterEmploymentStatus.Size = new Size(180, 18);
@@ -545,26 +574,27 @@
             dgvEmployees.TabIndex = 3;
             dgvEmployees.VirtualMode = true;
             dgvEmployees.CellMouseClick += dgvEmployees_CellMouseClick;
+            dgvEmployees.SelectionChanged += dgvEmployees_SelectionChanged;
             // 
             // cntxtEmployeeActions
             // 
             cntxtEmployeeActions.Font = new Font("Arial", 9F, FontStyle.Regular, GraphicsUnit.Point);
             cntxtEmployeeActions.Items.AddRange(new ToolStripItem[] { cntxtMenuView, cntxtMenuViewBillings, cntxtMenuHistory, toolStripSeparator1, cntxtMenuEdit, cntxtMenuUpdate, toolStripSeparator2, cntxtMenuArchive });
             cntxtEmployeeActions.Name = "cntxtEmployeeActions";
-            cntxtEmployeeActions.Size = new Size(145, 148);
+            cntxtEmployeeActions.Size = new Size(181, 170);
             // 
             // cntxtMenuView
             // 
             cntxtMenuView.DisplayStyle = ToolStripItemDisplayStyle.Text;
             cntxtMenuView.Name = "cntxtMenuView";
-            cntxtMenuView.Size = new Size(144, 22);
+            cntxtMenuView.Size = new Size(180, 22);
             cntxtMenuView.Text = "View Details";
             cntxtMenuView.Click += cntxtMenuView_Click;
             // 
             // cntxtMenuViewBillings
             // 
             cntxtMenuViewBillings.Name = "cntxtMenuViewBillings";
-            cntxtMenuViewBillings.Size = new Size(144, 22);
+            cntxtMenuViewBillings.Size = new Size(180, 22);
             cntxtMenuViewBillings.Text = "View Billings";
             cntxtMenuViewBillings.Click += cntxtMenuViewBillings_Click;
             // 
@@ -572,7 +602,7 @@
             // 
             cntxtMenuHistory.DropDownItems.AddRange(new ToolStripItem[] { menuHistoryPosition, menuHistoryCivilStatus, menuHistoryEmploymentStatus, menuHistoryDepartmentLocation });
             cntxtMenuHistory.Name = "cntxtMenuHistory";
-            cntxtMenuHistory.Size = new Size(144, 22);
+            cntxtMenuHistory.Size = new Size(180, 22);
             cntxtMenuHistory.Text = "History";
             // 
             // menuHistoryPosition
@@ -606,12 +636,12 @@
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(141, 6);
+            toolStripSeparator1.Size = new Size(177, 6);
             // 
             // cntxtMenuEdit
             // 
             cntxtMenuEdit.Name = "cntxtMenuEdit";
-            cntxtMenuEdit.Size = new Size(144, 22);
+            cntxtMenuEdit.Size = new Size(180, 22);
             cntxtMenuEdit.Text = "Edit";
             cntxtMenuEdit.Click += cntxtMenuEdit_Click;
             // 
@@ -619,7 +649,7 @@
             // 
             cntxtMenuUpdate.DropDownItems.AddRange(new ToolStripItem[] { menuUpdatePosition, menuUpdateCivilStatus, menuUpdateEmploymentStatus, menuUpdateDepartmentLocation });
             cntxtMenuUpdate.Name = "cntxtMenuUpdate";
-            cntxtMenuUpdate.Size = new Size(144, 22);
+            cntxtMenuUpdate.Size = new Size(180, 22);
             cntxtMenuUpdate.Text = "Update";
             // 
             // menuUpdatePosition
@@ -653,12 +683,12 @@
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(141, 6);
+            toolStripSeparator2.Size = new Size(177, 6);
             // 
             // cntxtMenuArchive
             // 
             cntxtMenuArchive.Name = "cntxtMenuArchive";
-            cntxtMenuArchive.Size = new Size(144, 22);
+            cntxtMenuArchive.Size = new Size(180, 22);
             cntxtMenuArchive.Text = "Archive";
             cntxtMenuArchive.Click += cntxtMenuArchive_Click;
             // 
@@ -739,5 +769,7 @@
         private ToolStripMenuItem cntxtMenuViewBillings;
         private Label lblClient;
         private ComboBox cmbClient;
+        private Label lblFilterWageType;
+        private Shared.DynamicCheckedListBoxControl dchkListFilterWageType;
     }
 }

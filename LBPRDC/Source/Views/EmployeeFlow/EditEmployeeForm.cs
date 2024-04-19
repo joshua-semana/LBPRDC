@@ -1,12 +1,13 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
-using System.Data;
 
 namespace LBPRDC.Source.Views.EmployeeFlow
 {
     public partial class EditEmployeeForm : Form
     {
-        public string? EmployeeId { get; set; }
+        public int EmployeeID { get; set; }
+        public int ClientID { get; set; }
         public ucEmployees? ParentControl { get; set; }
 
         private readonly List<Control> requiredFields;
@@ -32,35 +33,40 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void EditEmployeeForm_Load(object sender, EventArgs e)
         {
-            if (EmployeeId != null)
+            if (EmployeeID != 0 && ClientID != 0)
             {
-                InitializeEmployeeInformation(EmployeeId);
+                InitializeEmployeeInformation(EmployeeID);
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.RETRIEVE_DATA, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
             }
         }
 
-        private void InitializePositionComboBoxItems(int ID, string Name)
+        private async void InitializePositionComboBoxItems(int ID, string Name)
         {
-            var items = PositionService.GetAllItemsForComboBox();
+            var items = await PositionService.GetAllItemsForComboBoxByClientID(ClientID);
             cmbPosition.DisplayMember = "Name";
             cmbPosition.ValueMember = "ID";
             bool itemExists = items.Any(a => a.ID == ID);
             if (!itemExists)
             {
-                items.Add(new PositionService.Position { ID = ID, Name = Name });
+                items.Add(new Models.Position { ID = ID, Name = Name });
             }
             cmbPosition.DataSource = items;
             cmbPosition.SelectedValue = ID;
         }
 
-        private void InitializeCivilStatusComboBoxItems(int ID, string Name)
+        private async void InitializeCivilStatusComboBoxItems(int ID, string Name)
         {
-            var items = CivilStatusService.GetAllItemsForComboBox();
+            var items = await CivilStatusService.GetAllItemsForComboBox();
             cmbCivilStatus.DisplayMember = "Name";
             cmbCivilStatus.ValueMember = "ID";
             bool itemExists = items.Any(a => a.ID == ID);
             if (!itemExists)
             {
-                items.Add(new CivilStatusService.CivilStatus { ID = ID, Name = Name });
+                items.Add(new Models.CivilStatus { ID = ID, Name = Name });
             }
             cmbCivilStatus.DataSource = items;
             cmbCivilStatus.SelectedValue = ID;
@@ -94,29 +100,29 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             cmbSuffix.SelectedValue = ID;
         }
 
-        private void InitializeDepartmentComboBoxItems(int ID, string Name)
+        private async void InitializeDepartmentComboBoxItems(int ID, string Name)
         {
-            var items = DepartmentService.GetAllItemsForComboBox();
+            var items = await DepartmentService.GetAllItemsForComboBoxByClientID(ClientID);
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
             bool itemExists = items.Any(a => a.ID == ID);
             if (!itemExists)
             {
-                items.Add(new DepartmentService.Department { ID = ID, Name = Name });
+                items.Add(new Models.Department { ID = ID, Name = Name });
             }
             cmbDepartment.DataSource = items;
             cmbDepartment.SelectedValue = ID;
         }
 
-        private void InitializeLocationComboBoxItems(int DepartmentID, int ID, string Name)
+        private async void InitializeLocationComboBoxItems(int DepartmentID, int ID, string Name)
         {
-            var items = LocationService.GetAllItemsForComboBoxByID(Convert.ToInt32(DepartmentID));
+            var items = await LocationService.GetAllItemsForComboBoxByID(Convert.ToInt32(DepartmentID));
             cmbLocation.DisplayMember = "Name";
             cmbLocation.ValueMember = "ID";
             bool itemExists = items.Any(a => a.ID == ID);
             if (!itemExists)
             {
-                items.Add(new LocationService.Location { ID = ID, Name = Name });
+                items.Add(new Models.Location { ID = ID, Name = Name });
             }
             cmbLocation.DataSource = items;
             cmbLocation.SelectedValue = ID;
@@ -127,49 +133,68 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             cmbGender.SelectedItem = ID;
         }
 
-        private void InitializeEmployeeInformation(string ID)
+        private async void InitializeWageTypeComboBoxItems(int ID, string Name)
         {
-            List<EmployeeService.Employee> employees = EmployeeService.GetAllEmployees();
-            List<PositionService.History> positions = PositionService.GetAllHistory();
-            List<EmploymentStatusService.History> employmentStatus = EmploymentStatusService.GetAllHistory();
-            PreviousEmployeeService.PreviousEmployee employeeRecord = PreviousEmployeeService.GetRecordByEmployeeID(ID);
+            var items = await WageService.GetAllItemsForComboBox();
+            cmbWageType.DisplayMember = "Name";
+            cmbWageType.ValueMember = "ID";
+            bool itemExists = items.Any(a => a.ID == ID);
+            if (!itemExists)
+            {
+                items.Add(new Models.Wage { ID = ID, Name = Name });
+            }
+            cmbWageType.DataSource = items;
+            cmbWageType.SelectedValue = ID;
+        }
 
-            var employee = employees.First(e => e.EmployeeID == ID);
-            var currentPosition = positions.First(p => p.EmployeeID == ID && p.Status == "Active");
-            var curerntStatus = employmentStatus.First(f => f.EmployeeID == ID && f.Status == "Active");
+        private async void InitializeEmployeeInformation(int EmployeeID)
+        {
+            var employeeList = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
+
+            if (employeeList == null && !employeeList.Any())
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_EMPLOYEE, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
+            }
+
+            var employee = employeeList.First();
+            var positionHistory = await PositionService.GetEmployeeHistory(EmployeeID);
+            var employmentStatusHistory = await EmploymentStatusService.GetEmployeeHistory(EmployeeID);
+            var employeePreviousRecord = await PreviousEmployeeService.GetEmployeeHistory(EmployeeID);
 
             txtFirstName.Text = employee.FirstName;
             txtMiddleName.Text = employee.MiddleName;
             txtLastName.Text = employee.LastName;
             txtEducation.Text = employee.Education;
-            dtpBirthday.Value = employee.Birthday.Value;
+            dtpBirthday.Value = employee.Birthday;
             txtEmailAddress1.Text = employee.EmailAddress1;
             txtEmailAddress2.Text = employee.EmailAddress2;
             txtContactNumber1.Text = employee.ContactNumber1;
             txtContactNumber2.Text = employee.ContactNumber2;
             txtEmployeeID.Text = employee.EmployeeID;
-            dtpPositionEffectiveDate.Value = currentPosition.Timestamp.Value;
-            dtpStatusEffectiveDate.Value = curerntStatus.Timestamp.Value;
-            txtPositionTitle.Text = Utilities.StringFormat.ToSentenceCase(currentPosition.PositionTitle);
+            dtpPositionEffectiveDate.Value = positionHistory != null ? positionHistory.Timestamp : DateTime.MinValue;
+            dtpStatusEffectiveDate.Value = employmentStatusHistory != null ? employmentStatusHistory.Timestamp : DateTime.MinValue;
+            txtPositionTitle.Text = positionHistory != null ? Utilities.StringFormat.ToSentenceCase(positionHistory.PositionTitle) : "Error Getting Data";
             txtRemarks.Text = employee.Remarks;
             InitializeGenderComboBoxItems(employee.Gender);
             InitializePositionComboBoxItems(employee.PositionID, employee.PositionName);
-            InitializeCivilStatusComboBoxItems(employee.CivilStatusID, employee.CivilStatus);
-            InitializeEmploymentStatusComboBoxItems(employee.EmploymentStatusID, employee.EmploymentStatus);
-            InitializeSuffixComboBoxItems(employee.SuffixID, employee.Suffix);
-            InitializeDepartmentComboBoxItems(employee.DepartmentID, employee.Department);
-            InitializeLocationComboBoxItems(employee.DepartmentID, employee.LocationID, employee.Location);
+            InitializeCivilStatusComboBoxItems(employee.CivilStatusID, employee.CivilStatusName);
+            InitializeEmploymentStatusComboBoxItems(employee.EmploymentStatusID, employee.EmploymentStatusName);
+            InitializeSuffixComboBoxItems(employee.SuffixID, employee.SuffixName);
+            InitializeDepartmentComboBoxItems(employee.DepartmentID, employee.DepartmentName);
+            InitializeLocationComboBoxItems(employee.DepartmentID, employee.LocationID, employee.LocationName);
+            InitializeWageTypeComboBoxItems(employee.WageID, employee.WageName);
 
-            employeeHasRecord = employeeRecord.HasRecord;
-
-            if (employeeRecord.HasRecord)
+            if (employeePreviousRecord.HasRecord)
             {
+                employeeHasRecord = employeePreviousRecord.HasRecord;
                 chkPreviousEmployee.Checked = true;
                 grpPreviousWork.Enabled = true;
-                txtPreviousPosition.Text = employeeRecord.Position;
-                dtpFromDate.Value = employeeRecord.StartDate.Value;
-                dtpToDate.Value = employeeRecord.EndDate.Value;
-                txtOtherInformation.Text = employeeRecord.Information;
+                txtPreviousPosition.Text = employeePreviousRecord.Position;
+                dtpFromDate.Value = employeePreviousRecord.StartDate;
+                dtpToDate.Value = employeePreviousRecord.EndDate;
+                txtOtherInformation.Text = employeePreviousRecord.Information;
             }
         }
 
@@ -188,7 +213,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show(MessagesConstants.Cancel.QUESTION, MessagesConstants.Cancel.TITLE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
                 this.Close();
@@ -216,6 +241,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
         {
             EmployeeService.EmployeeHistory data = new()
             {
+                ID = EmployeeID,
                 EmployeeID = txtEmployeeID.Text,
                 LastName = txtLastName.Text.ToUpper(),
                 FirstName = txtFirstName.Text.ToUpper(),
@@ -236,6 +262,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
                 PositionID = Convert.ToInt32(cmbPosition.SelectedValue),
                 EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
                 Remarks = txtRemarks.Text,
+                WageID = Convert.ToInt32(cmbWageType.SelectedValue),
 
                 PositionEffectiveDate = dtpPositionEffectiveDate.Value,
                 StatusEffectiveDate = dtpStatusEffectiveDate.Value,
@@ -262,13 +289,13 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             GetLocationComboBoxItems();
         }
 
-        private void GetLocationComboBoxItems()
+        private async void GetLocationComboBoxItems()
         {
             if (cmbDepartment.SelectedIndex != 0)
             {
                 cmbLocation.Enabled = true;
                 int DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue);
-                cmbLocation.DataSource = LocationService.GetAllItemsForComboBoxByID(DepartmentID);
+                cmbLocation.DataSource = await LocationService.GetAllItemsForComboBoxByID(DepartmentID);
                 cmbLocation.DisplayMember = "Name";
                 cmbLocation.ValueMember = "ID";
             }
