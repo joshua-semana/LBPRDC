@@ -10,5 +10,13 @@ namespace LBPRDC.Source.Models
         public int DepartmentID { get; set; }
         public string Status { get; set; } = StringConstants.Status.ACTIVE;
         public string Description { get; set; } = "";
+
+        // Navigation Properties
+        public Department Department { get; set; }
+
+        public class View : Location
+        {
+            public string DepartmentName { get; set; } = "";
+        }
     }
 }

@@ -11,6 +11,14 @@ namespace LBPRDC.Source.Models
         public string Status { get; set; } = StringConstants.Status.ACTIVE;
         public string Description { get; set; } = "";
 
+        // Navigation Properties
+        public Client Client { get; set; }
+
+        public class View : Department
+        {
+            public string ClientName { get; set; } = "";
+        }
+
         public class History
         {
             public int HistoryID { get; set; }

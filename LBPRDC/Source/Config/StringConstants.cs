@@ -2,6 +2,18 @@
 {
     public class StringConstants
     {
+        public static class UserRole
+        {
+            public const string ADMIN = "Admin";
+            public const string STANDARD = "Standard";
+        }
+
+        public static class Wage
+        {
+            public const string DAILY = "Daily";
+            public const string MONTHLY = "Monthly";
+        }
+
         public static class Status
         {
             public const string INITIAL = "Initial Status";
@@ -23,6 +35,13 @@
             public const string NO_DATA = "No Data";
         }
 
+        public class InitialRemarks
+        {
+            public const string POSITION = "Initial Position";
+            public const string EMPLOYMENT_STATUS = "Initial Employment Status";
+            public const string DEPARTMENT_AND_LOCATION = "Initial Department & Location";
+        }
+
         public class Type
         {
             public const string REGULAR = "Regular";
@@ -35,6 +54,7 @@
 
         public class DisplayStatus
         {
+            public const string RIGHT_ARROW = ">";
             public const string CURRENT = "Current";
             public const string OLD = "Old";
         }
@@ -48,13 +68,13 @@
         {
             public const string NOTHING = "Nothing";
             public const string NOTHING_FOUND = "Nothing Found";
+            public const string DEFAULT_EMPLOYMENT_STATUS = "(Choose Employment Status)";
             public const string DEFAULT_CLIENT = "(Choose Client)";
+            public const string DEFAULT_CLASSIFICATION = "(Choose Classification)";
+            public const string DEFAULT_WAGE = "(Choose Wage Type)";
             public const string DEFAULT_POSITION = "(Choose Position)";
             public const string DEFAULT_DEPARTMENT = "(Choose Department)";
             public const string DEFAULT_LOCATION = "(Choose Location)";
-            public const string DEFAULT_CIVIL_STATUS = "(Choose Civil Status)";
-            public const string DEFAULT_EMPLOYMENT_STATUS = "(Choose Employment Status)";
-            public const string DEFAULT_WAGE = "(Choose Wage Type)";
         }
 
         public static class Remarks
@@ -84,21 +104,32 @@
         public static class Categories
         {
             public const string CLIENT = "Clients";
+            public const string CLASSIFICATION = "Classifications";
+            public const string WAGE = "Wages";
             public const string POSITION = "Positions";
             public const string DEPARTMENT = "Departments";
             public const string LOCATION = "Locations";
-            public const string CIVIL_STATUS = "Civil Status";
             public const string EMPLOYMENT_STATUS = "Employment Status";
-            public const string WAGE = "Wages";
+        }
+
+        public static class CategoriesSingular
+        {
+            public const string CLIENT = "Client";
+            public const string CLASSIFICATION = "Classification";
+            public const string WAGE = "Wage";
+            public const string POSITION = "Position";
+            public const string DEPARTMENT = "Department";
+            public const string LOCATION = "Location";
+            public const string EMPLOYMENT_STATUS = "Employment Status";
         }
 
         public static class DBTableNames
         {
             public const string CLIENT = "Clients";
+            public const string CLASSIFICATION = "Classifications";
             public const string POSITION = "Position";
             public const string DEPARTMENT = "Departments";
             public const string LOCATION = "Locations";
-            public const string CIVIL_STATUS = "CivilStatus";
             public const string EMPLOYMENT_STATUS = "EmploymentStatus";
             public const string WAGE = "Wages";
         }

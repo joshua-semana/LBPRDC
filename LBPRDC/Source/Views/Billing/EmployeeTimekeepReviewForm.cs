@@ -201,7 +201,7 @@ namespace LBPRDC.Source.Views.Billing
             string status = (person.VerificationStatus == "Verified") ? "(Verified) " : "";
             btnRemoveEntry.Enabled = (person.EntryType == StringConstants.Type.CUSTOM);
 
-            lblEmployeeInformation.Text = $"{status}{person.EmployeeID} | {Utilities.StringFormat.ToSentenceCase(person.FullName)} | {Utilities.StringFormat.ToSentenceCase(person.Position)} | Location: {person.Location} | Rate: {person.BillingRate.ToString("C2").Replace("$", "₱")}";
+            lblEmployeeInformation.Text = $"{status}{person.EmployeeID} | {Utilities.StringFormat.ToSentenceCase(person.FullName)} | {Utilities.StringFormat.ToSentenceCase(person.Position)} | Location: {person.Location} | Rate: {person.DailyBillingRate.ToString("C2").Replace("$", "₱")}";
 
             txtRegularInDays.Text = (time.RegularHours.TotalHours / 8).ToString();
             txtTotalRegularHours.Text = time.RegularHours.TotalHours.ToString();
@@ -863,6 +863,11 @@ namespace LBPRDC.Source.Views.Billing
                     this.Text += " (Modified)";
                 }
             }
+        }
+
+        private void dgvAdjustments_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

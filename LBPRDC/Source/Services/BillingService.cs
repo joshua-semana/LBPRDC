@@ -131,7 +131,7 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    LoggingService.LogActivity(new()
+                    await LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = MessagesConstants.UPDATE,
@@ -425,7 +425,7 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    LoggingService.LogActivity(new()
+                    await LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = MessagesConstants.Logs.TITLE_NEW_BILLING,
@@ -440,7 +440,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return (ExceptionHandler.HandleException(ex), -1); }
         }
 
-        public static bool UpdateConstantAndEditableJSON(List<Entry> entries, int BillingID)
+        public static async Task<bool> UpdateConstantAndEditableJSON(List<Entry> entries, int BillingID)
         {
             try
             {
@@ -460,7 +460,7 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    LoggingService.LogActivity(new()
+                    await LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = "Upload",
@@ -473,7 +473,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateEditableJSON(List<Entry> entries, string billingName)
+        public static async Task<bool> UpdateEditableJSON(List<Entry> entries, string billingName)
         {
             try
             {
@@ -492,7 +492,7 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    LoggingService.LogActivity(new()
+                    await LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = "Save",
@@ -505,7 +505,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateAccrualsJSON(List<AccrualsEntry> accruals, int BillingID)
+        public static async Task<bool> UpdateAccrualsJSON(List<AccrualsEntry> accruals, int BillingID)
         {
             try
             {
@@ -524,7 +524,7 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    LoggingService.LogActivity(new()
+                    await LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = "Upload",
@@ -537,7 +537,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateStatusByID(int BillingID, string status)
+        public static async Task<bool> UpdateStatusByID(int BillingID, string status)
         {
             try
             {
@@ -556,7 +556,7 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    LoggingService.LogActivity(new()
+                    await LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = MessagesConstants.UPDATE,
@@ -569,7 +569,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateVerificationStatus(int BillingID, string status)
+        public static async Task<bool> UpdateVerificationStatus(int BillingID, string status)
         {
             try
             {
@@ -587,7 +587,7 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    LoggingService.LogActivity(new()
+                    await LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = MessagesConstants.UPDATE,
@@ -620,7 +620,7 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    LoggingService.LogActivity(new()
+                    await LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = MessagesConstants.UPDATE,
@@ -676,7 +676,7 @@ namespace LBPRDC.Source.Services
 
                     if (updateStatus && updateLockStatus)
                     {
-                        LoggingService.LogActivity(new()
+                        await LoggingService.LogActivity(new()
                         {
                             UserID = UserService.CurrentUser.UserID,
                             ActivityType = "Release",

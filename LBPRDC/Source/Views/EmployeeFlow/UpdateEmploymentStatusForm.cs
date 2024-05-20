@@ -6,6 +6,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 {
     public partial class UpdateEmploymentStatusForm : Form
     {
+        public int ClientID { get; set; }
         public int EmployeeID { get; set; }
         public ucEmployees? ParentControl { get; set; }
 
@@ -22,9 +23,9 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void UpdateEmploymentStatusForm_Load(object sender, EventArgs e)
         {
-            if (EmployeeID != 0)
+            if (ClientID != 0 || EmployeeID != 0)
             {
-                InitializeEmployeeInformation(EmployeeID);
+                InitializeEmployeeInformation(ClientID, EmployeeID);
                 InitializePositionComboBoxItems();
             }
             else
@@ -41,15 +42,23 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             cmbEmploymentStatus.ValueMember = "ID";
         }
 
-        private async void InitializeEmployeeInformation(int ID)
+        private async void InitializeEmployeeInformation(int ClientID, int EmployeeID)
         {
-            var employees = await EmployeeService.GetAllEmployees();
+            var employees = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
 
-            var employee = employees.First(w => w.ID == ID);
+            if (employees.Any())
+            {
+                var employee = employees.First();
 
-            txtEmployeeID.Text = employee.EmployeeID;
-            txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
-            txtCurrentEmploymentStatus.Text = employee.EmploymentStatus;
+                txtEmployeeID.Text = employee.EmployeeID;
+                txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
+                txtCurrentEmploymentStatus.Text = employee.EmploymentStatusName;
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_EMPLOYEE, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+            }
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)

@@ -19,6 +19,32 @@ namespace LBPRDC.Source.Services
             public string? Description { get; set; }
         }
 
+        // Entity Framework
+
+        public static async Task<List<Models.Location.View>> GetAllItemsWithView()
+        {
+            List<Models.Location.View> items = new();
+
+            try
+            {
+                using var context = new Context();
+                items = await context.Locations.Select(s => new Models.Location.View
+                {
+                    ID = s.ID,
+                    Type = s.Type,
+                    Name = s.Name,
+                    DepartmentID = s.DepartmentID,
+                    Status = s.Status,
+                    Description = s.Description,
+                    DepartmentName = s.Department.Name
+                })
+                .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
+        }
+
         public static List<Location> GetAllItems()
         {
             List<Location> items = new();
@@ -58,36 +84,6 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
-        }
-
-        public static List<string> GetExistenceByID(int locationID)
-        {
-            List<string> databaseTableNames = new();
-
-            try
-            {
-                using var connection = Database.Connect();
-
-                string QueryCheckExistense = "";
-                List<string> tableNames = new()
-                {
-                    "Employee"
-                };
-
-                List<string> selectQueries = tableNames.Select(name =>
-                    $"SELECT DISTINCT '{name}' AS TableName FROM {name} WHERE LocationID = @LocationID"
-                ).ToList();
-
-                QueryCheckExistense = string.Join(" UNION ALL ", selectQueries);
-
-                databaseTableNames = connection.Query<string>(QueryCheckExistense, new
-                {
-                    LocationID = locationID
-                }).ToList();
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-
-            return databaseTableNames;
         }
 
         public static async Task RemoveDefaultByDepartmentID(int DepartmentID)
@@ -177,7 +173,7 @@ namespace LBPRDC.Source.Services
                 {
                     if (UserService.CurrentUser != null)
                     {
-                        LoggingService.LogActivity(new()
+                        await LoggingService.LogActivity(new()
                         {
                             UserID = UserService.CurrentUser.UserID,
                             ActivityType = MessagesConstants.UPDATE,

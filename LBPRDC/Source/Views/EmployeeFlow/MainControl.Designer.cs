@@ -75,14 +75,12 @@ namespace LBPRDC.Source.Views
             cntxtMenuViewBillings = new ToolStripMenuItem();
             cntxtMenuHistory = new ToolStripMenuItem();
             menuHistoryPosition = new ToolStripMenuItem();
-            menuHistoryCivilStatus = new ToolStripMenuItem();
             menuHistoryEmploymentStatus = new ToolStripMenuItem();
             menuHistoryDepartmentLocation = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
             cntxtMenuEdit = new ToolStripMenuItem();
             cntxtMenuUpdate = new ToolStripMenuItem();
             menuUpdatePosition = new ToolStripMenuItem();
-            menuUpdateCivilStatus = new ToolStripMenuItem();
             menuUpdateEmploymentStatus = new ToolStripMenuItem();
             menuUpdateDepartmentLocation = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
@@ -600,7 +598,7 @@ namespace LBPRDC.Source.Views
             // 
             // cntxtMenuHistory
             // 
-            cntxtMenuHistory.DropDownItems.AddRange(new ToolStripItem[] { menuHistoryPosition, menuHistoryCivilStatus, menuHistoryEmploymentStatus, menuHistoryDepartmentLocation });
+            cntxtMenuHistory.DropDownItems.AddRange(new ToolStripItem[] { menuHistoryPosition, menuHistoryEmploymentStatus, menuHistoryDepartmentLocation });
             cntxtMenuHistory.Name = "cntxtMenuHistory";
             cntxtMenuHistory.Size = new Size(180, 22);
             cntxtMenuHistory.Text = "History";
@@ -611,13 +609,6 @@ namespace LBPRDC.Source.Views
             menuHistoryPosition.Size = new Size(213, 22);
             menuHistoryPosition.Text = "Position";
             menuHistoryPosition.Click += menuHistoryPosition_Click;
-            // 
-            // menuHistoryCivilStatus
-            // 
-            menuHistoryCivilStatus.Name = "menuHistoryCivilStatus";
-            menuHistoryCivilStatus.Size = new Size(213, 22);
-            menuHistoryCivilStatus.Text = "Civil Status";
-            menuHistoryCivilStatus.Click += menuHistoryCivilStatus_Click;
             // 
             // menuHistoryEmploymentStatus
             // 
@@ -647,7 +638,7 @@ namespace LBPRDC.Source.Views
             // 
             // cntxtMenuUpdate
             // 
-            cntxtMenuUpdate.DropDownItems.AddRange(new ToolStripItem[] { menuUpdatePosition, menuUpdateCivilStatus, menuUpdateEmploymentStatus, menuUpdateDepartmentLocation });
+            cntxtMenuUpdate.DropDownItems.AddRange(new ToolStripItem[] { menuUpdatePosition, menuUpdateEmploymentStatus, menuUpdateDepartmentLocation });
             cntxtMenuUpdate.Name = "cntxtMenuUpdate";
             cntxtMenuUpdate.Size = new Size(180, 22);
             cntxtMenuUpdate.Text = "Update";
@@ -658,13 +649,6 @@ namespace LBPRDC.Source.Views
             menuUpdatePosition.Size = new Size(213, 22);
             menuUpdatePosition.Text = "Position";
             menuUpdatePosition.Click += menuUpdatePosition_Click;
-            // 
-            // menuUpdateCivilStatus
-            // 
-            menuUpdateCivilStatus.Name = "menuUpdateCivilStatus";
-            menuUpdateCivilStatus.Size = new Size(213, 22);
-            menuUpdateCivilStatus.Text = "Civil Status";
-            menuUpdateCivilStatus.Click += menuUpdateCivilStatus_Click;
             // 
             // menuUpdateEmploymentStatus
             // 
@@ -732,11 +716,9 @@ namespace LBPRDC.Source.Views
         private ToolStripMenuItem cntxtMenuUpdate;
         private ToolStripMenuItem menuUpdatePosition;
         private ToolStripMenuItem menuUpdateDepartmentLocation;
-        private ToolStripMenuItem menuUpdateCivilStatus;
         private ToolStripMenuItem menuUpdateEmploymentStatus;
         private ToolStripMenuItem cntxtMenuHistory;
         private ToolStripMenuItem menuHistoryPosition;
-        private ToolStripMenuItem menuHistoryCivilStatus;
         private ToolStripMenuItem menuHistoryEmploymentStatus;
         private ToolStripMenuItem menuHistoryDepartmentLocation;
         private ToolStripSeparator toolStripSeparator1;

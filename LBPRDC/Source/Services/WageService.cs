@@ -2,6 +2,7 @@
 using LBPRDC.Source.Config;
 using LBPRDC.Source.Data;
 using Microsoft.EntityFrameworkCore;
+using static Dapper.SqlMapper;
 using static LBPRDC.Source.Data.Database;
 
 namespace LBPRDC.Source.Services
@@ -49,13 +50,15 @@ namespace LBPRDC.Source.Services
                 item.Description = data.Description;
                 item.Status = data.Status;
 
+                context.Entry(item).State = EntityState.Modified;
+
                 int affectedRows = await context.SaveChangesAsync();
 
                 if (affectedRows > 0)
                 {
                     if (UserService.CurrentUser != null)
                     {
-                        LoggingService.LogActivity(new()
+                        await LoggingService.LogActivity(new()
                         {
                             UserID = UserService.CurrentUser.UserID,
                             ActivityType = MessagesConstants.UPDATE,
@@ -74,36 +77,6 @@ namespace LBPRDC.Source.Services
             return item1.Name == item2.Name &&
                    item1.Description == item2.Description &&
                    item1.Status == item2.Status;
-        }
-
-        public static List<string> GetExistenceByID(int WageID)
-        {
-            List<string> databaseTableNames = new();
-
-            try
-            {
-                using var connection = Database.Connect();
-
-                string QueryCheckExistense = "";
-                List<string> tableNames = new()
-                {
-                    "Employee"
-                };
-
-                List<string> selectQueries = tableNames.Select(name =>
-                    $"SELECT DISTINCT '{name}' AS TableName FROM {name} WHERE WageID = @WageID"
-                ).ToList();
-
-                QueryCheckExistense = string.Join(" UNION ALL ", selectQueries);
-
-                databaseTableNames = connection.Query<string>(QueryCheckExistense, new
-                {
-                    WageID
-                }).ToList();
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-
-            return databaseTableNames;
         }
 
         public static async Task<List<Models.Wage>> GetAllItemsForComboBox(bool WithDefault = true)

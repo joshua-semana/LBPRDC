@@ -11,6 +11,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
         public ucEmployees? ParentControl { get; set; }
 
         private readonly List<Control> requiredFields;
+        private List<Models.Department> DepartmentList = new();
 
         public UpdateDepartmentLocationForm()
         {
@@ -24,10 +25,15 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void UpdateDepartmentLocationForm_Load(object sender, EventArgs e)
         {
-            if (EmployeeID != 0 && ClientID != 0)
+            if (EmployeeID != 0 || ClientID != 0)
             {
-                InitializeEmployeeInformation(EmployeeID);
                 InitializeDepartmentComboBoxItems();
+                InitializeEmployeeInformation(ClientID, EmployeeID);
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.RETRIEVE_DATA, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
             }
         }
 
@@ -50,21 +56,34 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void InitializeDepartmentComboBoxItems()
         {
-            cmbDepartment.DataSource = await DepartmentService.GetAllItemsForComboBoxByClientID(ClientID);
+            DepartmentList = await DepartmentService.GetAllItemsForComboBoxByClientID(ClientID);
+            cmbDepartment.DataSource = DepartmentList;
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
         }
 
-        private async void InitializeEmployeeInformation(int ID)
+        private async void InitializeEmployeeInformation(int ClientID, int EmployeeID)
         {
-            var employees = await EmployeeService.GetAllEmployees();
+            var employees = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
 
-            var employee = employees.First(w => w.ID == ID);
+            if (employees.Any())
+            {
+                var employee = employees.First();
+                var departmentInfo = DepartmentList.Where(w => w.ID == employee.DepartmentID).FirstOrDefault();
 
-            txtEmployeeID.Text = employee.EmployeeID;
-            txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
-            txtCurrentDepartment.Text = employee.Department;
-            txtCurrentLocation.Text = employee.Location;
+                txtCurrentDepartment.Text = (departmentInfo != null) 
+                    ? departmentInfo.Name
+                    : $"{MessagesConstants.Error.TITLE} - {MessagesConstants.Error.CANT_RETRIEVE}";
+
+                txtEmployeeID.Text = employee.EmployeeID;
+                txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
+                txtCurrentLocation.Text = employee.LocationName;
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_EMPLOYEE, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+            }
         }
 
         private void cmbDepartment_SelectedIndexChanged(object sender, EventArgs e)
@@ -111,11 +130,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show(MessagesConstants.Cancel.QUESTION, MessagesConstants.Cancel.TITLE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result == DialogResult.Yes)
-            {
-                this.Close();
-            }
+            this.Close();
         }
     }
 }

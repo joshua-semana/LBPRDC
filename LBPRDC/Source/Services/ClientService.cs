@@ -100,42 +100,6 @@ namespace LBPRDC.Source.Services
             return items;
         }
 
-        public static List<string> GetExistenceByID(int clientID)
-        {
-            List<string> clients = new();
-
-            try
-            {
-                using var connection = Database.Connect();
-
-                string QueryCheckExistense = "";
-                List<string> tableNames = new()
-                {
-                    "Billing",
-                    "BillingAccounts",
-                    "BillingRecord",
-                    "Position",
-                    "Departments",
-                    "Employee"
-                };
-
-                List<string> selectQueries = tableNames.Select(name =>
-                    $"SELECT DISTINCT '{name}' AS TableName FROM {name} WHERE ClientID = @ClientID"
-                ).ToList();
-
-                QueryCheckExistense = string.Join(" UNION ALL ", selectQueries);
-
-                clients = connection.Query<string>(QueryCheckExistense, new
-                {
-                    ClientID = clientID
-                }).ToList();
-
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-
-            return clients;
-        }
-
         public static async Task<bool> AddClient(Client client)
         {
             try
@@ -161,7 +125,7 @@ namespace LBPRDC.Source.Services
 
                     if (affectedRows > 0)
                     {
-                        LoggingService.LogActivity(new()
+                        await LoggingService.LogActivity(new()
                         {
                             UserID = UserService.CurrentUser.UserID,
                             ActivityType = "New Client",

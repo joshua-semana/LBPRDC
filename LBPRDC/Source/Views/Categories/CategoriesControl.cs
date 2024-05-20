@@ -9,19 +9,19 @@ namespace LBPRDC.Source.Views.Categories
     {
         private string CurrentCategoryKey;
 
-        //private Dictionary<Control, string> OriginalValues = new();
-        private List<Control> RequiredFields;
+        private readonly List<Control> RequiredFields;
 
         private readonly Dictionary<string, string> Categories = new(); // Key = "Property Value", Value = "Property Key" || Clients, CLIENT
         private readonly List<Control> CommonFields;
+        private readonly List<Control> ClassificationSpecificFields;
         private readonly List<Control> PositionSpecificFields;
         private readonly List<Control> LocationSpecificFields;
         private readonly List<Control> DepartmentSpecificFields;
 
         UserControl loadingControl = new ucLoading() { Dock = DockStyle.Fill };
 
-        private List<Models.Department> DepartmentsList = new();
-        private List<Models.Position> PositionsList = new();
+        private List<Models.Department.View> DepartmentsList = new();
+        private List<Models.Position.View> PositionsList = new();
 
         public CategoriesControl()
         {
@@ -50,16 +50,26 @@ namespace LBPRDC.Source.Views.Categories
                 cmbStatus
             };
 
+            ClassificationSpecificFields = new()
+            {
+                lblClient,
+                cmbClient,
+            };
+
             PositionSpecificFields = new()
             {
                 lblCode,
                 txtCode,
                 lblClient,
                 cmbClient,
-                lblSalaryRate,
-                txtSalaryRate,
-                lblBillingRate,
-                txtBillingRate,
+                lblDailySalaryRate,
+                txtDailySalaryRate,
+                lblDailyBillingRate,
+                txtDailyBillingRate,
+                lblMonthlySalaryRate,
+                txtMonthlySalaryRate,
+                lblMonthlyBillingRate,
+                txtMonthlyBillingRate,
             };
 
             LocationSpecificFields = new()
@@ -77,7 +87,6 @@ namespace LBPRDC.Source.Views.Categories
             };
 
             CurrentCategoryKey = Categories.First().Key;
-            //OriginalValues = new();
             RequiredFields = new();
 
             InitializeCategoriesComboBoxItems();
@@ -100,10 +109,23 @@ namespace LBPRDC.Source.Views.Categories
                     dgvCategory.DataSource = ClientService.GetClients();
                     break;
 
+                case StringConstants.Categories.CLASSIFICATION:
+                    dgvCategory.DataSource = await ClassificationService.GetClassificationsForTableView();
+                    PolishColumnHeaderTexts(StringConstants.CategoriesSingular.CLIENT);
+                    ControlUtils.ToggleControlVisibility(ClassificationSpecificFields, true);
+                    cmbClient.Enabled = false;
+                    break;
+
                 case StringConstants.Categories.POSITION:
                     PositionsList.Clear();
-                    PositionsList = await PositionService.GetAllItems();
+                    PositionsList = await PositionService.GetAllItemsWithView();
                     dgvCategory.DataSource = PositionsList;
+                    PolishColumnHeaderTexts(StringConstants.CategoriesSingular.CLIENT);
+                    dgvCategory.Columns["DailySalaryRate"].HeaderText = "Salary Rate (Daily)";
+                    dgvCategory.Columns["DailyBillingRate"].HeaderText = "Billing Rate (Daily)";
+                    dgvCategory.Columns["MonthlySalaryRate"].HeaderText = "Salary Rate (Monthly)";
+                    dgvCategory.Columns["MonthlyBillingRate"].HeaderText = "Billing Rate (Monthly)";
+
                     ControlUtils.ToggleControlVisibility(PositionSpecificFields, true);
                     btnHistory.Visible = true;
                     cmbClient.Enabled = false;
@@ -111,19 +133,17 @@ namespace LBPRDC.Source.Views.Categories
 
                 case StringConstants.Categories.DEPARTMENT:
                     DepartmentsList.Clear();
-                    DepartmentsList = await DepartmentService.GetAllItems();
+                    DepartmentsList = await DepartmentService.GetAllItemsWithView();
                     dgvCategory.DataSource = DepartmentsList;
+                    PolishColumnHeaderTexts(StringConstants.CategoriesSingular.CLIENT);
                     ControlUtils.ToggleControlVisibility(DepartmentSpecificFields, true);
                     cmbClient.Enabled = false;
                     break;
 
                 case StringConstants.Categories.LOCATION:
-                    dgvCategory.DataSource = LocationService.GetAllItems();
+                    dgvCategory.DataSource = await LocationService.GetAllItemsWithView();
+                    PolishColumnHeaderTexts(StringConstants.CategoriesSingular.DEPARTMENT);
                     ControlUtils.ToggleControlVisibility(LocationSpecificFields, true);
-                    break;
-
-                case StringConstants.Categories.CIVIL_STATUS:
-                    dgvCategory.DataSource = CivilStatusService.GetAllItems();
                     break;
 
                 case StringConstants.Categories.EMPLOYMENT_STATUS:
@@ -150,6 +170,14 @@ namespace LBPRDC.Source.Views.Categories
             }
 
             ShowLoadingProgressBar(false);
+        }
+
+        private void PolishColumnHeaderTexts(string columnName)
+        {
+            dgvCategory.Columns[columnName].Visible = false;
+            dgvCategory.Columns[$"{columnName}ID"].Visible = false;
+            dgvCategory.Columns[$"{columnName}Name"].HeaderText = columnName;
+            dgvCategory.Columns[$"{columnName}Name"].DisplayIndex = 2;
         }
 
         private void CategoriesControl_VisibleChanged(object sender, EventArgs e)
@@ -203,6 +231,9 @@ namespace LBPRDC.Source.Views.Categories
 
                 switch (CurrentCategoryKey)
                 {
+                    case StringConstants.Categories.CLASSIFICATION:
+                        PopulateClassificationSpecificTextFieldData(selectedRow);
+                        break;
                     case StringConstants.Categories.POSITION:
                         PopulatePositionSpecificTextFieldData(selectedRow);
                         break;
@@ -227,19 +258,30 @@ namespace LBPRDC.Source.Views.Categories
             cmbStatus.SelectedItem = data.Cells["Status"].Value.ToString();
         }
 
+        private void PopulateClassificationSpecificTextFieldData(DataGridViewRow data)
+        {
+            GetClientComboBoxValue(Convert.ToInt32(data.Cells["ClientID"].Value));
+        }
+
         private void PopulatePositionSpecificTextFieldData(DataGridViewRow data)
         {
             GetClientComboBoxValue(Convert.ToInt32(data.Cells["ClientID"].Value));
             var code = data.Cells["Code"].Value.ToString();
-            var salaryRate = data.Cells["SalaryRate"].Value.ToString();
-            var billingRate = data.Cells["BillingRate"].Value.ToString();
+            var dailySalaryRate = data.Cells["DailySalaryRate"].Value.ToString();
+            var dailySalaryRAte = data.Cells["DailyBillingRate"].Value.ToString();
+            var monthlySalaryRate = data.Cells["MonthlySalaryRate"].Value.ToString();
+            var monthlySalaryRAte = data.Cells["MonthlyBillingRate"].Value.ToString();
 
             txtCode.Text = code;
             txtCode.Tag = code;
-            txtSalaryRate.Text = salaryRate;
-            txtSalaryRate.Tag = salaryRate;
-            txtBillingRate.Text = billingRate;
-            txtBillingRate.Tag = billingRate;
+            txtDailySalaryRate.Text = dailySalaryRate;
+            txtDailySalaryRate.Tag = dailySalaryRate;
+            txtDailyBillingRate.Text = dailySalaryRAte;
+            txtDailyBillingRate.Tag = dailySalaryRAte;
+            txtMonthlySalaryRate.Text = monthlySalaryRate;
+            txtMonthlySalaryRate.Tag = monthlySalaryRate;
+            txtMonthlyBillingRate.Text = monthlySalaryRAte;
+            txtMonthlyBillingRate.Tag = monthlySalaryRAte;
         }
 
         private void PopulateLocationSpecificTextFieldData(DataGridViewRow data)
@@ -375,9 +417,19 @@ namespace LBPRDC.Source.Views.Categories
 
                         break;
 
+                    case StringConstants.Categories.CLASSIFICATION:
+                        isUpdated = await ClassificationService.UpdateClassification(new()
+                        {
+                            ID = ID,
+                            Name = name,
+                            Description = description,
+                            Status = status
+                        });
+
+                        break;
+
                     case StringConstants.Categories.POSITION:
                         var similarPositionCodes = PositionsList.Where(w => txtCode.Text.ToUpper().Equals(w.Code)).ToList();
-                        //if (similarPositionCodes.Count > 0 && txtCode.Text != OriginalValues[txtCode])
                         if (similarPositionCodes.Count > 0 && txtCode.Text != txtCode.Tag.ToString())
                         {
                             MessageBox.Show("This code has already been used. Please enter another code to continue.", "Duplicate Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -392,17 +444,22 @@ namespace LBPRDC.Source.Views.Categories
                             Description = description,
                             Status = status,
                             Code = txtCode.Text.ToUpper().Trim(),
-                            SalaryRate = Convert.ToDecimal(txtSalaryRate.Text),
-                            BillingRate = Convert.ToDecimal(txtBillingRate.Text)
+                            DailySalaryRate = Convert.ToDecimal(txtDailySalaryRate.Text),
+                            DailyBillingRate = Convert.ToDecimal(txtDailyBillingRate.Text),
+                            MonthlySalaryRate = Convert.ToDecimal(txtMonthlySalaryRate.Text),
+                            MonthlyBillingRate = Convert.ToDecimal(txtMonthlyBillingRate.Text)
                         });
 
-                        if (txtSalaryRate.Text != txtSalaryRate.Tag.ToString() || txtBillingRate.Text != txtBillingRate.Tag.ToString())
+                        if (txtDailySalaryRate.Text != txtDailySalaryRate.Tag.ToString() || txtDailyBillingRate.Text != txtDailyBillingRate.Tag.ToString() ||
+                            txtMonthlySalaryRate.Text != txtMonthlySalaryRate.Tag.ToString() || txtMonthlyBillingRate.Text != txtMonthlyBillingRate.Tag.ToString())
                         {
                             PositionService.AddRatesHistory(new()
                             {
                                 PositionID = ID,
-                                SalaryRate = Convert.ToDecimal(txtSalaryRate.Text),
-                                BillingRate = Convert.ToDecimal(txtBillingRate.Text)
+                                DailySalaryRate = Convert.ToDecimal(txtDailySalaryRate.Text),
+                                DailyBillingRate = Convert.ToDecimal(txtDailyBillingRate.Text),
+                                MonthlySalaryRate = Convert.ToDecimal(txtMonthlySalaryRate.Text),
+                                MonthlyBillingRate = Convert.ToDecimal(txtMonthlyBillingRate.Text)
                             });
                         };
 
@@ -443,17 +500,6 @@ namespace LBPRDC.Source.Views.Categories
                             Description = description,
                             Status = status,
                             DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue)
-                        });
-
-                        break;
-
-                    case StringConstants.Categories.CIVIL_STATUS:
-                        isUpdated = await CivilStatusService.Update(new()
-                        {
-                            ID = ID,
-                            Name = name,
-                            Description = description,
-                            Status = status
                         });
 
                         break;
@@ -557,13 +603,13 @@ namespace LBPRDC.Source.Views.Categories
                 {
                     StringListProcess = CurrentCategoryKey switch
                     {
-                        StringConstants.Categories.CLIENT => Task.Run(() => ClientService.GetExistenceByID(ID)),
-                        StringConstants.Categories.POSITION => Task.Run(() => PositionService.GetExistenceByID(ID)),
-                        StringConstants.Categories.DEPARTMENT => Task.Run(() => DepartmentService.GetExistenceByID(ID)),
-                        StringConstants.Categories.LOCATION => Task.Run(() => LocationService.GetExistenceByID(ID)),
-                        StringConstants.Categories.CIVIL_STATUS => Task.Run(() => CivilStatusService.GetExistenceByID(ID)),
-                        StringConstants.Categories.EMPLOYMENT_STATUS => Task.Run(() => EmploymentStatusService.GetExistenceByID(ID)),
-                        StringConstants.Categories.WAGE => Task.Run(() => WageService.GetExistenceByID(ID)),
+                        StringConstants.Categories.CLIENT => Task.Run(() => UtilityService.GetEntityExistenceByID(ListConstants.EntityTableRefs.FOR_CLIENTS, "Client", ID)),
+                        StringConstants.Categories.CLASSIFICATION => Task.Run(() => UtilityService.GetEntityExistenceByID(ListConstants.EntityTableRefs.FOR_CLASSIFICATIONS, "Classification", ID)),
+                        StringConstants.Categories.WAGE => Task.Run(() => UtilityService.GetEntityExistenceByID(ListConstants.EntityTableRefs.FOR_WAGES, "Department", ID)),
+                        StringConstants.Categories.POSITION => Task.Run(() => UtilityService.GetEntityExistenceByID(ListConstants.EntityTableRefs.FOR_POSITIONS, "Position", ID)),
+                        StringConstants.Categories.DEPARTMENT => Task.Run(() => UtilityService.GetEntityExistenceByID(ListConstants.EntityTableRefs.FOR_DEPARTMENTS, "Department", ID)),
+                        StringConstants.Categories.LOCATION => Task.Run(() => UtilityService.GetEntityExistenceByID(ListConstants.EntityTableRefs.FOR_LOCATIONS, "Location", ID)),
+                        StringConstants.Categories.EMPLOYMENT_STATUS => Task.Run(() => UtilityService.GetEntityExistenceByID(ListConstants.EntityTableRefs.FOR_EMPLOYMENT_STATUS, "EmploymentStatus", ID)),
                         _ => throw new NotImplementedException(),
                     }
                 };
@@ -615,7 +661,9 @@ namespace LBPRDC.Source.Views.Categories
             {
                 PositionRatesHistory positionRatesHistory = new()
                 {
-                    PositionID = Convert.ToInt32(txtID.Text)
+                    PositionID = Convert.ToInt32(txtID.Text),
+                    PositionCode = txtCode.Text,
+                    PositionName = txtName.Text,
                 };
                 positionRatesHistory.ShowDialog();
             }

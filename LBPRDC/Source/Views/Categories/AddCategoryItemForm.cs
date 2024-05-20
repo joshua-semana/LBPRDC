@@ -9,14 +9,12 @@ namespace LBPRDC.Source.Views.Categories
         public CategoriesControl? ParentControl { get; set; }
         public string? CategoryName { get; set; }
 
-        private List<Control> RequiredFields;
+        private readonly List<Control> RequiredFields;
         private readonly List<Control> CommonFields;
+        private readonly List<Control> ClassificationSpecificFields;
         private readonly List<Control> PositionSpecificFields;
         private readonly List<Control> LocationSpecificFields;
         private readonly List<Control> DepartmentSpecificFields;
-
-        private List<Models.Position> PositionsListForComboBox = new();
-        private List<Models.Department> DepartmentsListForComboBox = new();
 
         public AddCategoryItemForm()
         {
@@ -31,16 +29,26 @@ namespace LBPRDC.Source.Views.Categories
                 cmbStatus
             };
 
+            ClassificationSpecificFields = new()
+            {
+                lblClient,
+                cmbClient,
+            };
+
             PositionSpecificFields = new()
             {
                 lblCode,
                 txtCode,
                 lblClient,
                 cmbClient,
-                lblSalaryRate,
-                txtSalaryRate,
-                lblBillingRate,
-                txtBillingRate,
+                lblDailySalaryRate,
+                txtDailySalaryRate,
+                lblDailyBillingRate,
+                txtDailyBillingRate,
+                lblMonthlySalaryRate,
+                txtMonthlySalaryRate,
+                lblMonthlyBillingRate,
+                txtMonthlyBillingRate,
             };
 
             LocationSpecificFields = new()
@@ -71,16 +79,23 @@ namespace LBPRDC.Source.Views.Categories
                 case StringConstants.Categories.CLIENT:
                     break;
 
+                case StringConstants.Categories.CLASSIFICATION:
+                    ControlUtils.ToggleControlVisibility(ClassificationSpecificFields, true);
+                    InitializeClientComboBoxItems();
+                    break;
+
+                case StringConstants.Categories.WAGE:
+                    break;
+
                 case StringConstants.Categories.POSITION:
                     ControlUtils.ToggleControlVisibility(PositionSpecificFields, true);
-                    PositionsListForComboBox = await PositionService.GetAllItems();
                     InitializeClientComboBoxItems();
                     break;
 
                 case StringConstants.Categories.LOCATION:
                     ControlUtils.ToggleControlVisibility(LocationSpecificFields, true);
-                    DepartmentsListForComboBox = await DepartmentService.GetAllItemsForComboBox();
-                    InitializeDepartmentComboBoxItems();
+                    var departments = await DepartmentService.GetAllItemsForComboBox();
+                    InitializeDepartmentComboBoxItems(departments);
                     break;
 
                 case StringConstants.Categories.DEPARTMENT:
@@ -88,14 +103,9 @@ namespace LBPRDC.Source.Views.Categories
                     InitializeClientComboBoxItems();
                     break;
 
-                case StringConstants.Categories.CIVIL_STATUS:
-                    break;
-
                 case StringConstants.Categories.EMPLOYMENT_STATUS:
                     break;
 
-                case StringConstants.Categories.WAGE:
-                    break;
 
                 default:
                     MessageBox.Show("Category is not allowed to use this feature. Please contact support for this error.", MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -106,9 +116,9 @@ namespace LBPRDC.Source.Views.Categories
             GetRequiredFields();
         }
 
-        private void InitializeDepartmentComboBoxItems()
+        private void InitializeDepartmentComboBoxItems(List<Models.Department> items)
         {
-            cmbDepartment.DataSource = DepartmentsListForComboBox;
+            cmbDepartment.DataSource = items;
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
         }
@@ -181,6 +191,7 @@ namespace LBPRDC.Source.Views.Categories
         private async void AddNewItem()
         {
             bool isAdded = false;
+            int clientID = Convert.ToInt32(cmbClient.SelectedValue);
             string code = txtCode.Text.ToUpper().Trim();
             string name = txtName.Text.Trim();
             string description = txtDescription.Text.Trim();
@@ -197,16 +208,28 @@ namespace LBPRDC.Source.Views.Categories
                     });
                     break;
 
+                case StringConstants.Categories.CLASSIFICATION:
+                    isAdded = await ClassificationService.AddClassification(new()
+                    {
+                        ClientID = clientID,
+                        Name = name,
+                        Description = description,
+                        Status = status
+                    });
+                    break;
+
                 case StringConstants.Categories.POSITION:
                     isAdded = await PositionService.Add(new()
                     {
+                        ClientID = clientID,
                         Name = name,
-                        ClientID = Convert.ToInt32(cmbClient.SelectedValue),
                         Description = description,
                         Status = status,
                         Code = code,
-                        SalaryRate = Convert.ToDecimal(txtSalaryRate.Text),
-                        BillingRate = Convert.ToDecimal(txtBillingRate.Text)
+                        DailySalaryRate = Convert.ToDecimal(txtDailySalaryRate.Text),
+                        DailyBillingRate = Convert.ToDecimal(txtDailyBillingRate.Text),
+                        MonthlySalaryRate = Convert.ToDecimal(txtMonthlySalaryRate.Text),
+                        MonthlyBillingRate = Convert.ToDecimal(txtMonthlyBillingRate.Text)
                     });
                     break;
 
@@ -214,7 +237,7 @@ namespace LBPRDC.Source.Views.Categories
                     DepartmentService.Department AddForDepartment = new()
                     {
                         Code = code,
-                        ClientID = Convert.ToInt32(cmbClient.SelectedValue),
+                        ClientID = clientID,
                         Name = name,
                         Description = description,
                         Status = status
@@ -232,16 +255,6 @@ namespace LBPRDC.Source.Views.Categories
                         DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue)
                     };
                     isAdded = await LocationService.Add(AddForLocation);
-                    break;
-
-                case StringConstants.Categories.CIVIL_STATUS:
-                    CivilStatusService.CivilStatus AddForCivilStatus = new()
-                    {
-                        Name = name,
-                        Description = description,
-                        Status = status
-                    };
-                    isAdded = await CivilStatusService.Add(AddForCivilStatus);
                     break;
 
                 case StringConstants.Categories.EMPLOYMENT_STATUS:

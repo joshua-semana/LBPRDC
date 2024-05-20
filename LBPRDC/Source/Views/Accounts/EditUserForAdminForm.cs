@@ -24,16 +24,33 @@ namespace LBPRDC.Source.Views.Accounts
 
         private void EditUserForAdminForm_Load(object sender, EventArgs e)
         {
+            if (UserID == 0)
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_USER, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
+            }
+
             InitializeUserInformation(UserID);
         }
 
-        private void InitializeUserInformation(int userID)
+        private async void InitializeUserInformation(int userID)
         {
-            var user = UserService.GetAllUsers().First(f => f.UserID == userID);
-            txtUserID.Text = userID.ToString();
-            txtUsername.Text = user.Username;
-            cmbRole.SelectedItem = user.Role;
-            cmbStatus.SelectedItem = user.Status;
+            var users = await UserService.GetUsers(userID);
+            if (users.Any())
+            {
+                var user = users.First();
+                txtUserID.Text = userID.ToString();
+                txtUsername.Text = user.Username;
+                cmbRole.SelectedItem = user.Role;
+                cmbStatus.SelectedItem = user.Status;
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.RETRIEVE_DATA, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
+            }
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -46,7 +63,7 @@ namespace LBPRDC.Source.Views.Accounts
 
         private async void UpdateUserInformation()
         {
-            UserService.User userUpdate = new()
+            Models.User userUpdate = new()
             {
                 UserID = Convert.ToInt32(txtUserID.Text),
                 Username = txtUsername.Text,

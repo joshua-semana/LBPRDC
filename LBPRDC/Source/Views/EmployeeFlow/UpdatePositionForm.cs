@@ -6,8 +6,8 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 {
     public partial class UpdatePositionForm : Form
     {
-        public int EmployeeID { get; set; }
         public int ClientID { get; set; }
+        public int EmployeeID { get; set; }
         public ucEmployees? ParentControl { get; set; }
 
         private readonly List<Control> requiredFields;
@@ -26,7 +26,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
         {
             if (EmployeeID != 0 && ClientID != 0)
             {
-                InitializeEmployeeInformation(EmployeeID);
+                InitializeEmployeeInformation(ClientID, EmployeeID);
                 InitializePositionComboBoxItems();
             }
             else
@@ -43,21 +43,29 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             cmbPosition.ValueMember = "ID";
         }
 
-        private async void InitializeEmployeeInformation(int ID)
+        private async void InitializeEmployeeInformation(int ClientID, int EmployeeID)
         {
-            var employees = await EmployeeService.GetAllEmployees();
+            var employees = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
             List<PositionService.History> positions = PositionService.GetAllHistory();
 
-            var employee = employees.First(w => w.ID == ID);
-            var currentPosition = positions.First(w => w.EmployeeID == ID && w.Status == StringConstants.Status.ACTIVE);
+            if (employees.Any())
+            {
+                var employee = employees.First();
+                var currentPosition = positions.First(w => w.EmployeeID == EmployeeID && w.Status == StringConstants.Status.ACTIVE);
 
-            ClientID = employee.ClientID;
+                ClientID = employee.ClientID;
 
-            txtEmployeeID.Text = employee.EmployeeID;
-            txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
-            txtCurrentPosition.Tag = employee.PositionID;
-            txtCurrentPosition.Text = $"{employee.PositionCode} - {employee.PositionName}";
-            txtCurrentPositionTitle.Text = currentPosition.PositionTitle;
+                txtEmployeeID.Text = employee.EmployeeID;
+                txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
+                txtCurrentPosition.Tag = employee.PositionID;
+                txtCurrentPosition.Text = employee.PositionName;
+                txtCurrentPositionTitle.Text = currentPosition.PositionTitle;
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_EMPLOYEE, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+            }
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)

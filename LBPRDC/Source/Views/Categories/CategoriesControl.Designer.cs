@@ -52,10 +52,14 @@ namespace LBPRDC.Source.Views.Categories
             txtName = new TextBox();
             lblDepartment = new Label();
             cmbDepartment = new ComboBox();
-            lblSalaryRate = new Label();
-            txtSalaryRate = new TextBox();
-            lblBillingRate = new Label();
-            txtBillingRate = new TextBox();
+            lblDailySalaryRate = new Label();
+            txtDailySalaryRate = new TextBox();
+            lblDailyBillingRate = new Label();
+            txtDailyBillingRate = new TextBox();
+            lblMonthlySalaryRate = new Label();
+            txtMonthlySalaryRate = new TextBox();
+            lblMonthlyBillingRate = new Label();
+            txtMonthlyBillingRate = new TextBox();
             lblDescription = new Label();
             txtDescription = new TextBox();
             lblStatus = new Label();
@@ -90,7 +94,7 @@ namespace LBPRDC.Source.Views.Categories
             pnlBody.Location = new Point(0, 0);
             pnlBody.Name = "pnlBody";
             pnlBody.Padding = new Padding(24);
-            pnlBody.Size = new Size(853, 628);
+            pnlBody.Size = new Size(853, 749);
             pnlBody.TabIndex = 0;
             // 
             // btnAdd
@@ -152,7 +156,7 @@ namespace LBPRDC.Source.Views.Categories
             dgvCategory.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
             dgvCategory.RowTemplate.Height = 41;
             dgvCategory.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvCategory.Size = new Size(805, 521);
+            dgvCategory.Size = new Size(805, 642);
             dgvCategory.TabIndex = 13;
             dgvCategory.VirtualMode = true;
             dgvCategory.SelectionChanged += dgvCategory_SelectionChanged;
@@ -202,7 +206,7 @@ namespace LBPRDC.Source.Views.Categories
             pnlRight.Dock = DockStyle.Right;
             pnlRight.Location = new Point(853, 0);
             pnlRight.Name = "pnlRight";
-            pnlRight.Size = new Size(360, 628);
+            pnlRight.Size = new Size(360, 749);
             pnlRight.TabIndex = 1;
             // 
             // pnlRightBody
@@ -211,7 +215,7 @@ namespace LBPRDC.Source.Views.Categories
             pnlRightBody.Dock = DockStyle.Fill;
             pnlRightBody.Location = new Point(0, 40);
             pnlRightBody.Name = "pnlRightBody";
-            pnlRightBody.Size = new Size(360, 528);
+            pnlRightBody.Size = new Size(360, 649);
             pnlRightBody.TabIndex = 1;
             // 
             // flowRightContent
@@ -226,10 +230,14 @@ namespace LBPRDC.Source.Views.Categories
             flowRightContent.Controls.Add(txtName);
             flowRightContent.Controls.Add(lblDepartment);
             flowRightContent.Controls.Add(cmbDepartment);
-            flowRightContent.Controls.Add(lblSalaryRate);
-            flowRightContent.Controls.Add(txtSalaryRate);
-            flowRightContent.Controls.Add(lblBillingRate);
-            flowRightContent.Controls.Add(txtBillingRate);
+            flowRightContent.Controls.Add(lblDailySalaryRate);
+            flowRightContent.Controls.Add(txtDailySalaryRate);
+            flowRightContent.Controls.Add(lblDailyBillingRate);
+            flowRightContent.Controls.Add(txtDailyBillingRate);
+            flowRightContent.Controls.Add(lblMonthlySalaryRate);
+            flowRightContent.Controls.Add(txtMonthlySalaryRate);
+            flowRightContent.Controls.Add(lblMonthlyBillingRate);
+            flowRightContent.Controls.Add(txtMonthlyBillingRate);
             flowRightContent.Controls.Add(lblDescription);
             flowRightContent.Controls.Add(txtDescription);
             flowRightContent.Controls.Add(lblStatus);
@@ -239,7 +247,7 @@ namespace LBPRDC.Source.Views.Categories
             flowRightContent.Location = new Point(0, 0);
             flowRightContent.Name = "flowRightContent";
             flowRightContent.Padding = new Padding(16);
-            flowRightContent.Size = new Size(360, 528);
+            flowRightContent.Size = new Size(360, 649);
             flowRightContent.TabIndex = 0;
             // 
             // lblID
@@ -371,57 +379,109 @@ namespace LBPRDC.Source.Views.Categories
             cmbDepartment.TabIndex = 23;
             cmbDepartment.Visible = false;
             // 
-            // lblSalaryRate
+            // lblDailySalaryRate
             // 
-            lblSalaryRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            lblSalaryRate.AutoSize = true;
-            lblSalaryRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
-            lblSalaryRate.ForeColor = SystemColors.GrayText;
-            lblSalaryRate.Location = new Point(19, 298);
-            lblSalaryRate.Margin = new Padding(3, 0, 3, 2);
-            lblSalaryRate.Name = "lblSalaryRate";
-            lblSalaryRate.Size = new Size(322, 16);
-            lblSalaryRate.TabIndex = 14;
-            lblSalaryRate.Text = "Salary Rate";
-            lblSalaryRate.Visible = false;
+            lblDailySalaryRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            lblDailySalaryRate.AutoSize = true;
+            lblDailySalaryRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblDailySalaryRate.ForeColor = SystemColors.GrayText;
+            lblDailySalaryRate.Location = new Point(19, 298);
+            lblDailySalaryRate.Margin = new Padding(3, 0, 3, 2);
+            lblDailySalaryRate.Name = "lblDailySalaryRate";
+            lblDailySalaryRate.Size = new Size(322, 16);
+            lblDailySalaryRate.TabIndex = 14;
+            lblDailySalaryRate.Text = "Salary Rate (Daily)";
+            lblDailySalaryRate.Visible = false;
             // 
-            // txtSalaryRate
+            // txtDailySalaryRate
             // 
-            txtSalaryRate.AccessibleName = "Salary Rate";
-            txtSalaryRate.Location = new Point(22, 319);
-            txtSalaryRate.Margin = new Padding(6, 3, 3, 12);
-            txtSalaryRate.MaxLength = 100;
-            txtSalaryRate.Name = "txtSalaryRate";
-            txtSalaryRate.Size = new Size(319, 23);
-            txtSalaryRate.TabIndex = 15;
-            txtSalaryRate.Visible = false;
-            txtSalaryRate.KeyPress += ValidateInputIfNumber_KeyPress;
+            txtDailySalaryRate.AccessibleName = "Salary Rate (Daily)";
+            txtDailySalaryRate.Location = new Point(22, 319);
+            txtDailySalaryRate.Margin = new Padding(6, 3, 3, 12);
+            txtDailySalaryRate.MaxLength = 100;
+            txtDailySalaryRate.Name = "txtDailySalaryRate";
+            txtDailySalaryRate.Size = new Size(319, 23);
+            txtDailySalaryRate.TabIndex = 15;
+            txtDailySalaryRate.Visible = false;
+            txtDailySalaryRate.KeyPress += ValidateInputIfNumber_KeyPress;
             // 
-            // lblBillingRate
+            // lblDailyBillingRate
             // 
-            lblBillingRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            lblBillingRate.AutoSize = true;
-            lblBillingRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
-            lblBillingRate.ForeColor = SystemColors.GrayText;
-            lblBillingRate.Location = new Point(19, 354);
-            lblBillingRate.Margin = new Padding(3, 0, 3, 2);
-            lblBillingRate.Name = "lblBillingRate";
-            lblBillingRate.Size = new Size(322, 16);
-            lblBillingRate.TabIndex = 16;
-            lblBillingRate.Text = "Billing Rate";
-            lblBillingRate.Visible = false;
+            lblDailyBillingRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            lblDailyBillingRate.AutoSize = true;
+            lblDailyBillingRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblDailyBillingRate.ForeColor = SystemColors.GrayText;
+            lblDailyBillingRate.Location = new Point(19, 354);
+            lblDailyBillingRate.Margin = new Padding(3, 0, 3, 2);
+            lblDailyBillingRate.Name = "lblDailyBillingRate";
+            lblDailyBillingRate.Size = new Size(322, 16);
+            lblDailyBillingRate.TabIndex = 16;
+            lblDailyBillingRate.Text = "Billing Rate (Daily)";
+            lblDailyBillingRate.Visible = false;
             // 
-            // txtBillingRate
+            // txtDailyBillingRate
             // 
-            txtBillingRate.AccessibleName = "Billing Rate";
-            txtBillingRate.Location = new Point(22, 375);
-            txtBillingRate.Margin = new Padding(6, 3, 3, 12);
-            txtBillingRate.MaxLength = 100;
-            txtBillingRate.Name = "txtBillingRate";
-            txtBillingRate.Size = new Size(319, 23);
-            txtBillingRate.TabIndex = 17;
-            txtBillingRate.Visible = false;
-            txtBillingRate.KeyPress += ValidateInputIfNumber_KeyPress;
+            txtDailyBillingRate.AccessibleName = "Billing Rate (Daily)";
+            txtDailyBillingRate.Location = new Point(22, 375);
+            txtDailyBillingRate.Margin = new Padding(6, 3, 3, 12);
+            txtDailyBillingRate.MaxLength = 100;
+            txtDailyBillingRate.Name = "txtDailyBillingRate";
+            txtDailyBillingRate.Size = new Size(319, 23);
+            txtDailyBillingRate.TabIndex = 17;
+            txtDailyBillingRate.Visible = false;
+            txtDailyBillingRate.KeyPress += ValidateInputIfNumber_KeyPress;
+            // 
+            // lblMonthlySalaryRate
+            // 
+            lblMonthlySalaryRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            lblMonthlySalaryRate.AutoSize = true;
+            lblMonthlySalaryRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblMonthlySalaryRate.ForeColor = SystemColors.GrayText;
+            lblMonthlySalaryRate.Location = new Point(19, 410);
+            lblMonthlySalaryRate.Margin = new Padding(3, 0, 3, 2);
+            lblMonthlySalaryRate.Name = "lblMonthlySalaryRate";
+            lblMonthlySalaryRate.Size = new Size(322, 16);
+            lblMonthlySalaryRate.TabIndex = 26;
+            lblMonthlySalaryRate.Text = "Salary Rate (Monthly)";
+            lblMonthlySalaryRate.Visible = false;
+            // 
+            // txtMonthlySalaryRate
+            // 
+            txtMonthlySalaryRate.AccessibleName = "Salary Rate (Monthly)";
+            txtMonthlySalaryRate.Location = new Point(22, 431);
+            txtMonthlySalaryRate.Margin = new Padding(6, 3, 3, 12);
+            txtMonthlySalaryRate.MaxLength = 100;
+            txtMonthlySalaryRate.Name = "txtMonthlySalaryRate";
+            txtMonthlySalaryRate.Size = new Size(319, 23);
+            txtMonthlySalaryRate.TabIndex = 27;
+            txtMonthlySalaryRate.Visible = false;
+            txtMonthlySalaryRate.KeyPress += ValidateInputIfNumber_KeyPress;
+            // 
+            // lblMonthlyBillingRate
+            // 
+            lblMonthlyBillingRate.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            lblMonthlyBillingRate.AutoSize = true;
+            lblMonthlyBillingRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblMonthlyBillingRate.ForeColor = SystemColors.GrayText;
+            lblMonthlyBillingRate.Location = new Point(19, 466);
+            lblMonthlyBillingRate.Margin = new Padding(3, 0, 3, 2);
+            lblMonthlyBillingRate.Name = "lblMonthlyBillingRate";
+            lblMonthlyBillingRate.Size = new Size(322, 16);
+            lblMonthlyBillingRate.TabIndex = 28;
+            lblMonthlyBillingRate.Text = "Billing Rate (Monthly)";
+            lblMonthlyBillingRate.Visible = false;
+            // 
+            // txtMonthlyBillingRate
+            // 
+            txtMonthlyBillingRate.AccessibleName = "Billing Rate (Monthly)";
+            txtMonthlyBillingRate.Location = new Point(22, 487);
+            txtMonthlyBillingRate.Margin = new Padding(6, 3, 3, 12);
+            txtMonthlyBillingRate.MaxLength = 100;
+            txtMonthlyBillingRate.Name = "txtMonthlyBillingRate";
+            txtMonthlyBillingRate.Size = new Size(319, 23);
+            txtMonthlyBillingRate.TabIndex = 29;
+            txtMonthlyBillingRate.Visible = false;
+            txtMonthlyBillingRate.KeyPress += ValidateInputIfNumber_KeyPress;
             // 
             // lblDescription
             // 
@@ -429,7 +489,7 @@ namespace LBPRDC.Source.Views.Categories
             lblDescription.AutoSize = true;
             lblDescription.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblDescription.ForeColor = SystemColors.GrayText;
-            lblDescription.Location = new Point(19, 410);
+            lblDescription.Location = new Point(19, 522);
             lblDescription.Margin = new Padding(3, 0, 3, 2);
             lblDescription.Name = "lblDescription";
             lblDescription.Size = new Size(322, 16);
@@ -440,7 +500,7 @@ namespace LBPRDC.Source.Views.Categories
             // txtDescription
             // 
             txtDescription.AccessibleName = "Description";
-            txtDescription.Location = new Point(22, 431);
+            txtDescription.Location = new Point(22, 543);
             txtDescription.Margin = new Padding(6, 3, 3, 12);
             txtDescription.MaxLength = 100;
             txtDescription.Name = "txtDescription";
@@ -454,7 +514,7 @@ namespace LBPRDC.Source.Views.Categories
             lblStatus.AutoSize = true;
             lblStatus.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblStatus.ForeColor = SystemColors.GrayText;
-            lblStatus.Location = new Point(19, 466);
+            lblStatus.Location = new Point(19, 578);
             lblStatus.Margin = new Padding(3, 0, 3, 2);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(322, 16);
@@ -468,7 +528,7 @@ namespace LBPRDC.Source.Views.Categories
             cmbStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbStatus.FormattingEnabled = true;
             cmbStatus.Items.AddRange(new object[] { "(Choose Status)", "Active", "Inactive" });
-            cmbStatus.Location = new Point(22, 487);
+            cmbStatus.Location = new Point(22, 599);
             cmbStatus.Margin = new Padding(6, 3, 3, 0);
             cmbStatus.Name = "cmbStatus";
             cmbStatus.Size = new Size(319, 24);
@@ -480,7 +540,7 @@ namespace LBPRDC.Source.Views.Categories
             pnlRightFooter.BackColor = SystemColors.Control;
             pnlRightFooter.Controls.Add(flowFooterActions);
             pnlRightFooter.Dock = DockStyle.Bottom;
-            pnlRightFooter.Location = new Point(0, 568);
+            pnlRightFooter.Location = new Point(0, 689);
             pnlRightFooter.Name = "pnlRightFooter";
             pnlRightFooter.Size = new Size(360, 60);
             pnlRightFooter.TabIndex = 2;
@@ -562,7 +622,7 @@ namespace LBPRDC.Source.Views.Categories
             // 
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 628);
+            pnlFooter.Location = new Point(0, 749);
             pnlFooter.Name = "pnlFooter";
             pnlFooter.Size = new Size(1213, 1);
             pnlFooter.TabIndex = 2;
@@ -574,7 +634,7 @@ namespace LBPRDC.Source.Views.Categories
             pnlVLine1.Dock = DockStyle.Right;
             pnlVLine1.Location = new Point(852, 0);
             pnlVLine1.Name = "pnlVLine1";
-            pnlVLine1.Size = new Size(1, 628);
+            pnlVLine1.Size = new Size(1, 749);
             pnlVLine1.TabIndex = 3;
             // 
             // CategoriesControl
@@ -587,7 +647,7 @@ namespace LBPRDC.Source.Views.Categories
             Controls.Add(pnlFooter);
             Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
             Name = "CategoriesControl";
-            Size = new Size(1213, 629);
+            Size = new Size(1213, 750);
             VisibleChanged += CategoriesControl_VisibleChanged;
             pnlBody.ResumeLayout(false);
             pnlBody.PerformLayout();
@@ -642,5 +702,14 @@ namespace LBPRDC.Source.Views.Categories
         private Label lblClient;
         private ComboBox cmbClient;
         private Button btnDelete;
+        private ComboBox comboBox1;
+        private Label lblDailySalaryRate;
+        private TextBox txtDailySalaryRate;
+        private Label lblDailyBillingRate;
+        private TextBox txtDailyBillingRate;
+        private Label lblMonthlySalaryRate;
+        private TextBox txtMonthlySalaryRate;
+        private Label lblMonthlyBillingRate;
+        private TextBox txtMonthlyBillingRate;
     }
 }

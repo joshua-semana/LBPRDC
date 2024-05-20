@@ -387,7 +387,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex);  }
         }
 
-        public static bool Add(List<BillingAccount> accounts, string billingName)
+        public static async Task<bool> Add(List<BillingAccount> accounts, string billingName)
         {
             try
             {
@@ -433,7 +433,7 @@ namespace LBPRDC.Source.Services
 
                     if (affectedRows > 0)
                     {
-                        LoggingService.LogActivity(new()
+                        await LoggingService.LogActivity(new()
                         {
                             UserID = UserService.CurrentUser.UserID,
                             ActivityType = "New Account",
@@ -546,7 +546,7 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    LoggingService.LogActivity(new()
+                    await LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = "Collect SOA",
@@ -573,7 +573,7 @@ namespace LBPRDC.Source.Services
                 account.Remarks = accountInfo.Remarks;
                 await context.SaveChangesAsync();
 
-                LoggingService.LogActivity(new()
+                await LoggingService.LogActivity(new()
                 {
                     UserID = UserService.CurrentUser.UserID,
                     ActivityType = "Update",
@@ -613,7 +613,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool Remove(string billingName, string accountNumber)
+        public static async Task<bool> Remove(string billingName, string accountNumber)
         {
             try
             {
@@ -639,7 +639,7 @@ namespace LBPRDC.Source.Services
 
                     if (affectedRows > 0)
                     {
-                        LoggingService.LogActivity(new()
+                        await LoggingService.LogActivity(new()
                         {
                             UserID = UserService.CurrentUser.UserID,
                             ActivityType = "Remove Account",

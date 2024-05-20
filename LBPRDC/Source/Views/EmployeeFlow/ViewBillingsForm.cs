@@ -37,10 +37,10 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void ApplySettingsToTable()
         {
-            ControlUtils.AddColumn(dgvBillings, "Description", "Status 1", "Description", true, true); // Verified or Unverified
+            ControlUtils.AddColumn(dgvBillings, "Description", "Status", "Description", true, true); // Verified or Unverified
             ControlUtils.AddColumn(dgvBillings, "BillingName", "Billing Name", "BillingName", true, true);
             ControlUtils.AddColumn(dgvBillings, $"{TimeType}AccountNumber", "SOA", $"{TimeType}AccountNumber", true, true);
-            ControlUtils.AddColumn(dgvBillings, "EntryType", "Type", "EntryType", true, true);
+            //ControlUtils.AddColumn(dgvBillings, "EntryType", "Type", "EntryType", true, true);
             ControlUtils.AddColumn(dgvBillings, "Position", "Position", "Position", true, true);
             ControlUtils.AddColumn(dgvBillings, "SalaryRate", "Salary Rate", "SalaryRate", true, true);
             ControlUtils.AddColumn(dgvBillings, "BillingRate", "Billing Rate", "BillingRate", true, true);

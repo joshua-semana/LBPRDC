@@ -52,6 +52,30 @@ namespace LBPRDC.Source.Services
             return items;
         }
 
+        public static async Task<List<Models.Department.View>> GetAllItemsWithView()
+        {
+            List<Models.Department.View> items = new();
+
+            try
+            {
+                using var context = new Context();
+                items = await context.Departments.Select(s => new Models.Department.View
+                {
+                    ID = s.ID,
+                    ClientID = s.ClientID,
+                    Code = s.Code,
+                    Name = s.Name,
+                    Status = s.Status,
+                    Description = s.Description,
+                    ClientName = s.Client.Name
+                })
+                .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
+        }
+
         public static async Task<List<Models.Department>> GetAllItemsForComboBox(bool WithDefault = true)
         {
             List<Models.Department> items = new();
@@ -166,7 +190,7 @@ namespace LBPRDC.Source.Services
                     .Select(d => new Models.Department()
                     {
                         ID = d.ID,
-                        Name = d.Name,
+                        Name = $"{d.Code} - {d.Name}",
                     })
                     .ToListAsync();
 
@@ -175,37 +199,6 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
-        }
-
-        public static List<string> GetExistenceByID(int departmentID)
-        {
-            List<string> databaseTableNames = new();
-
-            try
-            {
-                using var connection = Database.Connect();
-
-                string QueryCheckExistense = "";
-                List<string> tableNames = new()
-                {
-                    "Employee",
-                    "Locations"
-                };
-
-                List<string> selectQueries = tableNames.Select(name =>
-                    $"SELECT '{name}' AS TableName FROM {name} WHERE DepartmentID = @DepartmentID"
-                ).ToList();
-
-                QueryCheckExistense = string.Join(" UNION ALL ", selectQueries);
-
-                databaseTableNames = connection.Query<string>(QueryCheckExistense, new
-                {
-                    DepartmentID = departmentID
-                }).ToList();
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-
-            return databaseTableNames;
         }
 
         public static async Task<bool> Add(Department data)
@@ -248,7 +241,7 @@ namespace LBPRDC.Source.Services
 
                     if (newInsertedID > 0)
                     {
-                        LoggingService.LogActivity(new()
+                        await LoggingService.LogActivity(new()
                         {
                             UserID = UserService.CurrentUser.UserID,
                             ActivityType = MessagesConstants.Add.TITLE,
@@ -290,7 +283,7 @@ namespace LBPRDC.Source.Services
                 {
                     if (UserService.CurrentUser != null)
                     {
-                        LoggingService.LogActivity(new()
+                        await LoggingService.LogActivity(new()
                         {
                             UserID = UserService.CurrentUser.UserID,
                             ActivityType = MessagesConstants.UPDATE,
@@ -506,8 +499,8 @@ namespace LBPRDC.Source.Services
                 foreach (var item in items)
                 {
                     item.EffectiveDate = item.Timestamp.ToString(StringConstants.Date.DEFAULT);
-                    item.StatusName = (item.Status == StringConstants.Status.ACTIVE) ? StringConstants.DisplayStatus.CURRENT : StringConstants.DisplayStatus.OLD;
-                }
+                    item.StatusName = (item.Status == StringConstants.Status.ACTIVE) ? StringConstants.DisplayStatus.RIGHT_ARROW : "";
+                }   
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 

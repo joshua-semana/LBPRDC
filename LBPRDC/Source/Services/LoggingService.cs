@@ -1,13 +1,4 @@
-﻿using Microsoft.VisualBasic.ApplicationServices;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static LBPRDC.Source.Services.DepartmentService;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+﻿using System.Data.SqlClient;
 
 namespace LBPRDC.Source.Services
 {
@@ -17,13 +8,13 @@ namespace LBPRDC.Source.Services
         {
             public int LogID { get; set; }
             public int UserID { get; set; }
-            public string? ActivityType { get; set; }
-            public string? ActivityDetails { get; set; }
-            public DateTime? Timestamp { get; set; }
-            public string? FullName { get; set; }
+            public string ActivityType { get; set; } = "";
+            public string ActivityDetails { get; set; } = "";
+            public DateTime? Timestamp { get; set; } = DateTime.Now;
+            public string FullName { get; set; } = "";
         }
 
-        public static void LogActivity(Log log)
+        public static async Task LogActivity(Log log)
         {
             try
             {
@@ -40,13 +31,13 @@ namespace LBPRDC.Source.Services
 
                     connection.Open();
 
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync();
                 };
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
-        public static List<Log> GetAllItems()
+        public static async Task<List<Log>> GetAllItems()
         {
             List<Log> items = new();
 
@@ -69,10 +60,14 @@ namespace LBPRDC.Source.Services
                             Timestamp = reader["Timestamp"] as DateTime?
                         };
 
-                        var users = UserService.GetAllUsers();
-                        var currentUser = users.First(f => f.UserID == item.UserID);
+                        var users = await UserService.GetUsers(item.UserID);
 
-                        item.FullName = $"{currentUser.FirstName} {currentUser.LastName}";
+                        if (users != null)
+                        {
+                            var currentUser = users.First();
+                            item.FullName = $"{currentUser.FirstName} {currentUser.LastName}";
+                        }
+
                         items.Add(item);
                     }
                 }

@@ -2,6 +2,7 @@
 using LBPRDC.Source.Config;
 using LBPRDC.Source.Data;
 using System.Reflection;
+using System.Text.Json;
 
 namespace LBPRDC.Source.Services
 {
@@ -61,6 +62,44 @@ namespace LBPRDC.Source.Services
                 return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static List<string> GetEntityExistenceByID(List<string> TableNames, string Entity, int EntityID)
+        {
+            List<string> databaseTableNames = new();
+
+            try
+            {
+                using var connection = Database.Connect();
+
+                string QueryCheckExistense = "";
+
+                List<string> selectQueries = TableNames.Select(name =>
+                    $"SELECT DISTINCT '{name}' AS TableName FROM {name} WHERE {Entity}ID = @EntityID"
+                ).ToList();
+
+                QueryCheckExistense = string.Join(" UNION ALL ", selectQueries);
+
+                databaseTableNames = connection.Query<string>(QueryCheckExistense, new {
+                    EntityID 
+                }).ToList();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return databaseTableNames;
+        }
+
+        public static bool AreEqual<T>(T entity1, T entity2)
+        {
+            if (entity1 == null || entity2 == null)
+            {
+                return false;
+            }
+
+            var json1 = JsonSerializer.Serialize(entity1);
+            var json2 = JsonSerializer.Serialize(entity2);
+
+            return json1.Equals(json2);
         }
     }
 }

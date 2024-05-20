@@ -38,17 +38,15 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             var employee = employeeList.First();
 
             var positions = await PositionService.GetAllEmployeeHistory(EmployeeID);
-            var record = await PreviousEmployeeService.GetEmployeeHistory(EmployeeID);
+            var employeePreviousRecordList = await PreviousEmployeeService.GetEmployeeFormerHistory(EmployeeID);
+            bool isFormerEmployee = employeePreviousRecordList.Any();
 
-            var initialPosition = positions.First(p => p.Remarks == StringConstants.Status.INITIAL);
-            var currentPosition = positions.First(p => p.Status == StringConstants.Status.ACTIVE);
+            var initialPosition = positions.Where(p => p.Remarks == StringConstants.InitialRemarks.POSITION).First();
+            var currentPosition = positions.Where(p => p.Status == StringConstants.Status.ACTIVE).First();
             string noContent = "-";
 
             lblFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
             lblGender.Text = Utilities.StringFormat.ToSentenceCase(employee.Gender);
-            lblBirthday.Text = employee.Birthday.ToString(StringConstants.Date.DEFAULT) ?? noContent;
-            lblEducation.Text = employee.Education ?? noContent;
-            lblCivilStatus.Text = Utilities.StringFormat.ToSentenceCase(employee.CivilStatusName);
             lblEmailAddress1.Text = employee.EmailAddress1 ?? noContent;
             lblEmailAddress2.Text = employee.EmailAddress2 ?? noContent;
             lblContactNumber1.Text = employee.ContactNumber1 ?? noContent;
@@ -62,9 +60,20 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             lblLocation.Text = employee.LocationName;
             lblStatus.Text = Utilities.StringFormat.ToSentenceCase(employee.EmploymentStatusName);
             lblRemarks.Text = employee.Remarks ?? noContent;
-            lblPreviousEmployee.Text = (record.HasRecord) ? "Yes" : "No";
-            lblPeriod.Text = (record.HasRecord) ? $"{record.StartDate.ToString(StringConstants.Date.DEFAULT)} to {record.EndDate.ToString(StringConstants.Date.DEFAULT)}" : "N/A";
-            lblInformation.Text = (record.HasRecord) ? $"({record.Position}) {record.Information}" : "N/A";
+
+            if (isFormerEmployee)
+            {
+                var entity = employeePreviousRecordList.First();
+                lblPreviousEmployee.Text = "Yes";
+                lblPeriod.Text = $"{entity.StartDate.ToString(StringConstants.Date.DEFAULT)} to {entity.EndDate.ToString(StringConstants.Date.DEFAULT)}";
+                lblInformation.Text = $"({entity.Position}) {entity.Information}";
+            }
+            else
+            {
+                lblPreviousEmployee.Text = "No";
+                lblPeriod.Text = "N/A";
+                lblInformation.Text = "N/A";
+            }
         }
 
         private void btnDone_Click(object sender, EventArgs e)

@@ -26,11 +26,13 @@ namespace LBPRDC.Source.Views.Accounts
             };
         }
 
-        private void btnAdd_Click(object sender, EventArgs e)
+        private async void btnAdd_Click(object sender, EventArgs e)
         {
             if (ControlUtils.AreRequiredFieldsFilled(requiredFields))
             {
-                var userCount = UserService.GetAllUsers().Count(f => f.Username == txtUsername.Text);
+                var users = await UserService.GetUsers();
+                var userCount = users.Count(f => f.Username == txtUsername.Text);
+
                 if (userCount > 0)
                 {
                     MessageBox.Show("The username you entered already exists in the database. Please enter a different username.", "Username Already Exists", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -49,15 +51,19 @@ namespace LBPRDC.Source.Views.Accounts
 
         private async void AddNewUserAccount()
         {
-            UserService.User newUser = new()
+            Models.User newUser = new()
             {
                 Username = txtUsername.Text,
-                Password = txtConfirmPassword.Text,
+                PasswordHash = txtConfirmPassword.Text,
                 Email = txtEmailAddress.Text,
                 FirstName = txtFirstName.Text,
-                LastName = txtLastName.Text,
                 MiddleName = txtMiddleName.Text,
-                PositionTitle = txtPositionTitle.Text
+                LastName = txtLastName.Text,
+                PositionTitle = txtPositionTitle.Text,
+                Role = StringConstants.UserRole.STANDARD,
+                Status = StringConstants.Status.ACTIVE,
+                RegistrationDate = DateTime.Now,
+                LastLoginDate = DateTime.Now,
             };
 
             bool isAdded = await UserService.Add(newUser);

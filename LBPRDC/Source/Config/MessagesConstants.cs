@@ -8,6 +8,14 @@
         public const string CONFIRMATION = "Confirmation";
         public const string INVALID_INPUT = "Invalid Input";
 
+        public class Operation
+        {
+            public const string ADD = "Add";
+            public const string UPDATE = "Update";
+            public const string DELETE = "Delete";
+            public const string RESET_PASSWORD = "Reset Password";
+        }
+
         public class Action
         {
             public const string UPDATE = "Update";
@@ -25,6 +33,8 @@
             public const string MISSING_CLIENT_BILLING = "Client and billing information is missing. Operation will be cancelled.";
             public const string MISSING_ACCRUALS = "Accruals information is missing. Operation will be cancelled. Please upload accruals data to this billing.";
             public const string MISSING_EMPLOYEE = "Employee information is missing. Operation will be cancelled. Please try again.";
+            public const string MISSING_USER = "User information is missing. Operation will be cancelled. Please try again.";
+            public const string CANT_RETRIEVE = "Unable to retrieve information.";
         }
 
         public class Billing

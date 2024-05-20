@@ -208,7 +208,7 @@
             Name = "ViewBillingsForm";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "ViewBillingsForm";
+            Text = "All Billings";
             Load += ViewBillingsForm_Load;
             pnlFooter.ResumeLayout(false);
             flowLayoutPanel1.ResumeLayout(false);

@@ -101,61 +101,37 @@ namespace LBPRDC.Source.Services
             return items;
         }
 
-        public static List<EmploymentStatus> GetAllItemsForComboBox()
+        public static async Task<List<Models.EmploymentStatus>> GetAllItemsForComboBox(bool withDefault = true)
         {
-            List<EmploymentStatus> items = new();
+            List<Models.EmploymentStatus> items = new();
 
             try
             {
-                items.Add(new EmploymentStatus
+                if (withDefault)
                 {
-                    ID = 0,
-                    Name = StringConstants.ComboBox.DEFAULT_EMPLOYMENT_STATUS
-                });
+                    items.Add(new Models.EmploymentStatus
+                    {
+                        ID = 0,
+                        Name = StringConstants.ComboBox.DEFAULT_EMPLOYMENT_STATUS
+                    });
+                }
 
-                using var connection = Database.Connect();
-                string QuerySelect = "SELECT ID, Name FROM EmploymentStatus WHERE Status = @Status";
+                using var context = new Context();
 
-                var result = connection.Query<EmploymentStatus>(QuerySelect, new
-                {
-                    Status = StringConstants.Status.ACTIVE
-                }).ToList();
+                var result = await context.EmploymentStatus
+                    .Where(w => w.Status.Equals(StringConstants.Status.ACTIVE))
+                    .Select(s => new Models.EmploymentStatus
+                    {
+                        ID = s.ID,
+                        Name = s.Name
+                    })
+                    .ToListAsync();
 
                 items.AddRange(result);
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
-        }
-
-        public static List<string> GetExistenceByID(int employmentStatusID)
-        {
-            List<string> databaseTableNames = new();
-
-            try
-            {
-                using var connection = Database.Connect();
-
-                string QueryCheckExistense = "";
-                List<string> tableNames = new()
-                {
-                    "Employee"
-                };
-
-                List<string> selectQueries = tableNames.Select(name =>
-                    $"SELECT DISTINCT '{name}' AS TableName FROM {name} WHERE EmploymentStatusID = @EmploymentStatusID"
-                ).ToList();
-
-                QueryCheckExistense = string.Join(" UNION ALL ", selectQueries);
-
-                databaseTableNames = connection.Query<string>(QueryCheckExistense, new
-                {
-                    EmploymentStatusID = employmentStatusID
-                }).ToList();
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-
-            return databaseTableNames;
         }
 
         public static async Task <bool> Add(EmploymentStatus data)
@@ -184,7 +160,7 @@ namespace LBPRDC.Source.Services
 
                 if (UserService.CurrentUser != null)
                 {
-                    LoggingService.LogActivity(new()
+                    await LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
                         ActivityType = MessagesConstants.Add.TITLE,
@@ -222,7 +198,7 @@ namespace LBPRDC.Source.Services
                 {
                     if (UserService.CurrentUser != null)
                     {
-                        LoggingService.LogActivity(new()
+                        await LoggingService.LogActivity(new()
                         {
                             UserID = UserService.CurrentUser.UserID,
                             ActivityType = MessagesConstants.UPDATE,
@@ -436,7 +412,7 @@ namespace LBPRDC.Source.Services
                     var currentItem = allItems.First(f => f.ID == item.EmploymentStatusID);
                     item.Name = Utilities.StringFormat.ToSentenceCase(currentItem.Name);
                     item.EffectiveDate = item.Timestamp?.ToString(StringConstants.Date.DEFAULT);
-                    item.StatusName = (item.Status == StringConstants.Status.ACTIVE) ? StringConstants.DisplayStatus.CURRENT : StringConstants.DisplayStatus.OLD;
+                    item.StatusName = (item.Status == StringConstants.Status.ACTIVE) ? StringConstants.DisplayStatus.RIGHT_ARROW : "";
                 }
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }

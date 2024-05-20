@@ -1,5 +1,8 @@
 ﻿using LBPRDC.Source.Config;
 using System.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using static LBPRDC.Source.Data.Database;
+using static LBPRDC.Source.Config.StringConstants;
 
 namespace LBPRDC.Source.Services
 {
@@ -9,201 +12,157 @@ namespace LBPRDC.Source.Services
         public class User
         {
             public int UserID { get; set; }
-            public string? Username { get; set; }
-            public string? Password { get; set; }
-            public string? Email { get; set; }
-            public string? FirstName { get; set; }
-            public string? LastName { get; set;}
-            public string? Role { get; set; }
-            public string? Status { get; set; }
-            public DateTime? RegistrationDate { get; set; }
-            public DateTime? LastLoginDate { get; set; }
-            public string? MiddleName { get; set; }
-            public string? PositionTitle { get; set; }
+            public string Username { get; set; } = "";
+            public string Password { get; set; } = "";
+            public string Email { get; set; } = "";
+            public string FirstName { get; set; } = "";
+            public string LastName { get; set;} = "";
+            public string Role { get; set; } = "";
+            public string Status { get; set; } = "";
+            public DateTime RegistrationDate { get; set; }
+            public DateTime LastLoginDate { get; set; }
+            public string MiddleName { get; set; } = "";
+            public string PositionTitle { get; set; } = "";
 
         }
 
-        public static User? CurrentUser { get; set; }
+        public static Models.User CurrentUser { get; set; } = new Models.User();
 
-        public static void SetCurrentUser(User user)
+        public static void SetCurrentUser(Models.User user)
         {
             CurrentUser = user;
         }
 
         public static void ClearCurrentUser()
         {
-            CurrentUser = null;
+            CurrentUser = new Models.User();
         }
 
-        public static List<User> GetAllUsers()
+        public static async Task<List<Models.User>> GetUsers(int? ID = null, string? Username = null)
         {
-            List<User> users = new();
+            List<Models.User> users = new();
+
             try
             {
-                string query = "SELECT * FROM Users";
+                using var context = new Context();
+                var query = context.Users.AsQueryable();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
+                if (ID.HasValue)
                 {
-                    connection.Open();
-
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            User user = new()
-                            {
-                                UserID = Convert.ToInt32(reader["UserID"]),
-                                Username = Convert.ToString(reader["Username"]),
-                                FirstName = Convert.ToString(reader["FirstName"]),
-                                LastName = Convert.ToString(reader["LastName"]),
-                                Email = Convert.ToString(reader["Email"]),
-                                Role = Convert.ToString(reader["Role"]),
-                                Status = Convert.ToString(reader["Status"]),
-                                RegistrationDate = Convert.ToDateTime(reader["RegistrationDate"]),
-                                LastLoginDate = Convert.ToDateTime(reader["LastLoginDate"]),
-                                MiddleName = Convert.ToString(reader["MiddleName"]),
-                                PositionTitle = Convert.ToString(reader["PositionTitle"])
-                            };
-
-                            users.Add(user);
-                        }
-                    }
+                    query = query.Where(w => w.UserID == ID);
                 }
+
+                if (Username != null)
+                {
+                    query = query.Where(w => w.Username == Username);
+                }
+
+                users = await query.Select(s => new Models.User
+                {
+                    UserID = s.UserID,
+                    Username = s.Username,
+                    Email = s.Email,
+                    FirstName = s.FirstName,
+                    MiddleName = s.MiddleName,
+                    LastName = s.LastName,
+                    PositionTitle = s.PositionTitle,
+                    Role = s.Role,
+                    Status = s.Status,
+                    RegistrationDate = s.RegistrationDate,
+                    LastLoginDate = s.LastLoginDate
+                })
+                .ToListAsync();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return users;
         }
 
-        public static async Task<bool> Add(User newUser)
+        public static async Task<bool> Add(Models.User newUser)
         {
             try
             {
-                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newUser.Password);
+                using var context = new Context();
 
-                string query = "INSERT INTO Users (Username, PasswordHash, Email, FirstName, LastName, Role, Status, RegistrationDate, LastLoginDate, MiddleName, PositionTitle) " +
-                               "VALUES (@Username, @PasswordHash, @Email, @FirstName, @LastName, @Role, @Status, @RegistrationDate, @LastLoginDate, @MiddleName, @PositionTitle)";
+                newUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newUser.PasswordHash);
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
+                context.Users.Add(newUser);
+                await context.SaveChangesAsync();
+
+                await LoggingService.LogActivity(new()
                 {
-                    command.Parameters.AddWithValue("@Username", newUser.Username);
-                    command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
-                    command.Parameters.AddWithValue("@Email", newUser.Email);
-                    command.Parameters.AddWithValue("@FirstName", newUser.FirstName);
-                    command.Parameters.AddWithValue("@LastName", newUser.LastName);
-                    command.Parameters.AddWithValue("@Role", "Standard");
-                    command.Parameters.AddWithValue("@Status", StringConstants.Status.ACTIVE);
-                    command.Parameters.AddWithValue("@RegistrationDate", DateTime.Now);
-                    command.Parameters.AddWithValue("@LastLoginDate", DateTime.Now);
-                    command.Parameters.AddWithValue("@MiddleName", newUser.MiddleName);
-                    command.Parameters.AddWithValue("@PositionTitle", newUser.PositionTitle);
+                    UserID = CurrentUser.UserID,
+                    ActivityType = MessagesConstants.Operation.ADD,
+                    ActivityDetails = $"Added User: {newUser.UserID} - {newUser.Username}"
+                });
 
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
-
-                    if (CurrentUser != null)
-                    {
-                        LoggingService.Log newLog = new()
-                        {
-                            UserID = CurrentUser.UserID,
-                            ActivityType = MessagesConstants.Add.TITLE,
-                            ActivityDetails = $"This user added a new user account with username of {newUser.Username}."
-                        };
-
-                        LoggingService.LogActivity(newLog);
-                    }
-                }
                 return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static void UpdateLastLoginDate(string username)
+        public static async Task UpdateLastLoginDate(int ID)
         {
             try
             {
-                string query = "UPDATE Users SET LastLoginDate = @LastLoginDate WHERE Username = @Username";
+                using var context = new Context();
+                var user = await context.Users.FindAsync(ID);
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Username", username);
-                    command.Parameters.AddWithValue("@LastLoginDate", DateTime.Now);
+                if (user  == null) { return; }
 
-                    connection.Open();
-
-                    command.ExecuteNonQuery();
-                }
+                user.LastLoginDate = DateTime.Now;
+                await context.SaveChangesAsync();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
-        public static async Task<bool> UpdateUserStatusRole(User user)
+        public static async Task<bool> UpdateUserStatusRole(Models.User data)
         {
             try
             {
-                string query = "UPDATE Users SET " +
-                    "Role = @Role, " +
-                    "Status = @Status " +
-                    "WHERE UserID = @UserID";
+                using var context = new Context();
+                var user = await context.Users.FindAsync(data.UserID);
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
+                if (user == null) { return false; }
+
+                user.Role = data.Role;
+                user.Status = data.Status;
+
+                await context.SaveChangesAsync();
+
+                await LoggingService.LogActivity(new()
                 {
-                    command.Parameters.AddWithValue("@Role", user.Role);
-                    command.Parameters.AddWithValue("@Status", user.Status);
-                    command.Parameters.AddWithValue("@UserID", user.UserID);
+                    UserID = CurrentUser.UserID,
+                    ActivityType = MessagesConstants.Operation.UPDATE,
+                    ActivityDetails = $"Update User's Status and/or Role: {data.UserID}"
+                });
 
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
-
-                    if (CurrentUser != null)
-                    {
-                        LoggingService.Log newLog = new()
-                        {
-                            UserID = CurrentUser.UserID,
-                            ActivityType = MessagesConstants.UPDATE,
-                            ActivityDetails = $"This user updated a user's status and/or role with a username of {user.Username}."
-                        };
-
-                        LoggingService.LogActivity(newLog);
-                    }
-                }
                 return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static async Task<bool> ResetPassword(User user)
+        public static async Task<bool> ResetPassword(Models.User data)
         {
             try
             {
-                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                using var context = new Context();
 
-                string updateQuery = "UPDATE Users SET PasswordHash = @PasswordHash WHERE UserID = @UserID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
+                var user = await context.Users.FindAsync(data.UserID);
+
+                if (user == null) { return false; }
+
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(data.PasswordHash);
+
+                await context.SaveChangesAsync();
+
+                await LoggingService.LogActivity(new()
                 {
-                    command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
-                    command.Parameters.AddWithValue("@UserID", user.UserID);
+                    UserID = CurrentUser.UserID,
+                    ActivityType = MessagesConstants.Operation.RESET_PASSWORD,
+                    ActivityDetails = $"Resets Password: {data.UserID}"
+                });
 
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
-
-                    if (CurrentUser != null)
-                    {
-                        LoggingService.Log newLog = new()
-                        {
-                            UserID = CurrentUser.UserID,
-                            ActivityType = "Reset",
-                            ActivityDetails = $"This user resets the password of a user with ID of {user.UserID}."
-                        };
-
-                        LoggingService.LogActivity(newLog);
-                    }
-                }
                 return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }

@@ -14,7 +14,7 @@ namespace LBPRDC.Source.Views
     {
         UserControl loadingControl = new ucLoading() { Dock = DockStyle.Fill };
 
-        private UserPreference? preference;
+        private UserPreference preference = new();
         private int EmployeeID;
         private string strEmployeeID = "";
 
@@ -46,6 +46,7 @@ namespace LBPRDC.Source.Views
 
         public void ResetTableSearchFilter()
         {
+            preference = UserPreferenceManager.LoadPreference();
             txtSearch.Text = string.Empty;
             ControlUtils.ResetFilters(flowFilters);
             ApplyFilterAndSearchThenPopulate();
@@ -122,8 +123,7 @@ namespace LBPRDC.Source.Views
         private async void PopulateTableWithFilterAndSearch(List<int> departmentIDs, List<int> positionIDs, List<int> employmentStatusIDs, List<int> wageIDs, string searchWord, int clientID)
         {
             ShowLoadingProgressBar(true);
-            preference = UserPreferenceManager.LoadPreference();
-            var employees = await Task.Run(() => EmployeeService.GetEmployeesWithPreferenceByClientID(ClientID));
+            var employees = await Task.Run(() => EmployeeService.GetEmployeesTableViewByClientID(clientID));
 
             dgvEmployees.Columns.Clear();
 
@@ -192,11 +192,9 @@ namespace LBPRDC.Source.Views
                 }
             }
             ControlUtils.AddColumn(dgvEmployees, "Gender", "Gender", "Gender", preference.ShowGender, true);
-            ControlUtils.AddColumn(dgvEmployees, "Birthday", "Birthday", "Birthday", preference.ShowBirthday, true);
-            ControlUtils.AddColumn(dgvEmployees, "Education", "Education", "Education", preference.ShowEducation, true);
-            ControlUtils.AddColumn(dgvEmployees, "CivilStatusName", "Civil Status", "CivilStatusName", preference.ShowCivilStatus, true);
             ControlUtils.AddColumn(dgvEmployees, "JoinedEmailAddress", "Email Address", "JoinedEmailAddress", preference.ShowEmailAddress, true);
             ControlUtils.AddColumn(dgvEmployees, "JoinedContactNumber", "Contact Number", "JoinedContactNumber", preference.ShowContactNumber, true);
+            ControlUtils.AddColumn(dgvEmployees, "ClassificationName", "Classification", "ClassificationName", preference.ShowClassification, true);
             ControlUtils.AddColumn(dgvEmployees, "DepartmentName", "Department", "DepartmentName", preference.ShowDepartment, true);
             ControlUtils.AddColumn(dgvEmployees, "LocationName", "Location", "LocationName", preference.ShowLocation, true);
             ControlUtils.AddColumn(dgvEmployees, "PositionInfo", "Position", "PositionInfo", preference.ShowPosition, true);
@@ -329,22 +327,13 @@ namespace LBPRDC.Source.Views
             frmUpdatePosition.ShowDialog();
         }
 
-        private void menuUpdateCivilStatus_Click(object sender, EventArgs e)
-        {
-            UpdateCivilStatusForm frmUpdateCivilStatus = new()
-            {
-                ParentControl = this,
-                EmployeeID = EmployeeID
-            };
-            frmUpdateCivilStatus.ShowDialog();
-        }
-
         private void menuUpdateEmploymentStatus_Click(object sender, EventArgs e)
         {
             UpdateEmploymentStatusForm frmUpdateEmploymentStatus = new()
             {
                 ParentControl = this,
-                EmployeeID = EmployeeID
+                EmployeeID = EmployeeID,
+                ClientID = ClientID
             };
             frmUpdateEmploymentStatus.ShowDialog();
         }
@@ -391,7 +380,8 @@ namespace LBPRDC.Source.Views
             ViewHistory frmViewHistory = new()
             {
                 HistoryType = type,
-                EmployeeID = EmployeeID
+                EmployeeID = EmployeeID,
+                ClientID = ClientID
             };
             frmViewHistory.ShowDialog();
         }
@@ -399,11 +389,6 @@ namespace LBPRDC.Source.Views
         private void menuHistoryPosition_Click(object sender, EventArgs e)
         {
             ViewEmployeeHistory("Position");
-        }
-
-        private void menuHistoryCivilStatus_Click(object sender, EventArgs e)
-        {
-            ViewEmployeeHistory("Civil Status");
         }
 
         private void menuHistoryEmploymentStatus_Click(object sender, EventArgs e)
@@ -427,7 +412,7 @@ namespace LBPRDC.Source.Views
             {
                 var selectedClient = (Client)cmbClient.SelectedItem;
                 ClientID = selectedClient.ID;
-                ApplyFilterAndSearchThenPopulate();
+                ResetTableSearchFilter();
                 PopulateFilters();
             }
             else

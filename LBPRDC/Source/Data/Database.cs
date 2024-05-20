@@ -11,24 +11,30 @@ namespace LBPRDC.Source.Data
     {
         public class Context : DbContext
         {
-            public DbSet<Models.Client> Clients { get; set; }
-            public DbSet<Models.Employee> Employee { get; set; }
-            public DbSet<Models.Position> Position { get; set; }
-            public DbSet<Models.CivilStatus> CivilStatus { get; set; }
+            public DbSet<Models.User> Users { get; set; }
+
+            public DbSet<Models.Employee> Employees { get; set; }
+            public DbSet<Models.EmployeeArchive> EmployeeArchives { get; set; }
+
             public DbSet<Models.EmploymentStatus> EmploymentStatus { get; set; }
+
+            public DbSet<Models.Client> Clients { get; set; }
+            public DbSet<Models.Classification> Classifications { get; set; }
+            public DbSet<Models.Wage> Wages { get; set; }
+            public DbSet<Models.Position> Position { get; set; }
             public DbSet<Models.Department> Departments { get; set; }
             public DbSet<Models.Location> Locations { get; set; }
-            public DbSet<Models.Wage> Wages { get; set; }
-            public DbSet<Models.EmployeeArchive> EmployeeArchives { get; set; }
+
             public DbSet<Models.Employee.History> EmployeePreviousRecord { get; set; }
-            public DbSet<Models.Position.History> EmployeePositionHistory { get; set; }
-            public DbSet<Models.CivilStatus.History> EmployeeCivilStatusHistory { get; set; }
             public DbSet<Models.EmploymentStatus.History> EmployeeEmploymentHistory { get; set; }
             public DbSet<Models.Department.History> EmployeeDepartmentLocationHistory { get; set; }
+            public DbSet<Models.Position.History> EmployeePositionHistory { get; set; }
+            public DbSet<Models.Position.RatesHistory> PositionRatesHistory { get; set; }
+
             public DbSet<Models.Billing> Billing { get; set; }
+            public DbSet<Models.Billing.Record> BillingRecord { get; set; }
             public DbSet<Models.Billing.Account> BillingAccounts { get; set; }
             public DbSet<Models.Billing.Account.Equipment> BillingAccountEquipments { get; set; }
-            public DbSet<Models.Billing.Record> BillingRecord { get; set; }
 
             protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             {

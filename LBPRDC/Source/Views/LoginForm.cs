@@ -46,8 +46,15 @@ namespace LBPRDC.Source.Views
                     return;
                 }
 
-                var userDetails = UserService.GetAllUsers().First(f => f.Username == username);
-                UserService.SetCurrentUser(userDetails);
+                var users = await UserService.GetUsers(Username: username);
+
+                if (!users.Any())
+                {
+                    MessageBox.Show(MessagesConstants.Error.MISSING_USER, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                UserService.SetCurrentUser(users.First());
                 var currentUser = UserService.CurrentUser;
 
                 if (currentUser == null)
@@ -69,8 +76,8 @@ namespace LBPRDC.Source.Views
                     ActivityDetails = "This user signed in."
                 };
 
-                await Task.Run(() => LoggingService.LogActivity(newLog));
-                await Task.Run(() => UserService.UpdateLastLoginDate(username));
+                await LoggingService.LogActivity(newLog);
+                await UserService.UpdateLastLoginDate(currentUser.UserID);
 
                 try
                 {

@@ -379,8 +379,8 @@ namespace LBPRDC.Source.Services
                             PositionID = positionID,
                             Department = currentEmployee.DepartmentName,
                             Location = currentEmployee.LocationName,
-                            BillingRate = positionAndRates.First(f => f.ID == positionID).BillingRate,
-                            SalaryRate = positionAndRates.First(f => f.ID == positionID).SalaryRate,
+                            DailyBillingRate = positionAndRates.First(f => f.ID == positionID).DailyBillingRate,
+                            DailySalaryRate = positionAndRates.First(f => f.ID == positionID).DailySalaryRate,
                             TimeDetails = new EntryTimeDetails
                             {
                                 RegularHours = RegularHours,
@@ -742,7 +742,7 @@ namespace LBPRDC.Source.Services
             sheet.Cells[$"B{row}"].Value = $"{entry.FullName}{(entry.FinalReportRemarks != null && entry.FinalReportRemarks != "" ? " - " + entry.FinalReportRemarks : "")}";
             sheet.Cells[$"B{row + 1}"].Value = entry.EmployeeID;
             sheet.Cells[$"C{row}"].Value = entry.Position;
-            sheet.Cells[$"D{row}"].Value = entry.BillingRate;
+            sheet.Cells[$"D{row}"].Value = entry.DailyBillingRate;
             sheet.Cells[$"E{row}"].Value = entry.TimeDetails?.RegularHours.TotalHours / 8;
             sheet.Cells[$"F{row}"].Formula = $"=ROUND(D{row}*E{row},2)";
             sheet.Cells[$"G{row + 1}"].Value = (entry.TimeDetails?.UnderTime.TotalMinutes > 0) ? entry.TimeDetails.UnderTime.TotalMinutes : "";
@@ -844,12 +844,12 @@ namespace LBPRDC.Source.Services
         private static (int, int) AddToOvertimeSheet(int BillingID, int ClientID, ExcelWorksheet sheet, Entry entry, int index, int row, string accountNumber, string billingName, string exportType)
         {
             var time = entry.TimeDetails;
-            decimal convertedRate = Convert.ToDecimal(entry.BillingRate);
+            decimal convertedRate = Convert.ToDecimal(entry.DailyBillingRate);
             sheet.Cells[$"A{row}"].Value = index;
             sheet.Cells[$"B{row}"].Value = $"{entry.FullName}{(entry.FinalReportRemarks != null && entry.FinalReportRemarks != "" ? " - " + entry.FinalReportRemarks : "")}";
             sheet.Cells[$"B{row + 1}"].Value = entry.EmployeeID;
             sheet.Cells[$"C{row}"].Value = entry.Position;
-            sheet.Cells[$"D{row}"].Value = entry.BillingRate;
+            sheet.Cells[$"D{row}"].Value = entry.DailyBillingRate;
             sheet.Cells[$"E{row}"].Value = time?.RegularHours.TotalHours / 8;
 
             sheet.Cells[$"F{row + 1}"].Value = (time?.RegOT_125 > TimeSpan.Zero) ? time.RegOT_125 : "";
@@ -1096,8 +1096,8 @@ namespace LBPRDC.Source.Services
                         Position = entry.Position,
                         Department = entry.Department,
                         TimeDetailJSON = timeJSON,
-                        SalaryRate = entry.SalaryRate,
-                        BillingRate = entry.BillingRate,
+                        DailySalaryRate = entry.DailySalaryRate,
+                        DailyBillingRate = entry.DailyBillingRate,
                         //BillingName = billingName,
                         RegularAccountNumber = accountNumber,
                         OvertimeAccountNumber = "",
