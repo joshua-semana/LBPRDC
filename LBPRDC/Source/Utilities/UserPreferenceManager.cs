@@ -22,10 +22,8 @@ namespace LBPRDC.Source.Utilities
                     ShowName = true,
                     SelectedNameFormat = NameFormat.Full1,
                     ShowGender = true,
-                    ShowBirthday = true,
-                    ShowEducation = true,
-                    ShowCivilStatus = true,
                     ShowEmploymentStatus = true,
+                    ShowClassification = true,
                     ShowDepartment = true,
                     ShowLocation = true,
                     ShowEmailAddress = true,
@@ -35,7 +33,8 @@ namespace LBPRDC.Source.Utilities
                     ShowPosition = true,
                     SelectedPositionFormat = PositionFormat.NameOnly,
                     ShowSalaryRate = true,
-                    ShowBillingRate = true
+                    ShowBillingRate = true,
+                    ShowWageType = true
                 };
             }
         }

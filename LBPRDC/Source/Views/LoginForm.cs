@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using BCrypt.Net;
+﻿using LBPRDC.Source.Config;
 using LBPRDC.Source.Services;
 
 namespace LBPRDC.Source.Views
@@ -55,17 +46,24 @@ namespace LBPRDC.Source.Views
                     return;
                 }
 
-                var userDetails = UserService.GetAllUsers().First(f => f.Username == username);
-                UserService.SetCurrentUser(userDetails);
+                var users = await UserService.GetUsers(Username: username);
+
+                if (!users.Any())
+                {
+                    MessageBox.Show(MessagesConstants.Error.MISSING_USER, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                UserService.SetCurrentUser(users.First());
                 var currentUser = UserService.CurrentUser;
 
                 if (currentUser == null)
                 {
-                    MessageBox.Show("Failed to get user info. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Failed to get user info. Please try again.", MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                if (currentUser.Status != "Active")
+                if (currentUser.Status != StringConstants.Status.ACTIVE)
                 {
                     MessageBox.Show("Invalid username or password.", "Authentication Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -78,13 +76,21 @@ namespace LBPRDC.Source.Views
                     ActivityDetails = "This user signed in."
                 };
 
-                await Task.Run(() => LoggingService.LogActivity(newLog));
-                await Task.Run(() => UserService.UpdateLastLoginDate(username));
+                await LoggingService.LogActivity(newLog);
+                await UserService.UpdateLastLoginDate(currentUser.UserID);
 
-                this.Hide();
-                frmMain mainForm = new();
-                mainForm.ShowDialog();
-                this.Close();
+                try
+                {
+                    this.Hide();
+                    frmMain mainForm = new();
+                    mainForm.ShowDialog();
+                    this.Close();
+                }
+                catch (Exception ex)
+                {
+                    this.Show();
+                    ExceptionHandler.HandleException(ex);
+                }
             }
             catch (Exception ex)
             {

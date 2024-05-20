@@ -88,9 +88,6 @@
     <Compile Update="Source\Views\EmployeeFlow\Settings.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Source\Views\EmployeeFlow\UpdateCivilStatusForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Update="Source\Views\EmployeeFlow\UpdateDepartmentLocationForm.cs">
       <SubType>Form</SubType>
     </Compile>

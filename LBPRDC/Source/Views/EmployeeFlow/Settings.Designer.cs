@@ -40,9 +40,6 @@
             rdbName4 = new RadioButton();
             rdbName5 = new RadioButton();
             chkGender = new CheckBox();
-            chkBirthday = new CheckBox();
-            chkEducation = new CheckBox();
-            chkCivilStatus = new CheckBox();
             chkDepartment = new CheckBox();
             chkLocation = new CheckBox();
             chkEmailAddress = new CheckBox();
@@ -58,6 +55,7 @@
             rdbPosition1 = new RadioButton();
             rdbPosition2 = new RadioButton();
             rdbPosition3 = new RadioButton();
+            chkWageType = new CheckBox();
             chkSalaryRate = new CheckBox();
             chkBillingRate = new CheckBox();
             chkEmploymentStatus = new CheckBox();
@@ -65,6 +63,7 @@
             flowControls = new FlowLayoutPanel();
             btnApply = new Button();
             btnCancel = new Button();
+            chkClassification = new CheckBox();
             tabControl1.SuspendLayout();
             tabTableSettings.SuspendLayout();
             flowLayoutPanel1.SuspendLayout();
@@ -83,7 +82,7 @@
             tabControl1.Margin = new Padding(0);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(370, 406);
+            tabControl1.Size = new Size(370, 489);
             tabControl1.TabIndex = 0;
             // 
             // tabTableSettings
@@ -96,7 +95,7 @@
             tabTableSettings.Location = new Point(4, 27);
             tabTableSettings.Name = "tabTableSettings";
             tabTableSettings.Padding = new Padding(8);
-            tabTableSettings.Size = new Size(362, 375);
+            tabTableSettings.Size = new Size(362, 458);
             tabTableSettings.TabIndex = 0;
             tabTableSettings.Text = "Columns";
             // 
@@ -107,17 +106,16 @@
             flowLayoutPanel1.Controls.Add(chkName);
             flowLayoutPanel1.Controls.Add(flowRadioGroupForName);
             flowLayoutPanel1.Controls.Add(chkGender);
-            flowLayoutPanel1.Controls.Add(chkBirthday);
-            flowLayoutPanel1.Controls.Add(chkEducation);
-            flowLayoutPanel1.Controls.Add(chkCivilStatus);
-            flowLayoutPanel1.Controls.Add(chkDepartment);
-            flowLayoutPanel1.Controls.Add(chkLocation);
             flowLayoutPanel1.Controls.Add(chkEmailAddress);
             flowLayoutPanel1.Controls.Add(flowRadioGroupForEmail);
             flowLayoutPanel1.Controls.Add(chkContactNumber);
             flowLayoutPanel1.Controls.Add(flowRadioGroupForContact);
+            flowLayoutPanel1.Controls.Add(chkClassification);
+            flowLayoutPanel1.Controls.Add(chkDepartment);
+            flowLayoutPanel1.Controls.Add(chkLocation);
             flowLayoutPanel1.Controls.Add(chkPosition);
             flowLayoutPanel1.Controls.Add(flowRadioGroupForPosition);
+            flowLayoutPanel1.Controls.Add(chkWageType);
             flowLayoutPanel1.Controls.Add(chkSalaryRate);
             flowLayoutPanel1.Controls.Add(chkBillingRate);
             flowLayoutPanel1.Controls.Add(chkEmploymentStatus);
@@ -125,7 +123,7 @@
             flowLayoutPanel1.Location = new Point(11, 29);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Padding = new Padding(0, 8, 0, 0);
-            flowLayoutPanel1.Size = new Size(321, 739);
+            flowLayoutPanel1.Size = new Size(321, 731);
             flowLayoutPanel1.TabIndex = 1;
             // 
             // chkEmployeeID
@@ -231,44 +229,14 @@
             chkGender.Location = new Point(3, 207);
             chkGender.Name = "chkGender";
             chkGender.Size = new Size(79, 22);
-            chkGender.TabIndex = 2;
+            chkGender.TabIndex = 4;
             chkGender.Text = "Gender";
             chkGender.UseVisualStyleBackColor = true;
-            // 
-            // chkBirthday
-            // 
-            chkBirthday.AutoSize = true;
-            chkBirthday.Location = new Point(3, 235);
-            chkBirthday.Name = "chkBirthday";
-            chkBirthday.Size = new Size(84, 22);
-            chkBirthday.TabIndex = 3;
-            chkBirthday.Text = "Birthday";
-            chkBirthday.UseVisualStyleBackColor = true;
-            // 
-            // chkEducation
-            // 
-            chkEducation.AutoSize = true;
-            chkEducation.Location = new Point(3, 263);
-            chkEducation.Name = "chkEducation";
-            chkEducation.Size = new Size(97, 22);
-            chkEducation.TabIndex = 4;
-            chkEducation.Text = "Education";
-            chkEducation.UseVisualStyleBackColor = true;
-            // 
-            // chkCivilStatus
-            // 
-            chkCivilStatus.AutoSize = true;
-            chkCivilStatus.Location = new Point(3, 291);
-            chkCivilStatus.Name = "chkCivilStatus";
-            chkCivilStatus.Size = new Size(105, 22);
-            chkCivilStatus.TabIndex = 21;
-            chkCivilStatus.Text = "Civil Status";
-            chkCivilStatus.UseVisualStyleBackColor = true;
             // 
             // chkDepartment
             // 
             chkDepartment.AutoSize = true;
-            chkDepartment.Location = new Point(3, 319);
+            chkDepartment.Location = new Point(3, 431);
             chkDepartment.Name = "chkDepartment";
             chkDepartment.Size = new Size(109, 22);
             chkDepartment.TabIndex = 7;
@@ -278,7 +246,7 @@
             // chkLocation
             // 
             chkLocation.AutoSize = true;
-            chkLocation.Location = new Point(3, 347);
+            chkLocation.Location = new Point(3, 459);
             chkLocation.Name = "chkLocation";
             chkLocation.Size = new Size(87, 22);
             chkLocation.TabIndex = 30;
@@ -288,7 +256,7 @@
             // chkEmailAddress
             // 
             chkEmailAddress.AutoSize = true;
-            chkEmailAddress.Location = new Point(3, 375);
+            chkEmailAddress.Location = new Point(3, 235);
             chkEmailAddress.Name = "chkEmailAddress";
             chkEmailAddress.Size = new Size(128, 22);
             chkEmailAddress.TabIndex = 5;
@@ -301,7 +269,7 @@
             // 
             flowRadioGroupForEmail.Controls.Add(rdbEmail1);
             flowRadioGroupForEmail.Controls.Add(rdbEmail2);
-            flowRadioGroupForEmail.Location = new Point(19, 400);
+            flowRadioGroupForEmail.Location = new Point(19, 260);
             flowRadioGroupForEmail.Margin = new Padding(19, 0, 0, 0);
             flowRadioGroupForEmail.Name = "flowRadioGroupForEmail";
             flowRadioGroupForEmail.Size = new Size(200, 56);
@@ -334,7 +302,7 @@
             // chkContactNumber
             // 
             chkContactNumber.AutoSize = true;
-            chkContactNumber.Location = new Point(3, 459);
+            chkContactNumber.Location = new Point(3, 319);
             chkContactNumber.Name = "chkContactNumber";
             chkContactNumber.Size = new Size(137, 22);
             chkContactNumber.TabIndex = 6;
@@ -348,7 +316,7 @@
             flowRadioGroupForContact.Controls.Add(rdbContact1);
             flowRadioGroupForContact.Controls.Add(rdbContact2);
             flowRadioGroupForContact.FlowDirection = FlowDirection.TopDown;
-            flowRadioGroupForContact.Location = new Point(19, 484);
+            flowRadioGroupForContact.Location = new Point(19, 344);
             flowRadioGroupForContact.Margin = new Padding(19, 0, 0, 0);
             flowRadioGroupForContact.Name = "flowRadioGroupForContact";
             flowRadioGroupForContact.Size = new Size(200, 56);
@@ -381,7 +349,7 @@
             // chkPosition
             // 
             chkPosition.AutoSize = true;
-            chkPosition.Location = new Point(3, 543);
+            chkPosition.Location = new Point(3, 487);
             chkPosition.Name = "chkPosition";
             chkPosition.Size = new Size(84, 22);
             chkPosition.TabIndex = 17;
@@ -396,7 +364,7 @@
             flowRadioGroupForPosition.Controls.Add(rdbPosition2);
             flowRadioGroupForPosition.Controls.Add(rdbPosition3);
             flowRadioGroupForPosition.FlowDirection = FlowDirection.TopDown;
-            flowRadioGroupForPosition.Location = new Point(19, 568);
+            flowRadioGroupForPosition.Location = new Point(19, 512);
             flowRadioGroupForPosition.Margin = new Padding(19, 0, 0, 0);
             flowRadioGroupForPosition.Name = "flowRadioGroupForPosition";
             flowRadioGroupForPosition.Size = new Size(200, 84);
@@ -438,10 +406,20 @@
             rdbPosition3.Text = "Show both";
             rdbPosition3.UseVisualStyleBackColor = true;
             // 
+            // chkWageType
+            // 
+            chkWageType.AutoSize = true;
+            chkWageType.Location = new Point(3, 599);
+            chkWageType.Name = "chkWageType";
+            chkWageType.Size = new Size(105, 22);
+            chkWageType.TabIndex = 31;
+            chkWageType.Text = "Wage Type";
+            chkWageType.UseVisualStyleBackColor = true;
+            // 
             // chkSalaryRate
             // 
             chkSalaryRate.AutoSize = true;
-            chkSalaryRate.Location = new Point(3, 655);
+            chkSalaryRate.Location = new Point(3, 627);
             chkSalaryRate.Name = "chkSalaryRate";
             chkSalaryRate.Size = new Size(108, 22);
             chkSalaryRate.TabIndex = 28;
@@ -451,7 +429,7 @@
             // chkBillingRate
             // 
             chkBillingRate.AutoSize = true;
-            chkBillingRate.Location = new Point(3, 683);
+            chkBillingRate.Location = new Point(3, 655);
             chkBillingRate.Name = "chkBillingRate";
             chkBillingRate.Size = new Size(106, 22);
             chkBillingRate.TabIndex = 29;
@@ -461,7 +439,7 @@
             // chkEmploymentStatus
             // 
             chkEmploymentStatus.AutoSize = true;
-            chkEmploymentStatus.Location = new Point(3, 711);
+            chkEmploymentStatus.Location = new Point(3, 683);
             chkEmploymentStatus.Name = "chkEmploymentStatus";
             chkEmploymentStatus.Size = new Size(161, 22);
             chkEmploymentStatus.TabIndex = 22;
@@ -484,7 +462,7 @@
             flowControls.Controls.Add(btnCancel);
             flowControls.Dock = DockStyle.Bottom;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
-            flowControls.Location = new Point(0, 411);
+            flowControls.Location = new Point(0, 494);
             flowControls.Name = "flowControls";
             flowControls.Padding = new Padding(11, 11, 0, 11);
             flowControls.Size = new Size(387, 50);
@@ -516,11 +494,21 @@
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
             // 
+            // chkClassification
+            // 
+            chkClassification.AutoSize = true;
+            chkClassification.Location = new Point(3, 403);
+            chkClassification.Name = "chkClassification";
+            chkClassification.Size = new Size(121, 22);
+            chkClassification.TabIndex = 32;
+            chkClassification.Text = "Classification";
+            chkClassification.UseVisualStyleBackColor = true;
+            // 
             // frmSettingsEmployee
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = SystemColors.Control;
-            ClientSize = new Size(387, 461);
+            ClientSize = new Size(387, 544);
             Controls.Add(flowControls);
             Controls.Add(tabControl1);
             Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
@@ -555,8 +543,6 @@
         private FlowLayoutPanel flowLayoutPanel1;
         private CheckBox chkName;
         private CheckBox chkGender;
-        private CheckBox chkBirthday;
-        private CheckBox chkEducation;
         private CheckBox chkEmailAddress;
         private CheckBox chkContactNumber;
         private CheckBox chkDepartment;
@@ -573,7 +559,6 @@
         private RadioButton rdbPosition1;
         private RadioButton rdbPosition2;
         private RadioButton rdbPosition3;
-        private CheckBox chkCivilStatus;
         private CheckBox chkEmploymentStatus;
         private FlowLayoutPanel flowControls;
         private Button btnApply;
@@ -592,5 +577,7 @@
         private Label label6;
         private Label label7;
         private CheckBox chkLocation;
+        private CheckBox chkWageType;
+        private CheckBox chkClassification;
     }
 }

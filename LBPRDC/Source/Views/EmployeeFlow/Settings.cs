@@ -1,5 +1,4 @@
-﻿using LBPRDC.Source.Services;
-using LBPRDC.Source.Utilities;
+﻿using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views.Employee
 {
@@ -21,15 +20,14 @@ namespace LBPRDC.Source.Views.Employee
             chkEmployeeID.Checked = preference.ShowEmployeeID;
             chkName.Checked = preference.ShowName;
             chkGender.Checked = preference.ShowGender;
-            chkBirthday.Checked = preference.ShowBirthday;
-            chkEducation.Checked = preference.ShowEducation;
-            chkCivilStatus.Checked = preference.ShowCivilStatus;
             chkEmploymentStatus.Checked = preference.ShowEmploymentStatus;
+            chkClassification.Checked = preference.ShowClassification;
             chkDepartment.Checked = preference.ShowDepartment;
             chkLocation.Checked = preference.ShowLocation;
             chkEmailAddress.Checked = preference.ShowEmailAddress;
             chkContactNumber.Checked = preference.ShowContactNumber;
             chkPosition.Checked = preference.ShowPosition;
+            chkWageType.Checked = preference.ShowWageType;
             chkSalaryRate.Checked = preference.ShowSalaryRate;
             chkBillingRate.Checked = preference.ShowBillingRate;
 
@@ -61,15 +59,14 @@ namespace LBPRDC.Source.Views.Employee
             preference.ShowEmployeeID = chkEmployeeID.Checked;
             preference.ShowName = chkName.Checked;
             preference.ShowGender = chkGender.Checked;
-            preference.ShowBirthday = chkBirthday.Checked;
-            preference.ShowEducation = chkEducation.Checked;
-            preference.ShowCivilStatus = chkCivilStatus.Checked;
             preference.ShowEmploymentStatus = chkEmploymentStatus.Checked;
+            preference.ShowClassification = chkClassification.Checked;
             preference.ShowDepartment = chkDepartment.Checked;
             preference.ShowLocation = chkLocation.Checked;
             preference.ShowEmailAddress = chkEmailAddress.Checked;
             preference.ShowContactNumber = chkContactNumber.Checked;
             preference.ShowPosition = chkPosition.Checked;
+            preference.ShowWageType = chkWageType.Checked;
             preference.ShowSalaryRate = chkSalaryRate.Checked;
             preference.ShowBillingRate = chkBillingRate.Checked;
             preference.SelectedNameFormat = Enum.Parse<NameFormat>(GetSelectedRadioButton(flowRadioGroupForName));
@@ -78,7 +75,6 @@ namespace LBPRDC.Source.Views.Employee
             preference.SelectedPositionFormat = Enum.Parse<PositionFormat>(GetSelectedRadioButton(flowRadioGroupForPosition));
 
             UserPreferenceManager.SavePreferences(preference);
-            //MessageBox.Show("Preferences saved.", "User Settings", MessageBoxButtons.OK, MessageBoxIcon.Information);
             ParentControl?.ResetTableSearchFilter();
             this.Close();
         }

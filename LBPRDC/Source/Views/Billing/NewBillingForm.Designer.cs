@@ -202,7 +202,7 @@
             flowLayoutPanel1.Location = new Point(16, 60);
             flowLayoutPanel1.Margin = new Padding(0);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(403, 538);
+            flowLayoutPanel1.Size = new Size(403, 546);
             flowLayoutPanel1.TabIndex = 0;
             // 
             // pnlGroup1

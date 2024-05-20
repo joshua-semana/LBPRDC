@@ -52,7 +52,7 @@
             pnlLine1.Dock = DockStyle.Top;
             pnlLine1.Location = new Point(0, 0);
             pnlLine1.Name = "pnlLine1";
-            pnlLine1.Size = new Size(349, 1);
+            pnlLine1.Size = new Size(345, 1);
             pnlLine1.TabIndex = 0;
             // 
             // pnlFooter
@@ -60,9 +60,9 @@
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Controls.Add(flowLayoutPanel2);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 191);
+            pnlFooter.Location = new Point(0, 187);
             pnlFooter.Name = "pnlFooter";
-            pnlFooter.Size = new Size(349, 46);
+            pnlFooter.Size = new Size(345, 46);
             pnlFooter.TabIndex = 1;
             // 
             // flowLayoutPanel2
@@ -71,7 +71,7 @@
             flowLayoutPanel2.Controls.Add(btnCancel);
             flowLayoutPanel2.Dock = DockStyle.Right;
             flowLayoutPanel2.FlowDirection = FlowDirection.RightToLeft;
-            flowLayoutPanel2.Location = new Point(158, 0);
+            flowLayoutPanel2.Location = new Point(154, 0);
             flowLayoutPanel2.Name = "flowLayoutPanel2";
             flowLayoutPanel2.Padding = new Padding(16, 9, 0, 0);
             flowLayoutPanel2.Size = new Size(191, 46);
@@ -116,7 +116,7 @@
             pnlBody.Location = new Point(0, 1);
             pnlBody.Name = "pnlBody";
             pnlBody.Padding = new Padding(16);
-            pnlBody.Size = new Size(349, 190);
+            pnlBody.Size = new Size(345, 186);
             pnlBody.TabIndex = 2;
             // 
             // label7
@@ -183,7 +183,7 @@
             pnlLine2.Location = new Point(16, 43);
             pnlLine2.Margin = new Padding(0, 0, 0, 16);
             pnlLine2.Name = "pnlLine2";
-            pnlLine2.Size = new Size(317, 1);
+            pnlLine2.Size = new Size(313, 1);
             pnlLine2.TabIndex = 5;
             // 
             // lblTitle
@@ -201,7 +201,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(349, 237);
+            ClientSize = new Size(345, 233);
             ControlBox = false;
             Controls.Add(pnlBody);
             Controls.Add(pnlFooter);

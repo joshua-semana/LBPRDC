@@ -1,4 +1,5 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views.Profile
@@ -35,24 +36,41 @@ namespace LBPRDC.Source.Views.Profile
 
         private void ViewAndEditProfileForm_Load(object sender, EventArgs e)
         {
+            if (UserID == 0)
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_USER, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
+            }
+
             InitializeUserInformation(UserID);
         }
 
-        private void InitializeUserInformation(int userId)
+        private async void InitializeUserInformation(int userId)
         {
-            var user = UserService.GetAllUsers().First(f => f.UserID == userId);
-            lblHiddenUserID.Text = user.UserID.ToString();
-            txtFirstName.Text = user.FirstName;
-            txtLastName.Text = user.LastName;
-            txtEmailAddress.Text = user.Email;
-            txtMiddleName.Text = user.MiddleName;
-            txtPositionTitle.Text = user.PositionTitle;
+            var users = await UserService.GetUsers(userId);
+            if (users.Any())
+            {
+                var user = users.First();
+                lblHiddenUserID.Text = user.UserID.ToString();
+                txtFirstName.Text = user.FirstName;
+                txtLastName.Text = user.LastName;
+                txtEmailAddress.Text = user.Email;
+                txtMiddleName.Text = user.MiddleName;
+                txtPositionTitle.Text = user.PositionTitle;
 
-            originalTextBoxValues.Add(txtFirstName, user.FirstName);
-            originalTextBoxValues.Add(txtLastName, user.LastName);
-            originalTextBoxValues.Add(txtEmailAddress, user.Email);
-            originalTextBoxValues.Add(txtMiddleName, user.MiddleName);
-            originalTextBoxValues.Add(txtPositionTitle, user.PositionTitle);
+                originalTextBoxValues.Add(txtFirstName, user.FirstName);
+                originalTextBoxValues.Add(txtLastName, user.LastName);
+                originalTextBoxValues.Add(txtEmailAddress, user.Email);
+                originalTextBoxValues.Add(txtMiddleName, user.MiddleName);
+                originalTextBoxValues.Add(txtPositionTitle, user.PositionTitle);
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.RETRIEVE_DATA, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
+            }
 
             foreach (var kv in originalTextBoxValues)
             {
@@ -125,17 +143,25 @@ namespace LBPRDC.Source.Views.Profile
 
         private async Task UpdateUserPassword(int userId)
         {
-            var user = UserService.GetAllUsers().First(f => f.UserID == userId);
+            var users = await UserService.GetUsers(userId);
+
+            if (!users.Any())
+            {
+                MessageBox.Show(MessagesConstants.Error.RETRIEVE_DATA, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var user = users.First();
 
             if (!AuthenticationService.ValidateCredentials(user.Username, txtOldPassword.Text))
             {
-                MessageBox.Show("Your current password do not match to your entered old password.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Your current password do not match to your entered old password.", MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             if (txtNewPassword.Text != txtConfirmPassword.Text)
             {
-                MessageBox.Show("Passwords do not match.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Passwords do not match.", MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 

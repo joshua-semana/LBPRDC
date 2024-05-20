@@ -44,7 +44,6 @@
             label3 = new Label();
             txtFirstName = new TextBox();
             pnlGroup3 = new Panel();
-            label1 = new Label();
             label2 = new Label();
             txtMiddleName = new TextBox();
             pnlGroup4 = new Panel();
@@ -276,7 +275,6 @@
             // pnlGroup3
             // 
             pnlGroup3.AutoSize = true;
-            pnlGroup3.Controls.Add(label1);
             pnlGroup3.Controls.Add(label2);
             pnlGroup3.Controls.Add(txtMiddleName);
             pnlGroup3.Location = new Point(0, 124);
@@ -284,19 +282,6 @@
             pnlGroup3.Name = "pnlGroup3";
             pnlGroup3.Size = new Size(402, 46);
             pnlGroup3.TabIndex = 3;
-            // 
-            // label1
-            // 
-            label1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            label1.AutoSize = true;
-            label1.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.ForeColor = Color.Red;
-            label1.Location = new Point(85, 0);
-            label1.Margin = new Padding(0);
-            label1.Name = "label1";
-            label1.Size = new Size(12, 16);
-            label1.TabIndex = 21;
-            label1.Text = "*";
             // 
             // label2
             // 

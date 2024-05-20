@@ -31,7 +31,7 @@ namespace LBPRDC.Source.Views.Accounts
         private async void PopulateTableWithSearch(string searchWord)
         {
             ShowLoadingProgressBar(true);
-            var users = await Task.Run(() => UserService.GetAllUsers());
+            var users = await Task.Run(() => UserService.GetUsers());
 
             dgvUsers.Columns.Clear();
 
@@ -121,10 +121,10 @@ namespace LBPRDC.Source.Views.Accounts
         {
             string newPassword = Generator.GeneratePassword(12);
 
-            UserService.User user = new()
+            Models.User user = new()
             {
                 UserID = Convert.ToInt32(dgvUsers.SelectedRows[0].Cells[0].Value),
-                Password = newPassword
+                PasswordHash = newPassword
             };
 
             bool isReset = await UserService.ResetPassword(user);

@@ -1,13 +1,17 @@
 ﻿using Dapper;
 using LBPRDC.Source.Data;
 using System.Data.SqlClient;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using Microsoft.EntityFrameworkCore;
+using static LBPRDC.Source.Data.Database;
+using LBPRDC.Source.Config;
+using System.ComponentModel;
+using static LBPRDC.Source.Models.Billing;
 
 namespace LBPRDC.Source.Services
 {
     public class BillingRecord : EmployeeBase
     {
-        public int ID { get; set; }
+        public int BillingID { get; set; }
         public Guid Guid { get; set; }
         public string? EntryType { get; set; } // Regular Entry or Custom Entry
         public string? TimeDetailJSON { get; set; }
@@ -31,6 +35,282 @@ namespace LBPRDC.Source.Services
 
     internal class BillingRecordService
     {
+        // Entity Frameworks
+
+        public static async Task<List<string>> GetAccountNumbersByIDAsync(int BillingID)
+        {
+            List<string> accountsList = new();
+
+            try
+            {
+                using var context = new Context();
+
+                var regularAccounts = await context.BillingRecord
+                    .Where(br => !string.IsNullOrEmpty(br.RegularAccountNumber) && br.BillingID == BillingID)
+                    .Select(br => br.RegularAccountNumber)
+                    .Distinct()
+                    .ToListAsync();
+
+                var overtimeAccounts = await context.BillingRecord
+                    .Where(br => !string.IsNullOrEmpty(br.OvertimeAccountNumber) && br.BillingID == BillingID)
+                    .Select(br => br.OvertimeAccountNumber)
+                    .Distinct()
+                    .ToListAsync();
+
+                accountsList.AddRange(regularAccounts);
+                accountsList.AddRange(overtimeAccounts);
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return accountsList;
+        }
+
+        public static async Task<List<Models.Billing.AccountsWithType>> GetAccountsWithTypeByBillingID(int BillingID)
+        {
+            List<Models.Billing.AccountsWithType> accountsWithTypeList = new();
+
+            try
+            {
+                using var context = new Context();
+
+                var regularAccountsQuery = await context.BillingRecord
+                    .Where(b => b.RegularAccountNumber != "" && b.BillingID == BillingID)
+                    .Select(b => new Models.Billing.AccountsWithType
+                    {
+                        AccountNumber = b.RegularAccountNumber,
+                        //EntryType = b.EntryType
+                        EntryType = StringConstants.Type.REGULAR
+                    })
+                    .Distinct()
+                    .ToListAsync();
+
+                var overtimeAccountsQuery = await context.BillingRecord
+                    .Where(b => b.OvertimeAccountNumber != "" && b.BillingID == BillingID)
+                    .Select(b => new Models.Billing.AccountsWithType
+                    {
+                        AccountNumber = b.OvertimeAccountNumber,
+                        //EntryType = b.EntryType
+                        EntryType = StringConstants.Type.REGULAR
+                    })
+                    .Distinct()
+                    .ToListAsync();;
+
+                accountsWithTypeList.AddRange(regularAccountsQuery);
+                accountsWithTypeList.AddRange(overtimeAccountsQuery);
+
+                //var accountsWithTypeQuery = regularAccountsQuery.Union(overtimeAccountsQuery);
+                //accountsWithTypeList = await accountsWithTypeQuery.ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return accountsWithTypeList;
+        }
+
+        public static async Task<bool> RemoveRecordsByID(int BillingID) // THIS IS FOR OVERWRITING THE BILLING's TIMEKEEP FILE
+        {
+            try
+            {
+                using var context = new Context();
+                var recordsToDelete = await context.BillingRecord
+                    .Where(br => br.BillingID == BillingID)
+                    .ToListAsync();
+
+                if (recordsToDelete.Any())
+                {
+                    context.BillingRecord.RemoveRange(recordsToDelete);
+                    await context.SaveChangesAsync();
+                }
+
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<List<Models.Billing.Record.View>> GetAllBillingRecordInfoByIDs(int ClientID, string EmployeeID)
+        {
+            List<Models.Billing.Record.View> records = new();
+            try
+            {
+                using var context = new Context();
+
+                records = await context.BillingRecord
+                    .Where(br => br.ClientID == ClientID && br.EmployeeID == EmployeeID)
+                    .Select(br => new Models.Billing.Record.View {
+                        ID = br.ID,
+                        ClientID = br.ClientID,
+                        BillingID = br.BillingID,
+                        Guid = br.Guid,
+                        EntryType = br.EntryType,
+                        EmployeeID = br.EmployeeID,
+                        FullName = br.FullName,
+                        Position = br.Position,
+                        Department = br.Department,
+                        SalaryRate = br.SalaryRate,
+                        BillingRate = br.BillingRate,
+                        TimeDetailJSON = br.TimeDetailJSON,
+                        RegularAccountNumber = br.RegularAccountNumber,
+                        OvertimeAccountNumber = br.OvertimeAccountNumber,
+                        RegularBillingValue = br.RegularBillingValue,
+                        OvertimeBillingValue = br.OvertimeBillingValue,
+                        RegularCollectedValue = br.RegularCollectedValue,
+                        OvertimeCollectedValue = br.OvertimeCollectedValue,
+                        RegularCollectedDate = br.RegularCollectedDate,
+                        OvertimeCollectedDate = br.OvertimeCollectedDate,
+                        TimekeepRemarks = br.TimekeepRemarks,
+                        UserRemarks = br.UserRemarks,
+                        RegularAdjustmentRemarks = br.RegularAdjustmentRemarks,
+                        OvertimeAdjustmentRemarks = br.OvertimeAdjustmentRemarks,
+                        Description = br.Description,
+                        Status = br.Status,
+                        Timestamp = br.Timestamp,
+                        BillingName = br.Billing.Name
+                    })
+                    .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return records;
+        }
+
+        public static async Task<List<Models.Billing.Record>> GetRecordsByBillingId(int BillingID)
+        {
+            List<Models.Billing.Record> records = new();
+            try
+            {
+                using var context = new Context();
+
+                records = await context.BillingRecord
+                    .Where(br => br.BillingID == BillingID)
+                    .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return records;
+        }
+
+        public static async Task<List<Models.Billing.Record.TotalGross>> GetGrossBillingAndDepartmentByIDAsync(int BillingID)
+        {
+            List<Models.Billing.Record.TotalGross> totalDetails = new();
+
+            try
+            {
+                using var context = new Context();
+
+                var regularTotals = await context.BillingRecord
+                    .Where(br => br.BillingID == BillingID && !string.IsNullOrEmpty(br.RegularAccountNumber))
+                    .GroupBy(br => new
+                    {
+                        AccountNumber = br.RegularAccountNumber,
+                        Department = br.Department
+                    })
+                    .Select(group => new Models.Billing.Record.TotalGross
+                    {
+                        AccountNumber = group.Key.AccountNumber,
+                        Department = group.Key.Department,
+                        GrossBilling = group.Sum(br => br.RegularBillingValue)
+                    })
+                    .ToListAsync();
+
+                var overtimeTotals = await context.BillingRecord
+                    .Where(br => br.BillingID == BillingID && !string.IsNullOrEmpty(br.OvertimeAccountNumber))
+                    .GroupBy(br => new
+                    {
+                        AccountNumber = br.OvertimeAccountNumber,
+                        Department = br.Department
+                    })
+                    .Select(group => new Models.Billing.Record.TotalGross
+                    {
+                        AccountNumber = group.Key.AccountNumber,
+                        Department = group.Key.Department,
+                        GrossBilling = group.Sum(br => br.OvertimeBillingValue)
+                    })
+                    .ToListAsync();
+
+                totalDetails.AddRange(regularTotals);
+                totalDetails.AddRange(overtimeTotals);
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return totalDetails ;
+        }
+
+        public static async Task<bool> UpdateStatusByIDAsync(int BillingID, string Status)
+        {
+            try
+            {
+                using var context = new Context();
+
+                var recordsToUpdate = await context.BillingRecord
+                    .Where(br => br.BillingID == BillingID)
+                    .ToListAsync();
+
+                foreach (var record in recordsToUpdate)
+                {
+                    record.Status = Status;
+                }
+
+                int affectedRows = await context.SaveChangesAsync();
+
+                return (affectedRows > 0);
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> UpdateCollectedValuesAsync(List<Models.Billing.Record> Records, string Type)
+        {
+            try
+            {
+                using var connection = Database.Connect();
+                using var transaction = connection?.BeginTransaction();
+                try
+                {
+                    string QueryUpdate = @$"
+                    UPDATE BillingRecord SET
+                        {Type}CollectedValue = @{Type}CollectedValue
+                    WHERE
+                        BillingID = @BillingID AND {Type}AccountNumber = @{Type}AccountNumber AND Guid = @Guid";
+
+                    await connection.ExecuteAsync(QueryUpdate, Records, transaction);
+
+                    transaction?.Commit();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    transaction?.Rollback();
+                    return false;
+                }
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public static List<BillingRecord> GetRecordsByBillingName(string billingName)
         {
             List<BillingRecord> records = new();
@@ -90,50 +370,7 @@ namespace LBPRDC.Source.Services
             return records;
         }
 
-        public static List<BillingRecord> GetAllBillingsByEmployeeID(string employeeID)
-        {
-            List<BillingRecord> records = new();
-            try
-            {
-                using var connection = Database.Connect();
-
-                string QuerySelect = @"
-                    SELECT
-                        EntryType,
-                        Position,
-                        SalaryRate,
-                        BillingRate,
-                        BillingName,
-                        RegularAccountNumber,
-                        OvertimeAccountNumber,
-                        RegularBillingValue,
-                        OvertimeBillingValue,
-                        RegularCollectedValue,
-                        OvertimeCollectedValue,
-                        RegularCollectedDate,
-                        OvertimeCollectedDate,
-                        UserRemarks,
-                        RegularAdjustmentRemarks,
-                        OvertimeAdjustmentRemarks,
-                        Description,
-                        Status,
-                        Timestamp
-                    FROM
-                        BillingRecord
-                    WHERE
-                        EmployeeID = @EmployeeID";
-
-                records = connection.Query<BillingRecord>(QuerySelect, new
-                {
-                    EmployeeID = employeeID
-                }).ToList();
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-
-            return records;
-        }
-
-        public static List<BillingRecord> GetUnreleasedRecords(string billingName)
+        public static List<BillingRecord> GetUnreleasedRecords(int BillingID)
         {
             List<BillingRecord> records = new();
             try
@@ -147,12 +384,12 @@ namespace LBPRDC.Source.Services
                     FROM 
                         BillingRecord 
                     WHERE 
-                        Status = @Status AND BillingName = @BillingName";
+                        Status = @Status AND BillingID = @BillingID";
 
                 records = connection.Query<BillingRecord>(QuerySelect, new
                 {
-                    Status = "Unreleased",
-                    BillingName = billingName
+                    Status = StringConstants.Status.UNRELEASED,
+                    BillingID
                 }).ToList();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
@@ -192,7 +429,7 @@ namespace LBPRDC.Source.Services
             return accountNumberList;
         }
 
-        public static List<AccountsDetails> GetGrossBillingAndDepartmentByName(string billingName)
+        public static List<AccountsDetails> GetGrossBillingAndDepartmentByName(int BillingID)
         {
             List<AccountsDetails> accountsDetails = new();
 
@@ -206,7 +443,7 @@ namespace LBPRDC.Source.Services
                     FROM
                         BillingRecord
                     WHERE
-                        BillingName = @BillingName
+                        BillingID = @BillingID
                     GROUP BY
                         RegularAccountNumber,
                         Department
@@ -220,14 +457,14 @@ namespace LBPRDC.Source.Services
                     FROM
                         BillingRecord
                     WHERE
-                        BillingName = @BillingName
+                        BillingID = @BillingID
                     GROUP BY
                         OvertimeAccountNumber,
                         Department
                     HAVING
                         OvertimeAccountNumber IS NOT NULL AND OvertimeAccountNumber != ''";
                 using var connection = Database.Connect();
-                accountsDetails = connection.Query<AccountsDetails>(QuerySelect, new { BillingName = billingName }).ToList();
+                accountsDetails = connection.Query<AccountsDetails>(QuerySelect, new { BillingID }).ToList();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
@@ -249,14 +486,16 @@ namespace LBPRDC.Source.Services
             return guidList;
         }
 
-        public static bool Add(string billingName, List<BillingRecord> billingRecords)
+        public static bool Add(int BillingID, string billingName, List<BillingRecord> billingRecords)
         {
-            var existingRecords = GetUnreleasedRecords(billingName);
+            var existingRecords = GetUnreleasedRecords(BillingID);
 
             try
             {
                 string QueryInsert = @"
                     INSERT INTO BillingRecord (
+                        ClientID,
+                        BillingID,
                         Guid,
                         EmployeeID,
                         FullName,
@@ -266,7 +505,6 @@ namespace LBPRDC.Source.Services
                         TimeDetailJSON,
                         SalaryRate,
                         BillingRate,
-                        BillingName,
                         RegularAccountNumber,
                         OvertimeAccountNumber,
                         RegularBillingValue,
@@ -282,8 +520,9 @@ namespace LBPRDC.Source.Services
                         Description,
                         Status,
                         Timestamp
-                    ) 
-                    VALUES (
+                    ) VALUES (
+                        @ClientID,
+                        @BillingID,
                         @Guid,
                         @EmployeeID,
                         @FullName,
@@ -293,7 +532,6 @@ namespace LBPRDC.Source.Services
                         @TimeDetailJSON,
                         @SalaryRate,
                         @BillingRate,
-                        @BillingName,
                         @RegularAccountNumber,
                         @OvertimeAccountNumber,
                         @RegularBillingValue,
@@ -312,7 +550,7 @@ namespace LBPRDC.Source.Services
                     )";
 
                 string QueryUpdate = @"
-                    UPDATE BillingRecord SET 
+                    UPDATE BillingRecord SET
                         EmployeeID = @EmployeeID,
                         FullName = @FullName,
                         EntryType = @EntryType,
@@ -321,7 +559,6 @@ namespace LBPRDC.Source.Services
                         TimeDetailJSON = @TimeDetailJSON,
                         SalaryRate = @SalaryRate,
                         BillingRate = @BillingRate,
-                        BillingName = @BillingName,
                         RegularAccountNumber = @RegularAccountNumber,
                         OvertimeAccountNumber = @OvertimeAccountNumber,
                         RegularBillingValue = @RegularBillingValue,
@@ -427,30 +664,41 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool UpdateCollectionDates(BillingRecord record, string type)
+        public static async Task<bool> UpdateCollectionDatesAsync(Models.Billing.Record Record, string Type)
         {
             try
             {
-                using var connection = Database.Connect();
-                using var transaction = connection?.BeginTransaction();
-                try
-                {
-                    string QueryUpdate = @$"
-                        UPDATE BillingRecord SET 
-                            {type}CollectedDate = @{type}CollectedDate
-                        WHERE 
-                            BillingName = @BillingName AND {type}AccountNumber = @{type}AccountNumber";
+                int affectedRows = 0;
+                using var context = new Context(); 
 
-                    connection.Execute(QueryUpdate, record, transaction);
-
-                    transaction?.Commit();
-                    return true;
-                }
-                catch (Exception)
+                if (Type == StringConstants.Type.REGULAR)
                 {
-                    transaction?.Rollback();
-                    return false;
+                    var records = await context.BillingRecord
+                        .Where(br => br.BillingID == Record.BillingID && br.RegularAccountNumber == Record.RegularAccountNumber)
+                        .ToListAsync();
+
+                    foreach (var record in records)
+                    {
+                        record.RegularCollectedDate = Record.RegularCollectedDate;
+                    }
+
+                    affectedRows = await context.SaveChangesAsync();
                 }
+                else if (Type == StringConstants.Type.OVERTIME)
+                {
+                    var records = await context.BillingRecord
+                        .Where(br => br.BillingID == Record.BillingID && br.OvertimeAccountNumber == Record.OvertimeAccountNumber)
+                        .ToListAsync();
+
+                    foreach (var record in records)
+                    {
+                        record.OvertimeCollectedDate = Record.OvertimeCollectedDate;
+                    }
+
+                    affectedRows = await context.SaveChangesAsync();
+                }
+
+                return (affectedRows > 0);
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
@@ -485,32 +733,21 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool RemoveRecordsByGuid(List<Guid> recordGuid) // USED FOR REMOVING CUSTOM ENTRY WHEN REMOVED IN THE ADJUSTMENT FORM
+        public static async Task<bool> RemoveRecordsByGuid(List<Guid> recordGuid, int BillingID) // USED FOR REMOVING CUSTOM ENTRY WHEN REMOVED IN THE ADJUSTMENT FORM
         {
             try
             {
-                using var connection = Database.Connect();
-                using var transaction = connection?.BeginTransaction();
+                using var context = new Context();
 
-                try
-                {
-                    string QueryDelete = @"
-                        DELETE FROM 
-                            BillingRecord 
-                        WHERE 
-                            Guid = @Guid";
+                var entriesToRemove = await context.BillingRecord
+                    .Where(br => recordGuid.Contains(br.Guid) && br.BillingID == BillingID)
+                    .ToListAsync();
 
-                    connection.Execute(QueryDelete, new { Guid = recordGuid }, transaction);
+                context.BillingRecord.RemoveRange(entriesToRemove);
 
-                    transaction?.Commit();
-                    return true;
-                }
-                catch (Exception)
-                {
-                    transaction?.Rollback();
-                    return false;
-                }
+                var affectedRows = await context.SaveChangesAsync();
 
+                return (affectedRows > 0);
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }

@@ -1,4 +1,5 @@
-﻿using LBPRDC.Source.Utilities;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Utilities;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System;
@@ -93,12 +94,19 @@ namespace LBPRDC.Source.Services
         private static void SetFormatToMoney(ExcelWorksheet sheet, string cellRange) => sheet.Cells[cellRange].Style.Numberformat.Format = "#,##0.00";
 
 
-        public static bool ExportSummary(string billingName, string filePath)
+        public static async Task<bool> ExportSummary(int BillingID, int ClientID, string filePath)
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            var billing = BillingService.GetDetailsForTransmittalSummaryByName(billingName);
-            var accounts = BillingAccountService.GetAllByBillingName(billingName);
+            if (BillingID == 0 || ClientID == 0)
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_CLIENT_BILLING, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            var client = await ClientService.GetClientByID(ClientID);
+            var billing = await BillingService.GetBillingDetailsById(BillingID);
+            var accounts = await BillingAccountService.GetItemsByBillingID(BillingID);
 
             if (billing == null || accounts.Count == 0) return false;
 
@@ -107,7 +115,7 @@ namespace LBPRDC.Source.Services
                 using var package = new ExcelPackage();
                 var summarySheet = package.Workbook.Worksheets.Add("SUMMARY");
 
-                AddSummaryTitle(summarySheet, "SOCIAL HOUSING FINANCE CORPORATION", billing.StartDate.ToString("MMMM"), billing.EndDate.ToString("yyyy"));
+                AddSummaryTitle(summarySheet, client.Description, billing.StartDate.ToString("MMMM"), billing.EndDate.ToString("yyyy"));
                 AddHeaderTitles(summarySheet);
 
                 int row = 8, startRow = 8;
@@ -116,11 +124,11 @@ namespace LBPRDC.Source.Services
 
                 foreach (var account in accounts)
                 {
-                    var releaseDate = (billing.ReleaseDate.HasValue) ? billing.ReleaseDate.Value.ToString("MMMM dd, yyyy") : "Not Yet Released";
+                    var releaseDate = (billing.ReleaseDate.HasValue) ? billing.ReleaseDate.Value.ToString(StringConstants.Date.DEFAULT) : "Not Yet Released";
                     string classification = account.Classification ?? "";
 
                     string periodDate = "";
-                    if (!classification.ToUpper().Contains("OVERTIME"))
+                    if (!classification.ToUpper().Contains(StringConstants.Type.OVERTIME))
                     {
                         periodDate = $"{billing.StartDate:MMMM dd}-{billing.EndDate:dd, yyyy}";
                     }
@@ -131,11 +139,11 @@ namespace LBPRDC.Source.Services
                         periodDate = $"{startDate}-{endDate}";
                     }
 
-                    var accountNumber = $"SOA NO. {account.AccountNumber}";
+                    var accountNumber = $"{account.AccountNumber}";
                     var grossAmount = account.BilledValue;
                     // TODO ADJUSTMENT
                     // TODO REVISION
-                    var collectedDate = (account.CollectionDate.HasValue) ? account.CollectionDate.Value.ToString("MMMM dd, yyyy") : "";
+                    var collectedDate = (account.CollectionDate.HasValue) ? account.CollectionDate.Value.ToString(StringConstants.Date.DEFAULT) : "";
                     var orNumber = account.OfficialReceiptNumber;
                     var collectedValue = account.CollectedValue;
                     var balance = account.Balance;

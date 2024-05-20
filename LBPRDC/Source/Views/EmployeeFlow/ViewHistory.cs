@@ -1,10 +1,12 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 
 namespace LBPRDC.Source.Views.EmployeeFlow
 {
     public partial class ViewHistory : Form
     {
-        public string? EmployeeId { get; set; }
+        public int ClientID { get; set; }
+        public int EmployeeID { get; set; }
         public string? HistoryType { get; set; }
 
         public ViewHistory()
@@ -14,65 +16,62 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void ViewHistory_Load(object sender, EventArgs e)
         {
-            if (EmployeeId != null)
+            if (ClientID == 0 || EmployeeID == 0)
             {
-                switch (HistoryType)
-                {
-                    case "Position":
-                        PopulateTableWithPositions();
-                        break;
-                    case "Civil Status":
-                        PopulateTableWithCivilStatus();
-                        break;
-                    case "Employment Status":
-                        PopulateTableWithEmploymentStatus();
-                        break;
-                    case "Department and Location":
-                        PopulateTableWithDepartmentLocation();
-                        break;
-                }
-                this.Text = $"Employee {HistoryType} History";
-                InitializeEmployeeInformation();
+                MessageBox.Show(MessagesConstants.Error.RETRIEVE_DATA, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
             }
-            else
+
+            this.Text = $"Employee {HistoryType} History";
+            InitializeEmployeeInformation(ClientID, EmployeeID);
+
+            switch (HistoryType)
             {
-                MessageBox.Show("There seems to be a problem loading the data. Please try again.", "Error Loading Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.Close();
+                case "Position":
+                    PopulateTableWithPositions();
+                    break;
+                    break;
+                case "Employment Status":
+                    PopulateTableWithEmploymentStatus();
+                    break;
+                case "Department and Location":
+                    PopulateTableWithDepartmentLocation();
+                    break;
             }
         }
 
-        private void InitializeEmployeeInformation()
+        private async void InitializeEmployeeInformation(int ClientID, int EmployeeID)
         {
-            var employees = EmployeeService.GetAllEmployees();
-            var employee = employees.First(e => e.EmployeeID == EmployeeId);
-            txtEmployeeID.Text = EmployeeId;
-            txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
+            var employees = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
+
+            if (employees.Any())
+            {
+                var employee = employees.First();
+                txtEmployeeID.Text = employee.EmployeeID;
+                txtFullName.Text = employee.FullName;
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_EMPLOYEE, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+            }
         }
 
         private async void PopulateTableWithPositions()
         {
-            var records = await Task.Run(() => PositionService.GetAllHistoryByID(EmployeeId));
+            var records = await Task.Run(() => PositionService.GetAllHistoryByID(ClientID, EmployeeID));
             records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;
-            AddColumn("StatusName", "", "StatusName");
+            AddColumn("Indicator", "", "Indicator");
             AddColumn("PositionName", "Position", "PositionName");
             AddColumn("PositionTitle", "Title", "PositionTitle");
-            AddColumn("SalaryRate", "Salary Rate", "SalaryRate");
-            AddColumn("BillingRate", "Billing Rate", "BillingRate");
-            AddColumn("EffectiveDate", "Effective Date", "EffectiveDate");
-            AddColumn("Remarks", "Remarks", "Remarks");
-            dgvHistory.DataSource = records;
-        }
-
-        private async void PopulateTableWithCivilStatus()
-        {
-            var records = await Task.Run(() => CivilStatusService.GetAllHistoryByID(EmployeeId));
-            records = records.OrderByDescending(o => o.Timestamp).ToList();
-            dgvHistory.Columns.Clear();
-            dgvHistory.AutoGenerateColumns = false;
-            AddColumn("StatusName", "", "StatusName");
-            AddColumn("CivilStatusName", "Civil Status", "CivilStatusName");
+            AddColumn("WageType", "Wage Type", "WageType");
+            AddColumn("DailySalaryRate", "Salary Rate (Daily)", "DailySalaryRate");
+            AddColumn("DailyBillingRate", "Billing Rate (Daily)", "DailyBillingRate");
+            AddColumn("MonthlySalaryRate", "Salary Rate (Monthly)", "MonthlySalaryRate");
+            AddColumn("MonthlyBillingRate", "Billing Rate (Monthly)", "MonthlyBillingRate");
             AddColumn("EffectiveDate", "Effective Date", "EffectiveDate");
             AddColumn("Remarks", "Remarks", "Remarks");
             dgvHistory.DataSource = records;
@@ -80,7 +79,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void PopulateTableWithEmploymentStatus()
         {
-            var records = await Task.Run(() => EmploymentStatusService.GetAllHistoryByID(EmployeeId));
+            var records = await Task.Run(() => EmploymentStatusService.GetAllHistoryByID(EmployeeID));
             records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;
@@ -93,7 +92,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void PopulateTableWithDepartmentLocation()
         {
-            var records = await Task.Run(() => DepartmentService.GetAllHistoryByID(EmployeeId));
+            var records = await Task.Run(() => DepartmentService.GetAllHistoryByID(EmployeeID));
             records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;

@@ -1,4 +1,8 @@
-﻿using System.Data.SqlClient;
+﻿using Dapper;
+using LBPRDC.Source.Config;
+using LBPRDC.Source.Data;
+using Microsoft.EntityFrameworkCore;
+using static LBPRDC.Source.Data.Database;
 
 namespace LBPRDC.Source.Services
 {
@@ -7,74 +11,190 @@ namespace LBPRDC.Source.Services
         public class Department
         {
             public int ID { get; set; }
+            public int ClientID { get; set; }
             public string? Code { get; set; }
             public string? Name { get; set; }
             public string? Status { get; set; }
             public string? Description { get; set; }
         }
 
-        public static List<Department> GetAllItems()
+        // ENTITY FRAMEWORK
+
+        public static async Task RemoveHistoryByEmployeeID(int EmployeeID)
         {
-            List<Department> items = new();
+            try
+            {
+                using var context = new Context();
+                var historiesToRemove = await context.EmployeeDepartmentLocationHistory
+                    .Where(h => h.EmployeeID == EmployeeID)
+                    .ToListAsync();
+
+                if (historiesToRemove.Any())
+                {
+                    context.EmployeeDepartmentLocationHistory.RemoveRange(historiesToRemove);
+                    await context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<List<Models.Department>> GetAllItems()
+        {
+            List<Models.Department> items = new();
 
             try
             {
-                string query = "SELECT * FROM Departments";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        Department item = new()
-                        {
-                            ID = Convert.ToInt32(reader["ID"]),
-                            Code = Convert.ToString(reader["Code"]),
-                            Name = Convert.ToString(reader["Name"]),
-                            Description = Convert.ToString(reader["Description"]),
-                            Status = Convert.ToString(reader["Status"])
-                        };
-                        items.Add(item);
-                    }
-                }
+                using var context = new Context();
+                items = await context.Departments.ToListAsync();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
         }
 
-        public static List<Department> GetAllItemsForComboBox()
+        public static async Task<List<Models.Department.View>> GetAllItemsWithView()
+        {
+            List<Models.Department.View> items = new();
+
+            try
+            {
+                using var context = new Context();
+                items = await context.Departments.Select(s => new Models.Department.View
+                {
+                    ID = s.ID,
+                    ClientID = s.ClientID,
+                    Code = s.Code,
+                    Name = s.Name,
+                    Status = s.Status,
+                    Description = s.Description,
+                    ClientName = s.Client.Name
+                })
+                .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
+        }
+
+        public static async Task<List<Models.Department>> GetAllItemsForComboBox(bool WithDefault = true)
+        {
+            List<Models.Department> items = new();
+
+            try
+            {
+                if (WithDefault)
+                {
+                    items.Add(new Models.Department
+                    {
+                        ID = 0,
+                        Name = StringConstants.ComboBox.DEFAULT_DEPARTMENT
+                    });
+                }
+
+                using var context = new Context();
+
+                var result = await context.Departments
+                    .Where(d => d.Status.Equals(StringConstants.Status.ACTIVE))
+                    .Select(d => new Models.Department()
+                    {
+                        ID = d.ID,
+                        Name = d.Name,
+                    })
+                    .ToListAsync();
+
+                items.AddRange(result);
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
+        }
+
+        public static async Task<List<Models.Department>> GetItemsByClientID(int ClientID)
+        {
+            List<Models.Department> items = new();
+
+            try
+            {
+                using var context = new Context();
+                items = await context.Departments
+                    .Where(p => p.ClientID == ClientID)
+                    .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public static List<Department> GetAllItemsByStatusAndClientID(string status, int clientID)
         {
             List<Department> items = new();
 
             try
             {
-                Department blankItem = new()
+                using var connection = Database.Connect();
+                string QuerySelect = @"
+                    SELECT 
+                        * 
+                    FROM 
+                        Departments
+                    WHERE
+                        Status = @Status 
+                    AND 
+                        ClientID = @ClientID";
+                items = connection.Query<Department>(QuerySelect, new
                 {
-                    ID = 0,
-                    Name = "(Choose Department)"
-                };
+                    Status = status,
+                    ClientID = clientID
+                }).ToList();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
-                items.Add(blankItem);
+            return items;
+        }
 
-                string query = "SELECT ID, Name FROM Departments WHERE Status = 'Active'";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
+        public static async Task<List<Models.Department>> GetAllItemsForComboBoxByClientID(int ClientID = 0, bool WithDefault = true)
+        {
+            List<Models.Department> items = new();
+
+            try
+            {
+                if (WithDefault)
                 {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
+                    items.Add(new Models.Department
                     {
-                        Department item = new()
-                        {
-                            ID = Convert.ToInt32(reader["ID"]),
-                            Name = reader["Name"].ToString()
-                        };
-
-                        items.Add(item);
-                    }
+                        ID = 0,
+                        Name = StringConstants.ComboBox.DEFAULT_DEPARTMENT
+                    });
                 }
+
+                using var context = new Context();
+
+                var result = await context.Departments
+                    .Where(d => 
+                        d.Status.Equals(StringConstants.Status.ACTIVE) &&
+                        d.ClientID.Equals(ClientID))
+                    .Select(d => new Models.Department()
+                    {
+                        ID = d.ID,
+                        Name = $"{d.Code} - {d.Name}",
+                    })
+                    .ToListAsync();
+
+                items.AddRange(result);
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
@@ -85,82 +205,116 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string QueryUpdate = "INSERT INTO Departments (Code, Name, Description, Status) " +
-                    "VALUES (@Code, @Name, @Description, @Status)";
+                using var connection = Database.Connect();
+                using var transaction = connection?.BeginTransaction();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(QueryUpdate, connection))
+                try
                 {
-                    command.Parameters.AddWithValue("@Cond", data.Code);
-                    command.Parameters.AddWithValue("@Name", data.Name);
-                    command.Parameters.AddWithValue("@Description", data.Description);
-                    command.Parameters.AddWithValue("@Status", data.Status);
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
-                }
+                    string QueryUpdate = @"
+                    INSERT INTO Departments (
+                        Code,
+                        ClientID,
+                        Name, 
+                        Description, 
+                        Status
+                    ) VALUES (
+                        @Code,
+                        @ClientID,
+                        @Name, 
+                        @Description, 
+                        @Status
+                    );
 
-                if (UserService.CurrentUser != null)
-                {
-                    LoggingService.Log newLog = new()
+                    SELECT SCOPE_IDENTITY();";
+
+                    int newInsertedID = await connection.ExecuteScalarAsync<int>(QueryUpdate, data, transaction);
+                    transaction?.Commit();
+
+                    await LocationService.Add(new LocationService.Location
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Add",
-                        ActivityDetails = $"This user added a new item for the department category with a name of {data.Name}."
-                    };
+                        Name = "None",
+                        Description = $"Default none value for '{data.Name}' department.",
+                        Type = StringConstants.Type.DEFAULT,
+                        Status = data.Status,
+                        DepartmentID = newInsertedID
+                    });
 
-                    LoggingService.LogActivity(newLog);
+                    if (newInsertedID > 0)
+                    {
+                        await LoggingService.LogActivity(new()
+                        {
+                            UserID = UserService.CurrentUser.UserID,
+                            ActivityType = MessagesConstants.Add.TITLE,
+                            ActivityDetails = $"This user added a new item for the department category with a name of {data.Name}."
+                        });
+                    }
+
+                    return true;
                 }
-
-                return true;
+                catch (Exception)
+                {
+                    transaction?.Rollback();
+                    return false;
+                }
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static void Update(Department data)
+        public static async Task<bool> Update(Models.Department data)
         {
             try
             {
-                string QueryUpdate = "UPDATE Departments SET " +
-                    "Code = @Code, " +
-                    "Name = @Name, " +
-                    "Description = @Description, " +
-                    "Status = @Status " +
-                    "WHERE ID = @ID";
+                using var context = new Context();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(QueryUpdate, connection))
-                {
-                    command.Parameters.AddWithValue("@Code", data.Code);
-                    command.Parameters.AddWithValue("@Name", data.Name);
-                    command.Parameters.AddWithValue("@Description", data.Description);
-                    command.Parameters.AddWithValue("@Status", data.Status);
-                    command.Parameters.AddWithValue("@ID", data.ID);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                var item = await context.Departments.FindAsync(data.ID);
 
-                if (UserService.CurrentUser != null)
+                if (item == null) { return false; }
+                if (AreEqual(item, data)) { return true; }
+
+                item.ClientID = data.ClientID;
+                item.Code = data.Code;
+                item.Name = data.Name;
+                item.Description = data.Description;
+                item.Status = data.Status;
+
+                int affectedRows = await context.SaveChangesAsync();
+
+                if (affectedRows > 0)
                 {
-                    LoggingService.Log newLog = new()
+                    if (UserService.CurrentUser != null)
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Update",
-                        ActivityDetails = $"This user updated an item under the department category with an ID of {data.ID}."
-                    };
-
-                    LoggingService.LogActivity(newLog);
+                        await LoggingService.LogActivity(new()
+                        {
+                            UserID = UserService.CurrentUser.UserID,
+                            ActivityType = MessagesConstants.UPDATE,
+                            ActivityDetails = $"This user updated an item under the department category with an ID of {data.ID}."
+                        });
+                    }
                 }
+
+                return (affectedRows > 0);
             }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        private static bool AreEqual(Models.Department item1, Models.Department item2)
+        {
+            return item1.ClientID == item2.ClientID &&
+                   item1.Code == item2.Code &&
+                   item1.Name == item2.Name &&
+                   item1.Description == item2.Description &&
+                   item1.Status == item2.Status;
         }
 
         public class History
         {
             public int HistoryID { get; set; }
-            public string? EmployeeID { get; set; }
+            public int EmployeeID { get; set; }
             public int DepartmentID { get; set; }
             public int LocationID { get; set; }
-            public DateTime? Timestamp { get; set; }
+            public string DepartmentName { get; set; } = "";
+            public string LocationName { get; set; } = "";
+            public DateTime Timestamp { get; set; } = DateTime.MinValue;
             public string? Remarks { get; set; }
             public string? Status { get; set; }
         }
@@ -168,79 +322,120 @@ namespace LBPRDC.Source.Services
         public class HistoryUpdate
         {
             public int HistoryID { get; set; }
-            public int DepartmentID { get; set; }
-            public int LocationID { get; set; }
+            public string DepartmentName { get; set; } = "";
+            public string LocationName { get; set; } = "";
         }
 
         public class HistoryView : History
         {
-            public string? DepartmentName { get; set; }
-            public string? LocationName { get; set; }
-            public string? EffectiveDate { get; set; }
-            public string? StatusName { get; internal set; }
+            public string EffectiveDate { get; set; } = "";
+            public string StatusName { get; internal set; } = "";
         }
 
-        public static void AddNewHistory(History history)
+        public static async void AddNewHistory(History history)
         {
             try
             {
-                string query = "SELECT HistoryID FROM EmployeeDepartmentLocationHistory WHERE EmployeeID = @EmployeeID AND Status = 'Active'";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
-                    connection.Open();
+                using var connection = Database.Connect();
 
-                    using (SqlDataReader reader = command.ExecuteReader())
+                string QuerySelect = @"
+                    SELECT
+                        HistoryID
+                    FROM
+                        EmployeeDepartmentLocationHistory
+                    WHERE
+                        EmployeeID = @EmployeeID
+                    AND
+                        Status = @Status";
+
+                List<History> matchingHistory = connection.Query<History>(QuerySelect, new
+                {
+                    history.EmployeeID,
+                    Status = StringConstants.Status.ACTIVE
+                }).ToList();
+
+                if (matchingHistory.Count > 0)
+                {
+                    int historyID = matchingHistory.Select(s => s.HistoryID).First();
+                    UpdateStatusToInactiveByID(historyID);
+                }
+
+                bool isSuccessful = await AddToHistory(history);
+
+                if (!isSuccessful)
+                {
+                    MessageBox.Show(MessagesConstants.FAILED_HISTORY_ADD, MessagesConstants.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> AddToHistory(History history)
+        {
+            try
+            {
+                using var connection = Database.Connect();
+                using var transaction = connection?.BeginTransaction();
+
+                try
+                {
+                    string QuerySelect = @"
+                        INSERT INTO EmployeeDepartmentLocationHistory (
+                            EmployeeID,
+                            DepartmentName,
+                            LocationName,
+                            Timestamp,
+                            Remarks,
+                            Status
+                        ) VALUES (
+                            @EmployeeID,
+                            @DepartmentName,
+                            @LocationName,
+                            @Timestamp,
+                            @Remarks,
+                            @Status
+                        )";
+
+                    int affectedRows = await connection.ExecuteAsync(QuerySelect, history, transaction);
+
+                    if (affectedRows > 0)
                     {
-                        if (reader.Read())
-                        {
-                            int historyID = Convert.ToInt32(reader["HistoryID"]);
-                            UpdateStatusToInactiveByID(historyID);
-                        }
-                        AddToHistory(history);
+                        transaction?.Commit();
+                    }
+                    else
+                    {
+                        transaction?.Rollback();
+                        return false;
                     }
                 }
+                catch (Exception)
+                {
+                    transaction?.Rollback();
+                    return false;
+                }
+
+                return true;
             }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static void AddToHistory(History history)
+        private static async void UpdateStatusToInactiveByID(int HistoryID)
         {
             try
             {
-                string query = "INSERT INTO EmployeeDepartmentLocationHistory (EmployeeID, DepartmentID, LocationID, Timestamp, Remarks, Status)" +
-                    "VALUES (@EmployeeID, @DepartmentID, @LocationID, @Timestamp, @Remarks, @Status)";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
-                    command.Parameters.AddWithValue("@DepartmentID", history.DepartmentID);
-                    command.Parameters.AddWithValue("@LocationID", history.LocationID);
-                    command.Parameters.AddWithValue("@Timestamp", history.Timestamp);
-                    command.Parameters.AddWithValue("@Remarks", history.Remarks);
-                    command.Parameters.AddWithValue("@Status", history.Status);
+                using var connection = Database.Connect();
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-        }
+                string QueryUpdate = @"
+                    UPDATE EmployeeDepartmentLocationHistory SET 
+                        Status = @Status 
+                    WHERE 
+                        HistoryID = @HistoryID";
 
-        private static void UpdateStatusToInactiveByID(int historyID)
-        {
-            try
-            {
-                string updateQuery = "UPDATE EmployeeDepartmentLocationHistory SET Status = @Status WHERE HistoryID = @HistoryID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
+                await connection.ExecuteAsync(QueryUpdate, new
                 {
-                    command.Parameters.AddWithValue("@Status", "Inactive");
-                    command.Parameters.AddWithValue("@HistoryID", historyID);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                    Status = StringConstants.Status.INACTIVE,
+                    HistoryID
+                });
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
@@ -251,89 +446,61 @@ namespace LBPRDC.Source.Services
 
             try
             {
-                string query = "SELECT * FROM EmployeeDepartmentLocationHistory";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        History item = new()
-                        {
-                            HistoryID = Convert.ToInt32(reader["HistoryID"]),
-                            EmployeeID = reader["EmployeeID"].ToString(),
-                            DepartmentID = Convert.ToInt32(reader["DepartmentID"]),
-                            LocationID = Convert.ToInt32(reader["LocationID"]),
-                            Timestamp = reader["Timestamp"] as DateTime?,
-                            Remarks = reader["Remarks"].ToString(),
-                            Status = reader["Status"].ToString()
-                        };
+                using var connection = Database.Connect();
 
-                        items.Add(item);
-                    }
-                }
+                string QuerySelect = "SELECT * FROM EmployeeDepartmentLocationHistory";
+
+                items = connection.Query<History>(QuerySelect).ToList();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
         }
 
-        public static void UpdateHistory(HistoryUpdate data)
+        public static async void UpdateHistory(HistoryUpdate data)
         {
             try
             {
-                string updateQuery = "UPDATE EmployeeDepartmentLocationHistory SET " +
-                    "DepartmentID = @DepartmentID, " +
-                    "LocationID = @LocationID " +
-                    "WHERE HistoryID = @HistoryID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
-                {
-                    command.Parameters.AddWithValue("@DepartmentID", data.DepartmentID);
-                    command.Parameters.AddWithValue("@LocationID", data.LocationID);
-                    command.Parameters.AddWithValue("@HistoryID", data.HistoryID);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                using var connection = Database.Connect();
+
+                string QueryUpdate = @"
+                    UPDATE EmployeeDepartmentLocationHistory SET
+                        DepartmentName = @DepartmentName,
+                        LocationName = @LocationName
+                    WHERE 
+                        HistoryID = @HistoryID";
+
+                await connection.ExecuteAsync(QueryUpdate, data);
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
-        public static List<HistoryView> GetAllHistoryByID(string employeeId)
+        public static List<HistoryView> GetAllHistoryByID(int EmployeeID)
         {
             List<HistoryView> items = new();
 
             try
             {
-                string query = "SELECT * FROM EmployeeDepartmentLocationHistory WHERE EmployeeID = @EmployeeID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
+                using var connection = Database.Connect();
+
+                string QuerySelect = @"
+                    SELECT 
+                        * 
+                    FROM 
+                        EmployeeDepartmentLocationHistory 
+                    WHERE 
+                        EmployeeID = @EmployeeID";
+
+                items = connection.Query<HistoryView>(QuerySelect, new
                 {
-                    command.Parameters.AddWithValue("@EmployeeID", employeeId);
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        HistoryView item = new()
-                        {
-                            HistoryID = Convert.ToInt32(reader["HistoryID"]),
-                            EmployeeID = reader["EmployeeID"].ToString(),
-                            DepartmentID = Convert.ToInt32(reader["DepartmentID"]),
-                            LocationID = Convert.ToInt32(reader["LocationID"]),
-                            Timestamp = reader["Timestamp"] as DateTime?,
-                            Remarks = reader["Remarks"].ToString(),
-                            Status = reader["Status"].ToString()
-                        };
-                        var department = GetAllItems().First(f => f.ID == item.DepartmentID);
-                        var location = LocationService.GetAllItems().First(f => f.ID == item.LocationID);
-                        item.DepartmentName = department.Name;
-                        item.LocationName = location.Name;
-                        item.EffectiveDate = item.Timestamp.Value.ToString("MMMM dd, yyyy");
-                        item.StatusName = (item.Status == "Active") ? "Current" : "Old";
-                        items.Add(item);
-                    }
-                }
+                    EmployeeID
+                }).ToList();
+
+                foreach (var item in items)
+                {
+                    item.EffectiveDate = item.Timestamp.ToString(StringConstants.Date.DEFAULT);
+                    item.StatusName = (item.Status == StringConstants.Status.ACTIVE) ? StringConstants.DisplayStatus.RIGHT_ARROW : "";
+                }   
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 

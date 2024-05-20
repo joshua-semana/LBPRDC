@@ -1248,7 +1248,7 @@
             dgvAdjustments.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvAdjustments.EditMode = DataGridViewEditMode.EditOnF2;
             dgvAdjustments.GridColor = SystemColors.Control;
-            dgvAdjustments.Location = new Point(481, 101);
+            dgvAdjustments.Location = new Point(481, 104);
             dgvAdjustments.Margin = new Padding(0);
             dgvAdjustments.MultiSelect = false;
             dgvAdjustments.Name = "dgvAdjustments";
@@ -1270,6 +1270,7 @@
             dgvAdjustments.Size = new Size(808, 273);
             dgvAdjustments.TabIndex = 52;
             dgvAdjustments.VirtualMode = true;
+            dgvAdjustments.CellContentClick += dgvAdjustments_CellContentClick;
             // 
             // grpBasicInformation
             // 

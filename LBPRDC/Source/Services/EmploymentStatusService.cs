@@ -1,9 +1,12 @@
-﻿using System.Data.SqlClient;
-using static LBPRDC.Source.Services.DepartmentService;
+﻿using Dapper;
+using LBPRDC.Source.Config;
+using LBPRDC.Source.Data;
+using Microsoft.EntityFrameworkCore;
+using static LBPRDC.Source.Data.Database;
 
 namespace LBPRDC.Source.Services
 {
-    internal class EmploymentStatusService
+    public class EmploymentStatusService
     {
         public class EmploymentStatus
         {
@@ -13,68 +16,118 @@ namespace LBPRDC.Source.Services
             public string? Description { get; set; }
         }
 
+        // ENTITY FRAMEWORK
+        public static async Task RemoveHistoryByEmployeeID(int EmployeeID)
+        {
+            try
+            {
+                using var context = new Context();
+                var historiesToRemove = await context.EmployeeEmploymentHistory
+                    .Where(h => h.EmployeeID == EmployeeID)
+                    .ToListAsync();
+
+                if (historiesToRemove.Any())
+                {
+                    context.EmployeeEmploymentHistory.RemoveRange(historiesToRemove);
+                    await context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<Models.EmploymentStatus.History?> GetEmployeeHistory(int EmployeeID, string Status = StringConstants.Status.ACTIVE)
+        {
+            Models.EmploymentStatus.History? record = new();
+
+            try
+            {
+                using var context = new Context();
+                record = await context.EmployeeEmploymentHistory
+                    .Where(h => h.EmployeeID == EmployeeID && h.Status == Status)
+                    .FirstOrDefaultAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return record;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
         public static List<EmploymentStatus> GetAllItems()
         {
             List<EmploymentStatus> items = new();
 
             try
             {
-                string query = "SELECT * FROM EmploymentStatus";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        EmploymentStatus item = new()
-                        {
-                            ID = Convert.ToInt32(reader["ID"]),
-                            Name = reader["Name"].ToString(),
-                            Description = reader["Description"].ToString(),
-                            Status = reader["Status"].ToString()
-                        };
-
-                        items.Add(item);
-                    }
-                }
+                using var connection = Database.Connect();
+                string QuerySelect = "SELECT * FROM EmploymentStatus";
+                items = connection.Query<EmploymentStatus>(QuerySelect).ToList();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
         }
 
-        public static List<EmploymentStatus> GetAllItemsForComboBox()
+        public static List<EmploymentStatus> GetAllItemsByStatus(string Status)
         {
             List<EmploymentStatus> items = new();
 
             try
             {
-                EmploymentStatus blankItem = new()
+                using var connection = Database.Connect();
+                string QuerySelect = @"
+                    SELECT 
+                        * 
+                    FROM 
+                        EmploymentStatus
+                    WHERE
+                        Status = @Status";
+                items = connection.Query<EmploymentStatus>(QuerySelect, new
                 {
-                    ID = 0,
-                    Name = "(Choose Status)"
-                };
+                    Status
+                }).ToList();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
-                items.Add(blankItem);
+            return items;
+        }
 
-                string query = "SELECT ID, Name FROM EmploymentStatus WHERE Status = 'Active'";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
+        public static async Task<List<Models.EmploymentStatus>> GetAllItemsForComboBox(bool withDefault = true)
+        {
+            List<Models.EmploymentStatus> items = new();
+
+            try
+            {
+                if (withDefault)
                 {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
+                    items.Add(new Models.EmploymentStatus
                     {
-                        EmploymentStatus item = new()
-                        {
-                            ID = Convert.ToInt32(reader["ID"]),
-                            Name = reader["Name"].ToString()
-                        };
-
-                        items.Add(item);
-                    }
+                        ID = 0,
+                        Name = StringConstants.ComboBox.DEFAULT_EMPLOYMENT_STATUS
+                    });
                 }
+
+                using var context = new Context();
+
+                var result = await context.EmploymentStatus
+                    .Where(w => w.Status.Equals(StringConstants.Status.ACTIVE))
+                    .Select(s => new Models.EmploymentStatus
+                    {
+                        ID = s.ID,
+                        Name = s.Name
+                    })
+                    .ToListAsync();
+
+                items.AddRange(result);
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
@@ -85,29 +138,38 @@ namespace LBPRDC.Source.Services
         {
             try
             {
-                string QueryUpdate = "INSERT INTO EmploymentStatus (Name, Description, Status) " +
-                    "VALUES (@Name, @Description, @Status)";
+                using var connection = Database.Connect();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(QueryUpdate, connection))
+                string QueryUpdate = @"
+                    INSERT INTO EmploymentStatus (
+                        Name, 
+                        Description, 
+                        Status
+                    ) VALUES (
+                        @Name, 
+                        @Description, 
+                        @Status
+                    )";
+
+                int affectedRows = await connection.ExecuteAsync(QueryUpdate, new
                 {
-                    command.Parameters.AddWithValue("@Name", data.Name);
-                    command.Parameters.AddWithValue("@Description", data.Description);
-                    command.Parameters.AddWithValue("@Status", data.Status);
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
-                }
+                    data.Name,
+                    data.Description,
+                    data.Status
+                });
 
                 if (UserService.CurrentUser != null)
                 {
-                    LoggingService.Log newLog = new()
+                    await LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Add",
+                        ActivityType = MessagesConstants.Add.TITLE,
                         ActivityDetails = $"This user added a new item for the employment status category with a name of {data.Name}."
-                    };
-
-                    LoggingService.LogActivity(newLog);
+                    });
+                }
+                else
+                {
+                    return false;
                 }
 
                 return true;
@@ -115,46 +177,52 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static void Update(EmploymentStatus data)
+        public static async Task<bool> Update(Models.EmploymentStatus data)
         {
             try
             {
-                string QueryUpdate = "UPDATE EmploymentStatus SET " +
-                    "Name = @Name, " +
-                    "Description = @Description, " +
-                    "Status = @Status " +
-                    "WHERE ID = @ID";
+                using var context = new Context();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(QueryUpdate, connection))
-                {
-                    command.Parameters.AddWithValue("@Name", data.Name);
-                    command.Parameters.AddWithValue("@Description", data.Description);
-                    command.Parameters.AddWithValue("@Status", data.Status);
-                    command.Parameters.AddWithValue("@ID", data.ID);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                var item = await context.EmploymentStatus.FindAsync(data.ID);
 
-                if (UserService.CurrentUser != null)
+                if (item == null) { return false; }
+                if (AreEqual(item, data)) { return true; }
+
+                item.Name = data.Name;
+                item.Description = data.Description;
+                item.Status = data.Status;
+
+                int affectedRows = await context.SaveChangesAsync();
+
+                if (affectedRows > 0)
                 {
-                    LoggingService.Log newLog = new()
+                    if (UserService.CurrentUser != null)
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Update",
-                        ActivityDetails = $"This user updated an item under the employment status category with an ID of {data.ID}."
-                    };
-
-                    LoggingService.LogActivity(newLog);
+                        await LoggingService.LogActivity(new()
+                        {
+                            UserID = UserService.CurrentUser.UserID,
+                            ActivityType = MessagesConstants.UPDATE,
+                            ActivityDetails = $"This user updated an item under the employment status category with an ID of {data.ID}."
+                        });
+                    }
                 }
+                
+                return (affectedRows > 0);
             }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        private static bool AreEqual(Models.EmploymentStatus item1, Models.EmploymentStatus item2)
+        {
+            return item1.Name == item2.Name &&
+                   item1.Description == item2.Description &&
+                   item1.Status == item2.Status;
         }
 
         public class History
         {
             public int HistoryID { get; set; }
-            public string? EmployeeID { get; set; }
+            public int EmployeeID { get; set; }
             public int EmploymentStatusID { get; set; }
             public DateTime? Timestamp { get; set; }
             public string? Remarks { get; set; }
@@ -175,66 +243,108 @@ namespace LBPRDC.Source.Services
             public string? StatusName { get; set; }
         }
 
-        public static void AddNewHistory(History history)
+        public static async void AddNewHistory(History history)
         {
             try
             {
-                string query = "SELECT HistoryID FROM EmployeeEmploymentHistory WHERE EmployeeID = @EmployeeID AND Status = 'Active'";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
-                    connection.Open();
+                using var connection = Database.Connect();
 
-                    using (SqlDataReader reader = command.ExecuteReader())
+                string QuerySelect = @"
+                    SELECT
+                        HistoryID
+                    FROM
+                        EmployeeEmploymentHistory
+                    WHERE
+                        EmployeeID = @EmployeeID
+                    AND
+                        Status = @Status";
+
+                List<History> matchingHistory = connection.Query<History>(QuerySelect, new
+                {
+                    history.EmployeeID,
+                    Status = StringConstants.Status.ACTIVE
+                }).ToList();
+
+                if (matchingHistory.Count > 0)
+                {
+                    int historyID = matchingHistory.Select(s => s.HistoryID).First();
+                    UpdateStatusToInactiveByID(historyID);
+                }
+
+                bool isSuccessful = await AddToHistory(history);
+
+                if (!isSuccessful)
+                {
+                    MessageBox.Show("Unable to add a history for civil status of this specific individual.");
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> AddToHistory(History history)
+        {
+            try
+            {
+                using var connection = Database.Connect();
+                using var transaction = connection?.BeginTransaction();
+
+                try
+                {
+                    string QuerySelect = @"
+                        INSERT INTO EmployeeEmploymentHistory (
+                            EmployeeID,
+                            EmploymentStatusID,
+                            Timestamp,
+                            Remarks,
+                            Status
+                        ) VALUES (
+                            @EmployeeID,
+                            @EmploymentStatusID,
+                            @Timestamp,
+                            @Remarks,
+                            @Status
+                        )";
+
+                    int affectedRows = await connection.ExecuteAsync(QuerySelect, history, transaction);
+
+                    if (affectedRows > 0)
                     {
-                        if (reader.Read())
-                        {
-                            int historyID = Convert.ToInt32(reader["HistoryID"]);
-                            UpdateStatusToInactiveByID(historyID);
-                        }
-                        AddToHistory(history);
+                        transaction?.Commit();
+                    }
+                    else
+                    {
+                        transaction?.Rollback();
+                        return false;
                     }
                 }
+                catch (Exception)
+                {
+                    transaction?.Rollback();
+                    return false;
+                }
+
+                return true;
             }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static void AddToHistory(History history)
+        private static async void UpdateStatusToInactiveByID(int HistoryID)
         {
             try
             {
-                string query = "INSERT INTO EmployeeEmploymentHistory (EmployeeID, EmploymentStatusID, Timestamp, Remarks, Status)" +
-                    "VALUES (@EmployeeID, @EmploymentStatusID, @Timestamp, @Remarks, @Status)";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
-                    command.Parameters.AddWithValue("@EmploymentStatusID", history.EmploymentStatusID);
-                    command.Parameters.AddWithValue("@Timestamp", history.Timestamp);
-                    command.Parameters.AddWithValue("@Remarks", history.Remarks);
-                    command.Parameters.AddWithValue("@Status", history.Status);
+                using var connection = Database.Connect();
 
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-        }
+                string QueryUpdate = @"
+                    UPDATE EmployeeEmploymentHistory SET 
+                        Status = @Status 
+                    WHERE 
+                        HistoryID = @HistoryID";
 
-        private static void UpdateStatusToInactiveByID(int historyID)
-        {
-            try
-            {
-                string updateQuery = "UPDATE EmployeeEmploymentHistory SET Status = @Status WHERE HistoryID = @HistoryID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
+                await connection.ExecuteAsync(QueryUpdate, new
                 {
-                    command.Parameters.AddWithValue("@Status", "Inactive");
-                    command.Parameters.AddWithValue("@HistoryID", historyID);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                    Status = StringConstants.Status.INACTIVE,
+                    HistoryID
+                });
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
@@ -245,84 +355,64 @@ namespace LBPRDC.Source.Services
 
             try
             {
-                string query = "SELECT * FROM EmployeeEmploymentHistory";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        History item = new()
-                        {
-                            HistoryID = Convert.ToInt32(reader["HistoryID"]),
-                            EmployeeID = reader["EmployeeID"].ToString(),
-                            EmploymentStatusID = Convert.ToInt32(reader["EmploymentStatusID"]),
-                            Timestamp = reader["Timestamp"] as DateTime?,
-                            Remarks = reader["Remarks"].ToString(),
-                            Status = reader["Status"].ToString()
-                        };
+                using var connection = Database.Connect();
 
-                        items.Add(item);
-                    }
-                }
+                string QuerySelect = "SELECT * FROM EmployeeEmploymentHistory";
+
+                items = connection.Query<History>(QuerySelect).ToList();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
         }
 
-        public static void UpdateHistory(HistoryUpdate data)
+        public static async void UpdateHistory(HistoryUpdate data)
         {
             try
             {
-                string updateQuery = "UPDATE EmployeeEmploymentHistory SET " +
-                    "EmploymentStatusID = @EmploymentStatusID, " +
-                    "Timestamp = @Timestamp " +
-                    "WHERE HistoryID = @HistoryID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
-                {
-                    command.Parameters.AddWithValue("@EmploymentStatusID", data.EmploymentStatusID);
-                    command.Parameters.AddWithValue("@Timestamp", data.Timestamp);
-                    command.Parameters.AddWithValue("@HistoryID", data.HistoryID);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                using var connection = Database.Connect();
+
+                string QueryUpdate = @"
+                    UPDATE EmployeeEmploymentHistory SET
+                        EmploymentStatusID = @EmploymentStatusID,
+                        TimeStamp = @TimeStamp
+                    WHERE 
+                        HistoryID = @HistoryID";
+
+                await connection.ExecuteAsync(QueryUpdate, data);
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
-        public static List<HistoryView> GetAllHistoryByID(string employeeId)
+        public static List<HistoryView> GetAllHistoryByID(int EmployeeID)
         {
             List<HistoryView> items = new();
 
             try
             {
-                string query = "SELECT * FROM EmployeeEmploymentHistory WHERE EmployeeID = @EmployeeID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
+                using var connection = Database.Connect();
+
+                string QuerySelect = @"
+                    SELECT 
+                        * 
+                    FROM 
+                        EmployeeEmploymentHistory 
+                    WHERE 
+                        EmployeeID = @EmployeeID";
+
+                items = connection.Query<HistoryView>(QuerySelect, new
                 {
-                    command.Parameters.AddWithValue("@EmployeeID", employeeId);
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        HistoryView item = new()
-                        {
-                            HistoryID = Convert.ToInt32(reader["HistoryID"]),
-                            EmployeeID = reader["EmployeeID"].ToString(),
-                            EmploymentStatusID = Convert.ToInt32(reader["EmploymentStatusID"]),
-                            Timestamp = reader["Timestamp"] as DateTime?,
-                            Remarks = reader["Remarks"].ToString(),
-                            Status = reader["Status"].ToString()
-                        };
-                        var employmentStatus = GetAllItems().First(f => f.ID == item.EmploymentStatusID);
-                        item.Name = Utilities.StringFormat.ToSentenceCase(employmentStatus.Name);
-                        item.EffectiveDate = item.Timestamp.Value.ToString("MMMM dd, yyyy");
-                        item.StatusName = (item.Status == "Active") ? "Current" : "Old";
-                        items.Add(item);
-                    }
+                    EmployeeID
+                }).ToList();
+
+                var allItems = GetAllItems();
+
+                foreach (var item in items)
+                {
+                    var currentItem = allItems.First(f => f.ID == item.EmploymentStatusID);
+                    item.Name = Utilities.StringFormat.ToSentenceCase(currentItem.Name);
+                    item.EffectiveDate = item.Timestamp?.ToString(StringConstants.Date.DEFAULT);
+                    item.StatusName = (item.Status == StringConstants.Status.ACTIVE) ? StringConstants.DisplayStatus.RIGHT_ARROW : "";
                 }
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }

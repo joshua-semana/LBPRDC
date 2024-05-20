@@ -1,5 +1,8 @@
 ﻿using Dapper;
+using LBPRDC.Source.Config;
 using LBPRDC.Source.Data;
+using Microsoft.EntityFrameworkCore;
+using static LBPRDC.Source.Data.Database;
 
 namespace LBPRDC.Source.Services
 {
@@ -8,11 +11,35 @@ namespace LBPRDC.Source.Services
         public int ID { get; set; }
         public string Name { get; set; } = "";
         public string Description { get; set; } = "";
-        public string Status { get; set; } = "Active";
+        public string Status { get; set; } = StringConstants.Status.ACTIVE;
+    }
+
+    public class ClientExistence
+    {
+        public string TableName { get; set; } = "";
     }
 
     internal class ClientService
     {
+        // Entity Framework
+
+        public static async Task<Models.Client> GetClientByID(int ClientID)
+        {
+            Models.Client client = new();
+
+            try
+            {
+                using var context = new Context();
+                client = await context.Clients
+                    .FirstAsync(c => c.ID == ClientID);
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return client;
+        }
+
+
+
         public static List<Client> GetClients()
         {
             List<Client> clients = new();
@@ -28,37 +55,38 @@ namespace LBPRDC.Source.Services
             return clients;
         }
 
-        public static Client GetClientDetailsByID(int id)
+        public static async Task<Models.Client> GetDetailsByID(int ID)
         {
-            Client clientDetails = new();
+            Models.Client client = new();
 
             try
             {
-                using var connection = Database.Connect();
-                string QuerySelect = "SELECT * FROM Clients WHERE ID = @ID";
-                clientDetails = connection.QueryFirstOrDefault<Client>(QuerySelect, new {
-                    ID = id
-                }) ?? new();
+                using var context = new Context();
+                client = await context.Clients.FirstAsync(c => c.ID == ID);
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
-            return clientDetails;
+            return client;
         }
 
-        public static List<Client> GetClientsForComboBoxByStatus(string status)
+        public static List<Client> GetClientsForComboBoxByStatus(string status, bool withDefault)
         {
             List<Client> items = new();
 
             try
             {
-                items.Add(new Client
+                if (withDefault)
                 {
-                    ID = 0,
-                    Name = "(Choose Client)"
-                });
+                    items.Add(new Client
+                    {
+                        ID = 0,
+                        Name = "(Choose Client)",
+                        Description = "(Choose Client)"
+                    });
+                }
 
                 using var connection = Database.Connect();
-                string QuerySelect = "SELECT ID, Name FROM Clients WHERE Status = @Status";
+                string QuerySelect = "SELECT ID, Name, Description FROM Clients WHERE Status = @Status";
 
                 var result = connection.Query<Client>(QuerySelect, new
                 {
@@ -81,7 +109,7 @@ namespace LBPRDC.Source.Services
 
                 try
                 {
-                    string QuerySelect = @"
+                    string QueryInsert = @"
                         INSERT INTO Clients (
                             Name,
                             Description,
@@ -92,12 +120,12 @@ namespace LBPRDC.Source.Services
                             @Status
                         )";
 
-                    var affectedRows = await connection.ExecuteAsync(QuerySelect, client, transaction);
+                    var affectedRows = await connection.ExecuteAsync(QueryInsert, client, transaction);
                     transaction?.Commit();
 
                     if (affectedRows > 0)
                     {
-                        LoggingService.LogActivity(new()
+                        await LoggingService.LogActivity(new()
                         {
                             UserID = UserService.CurrentUser.UserID,
                             ActivityType = "New Client",
@@ -116,25 +144,33 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static bool Update(Client client)
+        public static async Task<bool> Update(Models.Client data)
         {
             try
             {
-                using var connection = Database.Connect();
+                using var context = new Context();
 
-                string QueryUpdate = @"
-                    UPDATE Clients SET
-                        Name = @Name,
-                        Description = @Description,
-                        Status = @Status
-                    WHERE
-                        ID = @ID";
+                var item = await context.Clients.FindAsync(data.ID);
 
-                int affectedRows = connection.Execute(QueryUpdate, client);
+                if (item == null) { return false; }
+                if (AreEqual(item, data)) { return true; }
 
-                return (affectedRows > 0);
+                item.Name = data.Name;
+                item.Description = data.Description;
+                item.Status = data.Status;
+
+                await context.SaveChangesAsync();
+
+                return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        private static bool AreEqual(Models.Client item1, Models.Client item2)
+        {
+            return item1.Name == item2.Name &&
+                   item1.Description == item2.Description &&
+                   item1.Status == item2.Status;
         }
     }
 }

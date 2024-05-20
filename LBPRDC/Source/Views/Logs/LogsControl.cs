@@ -40,15 +40,10 @@ namespace LBPRDC.Source.Views.Logs
             }
         }
 
-        private void PopulateFilters()
+        private async void PopulateFilters()
         {
-            InitializeFilter(
-                dchkListFilterType,
-                LoggingService.GetAllItems()
-                    .DistinctBy(d => d.ActivityType)
-                    .Select(s => new CheckedListBoxItems(0, s.ActivityType))
-                    .ToList()
-            );
+            var logs = await LoggingService.GetAllItems();
+            InitializeFilter(dchkListFilterType, logs.DistinctBy(d => d.ActivityType).Select(s => new CheckedListBoxItems(0, s.ActivityType)).ToList());
         }
 
         private static void InitializeFilter(DynamicCheckedListBoxControl control, List<CheckedListBoxItems> items)

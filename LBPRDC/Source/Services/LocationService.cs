@@ -1,6 +1,8 @@
-﻿
-using System.Data.SqlClient;
-using static LBPRDC.Source.Services.EmploymentStatusService;
+﻿using Dapper;
+using LBPRDC.Source.Config;
+using LBPRDC.Source.Data;
+using Microsoft.EntityFrameworkCore;
+using static LBPRDC.Source.Data.Database;
 
 namespace LBPRDC.Source.Services
 {
@@ -9,11 +11,38 @@ namespace LBPRDC.Source.Services
         public class Location
         {
             public int? ID { get; set; }
+            public string Type { get; set; } = StringConstants.Type.USER_ENTRY; // DEFAULT or USER_ENTRY
             public string? Name { get; set; }
             public int? DepartmentID { get; set; }
-            public string? DepartmentName { get; set; }
+            //public string? DepartmentName { get; set; } // Only intended to use for the viewing in Categories Control Table
             public string? Status { get; set; }
             public string? Description { get; set; }
+        }
+
+        // Entity Framework
+
+        public static async Task<List<Models.Location.View>> GetAllItemsWithView()
+        {
+            List<Models.Location.View> items = new();
+
+            try
+            {
+                using var context = new Context();
+                items = await context.Locations.Select(s => new Models.Location.View
+                {
+                    ID = s.ID,
+                    Type = s.Type,
+                    Name = s.Name,
+                    DepartmentID = s.DepartmentID,
+                    Status = s.Status,
+                    Description = s.Description,
+                    DepartmentName = s.Department.Name
+                })
+                .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
         }
 
         public static List<Location> GetAllItems()
@@ -22,176 +51,147 @@ namespace LBPRDC.Source.Services
 
             try
             {
-                string query = "SELECT * FROM Locations";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        Location item = new()
-                        {
-                            ID = Convert.ToInt32(reader["ID"]),
-                            Name = reader["Name"].ToString(),
-                            Description = reader["Description"].ToString(),
-                            Status = reader["Status"].ToString()
-                        };
+                using var connection = Database.Connect();
 
-                        items.Add(item);
-                    }
-                }
+                string QuerySelect = "SELECT * FROM Locations";
+
+                items = connection.Query<Location>(QuerySelect).ToList();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
         }
 
-        public static List<Location> GetAllItemsForComboBoxByID(int ID)
+        public static async Task<List<Models.Location>> GetAllItemsForComboBoxByID(int departmentID)
         {
-            List<Location> items = new();
-
-            Location defaultItem = new()
-            {
-                ID = 1,
-                Name = "None"
-            };
-
-            items.Add(defaultItem);
+            List<Models.Location> items = new();
 
             try
             {
-                string query = "SELECT ID, Name FROM Locations WHERE DepartmentID = @ID AND Status = 'Active'";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@ID", ID);
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        Location item = new()
-                        {
-                            ID = Convert.ToInt32(reader["ID"]),
-                            Name = reader["Name"].ToString()
-                        };
+                using var context = new Context();
 
-                        items.Add(item);
-                    }
-                }
+                items = await context.Locations
+                    .Where(l => 
+                        l.Status == StringConstants.Status.ACTIVE &&
+                        l.DepartmentID == departmentID)
+                    .Select(l => new Models.Location()
+                    {
+                        ID = l.ID,
+                        Name = l.Name,
+                    })
+                    .ToListAsync();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
         }
 
-        public static List<Location> GetAllItemsForCategories()
+        public static async Task RemoveDefaultByDepartmentID(int DepartmentID)
         {
-            List<Location> items = new();
-
             try
             {
-                string query = "SELECT * FROM Locations";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        Location item = new()
-                        {
-                            ID = Convert.ToInt32(reader["ID"]),
-                            Name = reader["Name"].ToString(),
-                            DepartmentID = reader["DepartmentID"] is DBNull ? null : Convert.ToInt32(reader["DepartmentID"]),
-                            Description = reader["Description"].ToString(),
-                            Status = reader["Status"].ToString()
-                        };
+                using var context = new Context();
 
-                        item.DepartmentName = item.DepartmentID.HasValue
-                            ? DepartmentService.GetAllItems().First(d => d.ID == item.DepartmentID.Value).Name
-                            : "None";
+                var locationToRemove = await context.Locations
+                    .Where(l => l.DepartmentID == DepartmentID && l.Type == StringConstants.Type.DEFAULT)
+                    .FirstAsync();
 
-                        items.Add(item);
-                    }
-                }
+                context.Locations.Remove(locationToRemove);
+
+                await context.SaveChangesAsync();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-
-            return items;
         }
 
         public static async Task<bool> Add(Location data)
         {
             try
             {
-                string QueryUpdate = "INSERT INTO Locations (Name, DepartmentID, Description, Status) " +
-                    "VALUES (@Name, @DepartmentID, @Description, @Status)";
+                using var connection = Database.Connect();
+                using var transaction = connection?.BeginTransaction();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(QueryUpdate, connection))
+                try
                 {
-                    command.Parameters.AddWithValue("@Name", data.Name);
-                    command.Parameters.AddWithValue("@DepartmentID", data.DepartmentID);
-                    command.Parameters.AddWithValue("@Description", data.Description);
-                    command.Parameters.AddWithValue("@Status", data.Status);
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
-                }
+                    string QueryInsert = @"
+                        INSERT INTO Locations (
+                            Type,
+                            Name, 
+                            DepartmentID,
+                            Description, 
+                            Status
+                        ) VALUES (
+                            @Type,
+                            @Name, 
+                            @DepartmentID,
+                            @Description, 
+                            @Status
+                        )";
 
-                if (UserService.CurrentUser != null)
-                {
-                    LoggingService.Log newLog = new()
+                    int affectedRows = await connection.ExecuteAsync(QueryInsert, data, transaction);
+                    transaction?.Commit();
+
+                    if (affectedRows > 0)
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Add",
-                        ActivityDetails = $"This user added a new item for the location category with a name of {data.Name}."
-                    };
+                        LoggingService.Log newLog = new()
+                        {
+                            UserID = UserService.CurrentUser.UserID,
+                            ActivityType = MessagesConstants.Add.TITLE,
+                            ActivityDetails = $"This user added a new item for the location category with a name of {data.Name}."
+                        };
+                    }
 
-                    LoggingService.LogActivity(newLog);
+                    return (affectedRows > 0);
                 }
-
-                return true;
+                catch (Exception)
+                {
+                    transaction?.Rollback();
+                    return false;
+                }
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static void Update(Location data)
+        public static async Task<bool> Update(Models.Location data)
         {
             try
             {
-                string QueryUpdate = "UPDATE Locations SET " +
-                    "Name = @Name, " +
-                    "DepartmentID = @DepartmentID, " +
-                    "Description = @Description, " +
-                    "Status = @Status " +
-                    "WHERE ID = @ID";
+                using var context = new Context();
 
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(QueryUpdate, connection))
-                {
-                    command.Parameters.AddWithValue("@Name", data.Name);
-                    command.Parameters.AddWithValue("@DepartmentID", data.DepartmentID);
-                    command.Parameters.AddWithValue("@Description", data.Description);
-                    command.Parameters.AddWithValue("@Status", data.Status);
-                    command.Parameters.AddWithValue("@ID", data.ID);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                var item = await context.Locations.FindAsync(data.ID);
 
-                if (UserService.CurrentUser != null)
+                if (item == null) { return false; }
+                if (AreEqual(item, data)) { return true; }
+
+                item.Name = data.Name;
+                item.DepartmentID = data.DepartmentID;
+                item.Description = data.Description;
+                item.Status = data.Status;
+
+                int affectedRows = await context.SaveChangesAsync();
+
+                if (affectedRows > 0)
                 {
-                    LoggingService.Log newLog = new()
+                    if (UserService.CurrentUser != null)
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Update",
-                        ActivityDetails = $"This user updated an item under the location category with an ID of {data.ID}."
-                    };
-
-                    LoggingService.LogActivity(newLog);
+                        await LoggingService.LogActivity(new()
+                        {
+                            UserID = UserService.CurrentUser.UserID,
+                            ActivityType = MessagesConstants.UPDATE,
+                            ActivityDetails = $"This user updated an item under the location category with an ID of {data.ID}."
+                        });
+                    }
                 }
+                return (affectedRows > 0);
             }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        private static bool AreEqual(Models.Location item1, Models.Location item2)
+        {
+            return item1.Name == item2.Name &&
+                   item1.DepartmentID == item2.DepartmentID &&
+                   item1.Description == item2.Description &&
+                   item1.Status == item2.Status;
         }
     }
 }

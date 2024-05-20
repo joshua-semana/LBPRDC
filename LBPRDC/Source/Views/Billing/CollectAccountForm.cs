@@ -1,4 +1,5 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views.Billing
@@ -6,12 +7,12 @@ namespace LBPRDC.Source.Views.Billing
     public partial class CollectAccountForm : Form
     {
         public BillingControl? ParentControl { get; set; }
-        public string? BillingName { get; set; }
-        public string? AccountNumber { get; set; }
+        public int BillingID { get; set; }
+        public string AccountNumber { get; set; } = "";
         public decimal BillingValue { get; set; }
-        //public decimal AmountCollected { get; set; }
         public string? OfficialReceiptNumber { get; set; }
         public DateTime CollectionDate { get; set; }
+        public string EntryType { get; set; } = "";
 
         public List<Control> RequiredFields;
 
@@ -27,6 +28,13 @@ namespace LBPRDC.Source.Views.Billing
 
         private void CollectAccountForm_Load(object sender, EventArgs e)
         {
+            if (BillingID == 0 || string.IsNullOrEmpty(AccountNumber) || string.IsNullOrEmpty(EntryType))
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_BILLING, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
+            }
+
             Text = AccountNumber;
 
             txtBillingValue.Text = BillingValue.ToString();
@@ -49,35 +57,35 @@ namespace LBPRDC.Source.Views.Billing
 
         private async void UpdateAccountCollectionInformation()
         {
-            BillingAccount accountInformation = new()
+            Models.Billing.Account accountInformation = new()
             {
-                BillingName = BillingName,
+                BillingID = BillingID,
                 AccountNumber = AccountNumber,
                 CollectionDate = dtpCollectionDate.Value,
                 OfficialReceiptNumber = txtReceiptNumber.Text,
-                Purpose = "Still Collecting",
+                Purpose = StringConstants.Status.COLLECTING,
             };
 
-            BillingRecord recordInformation = new();
+            Models.Billing.Record recordInformation = new();
             string transactionType = string.Empty;
 
 
             if (!AccountNumber.Contains("OT"))
             {
-                transactionType = "Regular";
+                transactionType = StringConstants.Type.REGULAR;
                 recordInformation = new()
                 {
-                    BillingName = BillingName,
+                    BillingID = BillingID,
                     RegularAccountNumber = AccountNumber,
                     RegularCollectedDate = dtpCollectionDate.Value,
                 };
             }
             else
             {
-                transactionType = "Overtime";
+                transactionType = StringConstants.Type.OVERTIME;
                 recordInformation = new()
                 {
-                    BillingName = BillingName,
+                    BillingID = BillingID,
                     OvertimeAccountNumber = AccountNumber,
                     OvertimeCollectedDate = dtpCollectionDate.Value,
                 };
@@ -85,16 +93,21 @@ namespace LBPRDC.Source.Views.Billing
 
             frmLoading form = new()
             {
-                BooleanProcess = Task.Run(() => BillingAccountService.UpdateInformation(accountInformation)),
+                BooleanProcess = Task.Run(() => BillingAccountService.UpdateInformationAsync(accountInformation)),
                 Description = "Updating information, please wait..."
             };
 
             var result = form.ShowDialog();
 
-            if (result == DialogResult.OK && await Task.Run(() => BillingRecordService.UpdateCollectionDates(recordInformation, transactionType)))
+            if (result == DialogResult.OK)
             {
+                if (EntryType == StringConstants.Type.REGULAR)
+                {
+                    await BillingRecordService.UpdateCollectionDatesAsync(recordInformation, transactionType);
+                }
+
                 MessageBox.Show("You have successfully updated the information of this billing's statement of account.", "Update Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ParentControl?.FetchAccountDetailsAndPopulate();
+                ParentControl?.PopulateSelectedAccountInformation();
                 Close();
             }
             else if (result == DialogResult.Abort)

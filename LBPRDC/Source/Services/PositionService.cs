@@ -1,309 +1,348 @@
 ﻿using Dapper;
+using LBPRDC.Source.Config;
 using LBPRDC.Source.Data;
-using System.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using static LBPRDC.Source.Data.Database;
 
 namespace LBPRDC.Source.Services
 {
     internal class PositionService
     {
-        public class Position
+        public static async Task<List<Models.Position>> GetAllItems()
         {
-            public int ID { get; set; }
-            public int ClientID { get; set; }
-            public string? Code { get; set; }
-            public string? Name { get; set; }
-            public decimal SalaryRate { get; set; }
-            public decimal BillingRate { get; set; }
-            public string? Status { get; set; }
-            public string? Description { get; set; }
-        }
-
-        public class PositionWithReferenceValues : Position
-        {
-            public string ClientName { get; set; } = "";
-        }
-
-        public static List<Position> GetAllItems()
-        {
-            List<Position> items = new();
+            List<Models.Position> items = new();
 
             try
             {
-                using var connection = Database.Connect();
-                string QuerySelect = "SELECT * FROM Position";
-                items = connection.Query<Position>(QuerySelect).ToList();
+                using var context = new Context();
+                items = await context.Position.ToListAsync();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
         }
 
-        //public static List<PositionWithReferenceValues> GetAllItemsWithReferenceValues()
-        //{
-        //    List<PositionWithReferenceValues> items = new();
-
-        //    try
-        //    {
-        //        using var connection = Database.Connect();
-        //        string QuerySelect = @"
-        //            SELECT
-        //                p.*,
-        //                c.Name AS ClientName
-        //            FROM
-        //                Position p
-        //            JOIN
-        //                Clients c ON p.ClientID = c.ID";
-        //        items = connection.Query<PositionWithReferenceValues>(QuerySelect).ToList();
-        //    }
-        //    catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-
-        //    return items;
-        //}
-
-        public static List<Position> GetAllItemsForComboBox()
+        public static async Task<List<Models.Position.View>> GetAllItemsWithView()
         {
-            List<Position> items = new();
+            List<Models.Position.View> items = new();
 
             try
             {
-                Position blankItem = new()
+                using var context = new Context();
+                items = await context.Position.Select(s => new Models.Position.View
                 {
-                    ID = 0,
-                    Name = "(Choose Position)"
-                };
+                    ID = s.ID,
+                    ClientID = s.ClientID,
+                    Code = s.Code,
+                    Name = s.Name,
+                    DailySalaryRate = s.DailySalaryRate,
+                    DailyBillingRate = s.DailyBillingRate,
+                    MonthlySalaryRate = s.MonthlySalaryRate,
+                    MonthlyBillingRate = s.MonthlyBillingRate,
+                    Status = s.Status,
+                    Description = s.Description,
+                    ClientName = s.Client.Name
+                })
+                .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
-                items.Add(blankItem);
+            return items;
+        }
 
-                string query = "SELECT ID, Name FROM Position WHERE Status = 'Active'";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
+        public static async Task<List<Models.Position>> GetItemsByClientID(int ClientID)
+        {
+            List<Models.Position> items = new();
+
+            try
+            {
+                using var context = new Context();
+                items = await context.Position
+                    .Where(p => p.ClientID == ClientID)
+                    .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
+        }
+
+        public static async Task<List<Models.Position>> GetAllItemsForComboBoxByClientID(int ClientID = 0, bool withDefault = true)
+        {
+            List<Models.Position> items = new();
+
+            try
+            {
+                if (withDefault) 
                 {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
+                    items.Add(new Models.Position
                     {
-                        Position item = new()
-                        {
-                            ID = Convert.ToInt32(reader["ID"]),
-                            Name = reader["Name"].ToString()
-                        };
-
-                        items.Add(item);
-                    }
+                        ID = 0,
+                        Name = StringConstants.ComboBox.DEFAULT_POSITION
+                    });
                 }
+
+                using var context = new Context();
+
+                var result = await context.Position
+                    .Where(p => 
+                        p.Status.Equals(StringConstants.Status.ACTIVE) &&
+                        p.ClientID.Equals(ClientID))
+                    .Select(p => new Models.Position
+                    {
+                        ID = p.ID,
+                        Name = p.Name
+                    })
+                    .ToListAsync();
+
+                items.AddRange(result);
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
         }
 
-        public static async Task<bool> Add(Position data)
+        // History Entity Framework
+
+        public static async Task<Models.Position.History?> GetEmployeeHistory(int EmployeeID, string Status = StringConstants.Status.ACTIVE)
+        {
+            Models.Position.History? record = new();
+
+            try
+            {
+                using var context = new Context();
+                record = await context.EmployeePositionHistory
+                    .Where(h => h.EmployeeID == EmployeeID && h.Status == Status)
+                    .FirstOrDefaultAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return record;
+        }
+
+        public static async Task<List<Models.Position.History>> GetAllEmployeeHistory(int ID)
+        {
+            List<Models.Position.History> record = new();
+
+            try
+            {
+                using var context = new Context();
+                record = await context.EmployeePositionHistory
+                    .Where(h => h.EmployeeID == ID)
+                    .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return record;
+        }
+
+        public static async Task<bool> Add(Models.Position data)
         {
             try
             {
-                using var connection = Database.Connect();
-                using var transaction = connection?.BeginTransaction();
+                using var context = new Context();
+                using var transaction = await context.Database.BeginTransactionAsync();
 
                 try
                 {
-                    string QueryUpdate = @"
-                    INSERT INTO Position (
-                        Code,
-                        ClientID,
-                        Name, 
-                        SalaryRate, 
-                        BillingRate, 
-                        Description, 
-                        Status
-                    ) VALUES (
-                        @Code,
-                        @ClientID,
-                        @Name, 
-                        @SalaryRate, 
-                        @BillingRate, 
-                        @Description, 
-                        @Status
-                    );
+                    context.Position.Add(data);
+                    await context.SaveChangesAsync();
 
-                    SELECT SCOPE_IDENTITY();"; // <-- This is to get the last inserted ID
-
-                    int newInsertedID = await connection.ExecuteScalarAsync<int>(QueryUpdate, data, transaction);
-                    transaction?.Commit();
+                    int newInsertedID = data.ID;
 
                     AddRatesHistory(new()
                     {
-                        PositionID = Convert.ToInt32(newInsertedID),
-                        SalaryRate = data.SalaryRate,
-                        BillingRate = data.BillingRate
+                        PositionID = newInsertedID,
+                        DailySalaryRate = data.DailySalaryRate,
+                        DailyBillingRate = data.DailyBillingRate,
+                        MonthlySalaryRate = data.MonthlySalaryRate,
+                        MonthlyBillingRate = data.MonthlyBillingRate,
+                        Timestamp = DateTime.Now
                     });
 
-                    LoggingService.LogActivity(new()
+                    await LoggingService.LogActivity(new()
                     {
                         UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "New Client",
-                        ActivityDetails = $"User added a new client"
+                        ActivityType = MessagesConstants.Logs.TITLE_NEW_CATEGORY,
+                        ActivityDetails = $"{MessagesConstants.Logs.NEW_POSITION}{data.Name}"
                     });
 
+                    await transaction.CommitAsync();
                     return true;
                 }
                 catch (Exception)
                 {
-                    transaction?.Rollback();
+                    await transaction.RollbackAsync();
                     return false;
                 }
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static void Update(Position data)
+        public static async Task<bool> Update(Models.Position data)
+        {
+            try
+            {
+                using var context = new Context();
+                using var transaction = await context.Database.BeginTransactionAsync();
+
+                try
+                {
+                    var position = await context.Position.FindAsync(data.ID);
+
+                    if (position == null)
+                    {
+                        return false;
+                    }
+
+                    position.ClientID = data.ClientID;
+                    position.Code = data.Code;
+                    position.Name = data.Name;
+                    position.DailySalaryRate = data.DailySalaryRate;
+                    position.DailyBillingRate = data.DailyBillingRate;
+                    position.MonthlySalaryRate = data.MonthlySalaryRate;
+                    position.MonthlyBillingRate = data.MonthlyBillingRate;
+                    position.Description = data.Description;
+                    position.Status = data.Status;
+
+                    await context.SaveChangesAsync();
+
+                    if (UserService.CurrentUser != null)
+                    {
+                        await LoggingService.LogActivity(new()
+                        {
+                            UserID = UserService.CurrentUser.UserID,
+                            ActivityType = MessagesConstants.UPDATE,
+                            ActivityDetails = $"{MessagesConstants.Logs.UPDATE_POSITION}{data.ID}."
+                        });
+                    }
+
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public class History
+        {
+            public int HistoryID { get; set; }
+            public int EmployeeID { get; set; }
+            public int OldPositionID { get; set; }
+            public int PositionID { get; set; }
+            public string? PositionTitle { get; set; }
+            public decimal DailySalaryRate { get; set; }
+            public decimal DailyBillingRate { get; set; }
+            public decimal MonthlySalaryRate { get; set; }
+            public decimal MonthlyBillingRate { get; set; }
+            public DateTime? Timestamp { get; set; }
+            public string? Remarks { get; set; }
+            public string? Status { get; set; }
+        }
+
+        public static async void AddNewHistory(Models.Position.HistoryAdditional history)
+        {
+            try
+            {
+                using var connection = Database.Connect();
+
+                string QuerySelect = @"
+                    SELECT
+                        HistoryID
+                    FROM
+                        EmployeePositionHistory
+                    WHERE
+                        EmployeeID = @EmployeeID
+                    AND
+                        Status = @Status";
+
+                List<Models.Position.History> matchingHistory = connection.Query<Models.Position.History>(QuerySelect, new
+                {
+                    history.EmployeeID,
+                    Status = StringConstants.Status.ACTIVE
+                }).ToList();
+
+                if (matchingHistory.Count > 0)
+                {
+                    int historyID = matchingHistory.Select(s => s.HistoryID).First();
+                    UpdateStatusToInactiveByID(historyID);
+                    UpdateRatesByID(history.OldPositionID, historyID);
+                }
+
+                bool isSuccessful = await AddToHistory(history);
+
+                if (!isSuccessful)
+                {
+                    MessageBox.Show(MessagesConstants.FAILED_HISTORY_ADD, MessagesConstants.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> AddToHistory(Models.Position.History data)
+        {
+            try
+            {
+                using var context = new Context();
+                context.EmployeePositionHistory.Add(data);
+                int affectedRows = await context.SaveChangesAsync();
+                return (affectedRows > 0);
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        private static async void UpdateStatusToInactiveByID(int HistoryID)
         {
             try
             {
                 using var connection = Database.Connect();
 
                 string QueryUpdate = @"
-                    UPDATE Position SET
-                        ClientID = @ClientID,
-                        Code = @Code,
-                        Name = @Name,
-                        SalaryRate = @SalaryRate,
-                        BillingRate = @BillingRate,
-                        Description = @Description,
+                    UPDATE EmployeePositionHistory SET
                         Status = @Status
                     WHERE
-                        ID = @ID";
+                        HistoryID = @HistoryID";
 
-                connection.Execute(QueryUpdate, data);
-
-                if (UserService.CurrentUser != null)
+                await connection.ExecuteAsync(QueryUpdate, new
                 {
-                    LoggingService.LogActivity(new()
-                    {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Update",
-                        ActivityDetails = $"This user updated an item under the position category with an ID of {data.ID}."
-                    });
-                }
+                    Status = StringConstants.Status.INACTIVE,
+                    HistoryID
+                });
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
-        public class History
-        {
-            public int HistoryID { get; set; }
-            public string? EmployeeID { get; set; }
-            public int OldPositionID { get; set; }
-            public int PositionID { get; set; }
-            public string? PositionTitle { get; set; }
-            public decimal SalaryRate { get; set; }
-            public decimal BillingRate { get; set; }
-            public DateTime? Timestamp { get; set; }
-            public string? Remarks { get; set; }
-            public string? Status { get; set; }
-        }
-
-        public class HistoryUpdate
-        {
-            public int HistoryID { get; set; }
-            public int PositionID { get; set; }
-            public string? PositionTitle { get; set; }
-            public DateTime? Timestamp { get; set; }
-        }
-
-        public class HistoryView : History
-        {
-            public string? PositionName { get; set; }
-            public string? EffectiveDate { get; set; }
-            public string? StatusName { get; set; }
-        }
-
-        public static void AddNewHistory(History history)
+        private static async void UpdateRatesByID(int OldPositionID, int HistoryID)
         {
             try
             {
-                string query = "SELECT HistoryID FROM EmployeePositionHistory WHERE EmployeeID = @EmployeeID AND Status = 'Active'";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
+                //TODO: By ClientID ang Get ALl items ng Positions
+                var positions = await GetAllItems();
+                var CurrentPositionRate = positions.First(f => f.ID == OldPositionID);
+
+                using var connection = Database.Connect();
+
+                string QueryUpdate = @"
+                    UPDATE EmployeePositionHistory SET
+                        DailySalaryRate = @DailySalaryRate,
+                        DailyBillingRate = @DailyBillingRate,
+                        MonthlySalaryRate = @MonthlySalaryRate,
+                        MonthlyBillingRate = @MonthlyBillingRate
+                    WHERE 
+                        HistoryID = @HistoryID";
+
+                await connection.ExecuteAsync(QueryUpdate, new
                 {
-                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
-                    connection.Open();
-
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            int historyID = Convert.ToInt32(reader["HistoryID"]);
-                            UpdateStatusToInactiveByID(historyID);
-                            UpdateRatesByID(history.OldPositionID, historyID);
-                        }
-                        AddToHistory(history);
-                    }
-                }
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-        }
-
-        public static void AddToHistory(History history)
-        {
-            try
-            {
-                string query = "INSERT INTO EmployeePositionHistory (EmployeeID, PositionID, PositionTitle, SalaryRate, BillingRate, Timestamp, Remarks, Status)" +
-                    "VALUES (@EmployeeID, @PositionID, @PositionTitle, @SalaryRate, @BillingRate, @Timestamp, @Remarks, @Status)";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeID", history.EmployeeID);
-                    command.Parameters.AddWithValue("@PositionID", history.PositionID);
-                    command.Parameters.AddWithValue("@PositionTitle", history.PositionTitle);
-                    command.Parameters.AddWithValue("@SalaryRate", history.SalaryRate);
-                    command.Parameters.AddWithValue("@BillingRate", history.BillingRate);
-                    command.Parameters.AddWithValue("@Timestamp", history.Timestamp);
-                    command.Parameters.AddWithValue("@Remarks", history.Remarks);
-                    command.Parameters.AddWithValue("@Status", history.Status);
-
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-        }
-
-        private static void UpdateStatusToInactiveByID(int historyID)
-        {
-            try
-            {
-                string updateQuery = "UPDATE EmployeePositionHistory SET Status = @Status WHERE HistoryID = @HistoryID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
-                {
-                    command.Parameters.AddWithValue("@Status", "Inactive");
-                    command.Parameters.AddWithValue("@HistoryID", historyID);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-        }
-
-        private static void UpdateRatesByID(int OldPositionID, int historyID)
-        {
-            try
-            {
-                var rate = GetAllItems().First(f => f.ID == OldPositionID);
-
-                string updateQuery = "UPDATE EmployeePositionHistory SET " +
-                    "SalaryRate = @SalaryRate, " +
-                    "BillingRate = @BillingRate " +
-                    "WHERE HistoryID = @HistoryID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
-                {
-                    command.Parameters.AddWithValue("@SalaryRate", rate.SalaryRate);
-                    command.Parameters.AddWithValue("@BillingRate", rate.BillingRate);
-                    command.Parameters.AddWithValue("@HistoryID", historyID);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
+                    CurrentPositionRate.DailySalaryRate,
+                    CurrentPositionRate.DailyBillingRate,
+                    CurrentPositionRate.MonthlySalaryRate,
+                    CurrentPositionRate.MonthlyBillingRate,
+                    HistoryID
+                });
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
@@ -314,166 +353,114 @@ namespace LBPRDC.Source.Services
 
             try
             {
-                string query = "SELECT * FROM EmployeePositionHistory";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        History item = new() {
-                            HistoryID = Convert.ToInt32(reader["HistoryID"]),
-                            EmployeeID = reader["EmployeeID"].ToString(),
-                            PositionID = Convert.ToInt32(reader["PositionId"]),
-                            PositionTitle = reader["PositionTitle"].ToString(),
-                            SalaryRate = Convert.ToDecimal(reader["SalaryRate"]),
-                            BillingRate = Convert.ToDecimal(reader["BillingRate"]),
-                            Timestamp = reader["Timestamp"] as DateTime?,
-                            Remarks = reader["Remarks"].ToString(),
-                            Status = reader["Status"].ToString()
-                        };
+                using var connection = Database.Connect();
 
-                        items.Add(item);
-                    }
-                }
+                string QuerySelect = "SELECT * FROM EmployeePositionHistory";
+
+                items = connection.Query<History>(QuerySelect).ToList();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return items;
         }
 
-        public static void UpdateHistory(HistoryUpdate data)
+        public static async Task<List<Models.Position.HistoryView>> GetAllHistoryByID(int ClientID, int EmployeeID)
         {
-            try
-            {
-                string updateQuery = "UPDATE EmployeePositionHistory SET " +
-                    "PositionID = @PositionID, " +
-                    "PositionTitle = @PositionTitle, " +
-                    "Timestamp = @Timestamp " +
-                    "WHERE HistoryID = @HistoryID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
-                {
-                    command.Parameters.AddWithValue("@PositionID", data.PositionID);
-                    command.Parameters.AddWithValue("@PositionTitle", data.PositionTitle);
-                    command.Parameters.AddWithValue("@Timestamp", data.Timestamp);
-                    command.Parameters.AddWithValue("@HistoryID", data.HistoryID);
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-        }
-
-        public static List<HistoryView> GetAllHistoryByID(string employeeId)
-        {
-            List<HistoryView> items = new();
+            List<Models.Position.HistoryView> histories = new();
 
             try
             {
-                string query = "SELECT * FROM EmployeePositionHistory WHERE EmployeeID = @EmployeeID";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
-                {
-                    command.Parameters.AddWithValue("@EmployeeID", employeeId);
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
+                using var context = new Context();
+
+                histories = await context.EmployeePositionHistory
+                    .Where(w => w.EmployeeID == EmployeeID)
+                    .Select(s => new Models.Position.HistoryView
                     {
-                        HistoryView item = new()
-                        {
-                            HistoryID = Convert.ToInt32(reader["HistoryID"]),
-                            EmployeeID = reader["EmployeeID"].ToString(),
-                            PositionID = Convert.ToInt32(reader["PositionId"]),
-                            PositionTitle = Utilities.StringFormat.ToSentenceCase(reader["PositionTitle"].ToString()),
-                            SalaryRate = Convert.ToDecimal(reader["SalaryRate"]),
-                            BillingRate = Convert.ToDecimal(reader["BillingRate"]),
-                            Timestamp = reader["Timestamp"] as DateTime?,
-                            Remarks = reader["Remarks"].ToString(),
-                            Status = reader["Status"].ToString()
-                        };
-                        var position = GetAllItems().First(f => f.ID == item.PositionID);
-                        item.PositionName = $"{position.Code} - {Utilities.StringFormat.ToSentenceCase(position.Name)}";
-                        item.SalaryRate = (item.Status == "Active") ? position.SalaryRate : item.SalaryRate;
-                        item.BillingRate = (item.Status == "Active") ? position.BillingRate : item.BillingRate;
-                        item.EffectiveDate = item.Timestamp.Value.ToString("MMMM dd, yyyy");
-                        item.StatusName = (item.Status == "Active") ? "Current" : "Old";
-                        items.Add(item);
-                    }
+                        PositionID = s.PositionID,
+                        PositionName = "",
+                        PositionTitle = s.PositionTitle,
+                        WageType = s.WageType,
+                        DailySalaryRate = s.DailySalaryRate,
+                        DailyBillingRate = s.DailyBillingRate,
+                        MonthlySalaryRate = s.MonthlySalaryRate,
+                        MonthlyBillingRate = s.MonthlyBillingRate,
+                        Timestamp = s.Timestamp,
+                        Status = s.Status,
+                        Remarks = s.Remarks
+                    })
+                    .ToListAsync();
+
+                var allPositions = await GetItemsByClientID(ClientID);
+
+                foreach (var history in histories)
+                {
+                    var activePosition = allPositions.First(f => f.ID == history.PositionID);
+
+                    history.PositionName = $"{activePosition.Code} - {Utilities.StringFormat.ToSentenceCase(activePosition.Name)}";
+                    history.DailySalaryRate = (history.Status == StringConstants.Status.ACTIVE) ? activePosition.DailySalaryRate : history.DailySalaryRate;
+                    history.DailyBillingRate = (history.Status == StringConstants.Status.ACTIVE) ? activePosition.DailyBillingRate : history.DailyBillingRate;
+                    history.MonthlySalaryRate = (history.Status == StringConstants.Status.ACTIVE) ? activePosition.MonthlySalaryRate : history.MonthlySalaryRate;
+                    history.MonthlyBillingRate = (history.Status == StringConstants.Status.ACTIVE) ? activePosition.MonthlyBillingRate : history.MonthlyBillingRate;
+                    history.EffectiveDate = history.Timestamp.ToString(StringConstants.Date.DEFAULT);
+                    history.Indicator = (history.Status == StringConstants.Status.ACTIVE) ? StringConstants.DisplayStatus.RIGHT_ARROW : "";
                 }
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
-            return items;
+            return histories;
         }
 
-        public class RatesHistory
-        {
-            public int PositionID { get; set; }
-            public decimal SalaryRate { get; set; }
-            public decimal BillingRate { get; set; }
-        }
-
-        public class RatesHistoryView
-        {
-            public string? Status { get; set; }
-            public decimal SalaryRate { get; set; }
-            public decimal BillingRate { get; set; }
-            public DateTime Timestamp { get; set; }
-        }
-
-        public static void AddRatesHistory(RatesHistory history)
+        public static async Task RemoveHistoryByEmployeeID(int EmployeeID)
         {
             try
             {
-                string queryAdd = "INSERT INTO PositionRatesHistory (PositionID, SalaryRate, BillingRate, TimeStamp) " +
-                    "VALUES (@PositionID, @SalaryRate, @BillingRate, @TimeStamp)";
-                using (SqlConnection connection =  new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(queryAdd, connection))
+                using var context = new Context();
+                var historiesToRemove = await context.EmployeePositionHistory
+                    .Where(h => h.EmployeeID == EmployeeID)
+                    .ToListAsync();
+
+                if (historiesToRemove.Any())
                 {
-                    command.Parameters.AddWithValue("@PositionID", history.PositionID);
-                    command.Parameters.AddWithValue("@SalaryRate", history.SalaryRate);
-                    command.Parameters.AddWithValue("@BillingRate", history.BillingRate);
-                    command.Parameters.AddWithValue("@TimeStamp", DateTime.Now);
-                    connection.Open();
-                    command.ExecuteNonQuery();
+                    context.EmployeePositionHistory.RemoveRange(historiesToRemove);
+                    await context.SaveChangesAsync();
                 }
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
-        public static List<RatesHistoryView> GetRatesHistoryByID(int? positionID)
+        public static async void AddRatesHistory(Models.Position.RatesHistory data)
         {
-            List<RatesHistoryView> histories = new();
+            try
+            {
+                using var context = new Context();
+
+                context.PositionRatesHistory.Add(data);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<List<Models.Position.RatesHistoryView>> GetRatesHistoryByID(int PositionID)
+        {
+            List<Models.Position.RatesHistoryView> histories = new();
 
             try
             {
-                string query = "SELECT * FROM PositionRatesHistory WHERE PositionID = @PositionID " +
-                    "ORDER BY Timestamp DESC";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(new(query), connection))
-                {
-                    command.Parameters.AddWithValue("@PositionID", positionID);
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
+                using var context = new Context();
+
+                histories = await context.PositionRatesHistory
+                    .Where(w => w.PositionID == PositionID)
+                    .Select(s => new Models.Position.RatesHistoryView
                     {
-                        RatesHistoryView history = new()
-                        {
-                            SalaryRate = Convert.ToDecimal(reader["SalaryRate"]),
-                            BillingRate = Convert.ToDecimal(reader["BillingRate"]),
-                            Timestamp = Convert.ToDateTime(reader["Timestamp"])
-                        };
-
-                        histories.Add(history);
-                    }
-                }
-
-                if (histories.Count > 0)
-                {
-                    histories[0].Status = "Current";
-                }
+                        Indicator = "",
+                        DailySalaryRate = s.DailySalaryRate,
+                        DailyBillingRate = s.DailyBillingRate,
+                        MonthlySalaryRate = s.MonthlySalaryRate,
+                        MonthlyBillingRate = s.MonthlyBillingRate,
+                        Timestamp = s.Timestamp,
+                    })
+                    .OrderByDescending(h => h.Timestamp)
+                    .ToListAsync();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 

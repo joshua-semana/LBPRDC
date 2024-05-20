@@ -1,21 +1,13 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static LBPRDC.Source.Services.EmployeeService;
 
 namespace LBPRDC.Source.Views.EmployeeFlow
 {
     public partial class UpdateEmploymentStatusForm : Form
     {
-        public string? EmployeeId { get; set; }
+        public int ClientID { get; set; }
+        public int EmployeeID { get; set; }
         public ucEmployees? ParentControl { get; set; }
 
         private readonly List<Control> requiredFields;
@@ -31,10 +23,15 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void UpdateEmploymentStatusForm_Load(object sender, EventArgs e)
         {
-            if (EmployeeId != null)
+            if (ClientID != 0 || EmployeeID != 0)
             {
-                InitializeEmployeeInformation(EmployeeId);
+                InitializeEmployeeInformation(ClientID, EmployeeID);
                 InitializePositionComboBoxItems();
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.RETRIEVE_DATA, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
             }
         }
 
@@ -45,15 +42,23 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             cmbEmploymentStatus.ValueMember = "ID";
         }
 
-        private void InitializeEmployeeInformation(string ID)
+        private async void InitializeEmployeeInformation(int ClientID, int EmployeeID)
         {
-            List<EmployeeService.Employee> employees = EmployeeService.GetAllEmployees();
+            var employees = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
 
-            var employee = employees.First(w => w.EmployeeID == ID);
+            if (employees.Any())
+            {
+                var employee = employees.First();
 
-            txtEmployeeID.Text = employee.EmployeeID;
-            txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
-            txtCurrentEmploymentStatus.Text = employee.EmploymentStatus;
+                txtEmployeeID.Text = employee.EmployeeID;
+                txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
+                txtCurrentEmploymentStatus.Text = employee.EmploymentStatusName;
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_EMPLOYEE, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+            }
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
@@ -66,7 +71,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
                     return;
                 }
 
-                var result1 = MessageBox.Show("Are you sure you want to update this employee's position information?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                var result1 = MessageBox.Show(MessagesConstants.Update.QUESTION, MessagesConstants.Update.TITLE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result1 == DialogResult.No) return;
 
                 UpdateEmployeeInformation();
@@ -77,7 +82,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
         {
             EmployeeService.EmployeeEmploymentStatusUpdate data = new()
             {
-                EmployeeID = txtEmployeeID.Text,
+                EmployeeID = EmployeeID,
                 EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
                 Remarks = txtRemarks.Text,
                 Date = DateTime.Now,
@@ -87,15 +92,19 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
             if (isUpdated)
             {
-                MessageBox.Show("You have successfully updated this employee's employment status information.", "Update Employee Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(MessagesConstants.Update.SUCCESS, MessagesConstants.SUCCESS, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ParentControl?.ApplyFilterAndSearchThenPopulate();
                 this.Close();
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.ACTION, MessagesConstants.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show(MessagesConstants.Cancel.QUESTION, MessagesConstants.Cancel.TITLE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
                 this.Close();

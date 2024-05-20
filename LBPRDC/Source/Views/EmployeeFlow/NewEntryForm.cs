@@ -1,11 +1,15 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views
 {
     public partial class frmNewEntryEmployee : Form
     {
+        public int ClientID { get; set; }
+        public string ClientName { get; set; } = "";
         public ucEmployees? ParentControl { get; set; }
+
         private readonly List<Control> requiredFields;
 
         public frmNewEntryEmployee()
@@ -17,8 +21,9 @@ namespace LBPRDC.Source.Views
                 txtFirstName,
                 txtLastName,
                 cmbGender,
-                cmbCivilStatus,
                 txtEmployeeID,
+                cmbClassification,
+                cmbWageType,
                 cmbPosition,
                 cmbEmploymentStatus,
                 cmbDepartment
@@ -27,33 +32,27 @@ namespace LBPRDC.Source.Views
 
         private void frmEmployeeDataEntry_Load(object sender, EventArgs e)
         {
-            InitializePositionComboBoxItems();
-            InitializeCivilStatusComboBoxItems();
-            InitializeEmploymentStatusComboBoxItems();
-            InitializeSuffixComboBoxItems();
+            if (ClientID == 0)
+            {
+                MessageBox.Show(MessagesConstants.ERROR_RETRIEVE_CLIENT, MessagesConstants.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+                return;
+            }
+
+            this.Text = $"New Employee for Client: {ClientName}";
+
             InitializeGenderComboBoxItems();
+            InitializeSuffixComboBoxItems();
+            InitializeEmploymentStatusComboBoxItems();
+            InitializeClassificationComboBoxItems();
+            InitializeWageTypeComboBoxItems();
+            InitializePositionComboBoxItems();
             InitializeDepartmentComboBoxItems();
         }
 
-        private void InitializePositionComboBoxItems()
+        private void InitializeGenderComboBoxItems()
         {
-            cmbPosition.DataSource = PositionService.GetAllItemsForComboBox();
-            cmbPosition.DisplayMember = "Name";
-            cmbPosition.ValueMember = "ID";
-        }
-
-        private void InitializeCivilStatusComboBoxItems()
-        {
-            cmbCivilStatus.DataSource = CivilStatusService.GetAllItemsForComboBox();
-            cmbCivilStatus.DisplayMember = "Name";
-            cmbCivilStatus.ValueMember = "ID";
-        }
-
-        private void InitializeEmploymentStatusComboBoxItems()
-        {
-            cmbEmploymentStatus.DataSource = EmploymentStatusService.GetAllItemsForComboBox();
-            cmbEmploymentStatus.DisplayMember = "Name";
-            cmbEmploymentStatus.ValueMember = "ID";
+            cmbGender.SelectedIndex = 0;
         }
 
         private void InitializeSuffixComboBoxItems()
@@ -63,20 +62,48 @@ namespace LBPRDC.Source.Views
             cmbSuffix.ValueMember = "ID";
         }
 
-        private void InitializeDepartmentComboBoxItems()
+        private async void InitializeEmploymentStatusComboBoxItems()
         {
-            cmbDepartment.DataSource = DepartmentService.GetAllItemsForComboBox();
+            cmbEmploymentStatus.DataSource = await EmploymentStatusService.GetAllItemsForComboBox();
+            cmbEmploymentStatus.DisplayMember = "Name";
+            cmbEmploymentStatus.ValueMember = "ID";
+        }
+
+        private async void InitializeWageTypeComboBoxItems()
+        {
+            cmbWageType.DataSource = await WageService.GetAllItemsForComboBox();
+            cmbWageType.DisplayMember = "Name";
+            cmbWageType.ValueMember = "ID";
+        }
+
+        private async void InitializeClassificationComboBoxItems()
+        {
+            cmbClassification.DataSource = await ClassificationService.GetAllItemsForComboBoxByClientID(ClientID);
+            cmbClassification.DisplayMember = "Name";
+            cmbClassification.ValueMember = "ID";
+        }
+
+        private async void InitializePositionComboBoxItems()
+        {
+            cmbPosition.DataSource = await PositionService.GetAllItemsForComboBoxByClientID(ClientID);
+            cmbPosition.DisplayMember = "Name";
+            cmbPosition.ValueMember = "ID";
+        }
+
+        private async void InitializeDepartmentComboBoxItems()
+        {
+            cmbDepartment.DataSource = await DepartmentService.GetAllItemsForComboBoxByClientID(ClientID);
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
         }
 
-        private void GetLocationComboBoxItems()
+        private async void GetLocationComboBoxItems()
         {
             if (cmbDepartment.SelectedIndex != 0)
             {
                 cmbLocation.Enabled = true;
                 int DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue);
-                cmbLocation.DataSource = LocationService.GetAllItemsForComboBoxByID(DepartmentID);
+                cmbLocation.DataSource = await LocationService.GetAllItemsForComboBoxByID(DepartmentID);
                 cmbLocation.DisplayMember = "Name";
                 cmbLocation.ValueMember = "ID";
             }
@@ -87,16 +114,11 @@ namespace LBPRDC.Source.Views
             }
         }
 
-        private void InitializeGenderComboBoxItems()
-        {
-            cmbGender.SelectedIndex = 0;
-        }
-
-        private void btnConfirm_Click(object sender, EventArgs e)
+        private async void btnConfirm_Click(object sender, EventArgs e)
         {
             if (ControlUtils.AreRequiredFieldsFilled(requiredFields))
             {
-                if (EmployeeService.IDExists(txtEmployeeID.Text))
+                if (await EmployeeService.IDExists(ClientID, txtEmployeeID.Text.ToUpper().Trim()))
                 {
                     MessageBox.Show("The Employee ID you entered already exists in the database. Please enter a different ID.", "Employee ID Already Exists", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -120,43 +142,54 @@ namespace LBPRDC.Source.Views
 
         private async void AddNewEmployee()
         {
-            EmployeeService.EmployeeHistory newEmployee = new()
+            var isAdded = await EmployeeService.AddEmployee(new()
             {
                 EmployeeID = txtEmployeeID.Text.ToUpper().Trim(),
-                LastName = txtLastName.Text.ToUpper().Trim(),
                 FirstName = txtFirstName.Text.ToUpper().Trim(),
                 MiddleName = txtMiddleName.Text.ToUpper().Trim(),
-                SuffixID = Convert.ToInt32(cmbSuffix.SelectedValue),
+                LastName = txtLastName.Text.ToUpper().Trim(),
                 Gender = cmbGender.Text,
-                Birthday = dtpBirthday.Value,
-                Education = txtEducation.Text,
-                DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue),
-                LocationID = Convert.ToInt32(cmbLocation.SelectedValue),
+
                 EmailAddress1 = txtEmailAddress1.Text.Trim(),
                 EmailAddress2 = txtEmailAddress2.Text.Trim(),
                 ContactNumber1 = txtContactNumber1.Text,
                 ContactNumber2 = txtContactNumber2.Text,
-                CivilStatusID = Convert.ToInt32(cmbCivilStatus.SelectedValue),
-                PositionID = Convert.ToInt32(cmbPosition.SelectedValue),
-                EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
                 Remarks = txtRemarks.Text.Trim(),
 
-                StartDate = dtpStartDate.Value,
-                PositionTitle = txtPositionTitle.Text.ToUpper().Trim(),
-                isPreviousEmployee = chkPreviousEmployee.Checked,
-                PreviousFrom = dtpFromDate.Value,
-                PreviousTo = dtpToDate.Value,
-                PreviousPosition = txtPreviousPosition.Text.ToUpper().Trim(),
-                OtherInformation = txtOtherInformation.Text.Trim()
-            };
+                SuffixID = Convert.ToInt32(cmbSuffix.SelectedValue),
+                EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
 
-            bool isAdded = await EmployeeService.AddNewEmployee(newEmployee);
+                ClientID = ClientID,
+                ClassificationID = Convert.ToInt32(cmbClassification.SelectedValue),
+                WageID = Convert.ToInt32(cmbWageType.SelectedValue),
+                PositionID = Convert.ToInt32(cmbPosition.SelectedValue),
+                DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue),
+                LocationID = Convert.ToInt32(cmbLocation.SelectedValue),
+            },
+            new()
+            {
+                IsFormerEmployee = chkPreviousEmployee.Checked,
+                FormerPositionTitle = txtPreviousPosition.Text.ToUpper().Trim(),
+                FormerStartDate = dtpFromDate.Value,
+                FormerEndDate = dtpToDate.Value,
+                MoreFormerInformation = txtOtherInformation.Text.Trim(),
+                CurrentPositionTitle = txtPositionTitle.Text.ToUpper().Trim(),
+                OfficialStartDate = dtpStartDate.Value,
+
+                WageName = cmbWageType.Text.ToUpper(),
+                DepartmentName = cmbDepartment.Text.Trim(),
+                LocationName = cmbLocation.Text.Trim()
+            });
 
             if (isAdded)
             {
                 MessageBox.Show("You have successfully added a new employee.", "New Employee Added", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ParentControl?.ResetTableSearchFilter();
                 this.Close();
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.ERROR_ACTION, MessagesConstants.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -170,7 +203,7 @@ namespace LBPRDC.Source.Views
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show(MessagesConstants.Cancel.QUESTION, MessagesConstants.Cancel.TITLE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
                 this.Close();

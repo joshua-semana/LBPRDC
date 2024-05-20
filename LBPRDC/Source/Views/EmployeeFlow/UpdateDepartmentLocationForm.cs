@@ -1,16 +1,17 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
-using System.Data;
-using static LBPRDC.Source.Services.EmployeeService;
 
 namespace LBPRDC.Source.Views.EmployeeFlow
 {
     public partial class UpdateDepartmentLocationForm : Form
     {
-        public string? EmployeeId { get; set; }
+        public int EmployeeID { get; set; }
+        public int ClientID { get; set; }
         public ucEmployees? ParentControl { get; set; }
 
         private readonly List<Control> requiredFields;
+        private List<Models.Department> DepartmentList = new();
 
         public UpdateDepartmentLocationForm()
         {
@@ -24,20 +25,25 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void UpdateDepartmentLocationForm_Load(object sender, EventArgs e)
         {
-            if (EmployeeId != null)
+            if (EmployeeID != 0 || ClientID != 0)
             {
-                InitializeEmployeeInformation(EmployeeId);
                 InitializeDepartmentComboBoxItems();
+                InitializeEmployeeInformation(ClientID, EmployeeID);
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.RETRIEVE_DATA, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
             }
         }
 
-        private void GetLocationComboBoxItems()
+        private async void GetLocationComboBoxItems()
         {
             if (cmbDepartment.SelectedIndex != 0)
             {
                 cmbLocation.Enabled = true;
                 int DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue);
-                cmbLocation.DataSource = LocationService.GetAllItemsForComboBoxByID(DepartmentID);
+                cmbLocation.DataSource = await LocationService.GetAllItemsForComboBoxByID(DepartmentID);
                 cmbLocation.DisplayMember = "Name";
                 cmbLocation.ValueMember = "ID";
             }
@@ -48,23 +54,36 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             }
         }
 
-        private void InitializeDepartmentComboBoxItems()
+        private async void InitializeDepartmentComboBoxItems()
         {
-            cmbDepartment.DataSource = DepartmentService.GetAllItemsForComboBox();
+            DepartmentList = await DepartmentService.GetAllItemsForComboBoxByClientID(ClientID);
+            cmbDepartment.DataSource = DepartmentList;
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
         }
 
-        private void InitializeEmployeeInformation(string ID)
+        private async void InitializeEmployeeInformation(int ClientID, int EmployeeID)
         {
-            List<EmployeeService.Employee> employees = EmployeeService.GetAllEmployees();
+            var employees = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
 
-            var employee = employees.First(w => w.EmployeeID == ID);
+            if (employees.Any())
+            {
+                var employee = employees.First();
+                var departmentInfo = DepartmentList.Where(w => w.ID == employee.DepartmentID).FirstOrDefault();
 
-            txtEmployeeID.Text = employee.EmployeeID;
-            txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
-            txtCurrentDepartment.Text = employee.Department;
-            txtCurrentLocation.Text = employee.Location;
+                txtCurrentDepartment.Text = (departmentInfo != null) 
+                    ? departmentInfo.Name
+                    : $"{MessagesConstants.Error.TITLE} - {MessagesConstants.Error.CANT_RETRIEVE}";
+
+                txtEmployeeID.Text = employee.EmployeeID;
+                txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
+                txtCurrentLocation.Text = employee.LocationName;
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_EMPLOYEE, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+            }
         }
 
         private void cmbDepartment_SelectedIndexChanged(object sender, EventArgs e)
@@ -76,7 +95,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
         {
             if (ControlUtils.AreRequiredFieldsFilled(requiredFields))
             {
-                var result1 = MessageBox.Show("Are you sure you want to update this employee's information?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                var result1 = MessageBox.Show(MessagesConstants.Update.QUESTION, MessagesConstants.Update.TITLE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result1 == DialogResult.No) return;
 
                 UpdateEmployeeInformation();
@@ -86,9 +105,11 @@ namespace LBPRDC.Source.Views.EmployeeFlow
         {
             EmployeeService.EmployeeDepartmentLocationUpdate data = new()
             {
-                EmployeeID = txtEmployeeID.Text,
+                EmployeeID = EmployeeID,
                 DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue),
                 LocationID = Convert.ToInt32(cmbLocation.SelectedValue),
+                DepartmentName = cmbDepartment.Text,
+                LocationName = cmbLocation.Text,
                 Remarks = txtRemarks.Text,
                 Date = DateTime.Now,
             };
@@ -97,19 +118,19 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
             if (isUpdated)
             {
-                MessageBox.Show("You have successfully updated this employee's department and location information.", "Update Employee Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(MessagesConstants.Update.SUCCESS, MessagesConstants.SUCCESS, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ParentControl?.ApplyFilterAndSearchThenPopulate();
                 this.Close();
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.ACTION, MessagesConstants.ERROR, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result == DialogResult.Yes)
-            {
-                this.Close();
-            }
+            this.Close();
         }
     }
 }

@@ -42,8 +42,8 @@
             label1 = new Label();
             txtReleaseDate = new TextBox();
             grpBillingInformation = new GroupBox();
+            txtEquipmentIncludedStatus = new TextBox();
             txtSuppliesAndEquipmentsAmount = new TextBox();
-            label13 = new Label();
             txtSuppliesAndEquipmentsAccount = new TextBox();
             label12 = new Label();
             btnUpdateBillingInformation = new Button();
@@ -79,10 +79,13 @@
             pnlRightFooter = new Panel();
             flowFooterActions = new FlowLayoutPanel();
             btnCloseDetails = new Button();
+            btnDuplicateBilling = new Button();
             btnView = new Button();
             pnlVLine1 = new Panel();
             pnlLeft = new Panel();
             pnlLeftBody = new Panel();
+            lblClient = new Label();
+            cmbClient = new ComboBox();
             btnNew = new Button();
             btnSearch = new Button();
             pnlLine1 = new Panel();
@@ -240,8 +243,8 @@
             // grpBillingInformation
             // 
             grpBillingInformation.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpBillingInformation.Controls.Add(txtEquipmentIncludedStatus);
             grpBillingInformation.Controls.Add(txtSuppliesAndEquipmentsAmount);
-            grpBillingInformation.Controls.Add(label13);
             grpBillingInformation.Controls.Add(txtSuppliesAndEquipmentsAccount);
             grpBillingInformation.Controls.Add(label12);
             grpBillingInformation.Controls.Add(btnUpdateBillingInformation);
@@ -253,49 +256,51 @@
             grpBillingInformation.Margin = new Padding(0, 0, 0, 12);
             grpBillingInformation.Name = "grpBillingInformation";
             grpBillingInformation.Padding = new Padding(16, 10, 16, 8);
-            grpBillingInformation.Size = new Size(391, 333);
+            grpBillingInformation.Size = new Size(391, 266);
             grpBillingInformation.TabIndex = 11;
             grpBillingInformation.TabStop = false;
             grpBillingInformation.Text = "Billing Information";
+            // 
+            // txtEquipmentIncludedStatus
+            // 
+            txtEquipmentIncludedStatus.AccessibleName = "ID";
+            txtEquipmentIncludedStatus.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtEquipmentIncludedStatus.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            txtEquipmentIncludedStatus.Location = new Point(16, 178);
+            txtEquipmentIncludedStatus.Margin = new Padding(0, 0, 0, 16);
+            txtEquipmentIncludedStatus.MaxLength = 100;
+            txtEquipmentIncludedStatus.Name = "txtEquipmentIncludedStatus";
+            txtEquipmentIncludedStatus.ReadOnly = true;
+            txtEquipmentIncludedStatus.Size = new Size(359, 26);
+            txtEquipmentIncludedStatus.TabIndex = 52;
             // 
             // txtSuppliesAndEquipmentsAmount
             // 
             txtSuppliesAndEquipmentsAmount.AccessibleName = "ID";
             txtSuppliesAndEquipmentsAmount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtSuppliesAndEquipmentsAmount.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            txtSuppliesAndEquipmentsAmount.Location = new Point(16, 244);
+            txtSuppliesAndEquipmentsAmount.Location = new Point(317, 21);
             txtSuppliesAndEquipmentsAmount.Margin = new Padding(0, 0, 0, 16);
             txtSuppliesAndEquipmentsAmount.MaxLength = 100;
             txtSuppliesAndEquipmentsAmount.Name = "txtSuppliesAndEquipmentsAmount";
             txtSuppliesAndEquipmentsAmount.ReadOnly = true;
-            txtSuppliesAndEquipmentsAmount.Size = new Size(359, 26);
+            txtSuppliesAndEquipmentsAmount.Size = new Size(58, 26);
             txtSuppliesAndEquipmentsAmount.TabIndex = 50;
-            // 
-            // label13
-            // 
-            label13.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            label13.AutoSize = true;
-            label13.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label13.ForeColor = SystemColors.ControlText;
-            label13.Location = new Point(16, 220);
-            label13.Margin = new Padding(0, 0, 0, 8);
-            label13.Name = "label13";
-            label13.Size = new Size(218, 16);
-            label13.TabIndex = 51;
-            label13.Text = "Supplies and Equipments Amount";
+            txtSuppliesAndEquipmentsAmount.Visible = false;
             // 
             // txtSuppliesAndEquipmentsAccount
             // 
             txtSuppliesAndEquipmentsAccount.AccessibleName = "ID";
             txtSuppliesAndEquipmentsAccount.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtSuppliesAndEquipmentsAccount.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            txtSuppliesAndEquipmentsAccount.Location = new Point(16, 178);
+            txtSuppliesAndEquipmentsAccount.Location = new Point(254, 21);
             txtSuppliesAndEquipmentsAccount.Margin = new Padding(0, 0, 0, 16);
             txtSuppliesAndEquipmentsAccount.MaxLength = 100;
             txtSuppliesAndEquipmentsAccount.Name = "txtSuppliesAndEquipmentsAccount";
             txtSuppliesAndEquipmentsAccount.ReadOnly = true;
-            txtSuppliesAndEquipmentsAccount.Size = new Size(359, 26);
+            txtSuppliesAndEquipmentsAccount.Size = new Size(61, 26);
             txtSuppliesAndEquipmentsAccount.TabIndex = 48;
+            txtSuppliesAndEquipmentsAccount.Visible = false;
             // 
             // label12
             // 
@@ -306,23 +311,24 @@
             label12.Location = new Point(16, 154);
             label12.Margin = new Padding(0, 0, 0, 8);
             label12.Name = "label12";
-            label12.Size = new Size(221, 16);
+            label12.Size = new Size(246, 16);
             label12.TabIndex = 49;
-            label12.Text = "Supplies and Equipments Account";
+            label12.Text = "Is Supplies and Equipments included?";
             // 
             // btnUpdateBillingInformation
             // 
             btnUpdateBillingInformation.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnUpdateBillingInformation.AutoSize = true;
             btnUpdateBillingInformation.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnUpdateBillingInformation.Location = new Point(300, 286);
+            btnUpdateBillingInformation.Location = new Point(300, 219);
             btnUpdateBillingInformation.Margin = new Padding(8, 0, 0, 0);
             btnUpdateBillingInformation.Name = "btnUpdateBillingInformation";
             btnUpdateBillingInformation.Size = new Size(75, 28);
             btnUpdateBillingInformation.TabIndex = 47;
+            btnUpdateBillingInformation.Tag = "Update";
             btnUpdateBillingInformation.Text = "Update";
             btnUpdateBillingInformation.UseVisualStyleBackColor = true;
-            btnUpdateBillingInformation.Click += btnUpdateBillingInformation_Click;
+            btnUpdateBillingInformation.Click += UpdateOrDuplicateBilling;
             // 
             // label5
             // 
@@ -400,7 +406,7 @@
             grpStatementOfAccounts.Controls.Add(txtCollectionDate);
             grpStatementOfAccounts.Controls.Add(cmbStatementOfAccounts);
             grpStatementOfAccounts.Controls.Add(btnViewAccountRecord);
-            grpStatementOfAccounts.Location = new Point(24, 545);
+            grpStatementOfAccounts.Location = new Point(24, 478);
             grpStatementOfAccounts.Margin = new Padding(0);
             grpStatementOfAccounts.Name = "grpStatementOfAccounts";
             grpStatementOfAccounts.Padding = new Padding(16, 10, 16, 16);
@@ -745,19 +751,20 @@
             // flowFooterActions
             // 
             flowFooterActions.Controls.Add(btnCloseDetails);
+            flowFooterActions.Controls.Add(btnDuplicateBilling);
             flowFooterActions.Dock = DockStyle.Right;
             flowFooterActions.FlowDirection = FlowDirection.RightToLeft;
-            flowFooterActions.Location = new Point(315, 0);
+            flowFooterActions.Location = new Point(233, 0);
             flowFooterActions.Name = "flowFooterActions";
             flowFooterActions.Padding = new Padding(15, 16, 0, 16);
-            flowFooterActions.Size = new Size(135, 60);
+            flowFooterActions.Size = new Size(217, 60);
             flowFooterActions.TabIndex = 4;
             // 
             // btnCloseDetails
             // 
             btnCloseDetails.AutoSize = true;
             btnCloseDetails.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnCloseDetails.Location = new Point(45, 16);
+            btnCloseDetails.Location = new Point(127, 16);
             btnCloseDetails.Margin = new Padding(8, 0, 0, 0);
             btnCloseDetails.Name = "btnCloseDetails";
             btnCloseDetails.Size = new Size(75, 28);
@@ -765,6 +772,20 @@
             btnCloseDetails.Text = "Close";
             btnCloseDetails.UseVisualStyleBackColor = true;
             btnCloseDetails.Click += btnCloseDetails_Click;
+            // 
+            // btnDuplicateBilling
+            // 
+            btnDuplicateBilling.AutoSize = true;
+            btnDuplicateBilling.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnDuplicateBilling.Location = new Point(43, 16);
+            btnDuplicateBilling.Margin = new Padding(8, 0, 0, 0);
+            btnDuplicateBilling.Name = "btnDuplicateBilling";
+            btnDuplicateBilling.Size = new Size(76, 28);
+            btnDuplicateBilling.TabIndex = 41;
+            btnDuplicateBilling.Tag = "Duplicate";
+            btnDuplicateBilling.Text = "Duplicate";
+            btnDuplicateBilling.UseVisualStyleBackColor = true;
+            btnDuplicateBilling.Click += UpdateOrDuplicateBilling;
             // 
             // btnView
             // 
@@ -800,6 +821,8 @@
             // 
             // pnlLeftBody
             // 
+            pnlLeftBody.Controls.Add(lblClient);
+            pnlLeftBody.Controls.Add(cmbClient);
             pnlLeftBody.Controls.Add(btnNew);
             pnlLeftBody.Controls.Add(btnSearch);
             pnlLeftBody.Controls.Add(pnlLine1);
@@ -813,6 +836,32 @@
             pnlLeftBody.Size = new Size(762, 610);
             pnlLeftBody.TabIndex = 1;
             pnlLeftBody.EnabledChanged += pnlLeftBody_EnabledChanged;
+            // 
+            // lblClient
+            // 
+            lblClient.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            lblClient.AutoSize = true;
+            lblClient.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblClient.ForeColor = Color.Black;
+            lblClient.Location = new Point(24, 29);
+            lblClient.Margin = new Padding(3, 0, 3, 2);
+            lblClient.Name = "lblClient";
+            lblClient.Size = new Size(48, 16);
+            lblClient.TabIndex = 27;
+            lblClient.Text = "Client";
+            // 
+            // cmbClient
+            // 
+            cmbClient.AccessibleName = "Client";
+            cmbClient.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbClient.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            cmbClient.FormattingEnabled = true;
+            cmbClient.Location = new Point(81, 24);
+            cmbClient.Margin = new Padding(6, 3, 3, 12);
+            cmbClient.Name = "cmbClient";
+            cmbClient.Size = new Size(216, 26);
+            cmbClient.TabIndex = 26;
+            cmbClient.SelectedIndexChanged += cmbClient_SelectedIndexChanged;
             // 
             // btnNew
             // 
@@ -832,7 +881,7 @@
             // 
             btnSearch.AutoSize = true;
             btnSearch.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnSearch.Location = new Point(247, 23);
+            btnSearch.Location = new Point(531, 23);
             btnSearch.Margin = new Padding(4, 0, 8, 0);
             btnSearch.Name = "btnSearch";
             btnSearch.Size = new Size(75, 28);
@@ -878,7 +927,7 @@
             // txtSearch
             // 
             txtSearch.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            txtSearch.Location = new Point(24, 24);
+            txtSearch.Location = new Point(308, 24);
             txtSearch.Margin = new Padding(0, 0, 4, 16);
             txtSearch.Name = "txtSearch";
             txtSearch.Size = new Size(215, 26);
@@ -962,39 +1011,39 @@
             cntxtBillingActions.Font = new Font("Arial", 9F, FontStyle.Regular, GraphicsUnit.Point);
             cntxtBillingActions.Items.AddRange(new ToolStripItem[] { cntxtMenuViewVerify, cntxtMenuDuplicate, cntxtMenuRelease, toolStripSeparator1, cntxtMenuUpload, cntxtMenuExport, toolStripSeparator2, cntxtMenuArchive });
             cntxtBillingActions.Name = "cntxtBillingActions";
-            cntxtBillingActions.Size = new Size(138, 148);
+            cntxtBillingActions.Size = new Size(181, 170);
             // 
             // cntxtMenuViewVerify
             // 
             cntxtMenuViewVerify.Name = "cntxtMenuViewVerify";
-            cntxtMenuViewVerify.Size = new Size(137, 22);
+            cntxtMenuViewVerify.Size = new Size(180, 22);
             cntxtMenuViewVerify.Text = "View/Adjust";
             cntxtMenuViewVerify.Click += cntxtMenuViewVerify_Click;
             // 
             // cntxtMenuDuplicate
             // 
             cntxtMenuDuplicate.Name = "cntxtMenuDuplicate";
-            cntxtMenuDuplicate.Size = new Size(137, 22);
+            cntxtMenuDuplicate.Size = new Size(180, 22);
             cntxtMenuDuplicate.Text = "Duplicate";
-            cntxtMenuDuplicate.Click += cntxtMenuDuplicate_Click;
+            cntxtMenuDuplicate.Visible = false;
             // 
             // cntxtMenuRelease
             // 
             cntxtMenuRelease.Name = "cntxtMenuRelease";
-            cntxtMenuRelease.Size = new Size(137, 22);
+            cntxtMenuRelease.Size = new Size(180, 22);
             cntxtMenuRelease.Text = "Release";
             cntxtMenuRelease.Click += cntxtMenuRelease_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(134, 6);
+            toolStripSeparator1.Size = new Size(177, 6);
             // 
             // cntxtMenuUpload
             // 
             cntxtMenuUpload.DropDownItems.AddRange(new ToolStripItem[] { menuUploadTimekeep, menuUploadAccruals });
             cntxtMenuUpload.Name = "cntxtMenuUpload";
-            cntxtMenuUpload.Size = new Size(137, 22);
+            cntxtMenuUpload.Size = new Size(180, 22);
             cntxtMenuUpload.Text = "Upload";
             // 
             // menuUploadTimekeep
@@ -1015,7 +1064,7 @@
             // 
             cntxtMenuExport.DropDownItems.AddRange(new ToolStripItem[] { menuExportBilling, menuExportBalancing, menuExportLetter, menuExportTransmittal });
             cntxtMenuExport.Name = "cntxtMenuExport";
-            cntxtMenuExport.Size = new Size(137, 22);
+            cntxtMenuExport.Size = new Size(180, 22);
             cntxtMenuExport.Text = "Export";
             // 
             // menuExportBilling
@@ -1048,12 +1097,12 @@
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(134, 6);
+            toolStripSeparator2.Size = new Size(177, 6);
             // 
             // cntxtMenuArchive
             // 
             cntxtMenuArchive.Name = "cntxtMenuArchive";
-            cntxtMenuArchive.Size = new Size(137, 22);
+            cntxtMenuArchive.Size = new Size(180, 22);
             cntxtMenuArchive.Text = "Archive";
             cntxtMenuArchive.Click += cntxtMenuArchive_Click;
             // 
@@ -1181,5 +1230,9 @@
         private TextBox txtSuppliesAndEquipmentsAccount;
         private Label label13;
         private Button btnUpdateRemarks;
+        private ComboBox cmbClient;
+        private Label lblClient;
+        private TextBox txtEquipmentIncludedStatus;
+        private Button btnDuplicateBilling;
     }
 }

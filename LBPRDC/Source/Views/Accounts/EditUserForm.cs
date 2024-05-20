@@ -1,4 +1,5 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views.Accounts
@@ -25,18 +26,35 @@ namespace LBPRDC.Source.Views.Accounts
 
         private void EditUserForm_Load(object sender, EventArgs e)
         {
+            if (UserID == 0)
+            {
+                MessageBox.Show(MessagesConstants.Error.MISSING_USER, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
+            }
+
             InitializeUserInformation(UserID);
         }
 
-        private void InitializeUserInformation(int userID)
+        private async void InitializeUserInformation(int userID)
         {
-            var user = UserService.GetAllUsers().First(f => f.UserID == userID);
-            txtFirstName.Text = user.FirstName;
-            txtLastName.Text = user.LastName;
-            txtEmailAddress.Text = user.Email;
-            txtUsername.Text = user.Username;
-            cmbRole.SelectedItem = user.Role;
-            cmbStatus.SelectedItem = user.Status;
+            var users = await UserService.GetUsers(userID);
+            if (users.Any())
+            {
+                var user = users.First();
+                txtFirstName.Text = user.FirstName;
+                txtLastName.Text = user.LastName;
+                txtEmailAddress.Text = user.Email;
+                txtUsername.Text = user.Username;
+                cmbRole.SelectedItem = user.Role;
+                cmbStatus.SelectedItem = user.Status;
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.RETRIEVE_DATA, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
+            }
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
@@ -45,7 +63,7 @@ namespace LBPRDC.Source.Views.Accounts
             {
                 if (chkChangePassword.Checked && txtPassword.Text != txtConfirmPassword.Text)
                 {
-                    MessageBox.Show("Passwords do not match.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Passwords do not match.", MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -77,7 +95,7 @@ namespace LBPRDC.Source.Views.Accounts
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to cancel this operation?", "Cancel Operation Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var result = MessageBox.Show(MessagesConstants.Cancel.QUESTION, MessagesConstants.Cancel.TITLE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.Yes)
             {
                 this.Close();

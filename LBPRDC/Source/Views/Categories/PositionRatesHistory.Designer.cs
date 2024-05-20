@@ -58,7 +58,7 @@
             pnlLine1.Dock = DockStyle.Top;
             pnlLine1.Location = new Point(0, 0);
             pnlLine1.Name = "pnlLine1";
-            pnlLine1.Size = new Size(484, 1);
+            pnlLine1.Size = new Size(870, 1);
             pnlLine1.TabIndex = 0;
             // 
             // pnlHeader
@@ -68,7 +68,7 @@
             pnlHeader.Dock = DockStyle.Top;
             pnlHeader.Location = new Point(0, 1);
             pnlHeader.Name = "pnlHeader";
-            pnlHeader.Size = new Size(484, 40);
+            pnlHeader.Size = new Size(870, 40);
             pnlHeader.TabIndex = 1;
             // 
             // lblTitle
@@ -78,7 +78,7 @@
             lblTitle.Location = new Point(16, 11);
             lblTitle.Margin = new Padding(0, 0, 0, 16);
             lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(452, 19);
+            lblTitle.Size = new Size(838, 19);
             lblTitle.TabIndex = 28;
             lblTitle.Text = "RATES HISTORY";
             lblTitle.TextAlign = ContentAlignment.MiddleCenter;
@@ -88,9 +88,9 @@
             pnlFooter.BackColor = SystemColors.Control;
             pnlFooter.Controls.Add(flowFooterActions);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 601);
+            pnlFooter.Location = new Point(0, 398);
             pnlFooter.Name = "pnlFooter";
-            pnlFooter.Size = new Size(484, 60);
+            pnlFooter.Size = new Size(870, 60);
             pnlFooter.TabIndex = 2;
             // 
             // flowFooterActions
@@ -98,7 +98,7 @@
             flowFooterActions.Controls.Add(btnClose);
             flowFooterActions.Dock = DockStyle.Right;
             flowFooterActions.FlowDirection = FlowDirection.RightToLeft;
-            flowFooterActions.Location = new Point(373, 0);
+            flowFooterActions.Location = new Point(759, 0);
             flowFooterActions.Name = "flowFooterActions";
             flowFooterActions.Padding = new Padding(15, 16, 0, 16);
             flowFooterActions.Size = new Size(111, 60);
@@ -125,7 +125,7 @@
             pnlBody.Location = new Point(0, 41);
             pnlBody.Name = "pnlBody";
             pnlBody.Padding = new Padding(16, 10, 16, 16);
-            pnlBody.Size = new Size(484, 560);
+            pnlBody.Size = new Size(870, 357);
             pnlBody.TabIndex = 3;
             // 
             // dgvHistory
@@ -172,7 +172,7 @@
             dgvHistory.RowTemplate.DefaultCellStyle.SelectionBackColor = Color.SeaGreen;
             dgvHistory.RowTemplate.Height = 41;
             dgvHistory.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvHistory.Size = new Size(452, 426);
+            dgvHistory.Size = new Size(838, 223);
             dgvHistory.TabIndex = 6;
             dgvHistory.VirtualMode = true;
             // 
@@ -187,7 +187,7 @@
             grpPersonalData.Margin = new Padding(0, 0, 0, 16);
             grpPersonalData.Name = "grpPersonalData";
             grpPersonalData.Padding = new Padding(4);
-            grpPersonalData.Size = new Size(452, 92);
+            grpPersonalData.Size = new Size(838, 92);
             grpPersonalData.TabIndex = 5;
             grpPersonalData.TabStop = false;
             // 
@@ -223,7 +223,7 @@
             txtName.MaxLength = 50;
             txtName.Name = "txtName";
             txtName.ReadOnly = true;
-            txtName.Size = new Size(312, 23);
+            txtName.Size = new Size(698, 23);
             txtName.TabIndex = 10;
             // 
             // label1
@@ -242,7 +242,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(484, 661);
+            ClientSize = new Size(870, 458);
             Controls.Add(pnlBody);
             Controls.Add(pnlFooter);
             Controls.Add(pnlHeader);

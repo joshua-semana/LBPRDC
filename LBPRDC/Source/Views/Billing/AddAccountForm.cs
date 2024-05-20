@@ -1,4 +1,5 @@
-﻿using LBPRDC.Source.Services;
+﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 
 namespace LBPRDC.Source.Views.Billing
@@ -76,7 +77,7 @@ namespace LBPRDC.Source.Views.Billing
             {
                 BillingName = BillingName,
                 AccountNumber = txtAccountNumber.Text.ToString().ToUpper().Trim(),
-                EntryType = "Custom Entry",
+                EntryType = StringConstants.Type.CUSTOM,
                 OfficialReceiptNumber = "",
                 Classification = txtClassification.Text.ToString().ToUpper().Trim(),
                 BilledValue = grossAmount,
@@ -104,7 +105,7 @@ namespace LBPRDC.Source.Views.Billing
             }
             else if (result == DialogResult.Abort)
             {
-                MessageBox.Show("There is a problem adding a custom account entry, please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("There is a problem adding a custom account entry, please try again.", MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

@@ -1,4 +1,6 @@
-﻿namespace LBPRDC.Source.Views.Accounts
+﻿using LBPRDC.Source.Config;
+
+namespace LBPRDC.Source.Views.Accounts
 {
     partial class EditUserForm
     {
@@ -142,7 +144,7 @@
             btnUpdate.Name = "btnUpdate";
             btnUpdate.Size = new Size(75, 28);
             btnUpdate.TabIndex = 27;
-            btnUpdate.Text = "Update";
+            btnUpdate.Text = MessagesConstants.Update.TITLE;
             btnUpdate.UseVisualStyleBackColor = true;
             btnUpdate.Click += btnUpdate_Click;
             // 
@@ -382,7 +384,7 @@
             cmbStatus.AccessibleName = "Status";
             cmbStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbStatus.FormattingEnabled = true;
-            cmbStatus.Items.AddRange(new object[] { "(Choose Status)", "Active", "Inactive" });
+            cmbStatus.Items.AddRange(new object[] { "(Choose Status)", StringConstants.Status.ACTIVE, StringConstants.Status.INACTIVE });
             cmbStatus.Location = new Point(213, 115);
             cmbStatus.Name = "cmbStatus";
             cmbStatus.Size = new Size(197, 26);
