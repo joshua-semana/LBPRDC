@@ -30,10 +30,12 @@ namespace LBPRDC.Source.Views.Categories
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CategoriesControl));
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             pnlBody = new Panel();
+            flowButtonActions = new FlowLayoutPanel();
             btnAdd = new Button();
             dgvCategory = new DataGridView();
             pnlLine1 = new Panel();
@@ -44,6 +46,8 @@ namespace LBPRDC.Source.Views.Categories
             flowRightContent = new FlowLayoutPanel();
             lblID = new Label();
             txtID = new TextBox();
+            lblPayFrequency = new Label();
+            cmbPayFrequency = new ComboBox();
             lblClient = new Label();
             cmbClient = new ComboBox();
             lblCode = new Label();
@@ -74,6 +78,7 @@ namespace LBPRDC.Source.Views.Categories
             pnlFooter = new Panel();
             pnlVLine1 = new Panel();
             pnlBody.SuspendLayout();
+            flowButtonActions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvCategory).BeginInit();
             pnlRight.SuspendLayout();
             pnlRightBody.SuspendLayout();
@@ -85,7 +90,7 @@ namespace LBPRDC.Source.Views.Categories
             // 
             // pnlBody
             // 
-            pnlBody.Controls.Add(btnAdd);
+            pnlBody.Controls.Add(flowButtonActions);
             pnlBody.Controls.Add(dgvCategory);
             pnlBody.Controls.Add(pnlLine1);
             pnlBody.Controls.Add(btnSelect);
@@ -97,17 +102,29 @@ namespace LBPRDC.Source.Views.Categories
             pnlBody.Size = new Size(853, 749);
             pnlBody.TabIndex = 0;
             // 
+            // flowButtonActions
+            // 
+            flowButtonActions.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            flowButtonActions.Controls.Add(btnAdd);
+            flowButtonActions.FlowDirection = FlowDirection.RightToLeft;
+            flowButtonActions.Location = new Point(722, 21);
+            flowButtonActions.Name = "flowButtonActions";
+            flowButtonActions.Size = new Size(107, 33);
+            flowButtonActions.TabIndex = 28;
+            // 
             // btnAdd
             // 
             btnAdd.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnAdd.AutoSize = true;
-            btnAdd.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnAdd.Location = new Point(755, 23);
+            btnAdd.Cursor = Cursors.Hand;
+            btnAdd.FlatAppearance.BorderSize = 0;
+            btnAdd.FlatStyle = FlatStyle.Flat;
+            btnAdd.Image = (Image)resources.GetObject("btnAdd.Image");
+            btnAdd.Location = new Point(74, 0);
             btnAdd.Margin = new Padding(0);
             btnAdd.Name = "btnAdd";
-            btnAdd.Size = new Size(75, 28);
-            btnAdd.TabIndex = 27;
-            btnAdd.Text = "Add";
+            btnAdd.Size = new Size(33, 33);
+            btnAdd.TabIndex = 9;
+            btnAdd.Tag = "Home";
             btnAdd.UseVisualStyleBackColor = true;
             btnAdd.Click += btnAdd_Click;
             // 
@@ -183,7 +200,6 @@ namespace LBPRDC.Source.Views.Categories
             btnSelect.Text = "Select";
             btnSelect.UseVisualStyleBackColor = true;
             btnSelect.Visible = false;
-            btnSelect.Click += btnSelect_Click;
             // 
             // cmbCategories
             // 
@@ -220,8 +236,12 @@ namespace LBPRDC.Source.Views.Categories
             // 
             // flowRightContent
             // 
+            flowRightContent.AutoScroll = true;
+            flowRightContent.AutoScrollMargin = new Size(50, 0);
             flowRightContent.Controls.Add(lblID);
             flowRightContent.Controls.Add(txtID);
+            flowRightContent.Controls.Add(lblPayFrequency);
+            flowRightContent.Controls.Add(cmbPayFrequency);
             flowRightContent.Controls.Add(lblClient);
             flowRightContent.Controls.Add(cmbClient);
             flowRightContent.Controls.Add(lblCode);
@@ -249,6 +269,7 @@ namespace LBPRDC.Source.Views.Categories
             flowRightContent.Padding = new Padding(16);
             flowRightContent.Size = new Size(360, 649);
             flowRightContent.TabIndex = 0;
+            flowRightContent.WrapContents = false;
             // 
             // lblID
             // 
@@ -276,13 +297,40 @@ namespace LBPRDC.Source.Views.Categories
             txtID.TabIndex = 9;
             txtID.Visible = false;
             // 
+            // lblPayFrequency
+            // 
+            lblPayFrequency.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            lblPayFrequency.AutoSize = true;
+            lblPayFrequency.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblPayFrequency.ForeColor = SystemColors.GrayText;
+            lblPayFrequency.Location = new Point(19, 72);
+            lblPayFrequency.Margin = new Padding(3, 0, 3, 2);
+            lblPayFrequency.Name = "lblPayFrequency";
+            lblPayFrequency.Size = new Size(322, 16);
+            lblPayFrequency.TabIndex = 30;
+            lblPayFrequency.Text = "Pay Frequency";
+            lblPayFrequency.Visible = false;
+            // 
+            // cmbPayFrequency
+            // 
+            cmbPayFrequency.AccessibleName = "Pay Frequency";
+            cmbPayFrequency.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbPayFrequency.Enabled = false;
+            cmbPayFrequency.FormattingEnabled = true;
+            cmbPayFrequency.Location = new Point(22, 93);
+            cmbPayFrequency.Margin = new Padding(6, 3, 3, 12);
+            cmbPayFrequency.Name = "cmbPayFrequency";
+            cmbPayFrequency.Size = new Size(319, 24);
+            cmbPayFrequency.TabIndex = 31;
+            cmbPayFrequency.Visible = false;
+            // 
             // lblClient
             // 
             lblClient.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             lblClient.AutoSize = true;
             lblClient.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblClient.ForeColor = SystemColors.GrayText;
-            lblClient.Location = new Point(19, 72);
+            lblClient.Location = new Point(19, 129);
             lblClient.Margin = new Padding(3, 0, 3, 2);
             lblClient.Name = "lblClient";
             lblClient.Size = new Size(322, 16);
@@ -295,7 +343,7 @@ namespace LBPRDC.Source.Views.Categories
             cmbClient.AccessibleName = "Client";
             cmbClient.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbClient.FormattingEnabled = true;
-            cmbClient.Location = new Point(22, 93);
+            cmbClient.Location = new Point(22, 150);
             cmbClient.Margin = new Padding(6, 3, 3, 12);
             cmbClient.Name = "cmbClient";
             cmbClient.Size = new Size(319, 24);
@@ -308,7 +356,7 @@ namespace LBPRDC.Source.Views.Categories
             lblCode.AutoSize = true;
             lblCode.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblCode.ForeColor = SystemColors.GrayText;
-            lblCode.Location = new Point(19, 129);
+            lblCode.Location = new Point(19, 186);
             lblCode.Margin = new Padding(3, 0, 3, 2);
             lblCode.Name = "lblCode";
             lblCode.Size = new Size(322, 16);
@@ -319,7 +367,7 @@ namespace LBPRDC.Source.Views.Categories
             // txtCode
             // 
             txtCode.AccessibleName = "Code";
-            txtCode.Location = new Point(22, 150);
+            txtCode.Location = new Point(22, 207);
             txtCode.Margin = new Padding(6, 3, 3, 12);
             txtCode.MaxLength = 100;
             txtCode.Name = "txtCode";
@@ -334,7 +382,7 @@ namespace LBPRDC.Source.Views.Categories
             lblName.AutoSize = true;
             lblName.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblName.ForeColor = SystemColors.GrayText;
-            lblName.Location = new Point(19, 185);
+            lblName.Location = new Point(19, 242);
             lblName.Margin = new Padding(3, 0, 3, 2);
             lblName.Name = "lblName";
             lblName.Size = new Size(322, 16);
@@ -345,7 +393,7 @@ namespace LBPRDC.Source.Views.Categories
             // txtName
             // 
             txtName.AccessibleName = "Name";
-            txtName.Location = new Point(22, 206);
+            txtName.Location = new Point(22, 263);
             txtName.Margin = new Padding(6, 3, 3, 12);
             txtName.MaxLength = 100;
             txtName.Name = "txtName";
@@ -359,7 +407,7 @@ namespace LBPRDC.Source.Views.Categories
             lblDepartment.AutoSize = true;
             lblDepartment.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblDepartment.ForeColor = SystemColors.GrayText;
-            lblDepartment.Location = new Point(19, 241);
+            lblDepartment.Location = new Point(19, 298);
             lblDepartment.Margin = new Padding(3, 0, 3, 2);
             lblDepartment.Name = "lblDepartment";
             lblDepartment.Size = new Size(322, 16);
@@ -372,7 +420,7 @@ namespace LBPRDC.Source.Views.Categories
             cmbDepartment.AccessibleName = "Department";
             cmbDepartment.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbDepartment.FormattingEnabled = true;
-            cmbDepartment.Location = new Point(22, 262);
+            cmbDepartment.Location = new Point(22, 319);
             cmbDepartment.Margin = new Padding(6, 3, 3, 12);
             cmbDepartment.Name = "cmbDepartment";
             cmbDepartment.Size = new Size(319, 24);
@@ -385,7 +433,7 @@ namespace LBPRDC.Source.Views.Categories
             lblDailySalaryRate.AutoSize = true;
             lblDailySalaryRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblDailySalaryRate.ForeColor = SystemColors.GrayText;
-            lblDailySalaryRate.Location = new Point(19, 298);
+            lblDailySalaryRate.Location = new Point(19, 355);
             lblDailySalaryRate.Margin = new Padding(3, 0, 3, 2);
             lblDailySalaryRate.Name = "lblDailySalaryRate";
             lblDailySalaryRate.Size = new Size(322, 16);
@@ -396,7 +444,7 @@ namespace LBPRDC.Source.Views.Categories
             // txtDailySalaryRate
             // 
             txtDailySalaryRate.AccessibleName = "Salary Rate (Daily)";
-            txtDailySalaryRate.Location = new Point(22, 319);
+            txtDailySalaryRate.Location = new Point(22, 376);
             txtDailySalaryRate.Margin = new Padding(6, 3, 3, 12);
             txtDailySalaryRate.MaxLength = 100;
             txtDailySalaryRate.Name = "txtDailySalaryRate";
@@ -411,7 +459,7 @@ namespace LBPRDC.Source.Views.Categories
             lblDailyBillingRate.AutoSize = true;
             lblDailyBillingRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblDailyBillingRate.ForeColor = SystemColors.GrayText;
-            lblDailyBillingRate.Location = new Point(19, 354);
+            lblDailyBillingRate.Location = new Point(19, 411);
             lblDailyBillingRate.Margin = new Padding(3, 0, 3, 2);
             lblDailyBillingRate.Name = "lblDailyBillingRate";
             lblDailyBillingRate.Size = new Size(322, 16);
@@ -422,7 +470,7 @@ namespace LBPRDC.Source.Views.Categories
             // txtDailyBillingRate
             // 
             txtDailyBillingRate.AccessibleName = "Billing Rate (Daily)";
-            txtDailyBillingRate.Location = new Point(22, 375);
+            txtDailyBillingRate.Location = new Point(22, 432);
             txtDailyBillingRate.Margin = new Padding(6, 3, 3, 12);
             txtDailyBillingRate.MaxLength = 100;
             txtDailyBillingRate.Name = "txtDailyBillingRate";
@@ -437,7 +485,7 @@ namespace LBPRDC.Source.Views.Categories
             lblMonthlySalaryRate.AutoSize = true;
             lblMonthlySalaryRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblMonthlySalaryRate.ForeColor = SystemColors.GrayText;
-            lblMonthlySalaryRate.Location = new Point(19, 410);
+            lblMonthlySalaryRate.Location = new Point(19, 467);
             lblMonthlySalaryRate.Margin = new Padding(3, 0, 3, 2);
             lblMonthlySalaryRate.Name = "lblMonthlySalaryRate";
             lblMonthlySalaryRate.Size = new Size(322, 16);
@@ -448,7 +496,7 @@ namespace LBPRDC.Source.Views.Categories
             // txtMonthlySalaryRate
             // 
             txtMonthlySalaryRate.AccessibleName = "Salary Rate (Monthly)";
-            txtMonthlySalaryRate.Location = new Point(22, 431);
+            txtMonthlySalaryRate.Location = new Point(22, 488);
             txtMonthlySalaryRate.Margin = new Padding(6, 3, 3, 12);
             txtMonthlySalaryRate.MaxLength = 100;
             txtMonthlySalaryRate.Name = "txtMonthlySalaryRate";
@@ -463,7 +511,7 @@ namespace LBPRDC.Source.Views.Categories
             lblMonthlyBillingRate.AutoSize = true;
             lblMonthlyBillingRate.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblMonthlyBillingRate.ForeColor = SystemColors.GrayText;
-            lblMonthlyBillingRate.Location = new Point(19, 466);
+            lblMonthlyBillingRate.Location = new Point(19, 523);
             lblMonthlyBillingRate.Margin = new Padding(3, 0, 3, 2);
             lblMonthlyBillingRate.Name = "lblMonthlyBillingRate";
             lblMonthlyBillingRate.Size = new Size(322, 16);
@@ -474,7 +522,7 @@ namespace LBPRDC.Source.Views.Categories
             // txtMonthlyBillingRate
             // 
             txtMonthlyBillingRate.AccessibleName = "Billing Rate (Monthly)";
-            txtMonthlyBillingRate.Location = new Point(22, 487);
+            txtMonthlyBillingRate.Location = new Point(22, 544);
             txtMonthlyBillingRate.Margin = new Padding(6, 3, 3, 12);
             txtMonthlyBillingRate.MaxLength = 100;
             txtMonthlyBillingRate.Name = "txtMonthlyBillingRate";
@@ -489,7 +537,7 @@ namespace LBPRDC.Source.Views.Categories
             lblDescription.AutoSize = true;
             lblDescription.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblDescription.ForeColor = SystemColors.GrayText;
-            lblDescription.Location = new Point(19, 522);
+            lblDescription.Location = new Point(19, 579);
             lblDescription.Margin = new Padding(3, 0, 3, 2);
             lblDescription.Name = "lblDescription";
             lblDescription.Size = new Size(322, 16);
@@ -500,7 +548,7 @@ namespace LBPRDC.Source.Views.Categories
             // txtDescription
             // 
             txtDescription.AccessibleName = "Description";
-            txtDescription.Location = new Point(22, 543);
+            txtDescription.Location = new Point(22, 600);
             txtDescription.Margin = new Padding(6, 3, 3, 12);
             txtDescription.MaxLength = 100;
             txtDescription.Name = "txtDescription";
@@ -514,7 +562,7 @@ namespace LBPRDC.Source.Views.Categories
             lblStatus.AutoSize = true;
             lblStatus.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
             lblStatus.ForeColor = SystemColors.GrayText;
-            lblStatus.Location = new Point(19, 578);
+            lblStatus.Location = new Point(19, 635);
             lblStatus.Margin = new Padding(3, 0, 3, 2);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(322, 16);
@@ -528,8 +576,8 @@ namespace LBPRDC.Source.Views.Categories
             cmbStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbStatus.FormattingEnabled = true;
             cmbStatus.Items.AddRange(new object[] { "(Choose Status)", "Active", "Inactive" });
-            cmbStatus.Location = new Point(22, 599);
-            cmbStatus.Margin = new Padding(6, 3, 3, 0);
+            cmbStatus.Location = new Point(22, 656);
+            cmbStatus.Margin = new Padding(6, 3, 3, 40);
             cmbStatus.Name = "cmbStatus";
             cmbStatus.Size = new Size(319, 24);
             cmbStatus.TabIndex = 21;
@@ -651,6 +699,7 @@ namespace LBPRDC.Source.Views.Categories
             VisibleChanged += CategoriesControl_VisibleChanged;
             pnlBody.ResumeLayout(false);
             pnlBody.PerformLayout();
+            flowButtonActions.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvCategory).EndInit();
             pnlRight.ResumeLayout(false);
             pnlRightBody.ResumeLayout(false);
@@ -711,5 +760,9 @@ namespace LBPRDC.Source.Views.Categories
         private TextBox txtMonthlySalaryRate;
         private Label lblMonthlyBillingRate;
         private TextBox txtMonthlyBillingRate;
+        private Label lblPayFrequency;
+        private ComboBox cmbPayFrequency;
+        private FlowLayoutPanel flowButtonActions;
+        private Button btnSettings;
     }
 }

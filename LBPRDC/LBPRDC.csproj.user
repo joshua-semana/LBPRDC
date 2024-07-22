@@ -73,6 +73,9 @@
     <Compile Update="Source\Views\Categories\CategoriesControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Update="Source\Views\Accounts\PermissionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Source\Views\Categories\PositionRatesHistory.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -119,6 +122,9 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Source\Views\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Source\Views\PayFrequencyForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Source\Views\Profile\ViewAndEditProfileForm.cs">

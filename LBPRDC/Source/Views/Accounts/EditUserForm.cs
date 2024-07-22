@@ -46,7 +46,7 @@ namespace LBPRDC.Source.Views.Accounts
                 txtLastName.Text = user.LastName;
                 txtEmailAddress.Text = user.Email;
                 txtUsername.Text = user.Username;
-                cmbRole.SelectedItem = user.Role;
+                cmbRole.SelectedItem = user.UserRoleID;
                 cmbStatus.SelectedItem = user.Status;
             }
             else

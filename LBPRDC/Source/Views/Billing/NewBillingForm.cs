@@ -38,7 +38,7 @@ namespace LBPRDC.Source.Views.Billing
                 return;
             }
 
-            Client = await ClientService.GetDetailsByID(ClientID);
+            Client = await ClientService.GetClientByID(ClientID);
 
             this.Text = $"New Billing for Client: {Client.Description}";
 
@@ -115,7 +115,7 @@ namespace LBPRDC.Source.Views.Billing
             Models.Billing billing = new()
             {
                 ClientID = ClientID,
-                UserID = UserService.CurrentUser.UserID,
+                UserID = UserService.CurrentUser.ID,
                 Name = billingName,
                 OfficerName = txtOfficerInCharge.Text.ToUpper().Trim(),
                 OfficerPosition = txtOfficerPosition.Text.ToUpper().Trim(),

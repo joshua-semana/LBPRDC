@@ -64,11 +64,11 @@ namespace LBPRDC.Source.Views
             }
         }
 
-        private void InitializeClientComboBoxItems()
+        private async void InitializeClientComboBoxItems()
         {
-            cmbClient.DataSource = ClientService.GetClientsForComboBoxByStatus(StringConstants.Status.ACTIVE, false);
-            cmbClient.DisplayMember = "Description";
-            cmbClient.ValueMember = "ID";
+            cmbClient.DataSource = await ClientService.GetAllItemsForComboBox(StringConstants.Status.ACTIVE, false);
+            cmbClient.DisplayMember = nameof(Models.Client.Name);
+            cmbClient.ValueMember = nameof(Models.Client.ID);
             cmbClient.MouseWheel += ComboBoxUtils.HandleMouseWheel;
             cmbClient.KeyDown += ComboBoxUtils.HandleKeyDown;
         }
@@ -77,11 +77,13 @@ namespace LBPRDC.Source.Views
         {
             var positions = await PositionService.GetAllItemsForComboBoxByClientID(ClientID, false);
             var wages = await WageService.GetWagesAsync();
+            var departments = await DepartmentService.GetItems(ClientID, StringConstants.Status.ACTIVE);
+            var employmentStatus = await EmploymentStatusService.GetItems(StringConstants.Status.ACTIVE);
 
             InitializeFilter(
                 lblFilterDepartments,
                 dchkListFilterDepartments,
-                DepartmentService.GetAllItemsByStatusAndClientID(StringConstants.Status.ACTIVE, ClientID)
+                departments
                     .Select(s => new CheckedListBoxItems(s.ID, s.Name))
                     .ToList()
             );
@@ -95,7 +97,7 @@ namespace LBPRDC.Source.Views
             InitializeFilter(
                 lblFilterEmploymentStatus,
                 dchkListFilterEmploymentStatus,
-                EmploymentStatusService.GetAllItemsByStatus(StringConstants.Status.ACTIVE)
+                employmentStatus
                     .Select(s => new CheckedListBoxItems(s.ID, Utilities.StringFormat.ToSentenceCase(s.Name)))
                     .ToList()
             );
@@ -123,7 +125,7 @@ namespace LBPRDC.Source.Views
         private async void PopulateTableWithFilterAndSearch(List<int> departmentIDs, List<int> positionIDs, List<int> employmentStatusIDs, List<int> wageIDs, string searchWord, int clientID)
         {
             ShowLoadingProgressBar(true);
-            var employees = await Task.Run(() => EmployeeService.GetEmployeesTableViewByClientID(clientID));
+            var employees = await EmployeeService.GetEmployeesTableViewByClientID(clientID);
 
             dgvEmployees.Columns.Clear();
 
@@ -410,7 +412,7 @@ namespace LBPRDC.Source.Views
         {
             if (cmbClient.Items.Count > 0)
             {
-                var selectedClient = (Client)cmbClient.SelectedItem;
+                var selectedClient = (Models.Client)cmbClient.SelectedItem;
                 ClientID = selectedClient.ID;
                 ResetTableSearchFilter();
                 PopulateFilters();

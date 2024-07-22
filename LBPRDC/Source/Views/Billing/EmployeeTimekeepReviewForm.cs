@@ -96,7 +96,7 @@ namespace LBPRDC.Source.Views.Billing
         private async void GetLatestEmployeeInformation()
         {
             //var employees = await EmployeeService.GetAllEmployeesBase();
-            var employeeList = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID);
+            var employeeList = await EmployeeService.GetEmployees(ClientID);
             var positions = await PositionService.GetAllItems();
             foreach (var entry in EditableEntries)
             {

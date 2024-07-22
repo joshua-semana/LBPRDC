@@ -1,32 +1,12 @@
 ﻿using LBPRDC.Source.Config;
-using System.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using static LBPRDC.Source.Data.Database;
-using static LBPRDC.Source.Config.StringConstants;
 
 namespace LBPRDC.Source.Services
 {
     internal class UserService
     {
-
-        public class User
-        {
-            public int UserID { get; set; }
-            public string Username { get; set; } = "";
-            public string Password { get; set; } = "";
-            public string Email { get; set; } = "";
-            public string FirstName { get; set; } = "";
-            public string LastName { get; set;} = "";
-            public string Role { get; set; } = "";
-            public string Status { get; set; } = "";
-            public DateTime RegistrationDate { get; set; }
-            public DateTime LastLoginDate { get; set; }
-            public string MiddleName { get; set; } = "";
-            public string PositionTitle { get; set; } = "";
-
-        }
-
-        public static Models.User CurrentUser { get; set; } = new Models.User();
+        public static Models.User CurrentUser { get; set; } = new();
 
         public static void SetCurrentUser(Models.User user)
         {
@@ -38,9 +18,24 @@ namespace LBPRDC.Source.Services
             CurrentUser = new Models.User();
         }
 
-        public static async Task<List<Models.User>> GetUsers(int? ID = null, string? Username = null)
+        public static async Task<bool> Authenticate(string username, string password)
         {
-            List<Models.User> users = new();
+            try
+            {
+                using var context = new Context();
+                var user = await context.Users.Where(w => w.Username == username).FirstOrDefaultAsync();
+                if (user == null) { return false; }
+
+                bool result = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+
+                return result;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<List<Models.User.View>> GetUsers(int? ID = null, string? Username = null)
+        {
+            List<Models.User.View> users = new();
 
             try
             {
@@ -49,7 +44,7 @@ namespace LBPRDC.Source.Services
 
                 if (ID.HasValue)
                 {
-                    query = query.Where(w => w.UserID == ID);
+                    query = query.Where(w => w.ID == ID);
                 }
 
                 if (Username != null)
@@ -57,19 +52,20 @@ namespace LBPRDC.Source.Services
                     query = query.Where(w => w.Username == Username);
                 }
 
-                users = await query.Select(s => new Models.User
+                users = await query.Select(s => new Models.User.View
                 {
-                    UserID = s.UserID,
+                    ID = s.ID,
+                    UserRoleID = s.UserRoleID,
                     Username = s.Username,
-                    Email = s.Email,
                     FirstName = s.FirstName,
                     MiddleName = s.MiddleName,
                     LastName = s.LastName,
+                    Email = s.Email,
                     PositionTitle = s.PositionTitle,
-                    Role = s.Role,
                     Status = s.Status,
                     RegistrationDate = s.RegistrationDate,
-                    LastLoginDate = s.LastLoginDate
+                    LastLoginDate = s.LastLoginDate,
+                    UserRoleName = s._UserRole.Name
                 })
                 .ToListAsync();
             }
@@ -89,11 +85,11 @@ namespace LBPRDC.Source.Services
                 context.Users.Add(newUser);
                 await context.SaveChangesAsync();
 
-                await LoggingService.LogActivity(new()
+                await LoggingService.AddLog(new()
                 {
-                    UserID = CurrentUser.UserID,
-                    ActivityType = MessagesConstants.Operation.ADD,
-                    ActivityDetails = $"Added User: {newUser.UserID} - {newUser.Username}"
+                    UserID = CurrentUser.ID,
+                    Type = MessagesConstants.Operation.ADD,
+                    Details = $"Added User: {newUser.ID} - {newUser.Username}"
                 });
 
                 return true;
@@ -116,25 +112,76 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
+        public static async Task<bool> UpdateCurrentUserBasicInformation(Models.User updatedUser)
+        {
+            try
+            {
+                using var context = new Context();
+                var user = await context.Users.FindAsync(updatedUser.ID);
+                if (user == null) { return false; }
+
+                user.FirstName = updatedUser.FirstName;
+                user.MiddleName = updatedUser.MiddleName;
+                user.LastName = updatedUser.LastName;
+                user.Email = updatedUser.Email;
+                user.PositionTitle = updatedUser.PositionTitle;
+
+                await context.SaveChangesAsync();
+
+                await LoggingService.AddLog(new()
+                {
+                    UserID = CurrentUser.ID,
+                    Type = MessagesConstants.Operation.UPDATE,
+                    Details = $"Updated their basic information"
+                });
+
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> UpdateCurrentUserPassword(Models.User updatedUser)
+        {
+            try
+            {
+                using var context = new Context();
+                var user = await context.Users.FindAsync(updatedUser.ID);
+                if (user == null) { return false; }
+
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updatedUser.PasswordHash);
+
+                await context.SaveChangesAsync();
+
+                await LoggingService.AddLog(new()
+                {
+                    UserID = CurrentUser.ID,
+                    Type = MessagesConstants.Operation.UPDATE,
+                    Details = $"Updated their password"
+                });
+
+                return true;
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
         public static async Task<bool> UpdateUserStatusRole(Models.User data)
         {
             try
             {
                 using var context = new Context();
-                var user = await context.Users.FindAsync(data.UserID);
-
+                var user = await context.Users.FindAsync(data.ID);
                 if (user == null) { return false; }
 
-                user.Role = data.Role;
+                user.UserRoleID = data.UserRoleID;
                 user.Status = data.Status;
 
                 await context.SaveChangesAsync();
 
-                await LoggingService.LogActivity(new()
+                await LoggingService.AddLog(new()
                 {
-                    UserID = CurrentUser.UserID,
-                    ActivityType = MessagesConstants.Operation.UPDATE,
-                    ActivityDetails = $"Update User's Status and/or Role: {data.UserID}"
+                    UserID = CurrentUser.ID,
+                    Type = MessagesConstants.Operation.UPDATE,
+                    Details = $"Update user's status and/or role: {data.ID}"
                 });
 
                 return true;
@@ -147,76 +194,20 @@ namespace LBPRDC.Source.Services
             try
             {
                 using var context = new Context();
-
-                var user = await context.Users.FindAsync(data.UserID);
-
+                var user = await context.Users.FindAsync(data.ID);
                 if (user == null) { return false; }
 
                 user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(data.PasswordHash);
 
                 await context.SaveChangesAsync();
 
-                await LoggingService.LogActivity(new()
+                await LoggingService.AddLog(new()
                 {
-                    UserID = CurrentUser.UserID,
-                    ActivityType = MessagesConstants.Operation.RESET_PASSWORD,
-                    ActivityDetails = $"Resets Password: {data.UserID}"
+                    UserID = CurrentUser.ID,
+                    Type = MessagesConstants.Operation.RESET_PASSWORD,
+                    Details = $"Resets password: {data.ID}"
                 });
 
-                return true;
-            }
-            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        public static async Task<bool> UpdateUserBasicInformation(User user)
-        {
-            try
-            {
-                string updateQuery = "UPDATE Users SET " +
-                    "FirstName = @FirstName, " +
-                    "LastName = @LastName, " +
-                    "Email = @Email," +
-                    "MiddleName = @MiddleName," +
-                    "PositionTitle = @PositionTitle " +
-                    "WHERE UserID = @UserID";
-
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
-                {
-                    command.Parameters.AddWithValue("@FirstName", user.FirstName);
-                    command.Parameters.AddWithValue("@LastName", user.LastName);
-                    command.Parameters.AddWithValue("@Email", user.Email);
-                    command.Parameters.AddWithValue("@MiddleName", user.MiddleName);
-                    command.Parameters.AddWithValue("@PositionTitle", user.PositionTitle);
-                    command.Parameters.AddWithValue("@UserID", user.UserID);
-
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
-                }
-                return true;
-            }
-            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        public static async Task<bool> UpdatePassword(User user)
-        {
-            try
-            {
-                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(user.Password);
-
-                string updateQuery = "UPDATE Users SET " +
-                    "PasswordHash = @PasswordHash " +
-                    "WHERE UserID = @UserID";
-
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(updateQuery, connection))
-                {
-                    command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
-                    command.Parameters.AddWithValue("@UserID", user.UserID);
-
-                    connection.Open();
-                    await command.ExecuteNonQueryAsync();
-                }
                 return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }

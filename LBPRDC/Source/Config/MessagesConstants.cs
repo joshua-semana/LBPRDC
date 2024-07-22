@@ -8,12 +8,18 @@
         public const string CONFIRMATION = "Confirmation";
         public const string INVALID_INPUT = "Invalid Input";
 
+        public class Result
+        {
+            public const string SUCCESS_UPDATE_PERMISSIONS = "You have successfully updated the permission of this user role group.";
+        }
+
         public class Operation
         {
             public const string ADD = "Add";
             public const string UPDATE = "Update";
             public const string DELETE = "Delete";
             public const string RESET_PASSWORD = "Reset Password";
+            public const string ARCHIVE = "Archive";
         }
 
         public class Action
@@ -34,6 +40,7 @@
             public const string MISSING_ACCRUALS = "Accruals information is missing. Operation will be cancelled. Please upload accruals data to this billing.";
             public const string MISSING_EMPLOYEE = "Employee information is missing. Operation will be cancelled. Please try again.";
             public const string MISSING_USER = "User information is missing. Operation will be cancelled. Please try again.";
+            public const string MISSING_USER_ROLES = "There are no user roles available, please add user roles first. Operation will be cancelled. Please try again.";
             public const string CANT_RETRIEVE = "Unable to retrieve information.";
         }
 

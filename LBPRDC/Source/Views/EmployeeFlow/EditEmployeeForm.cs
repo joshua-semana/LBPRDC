@@ -47,15 +47,15 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             cmbGender.SelectedItem = name;
         }
 
-        private void InitializeSuffixComboBoxItems(int ID, string Name)
+        private async void InitializeSuffixComboBoxItems(int ID, string Name)
         {
-            var items = SuffixService.GetAllItemsForComboBox();
+            var items = await SuffixService.GetAllItemsForComboBox();
             cmbSuffix.DisplayMember = "Name";
             cmbSuffix.ValueMember = "ID";
             bool itemExists = items.Any(a => a.ID == ID);
             if (!itemExists)
             {
-                items.Add(new SuffixService.Suffix { ID = ID, Name = Name });
+                items.Add(new Models.Suffix { ID = ID, Name = Name });
             }
             cmbSuffix.DataSource = items;
             cmbSuffix.SelectedValue = ID;
@@ -119,7 +119,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void InitializeDepartmentComboBoxItems(int ID, string Name)
         {
-            var items = await DepartmentService.GetAllItemsForComboBoxByClientID(ClientID);
+            var items = await DepartmentService.GetAllItemsForComboBox(ClientID);
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
             bool itemExists = items.Any(a => a.ID == ID);
@@ -147,45 +147,46 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void PopulateEmployeeInformation(int EmployeeID)
         {
-            var employeeList = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
+            var employees = await EmployeeService.GetEmployees(ClientID, EmployeeID);
+            var positionHistories = await PositionService.GetAllEmployeeHistory(EmployeeID);
+            var employmentStatusHistory = await EmploymentStatusService.GetEmployeeHistory(EmployeeID);
 
-            if (!employeeList.Any())
+            if (!employees.Any() || !positionHistories.Any() || employmentStatusHistory == null)
             {
                 MessageBox.Show(MessagesConstants.Error.MISSING_EMPLOYEE, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
                 return;
             }
 
-            var employee = employeeList.First();
+            var e = employees.First();
 
-            txtFirstName.Text = employee.FirstName;
-            txtMiddleName.Text = employee.MiddleName;
-            txtLastName.Text = employee.LastName;
-            txtEmailAddress1.Text = employee.EmailAddress1;
-            txtEmailAddress2.Text = employee.EmailAddress2;
-            txtContactNumber1.Text = employee.ContactNumber1;
-            txtContactNumber2.Text = employee.ContactNumber2;
-            txtEmployeeID.Text = employee.EmployeeID;
+            txtFirstName.Text = e.FirstName;
+            txtMiddleName.Text = e.MiddleName;
+            txtLastName.Text = e.LastName;
+            txtEmailAddress1.Text = e.EmailAddress1;
+            txtEmailAddress2.Text = e.EmailAddress2;
+            txtContactNumber1.Text = e.ContactNumber1;
+            txtContactNumber2.Text = e.ContactNumber2;
+            txtEmployeeID.Text = e.EmployeeID;
+            txtRemarks.Text = e.Remarks;
 
-            var positionHistory = await PositionService.GetEmployeeHistory(EmployeeID);
-            var employmentStatusHistory = await EmploymentStatusService.GetEmployeeHistory(EmployeeID);
-            var employeePreviousRecordList = await PreviousEmployeeService.GetEmployeeFormerHistory(EmployeeID);
+            InitializeSuffixComboBoxItems(e.SuffixID, e.SuffixName);
+            InitializeGenderComboBoxItems(e.Gender);
+            InitializeEmploymentStatusComboBoxItems(e.EmploymentStatusID, e.EmploymentStatusName);
+            InitializeClassificationComboBoxItems(e.ClassificationID, e.ClassificationName);
+            InitializeWageTypeComboBoxItems(e.WageID, e.WageName);
+            InitializePositionComboBoxItems(e.PositionID, e.PositionName);
+            InitializeDepartmentComboBoxItems(e.DepartmentID, e.DepartmentName);
+            InitializeLocationComboBoxItems(e.DepartmentID, e.LocationID, e.LocationName);
+            
+            var currentPosition = positionHistories.Where(w => w.Status == StringConstants.Status.ACTIVE).FirstOrDefault();
+            dtpPositionEffectiveDate.Value = currentPosition != null ? currentPosition.Timestamp : dtpPositionEffectiveDate.MinDate;
+            txtPositionTitle.Text = currentPosition != null ? Utilities.StringFormat.ToSentenceCase(currentPosition.PositionTitle) : "Error Getting Data";
 
-            isFormerEmployee = employeePreviousRecordList.Any();
-
-            dtpPositionEffectiveDate.Value = positionHistory != null ? positionHistory.Timestamp : dtpPositionEffectiveDate.MinDate;
             dtpStatusEffectiveDate.Value = employmentStatusHistory != null ? employmentStatusHistory.Timestamp : dtpStatusEffectiveDate.MinDate;
-            txtPositionTitle.Text = positionHistory != null ? Utilities.StringFormat.ToSentenceCase(positionHistory.PositionTitle) : "Error Getting Data";
-            txtRemarks.Text = employee.Remarks;
 
-            InitializeSuffixComboBoxItems(employee.SuffixID, employee.SuffixName);
-            InitializeGenderComboBoxItems(employee.Gender);
-            InitializeEmploymentStatusComboBoxItems(employee.EmploymentStatusID, employee.EmploymentStatusName);
-            InitializeClassificationComboBoxItems(employee.ClassificationID, employee.ClassificationName);
-            InitializeWageTypeComboBoxItems(employee.WageID, employee.WageName);
-            InitializePositionComboBoxItems(employee.PositionID, employee.PositionName);
-            InitializeDepartmentComboBoxItems(employee.DepartmentID, employee.DepartmentName);
-            InitializeLocationComboBoxItems(employee.DepartmentID, employee.LocationID, employee.LocationName);
+            var employeePreviousRecordList = await PreviousEmployeeService.GetEmployeeFormerHistory(EmployeeID);
+            isFormerEmployee = employeePreviousRecordList.Any();
 
             if (isFormerEmployee)
             {

@@ -27,28 +27,26 @@ namespace LBPRDC.Source.Views
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            SetControlAccessVisibility();
             UpdatePageSwitchButtonsStyle();
-            InitializeFeatureBasedOnUserRole();
             PopulateGreetingText();
             lblDateToday.Text = DateTime.Now.ToString("MMM. dd, yyyy (ddd)");
             lblPageName.Text = currentPage;
+        }
+
+        private void SetControlAccessVisibility()
+        {
+            btnBilling.Visible = AccessPermissionService.CurrentUserPermissions.CanAccessBillingTab;
+            btnEmployees.Visible = AccessPermissionService.CurrentUserPermissions.CanAccessEmployeesTab;
+            btnCategories.Visible = AccessPermissionService.CurrentUserPermissions.CanAccessCategoriesTab;
+            btnLogs.Visible = AccessPermissionService.CurrentUserPermissions.CanAccessLogsTab;
+            btnAccounts.Visible = AccessPermissionService.CurrentUserPermissions.CanAccessAccountsTab;
         }
 
         private void PopulateGreetingText()
         {
             string randomGreeting = StringConstants.Greetings[new Random().Next(StringConstants.Greetings.Length)];
             lblGreetUser.Text = $"{randomGreeting} {UserService.CurrentUser?.FirstName} 👋🏻";
-        }
-
-        private void InitializeFeatureBasedOnUserRole()
-        {
-            string? userRole = UserService.CurrentUser?.Role;
-
-            if (userRole != "Admin")
-            {
-                btnAccounts.Visible = false;
-                btnLogs.Visible = false;
-            }
         }
 
         private void InitializePageSwitchButtons(Control container)
@@ -144,6 +142,7 @@ namespace LBPRDC.Source.Views
             if (result == DialogResult.Yes)
             {
                 UserService.ClearCurrentUser();
+                AccessPermissionService.SetAllPermissionsByBool(AccessPermissionService.CurrentUserPermissions, false);
                 this.Hide();
                 frmLogin loginForm = new();
                 loginForm.ShowDialog();
@@ -157,7 +156,7 @@ namespace LBPRDC.Source.Views
             {
                 ViewAndEditProfileForm viewAndEditProfileForm = new()
                 {
-                    UserID = UserService.CurrentUser.UserID
+                    UserID = UserService.CurrentUser.ID
                 };
                 viewAndEditProfileForm.ShowDialog();
             }

@@ -1,4 +1,5 @@
 ﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Models;
 using LBPRDC.Source.Services;
 
 namespace LBPRDC.Source.Views
@@ -38,11 +39,11 @@ namespace LBPRDC.Source.Views
                 SetSignInButtonState("Signing in...", false);
                 SetTextBoxState(false);
 
-                bool isAuthenticated = await Task.Run(() => AuthenticationService.ValidateCredentials(username, password));
+                bool isAuthenticated = await UserService.Authenticate(username, password);
 
                 if (!isAuthenticated)
                 {
-                    MessageBox.Show("Invalid username or password.", "Authentication Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Invalid username or password. Please try again.", "Authentication Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -65,32 +66,36 @@ namespace LBPRDC.Source.Views
 
                 if (currentUser.Status != StringConstants.Status.ACTIVE)
                 {
-                    MessageBox.Show("Invalid username or password.", "Authentication Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Your account is set to inactive. Please contact your administrator.", "Authentication Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                LoggingService.Log newLog = new()
+                await LoggingService.AddLog(new()
                 {
-                    UserID = currentUser.UserID,
-                    ActivityType = "Sign In",
-                    ActivityDetails = "This user signed in."
-                };
+                    UserID = currentUser.ID,
+                    Type = "Sign In",
+                    Details = "User Signed In"
+                });
 
-                await LoggingService.LogActivity(newLog);
-                await UserService.UpdateLastLoginDate(currentUser.UserID);
+                await UserService.UpdateLastLoginDate(currentUser.ID);
 
-                try
+                PayFrequencyForm form = new();
+                form.ShowDialog();
+
+                if (form.DialogResult == DialogResult.Cancel) { return; }
+
+                if (PayFrequencyService.CurrentPayFrequencyID == 0)
                 {
-                    this.Hide();
-                    frmMain mainForm = new();
-                    mainForm.ShowDialog();
-                    this.Close();
+                    MessageBox.Show("Unable to set the Pay Frequency. Please call an administrator.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
-                catch (Exception ex)
-                {
-                    this.Show();
-                    ExceptionHandler.HandleException(ex);
-                }
+
+                await FetchUserPermissions(currentUser);
+
+                this.Hide();
+                frmMain mainForm = new();
+                mainForm.ShowDialog();
+                this.Close();
             }
             catch (Exception ex)
             {
@@ -100,6 +105,24 @@ namespace LBPRDC.Source.Views
             {
                 SetSignInButtonState("Sign In", true);
                 SetTextBoxState(true);
+            }
+        }
+
+        private static async Task FetchUserPermissions(User currentUser)
+        {
+            var roleType = await UserRoleService.GetType(currentUser.UserRoleID);
+
+            if (roleType.IsAdmin)
+            {
+                AccessPermissionService.SetAllPermissionsByBool(AccessPermissionService.CurrentUserPermissions, true);
+                return;
+            }
+
+            var userPermissions = await RolePermissionService.GetAllPermission(currentUser.UserRoleID);
+
+            if (userPermissions.Any())
+            {
+                AccessPermissionService.SetPermissions(AccessPermissionService.CurrentUserPermissions, userPermissions);
             }
         }
 
@@ -126,7 +149,7 @@ namespace LBPRDC.Source.Views
 
             if (result == DialogResult.Yes)
             {
-                frmServerSetup serverSetupForm = new frmServerSetup();
+                frmServerSetup serverSetupForm = new();
                 serverSetupForm.ShowDialog();
             }
         }

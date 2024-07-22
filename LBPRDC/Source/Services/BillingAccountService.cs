@@ -433,11 +433,11 @@ namespace LBPRDC.Source.Services
 
                     if (affectedRows > 0)
                     {
-                        await LoggingService.LogActivity(new()
+                        await LoggingService.AddLog(new()
                         {
-                            UserID = UserService.CurrentUser.UserID,
-                            ActivityType = "New Account",
-                            ActivityDetails = $"User added account(s) for a billing named {billingName}."
+                            UserID = UserService.CurrentUser.ID,
+                            Type = "New Account",
+                            Details = $"User added account(s) for a billing named {billingName}."
                         });
                     }
 
@@ -546,11 +546,11 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    await LoggingService.LogActivity(new()
+                    await LoggingService.AddLog(new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Collect SOA",
-                        ActivityDetails = $"User has updated the information of a statement of account: {Account.AccountNumber} under billing ID: {Account.BillingID}"
+                        UserID = UserService.CurrentUser.ID,
+                        Type = "Collect SOA",
+                        Details = $"User has updated the information of a statement of account: {Account.AccountNumber} under billing ID: {Account.BillingID}"
                     });
                 }
 
@@ -573,11 +573,11 @@ namespace LBPRDC.Source.Services
                 account.Remarks = accountInfo.Remarks;
                 await context.SaveChangesAsync();
 
-                await LoggingService.LogActivity(new()
+                await LoggingService.AddLog(new()
                 {
-                    UserID = UserService.CurrentUser.UserID,
-                    ActivityType = "Update",
-                    ActivityDetails = $"User has updated the information of a statement of account: {accountInfo.AccountNumber} under billing ID: {accountInfo.BillingID}"
+                    UserID = UserService.CurrentUser.ID,
+                    Type = "Update",
+                    Details = $"User has updated the information of a statement of account: {accountInfo.AccountNumber} under billing ID: {accountInfo.BillingID}"
                 });
 
                 return true;
@@ -639,11 +639,11 @@ namespace LBPRDC.Source.Services
 
                     if (affectedRows > 0)
                     {
-                        await LoggingService.LogActivity(new()
+                        await LoggingService.AddLog(new()
                         {
-                            UserID = UserService.CurrentUser.UserID,
-                            ActivityType = "Remove Account",
-                            ActivityDetails = $"User has removed a statement of account: {accountNumber} under billing: {billingName}"
+                            UserID = UserService.CurrentUser.ID,
+                            Type = "Remove Account",
+                            Details = $"User has removed a statement of account: {accountNumber} under billing: {billingName}"
                         });
                     }
 

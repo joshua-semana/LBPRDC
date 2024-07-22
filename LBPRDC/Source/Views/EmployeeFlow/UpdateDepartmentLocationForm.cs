@@ -56,7 +56,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void InitializeDepartmentComboBoxItems()
         {
-            DepartmentList = await DepartmentService.GetAllItemsForComboBoxByClientID(ClientID);
+            DepartmentList = await DepartmentService.GetAllItemsForComboBox(ClientID);
             cmbDepartment.DataSource = DepartmentList;
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
@@ -64,7 +64,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void InitializeEmployeeInformation(int ClientID, int EmployeeID)
         {
-            var employees = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
+            var employees = await EmployeeService.GetEmployees(ClientID, EmployeeID);
 
             if (employees.Any())
             {
@@ -103,7 +103,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
         }
         private async void UpdateEmployeeInformation()
         {
-            EmployeeService.EmployeeDepartmentLocationUpdate data = new()
+            bool isUpdated = await EmployeeService.UpdateEmployeeDepartmentLocation(new()
             {
                 EmployeeID = EmployeeID,
                 DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue),
@@ -111,10 +111,8 @@ namespace LBPRDC.Source.Views.EmployeeFlow
                 DepartmentName = cmbDepartment.Text,
                 LocationName = cmbLocation.Text,
                 Remarks = txtRemarks.Text,
-                Date = DateTime.Now,
-            };
-
-            bool isUpdated = await EmployeeService.UpdateEmployeeDepartmentLocation(data);
+                Timestamp = DateTime.Now,
+            });
 
             if (isUpdated)
             {

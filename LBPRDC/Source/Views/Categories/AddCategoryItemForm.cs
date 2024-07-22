@@ -11,6 +11,7 @@ namespace LBPRDC.Source.Views.Categories
 
         private readonly List<Control> RequiredFields;
         private readonly List<Control> CommonFields;
+        private readonly List<Control> ClientSpecificFields;
         private readonly List<Control> ClassificationSpecificFields;
         private readonly List<Control> PositionSpecificFields;
         private readonly List<Control> LocationSpecificFields;
@@ -27,6 +28,14 @@ namespace LBPRDC.Source.Views.Categories
                 txtDescription,
                 lblStatus,
                 cmbStatus
+            };
+
+            ClientSpecificFields = new()
+            {
+                lblPayFrequency,
+                cmbPayFrequency,
+                lblCode,
+                txtCode,
             };
 
             ClassificationSpecificFields = new()
@@ -77,6 +86,8 @@ namespace LBPRDC.Source.Views.Categories
             switch (CategoryName)
             {
                 case StringConstants.Categories.CLIENT:
+                    ControlUtils.ToggleControlVisibility(ClientSpecificFields, true);
+                    InitializePayFrequencyComboBoxItems();
                     break;
 
                 case StringConstants.Categories.CLASSIFICATION:
@@ -106,29 +117,69 @@ namespace LBPRDC.Source.Views.Categories
                 case StringConstants.Categories.EMPLOYMENT_STATUS:
                     break;
 
-
                 default:
                     MessageBox.Show("Category is not allowed to use this feature. Please contact support for this error.", MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     this.Close();
                     break;
             }
 
+            AdjustFormSize(GetVisibleControlsCount(flowBody));
+            CenterForm();
             GetRequiredFields();
+        }
+
+        private int GetVisibleControlsCount(Control control)
+        {
+            int count = 0;
+
+            foreach (Control item in control.Controls)
+            {
+                if ((item is Label || item is TextBox) && item.Visible)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        private void AdjustFormSize(int Count)
+        {
+            var multiplier = (Count / 2) * 57;
+            this.Height = 227 + multiplier;
+        }
+
+        private void CenterForm()
+        {
+            this.StartPosition = FormStartPosition.Manual;
+            this.Location = new Point(
+                (Screen.PrimaryScreen.WorkingArea.Width - this.Width) / 2,
+                (Screen.PrimaryScreen.WorkingArea.Height - this.Height) / 2
+            );
+        }
+
+        private async void InitializePayFrequencyComboBoxItems()
+        {
+            cmbPayFrequency.DataSource = await PayFrequencyService.GetAllItemsForComboBox();
+            cmbPayFrequency.DisplayMember = nameof(Models.PayFrequency.Name);
+            cmbPayFrequency.ValueMember = nameof(Models.PayFrequency.ID);
+            cmbPayFrequency.SelectedValue = PayFrequencyService.CurrentPayFrequencyID;
+        }
+
+        private async void InitializeClientComboBoxItems()
+        {
+            cmbClient.DataSource = await ClientService.GetAllItemsForComboBox(StringConstants.Status.ACTIVE);
+            cmbClient.DisplayMember = nameof(Models.Client.Name);
+            cmbClient.ValueMember = nameof(Models.Client.ID);
         }
 
         private void InitializeDepartmentComboBoxItems(List<Models.Department> items)
         {
             cmbDepartment.DataSource = items;
-            cmbDepartment.DisplayMember = "Name";
-            cmbDepartment.ValueMember = "ID";
+            cmbDepartment.DisplayMember = nameof(Models.Department.Name);
+            cmbDepartment.ValueMember = nameof(Models.Department.ID);
         }
 
-        private void InitializeClientComboBoxItems()
-        {
-            cmbClient.DataSource = ClientService.GetClientsForComboBoxByStatus(StringConstants.Status.ACTIVE, true);
-            cmbClient.DisplayMember = "Description";
-            cmbClient.ValueMember = "ID";
-        }
 
         private void GetRequiredFields()
         {
@@ -164,7 +215,7 @@ namespace LBPRDC.Source.Views.Categories
                 switch (CategoryName)
                 {
                     case StringConstants.Categories.POSITION:
-                        var positionItemsList = await PositionService.GetItemsByClientID(Convert.ToInt32(cmbClient.SelectedValue));
+                        var positionItemsList = await PositionService.GetItems(Convert.ToInt32(cmbClient.SelectedValue));
                         var similarPositionCodesCount = positionItemsList.Where(w => txtCode.Text.ToUpper().Equals(w.Code)).Count();
                         if (similarPositionCodesCount > 0)
                         {
@@ -174,7 +225,7 @@ namespace LBPRDC.Source.Views.Categories
                         break;
 
                     case StringConstants.Categories.DEPARTMENT:
-                        var departmentItemsList = await DepartmentService.GetItemsByClientID(Convert.ToInt32(cmbClient.SelectedValue));
+                        var departmentItemsList = await DepartmentService.GetItems(Convert.ToInt32(cmbClient.SelectedValue));
                         var similarDepartmentCodesCount = departmentItemsList.Where(w => txtCode.Text.ToUpper().Equals(w.Code)).Count();
                         if (similarDepartmentCodesCount > 0)
                         {
@@ -200,8 +251,10 @@ namespace LBPRDC.Source.Views.Categories
             switch (CategoryName)
             {
                 case StringConstants.Categories.CLIENT:
-                    isAdded = await ClientService.AddClient(new()
+                    isAdded = await ClientService.Add(new()
                     {
+                        PayFrequencyID = Convert.ToInt32(cmbPayFrequency.SelectedValue),
+                        Code = code,
                         Name = name,
                         Description = description,
                         Status = status
@@ -234,37 +287,34 @@ namespace LBPRDC.Source.Views.Categories
                     break;
 
                 case StringConstants.Categories.DEPARTMENT:
-                    DepartmentService.Department AddForDepartment = new()
+                    isAdded = await DepartmentService.Add(new()
                     {
                         Code = code,
                         ClientID = clientID,
                         Name = name,
                         Description = description,
                         Status = status
-                    };
-                    isAdded = await DepartmentService.Add(AddForDepartment);
+                    });
                     break;
 
                 case StringConstants.Categories.LOCATION:
-                    LocationService.Location AddForLocation = new()
+                    isAdded = await LocationService.Add(new()
                     {
                         Name = name,
                         Description = description,
                         Type = StringConstants.Type.USER_ENTRY,
                         Status = status,
                         DepartmentID = Convert.ToInt32(cmbDepartment.SelectedValue)
-                    };
-                    isAdded = await LocationService.Add(AddForLocation);
+                    });
                     break;
 
                 case StringConstants.Categories.EMPLOYMENT_STATUS:
-                    EmploymentStatusService.EmploymentStatus AddForEmploymentStatus = new()
+                    isAdded = await EmploymentStatusService.Add(new()
                     {
                         Name = name,
                         Description = description,
                         Status = status
-                    };
-                    isAdded = await EmploymentStatusService.Add(AddForEmploymentStatus);
+                    });
                     break;
 
                 case StringConstants.Categories.WAGE:

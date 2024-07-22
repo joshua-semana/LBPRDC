@@ -1,5 +1,6 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
+using LBPRDC.Source.Views.Categories;
 
 namespace LBPRDC.Source.Views.Accounts
 {
@@ -39,7 +40,7 @@ namespace LBPRDC.Source.Views.Accounts
             {
                 dgvUsers.AutoGenerateColumns = false;
 
-                var filteredUsers = users.Where(w => w.UserID != UserService.CurrentUser?.UserID).ToList();
+                var filteredUsers = users.Where(w => w.ID != UserService.CurrentUser?.ID).ToList();
 
                 if (!string.IsNullOrEmpty(searchWord))
                 {
@@ -61,7 +62,7 @@ namespace LBPRDC.Source.Views.Accounts
 
         private void ApplySettingsToTable()
         {
-            ControlUtils.AddColumn(dgvUsers, "UserID", "ID", "UserID", true, true);
+            ControlUtils.AddColumn(dgvUsers, "ID", "ID", "ID", true, true);
             ControlUtils.AddColumn(dgvUsers, "Role", "Role", "Role", true, true);
             ControlUtils.AddColumn(dgvUsers, "Username", "Username", "Username", true, true);
             ControlUtils.AddColumn(dgvUsers, "Email", "Email", "Email", true, true);
@@ -123,7 +124,7 @@ namespace LBPRDC.Source.Views.Accounts
 
             Models.User user = new()
             {
-                UserID = Convert.ToInt32(dgvUsers.SelectedRows[0].Cells[0].Value),
+                ID = Convert.ToInt32(dgvUsers.SelectedRows[0].Cells[0].Value),
                 PasswordHash = newPassword
             };
 
@@ -142,6 +143,15 @@ namespace LBPRDC.Source.Views.Accounts
         private void btnSearch_Click(object sender, EventArgs e)
         {
             PopulateTableWithSearch(txtSearch.Text.Trim().ToLower());
+        }
+
+        private void btnPermissions_Click(object sender, EventArgs e)
+        {
+            PermissionsForm form = new()
+            {
+                ParentAccountsControl = this,
+            };
+            form.ShowDialog();
         }
     }
 }

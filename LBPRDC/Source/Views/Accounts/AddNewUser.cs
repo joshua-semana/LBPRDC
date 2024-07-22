@@ -16,14 +16,26 @@ namespace LBPRDC.Source.Views.Accounts
             requiredFields = new List<Control>
             {
                 txtFirstName,
-                txtMiddleName,
                 txtLastName,
                 txtEmailAddress,
                 txtPositionTitle,
                 txtUsername,
                 txtPassword,
                 txtConfirmPassword,
+                cmbUserRole
             };
+        }
+
+        private void AddNewUser_Load(object sender, EventArgs e)
+        {
+            FetchUserRolesCollection();
+        }
+
+        private async void FetchUserRolesCollection()
+        {
+            cmbUserRole.DataSource = await UserRoleService.GetItemsForComboBox();
+            cmbUserRole.DisplayMember = nameof(Models.UserRole.Name);
+            cmbUserRole.ValueMember = nameof(Models.UserRole.ID);
         }
 
         private async void btnAdd_Click(object sender, EventArgs e)
@@ -60,7 +72,7 @@ namespace LBPRDC.Source.Views.Accounts
                 MiddleName = txtMiddleName.Text,
                 LastName = txtLastName.Text,
                 PositionTitle = txtPositionTitle.Text,
-                Role = StringConstants.UserRole.STANDARD,
+                UserRoleID = Convert.ToInt32(cmbUserRole.SelectedValue),
                 Status = StringConstants.Status.ACTIVE,
                 RegistrationDate = DateTime.Now,
                 LastLoginDate = DateTime.Now,

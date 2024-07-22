@@ -26,7 +26,8 @@ namespace LBPRDC.Source.Views
                 cmbWageType,
                 cmbPosition,
                 cmbEmploymentStatus,
-                cmbDepartment
+                cmbDepartment,
+                cmbSuffix
             };
         }
 
@@ -55,9 +56,9 @@ namespace LBPRDC.Source.Views
             cmbGender.SelectedIndex = 0;
         }
 
-        private void InitializeSuffixComboBoxItems()
+        private async void InitializeSuffixComboBoxItems()
         {
-            cmbSuffix.DataSource = SuffixService.GetAllItemsForComboBox();
+            cmbSuffix.DataSource = await SuffixService.GetAllItemsForComboBox();
             cmbSuffix.DisplayMember = "Name";
             cmbSuffix.ValueMember = "ID";
         }
@@ -92,7 +93,7 @@ namespace LBPRDC.Source.Views
 
         private async void InitializeDepartmentComboBoxItems()
         {
-            cmbDepartment.DataSource = await DepartmentService.GetAllItemsForComboBoxByClientID(ClientID);
+            cmbDepartment.DataSource = await DepartmentService.GetAllItemsForComboBox(ClientID);
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
         }

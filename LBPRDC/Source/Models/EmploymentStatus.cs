@@ -17,6 +17,14 @@ namespace LBPRDC.Source.Models
             public DateTime Timestamp { get; set; } = DateTime.Now;
             public string Remarks { get; set; } = "";
             public string Status { get; set; } = StringConstants.Status.ACTIVE;
+            public EmploymentStatus _EmploymentStatus { get; set; }
+        }
+
+        public class HistoryView : History
+        {
+            public string Indicator { get; set; } = "";
+            public string EmploymentStatusName { get; set; } = "";
+            public string EffectiveDate { get; set; } = "";
         }
     }
 }

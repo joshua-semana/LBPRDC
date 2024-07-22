@@ -32,6 +32,14 @@ namespace LBPRDC.Source.Views.Accounts
             }
 
             InitializeUserInformation(UserID);
+            FetchUserRoleCollection();
+        }
+
+        private async void FetchUserRoleCollection()
+        {
+            cmbRole.DataSource = await UserRoleService.GetItemsForComboBox();
+            cmbRole.DisplayMember = nameof(Models.UserRole.Name);
+            cmbRole.ValueMember = nameof(Models.UserRole.ID);
         }
 
         private async void InitializeUserInformation(int userID)
@@ -42,7 +50,7 @@ namespace LBPRDC.Source.Views.Accounts
                 var user = users.First();
                 txtUserID.Text = userID.ToString();
                 txtUsername.Text = user.Username;
-                cmbRole.SelectedItem = user.Role;
+                cmbRole.SelectedValue = user.UserRoleID;
                 cmbStatus.SelectedItem = user.Status;
             }
             else
@@ -65,9 +73,9 @@ namespace LBPRDC.Source.Views.Accounts
         {
             Models.User userUpdate = new()
             {
-                UserID = Convert.ToInt32(txtUserID.Text),
+                ID = Convert.ToInt32(txtUserID.Text),
                 Username = txtUsername.Text,
-                Role = cmbRole.Text,
+                UserRoleID = Convert.ToInt32(cmbRole.SelectedValue),
                 Status = cmbStatus.Text
             };
 

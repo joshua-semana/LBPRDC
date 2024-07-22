@@ -26,7 +26,8 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void InitializeEmployeeInformation()
         {
-            var employeeList = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
+            string noContent = "-";
+            var employeeList = await EmployeeService.GetEmployees(ClientID, EmployeeID);
 
             if (employeeList == null && !employeeList.Any())
             {
@@ -35,38 +36,40 @@ namespace LBPRDC.Source.Views.EmployeeFlow
                 return;
             }
 
-            var employee = employeeList.First();
+            var e = employeeList.First();
+
+            lblIdentificationCode.Text = e.EmployeeID;
+            lblFullName.Text = Utilities.StringFormat.ToSentenceCase(e.FullName.Trim());
+            lblGender.Text = e.Gender;
+            lblEmailAddress1.Text = e.EmailAddress1 ?? noContent;
+            lblEmailAddress2.Text = e.EmailAddress2 ?? noContent;
+            lblContactNumber1.Text = e.ContactNumber1 ?? noContent;
+            lblContactNumber2.Text = e.ContactNumber2 ?? noContent;
+            lblRemarks.Text = e.Remarks ?? noContent;
+            lblClassification.Text = e.ClassificationName;
+            lblWageType.Text = e.WageName;
+            lblPosition.Text = e.PositionName;
+            lblDepartment.Text = e.DepartmentName;
+            lblLocation.Text = e.LocationName;
+            lblStatus.Text = e.EmploymentStatusName;
 
             var positions = await PositionService.GetAllEmployeeHistory(EmployeeID);
-            var employeePreviousRecordList = await PreviousEmployeeService.GetEmployeeFormerHistory(EmployeeID);
-            bool isFormerEmployee = employeePreviousRecordList.Any();
-
             var initialPosition = positions.Where(p => p.Remarks == StringConstants.InitialRemarks.POSITION).First();
             var currentPosition = positions.Where(p => p.Status == StringConstants.Status.ACTIVE).First();
-            string noContent = "-";
 
-            lblFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
-            lblGender.Text = Utilities.StringFormat.ToSentenceCase(employee.Gender);
-            lblEmailAddress1.Text = employee.EmailAddress1 ?? noContent;
-            lblEmailAddress2.Text = employee.EmailAddress2 ?? noContent;
-            lblContactNumber1.Text = employee.ContactNumber1 ?? noContent;
-            lblContactNumber2.Text = employee.ContactNumber2 ?? noContent;
-            lblIdentificationCode.Text = employee.EmployeeID.ToString();
             lblStartDate.Text = initialPosition.Timestamp.ToString(StringConstants.Date.DEFAULT) ?? noContent;
-            lblWageType.Text = employee.WageName;
-            lblPosition.Text = Utilities.StringFormat.ToSentenceCase(employee.PositionName);
             lblEffectiveDate.Text = currentPosition.Timestamp.ToString(StringConstants.Date.DEFAULT) ?? noContent;
-            lblDepartment.Text = employee.DepartmentName;
-            lblLocation.Text = employee.LocationName;
-            lblStatus.Text = Utilities.StringFormat.ToSentenceCase(employee.EmploymentStatusName);
-            lblRemarks.Text = employee.Remarks ?? noContent;
+
+            var employeePreviousRecordList = await PreviousEmployeeService.GetEmployeeFormerHistory(EmployeeID);
+            bool isFormerEmployee = employeePreviousRecordList.Any();
 
             if (isFormerEmployee)
             {
                 var entity = employeePreviousRecordList.First();
+                var formerPosition = Utilities.StringFormat.ToSentenceCase(entity.Position);
                 lblPreviousEmployee.Text = "Yes";
                 lblPeriod.Text = $"{entity.StartDate.ToString(StringConstants.Date.DEFAULT)} to {entity.EndDate.ToString(StringConstants.Date.DEFAULT)}";
-                lblInformation.Text = $"({entity.Position}) {entity.Information}";
+                lblInformation.Text = $"({formerPosition}) {entity.Information}";
             }
             else
             {
@@ -86,7 +89,8 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             ViewHistory frmViewHistory = new()
             {
                 HistoryType = "Position",
-                EmployeeID = EmployeeID
+                EmployeeID = EmployeeID,
+                ClientID = ClientID
             };
             frmViewHistory.ShowDialog();
         }

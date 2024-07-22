@@ -76,11 +76,11 @@ namespace LBPRDC.Source.Views.Billing
             }
         }
 
-        private void InitializeClientComboBoxItems()
+        private async void InitializeClientComboBoxItems()
         {
-            cmbClient.DataSource = ClientService.GetClientsForComboBoxByStatus(StringConstants.Status.ACTIVE, false);
-            cmbClient.DisplayMember = "Description";
-            cmbClient.ValueMember = "ID";
+            cmbClient.DataSource = await ClientService.GetAllItemsForComboBox(StringConstants.Status.ACTIVE, false);
+            cmbClient.DisplayMember = nameof(Client.Name);
+            cmbClient.ValueMember = nameof(Models.Client.ID);
             cmbClient.MouseWheel += ComboBoxUtils.HandleMouseWheel;
             cmbClient.KeyDown += ComboBoxUtils.HandleKeyDown;
         }
@@ -471,7 +471,7 @@ namespace LBPRDC.Source.Views.Billing
         {
             if (cmbClient.Items.Count > 0)
             {
-                var selectedClient = (Services.Client)cmbClient.SelectedItem;
+                var selectedClient = (Models.Client)cmbClient.SelectedItem;
                 ClientID = selectedClient.ID;
                 ClientName = selectedClient.Name;
                 BillingID = 0;
@@ -706,16 +706,14 @@ namespace LBPRDC.Source.Views.Billing
             if (await Task.Run(() => BillingService.UpdateStatusByID(BillingID, StringConstants.Status.INACTIVE)))
             {
                 MessageBox.Show($"You have successfully archived the {selectedBillingName} billing.", "Archive Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                if (UserService.CurrentUser != null)
+                
+                await LoggingService.AddLog(new()
                 {
-                    LoggingService.Log newLog = new()
-                    {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Archive",
-                        ActivityDetails = $"This user has archive a billing with a name of {selectedBillingName}."
-                    };
-                    LoggingService.LogActivity(newLog);
-                }
+                    UserID = UserService.CurrentUser.ID,
+                    Type = "Archive",
+                    Details = $"This user has archive a billing with a name of {selectedBillingName}."
+                });
+
                 ApplySearchThenPopulate();
             }
         }

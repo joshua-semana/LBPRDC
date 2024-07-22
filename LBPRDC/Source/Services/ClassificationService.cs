@@ -1,6 +1,4 @@
-﻿using Dapper;
-using LBPRDC.Source.Config;
-using LBPRDC.Source.Data;
+﻿using LBPRDC.Source.Config;
 using Microsoft.EntityFrameworkCore;
 using static LBPRDC.Source.Data.Database;
 
@@ -16,6 +14,8 @@ namespace LBPRDC.Source.Services
             {
                 using var context = new Context();
                 classifications = await context.Classifications
+                    .Include(i => i.Client)
+                    .Where(w => w.Client.PayFrequencyID == PayFrequencyService.CurrentPayFrequencyID)
                     .Select(s => new Models.Classification.TableView
                     {
                         ID = s.ID,
@@ -66,9 +66,9 @@ namespace LBPRDC.Source.Services
                 using var context = new Context();
 
                 var result = await context.Classifications
-                    .Where(w =>
-                        w.Status.Equals(StringConstants.Status.ACTIVE) &&
-                        w.ClientID.Equals(ClientID))
+                    .Include(i => i.Client)
+                    .Where(w => w.Client.PayFrequencyID == PayFrequencyService.CurrentPayFrequencyID)
+                    .Where(w => w.Status.Equals(StringConstants.Status.ACTIVE) && w.ClientID.Equals(ClientID))
                     .Select(s => new Models.Classification
                     {
                         ID = s.ID,
@@ -93,11 +93,11 @@ namespace LBPRDC.Source.Services
 
                 if (result > 0)
                 {
-                    await LoggingService.LogActivity(new()
+                    await LoggingService.AddLog(new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Add",
-                        ActivityDetails = $"Added Classification: {entity.ID} - {entity.Name}"
+                        UserID = UserService.CurrentUser.ID,
+                        Type = MessagesConstants.Operation.ADD,
+                        Details = $"Added Classification: {entity.ID} - {entity.Name}"
                     });
                 }
 
@@ -106,7 +106,7 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
 
-        public static async Task<bool> UpdateClassification(Models.Classification updatedEntity)
+        public static async Task<bool> Update(Models.Classification updatedEntity)
         {
             try
             {
@@ -115,7 +115,6 @@ namespace LBPRDC.Source.Services
                 var entity = await context.Classifications.FindAsync(updatedEntity.ID);
 
                 if (entity == null) { return false; }
-                if (AreEqual(entity, updatedEntity)) { return true; }
 
                 entity.Name = updatedEntity.Name;
                 entity.Status = updatedEntity.Status;
@@ -125,56 +124,16 @@ namespace LBPRDC.Source.Services
 
                 int result = await context.SaveChangesAsync();
 
-                if (result > 0)
+                await LoggingService.AddLog(new()
                 {
-                    await LoggingService.LogActivity(new()
-                    {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Update",
-                        ActivityDetails = $"Updated Classification: {entity.ID} - {entity.Name}"
-                    });
-                }
+                    UserID = UserService.CurrentUser.ID,
+                    Type = MessagesConstants.Operation.UPDATE,
+                    Details = $"Updated Classification: {entity.ID} - {entity.Name}"
+                });
 
-                return (result > 0);
+                return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        private static bool AreEqual(Models.Classification entity1, Models.Classification entity2)
-        {
-            return entity1.Name == entity2.Name &&
-                   entity1.Status == entity2.Status &&
-                   entity1.Description == entity2.Description;
-        }
-
-        public static List<string> GetExistenceByID(int ID)
-        {
-            List<string> databaseTableNames = new();
-
-            try
-            {
-                using var connection = Database.Connect();
-
-                string QueryCheckExistense = "";
-                List<string> tableNames = new()
-                {
-                    "Employee"
-                };
-
-                List<string> selectQueries = tableNames.Select(name =>
-                    $"SELECT DISTINCT '{name}' AS TableName FROM {name} WHERE ClassificationID = @ClassificationID"
-                ).ToList();
-
-                QueryCheckExistense = string.Join(" UNION ALL ", selectQueries);
-
-                databaseTableNames = connection.Query<string>(QueryCheckExistense, new
-                {
-                    ID
-                }).ToList();
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-
-            return databaseTableNames;
         }
     }
 }

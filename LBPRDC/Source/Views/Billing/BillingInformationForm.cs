@@ -172,7 +172,7 @@ namespace LBPRDC.Source.Views.Billing
                 Models.Billing newBilling = new()
                 {
                     ClientID = ClientID,
-                    UserID = UserService.CurrentUser.UserID,
+                    UserID = UserService.CurrentUser.ID,
                     Name = newBillingName,
                     OfficerName = txtOfficerName.Text.ToUpper().Trim(),
                     OfficerPosition = txtOfficerPosition.Text.ToUpper().Trim(),

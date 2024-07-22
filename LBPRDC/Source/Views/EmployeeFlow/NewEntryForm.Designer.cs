@@ -33,6 +33,7 @@
             btnConfirm = new Button();
             btnCancel = new Button();
             pnlMain = new Panel();
+            label12 = new Label();
             pnlLine2 = new Panel();
             label33 = new Label();
             grpJobData = new GroupBox();
@@ -45,6 +46,7 @@
             cmbWageType = new ComboBox();
             label35 = new Label();
             label31 = new Label();
+            chkPreviousEmployee = new CheckBox();
             dtpStartDate = new DateTimePicker();
             label30 = new Label();
             label29 = new Label();
@@ -63,7 +65,6 @@
             dtpFromDate = new DateTimePicker();
             txtPreviousPosition = new TextBox();
             label16 = new Label();
-            chkPreviousEmployee = new CheckBox();
             txtRemarks = new TextBox();
             label15 = new Label();
             txtPositionTitle = new TextBox();
@@ -95,7 +96,7 @@
             txtFirstName = new TextBox();
             label1 = new Label();
             pnlFooter = new Panel();
-            label12 = new Label();
+            label26 = new Label();
             flowControls.SuspendLayout();
             pnlMain.SuspendLayout();
             grpJobData.SuspendLayout();
@@ -168,6 +169,18 @@
             pnlMain.Padding = new Padding(16);
             pnlMain.Size = new Size(1061, 693);
             pnlMain.TabIndex = 2;
+            // 
+            // label12
+            // 
+            label12.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label12.AutoSize = true;
+            label12.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label12.Location = new Point(16, 661);
+            label12.Margin = new Padding(0, 6, 8, 0);
+            label12.Name = "label12";
+            label12.Size = new Size(427, 16);
+            label12.TabIndex = 28;
+            label12.Text = "Reminder: All text fields marked with a red asterisk (*) are required.";
             // 
             // pnlLine2
             // 
@@ -339,6 +352,19 @@
             label31.Size = new Size(71, 16);
             label31.TabIndex = 33;
             label31.Text = "Start Date";
+            // 
+            // chkPreviousEmployee
+            // 
+            chkPreviousEmployee.AutoSize = true;
+            chkPreviousEmployee.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            chkPreviousEmployee.Location = new Point(20, 221);
+            chkPreviousEmployee.Margin = new Padding(3, 3, 3, 8);
+            chkPreviousEmployee.Name = "chkPreviousEmployee";
+            chkPreviousEmployee.Size = new Size(317, 20);
+            chkPreviousEmployee.TabIndex = 19;
+            chkPreviousEmployee.Text = "This person is a previous employee of LBRDC";
+            chkPreviousEmployee.UseVisualStyleBackColor = true;
+            chkPreviousEmployee.CheckedChanged += chkPreviousEmployee_CheckedChanged;
             // 
             // dtpStartDate
             // 
@@ -569,19 +595,6 @@
             label16.TabIndex = 21;
             label16.Text = "Position";
             // 
-            // chkPreviousEmployee
-            // 
-            chkPreviousEmployee.AutoSize = true;
-            chkPreviousEmployee.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            chkPreviousEmployee.Location = new Point(20, 221);
-            chkPreviousEmployee.Margin = new Padding(3, 3, 3, 8);
-            chkPreviousEmployee.Name = "chkPreviousEmployee";
-            chkPreviousEmployee.Size = new Size(317, 20);
-            chkPreviousEmployee.TabIndex = 19;
-            chkPreviousEmployee.Text = "This person is a previous employee of LBRDC";
-            chkPreviousEmployee.UseVisualStyleBackColor = true;
-            chkPreviousEmployee.CheckedChanged += chkPreviousEmployee_CheckedChanged;
-            // 
             // txtRemarks
             // 
             txtRemarks.AccessibleName = "Remarks";
@@ -778,6 +791,7 @@
             // grpPersonalData
             // 
             grpPersonalData.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpPersonalData.Controls.Add(label26);
             grpPersonalData.Controls.Add(label25);
             grpPersonalData.Controls.Add(label24);
             grpPersonalData.Controls.Add(label23);
@@ -952,17 +966,17 @@
             pnlFooter.Size = new Size(1061, 60);
             pnlFooter.TabIndex = 3;
             // 
-            // label12
+            // label26
             // 
-            label12.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            label12.AutoSize = true;
-            label12.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            label12.Location = new Point(16, 661);
-            label12.Margin = new Padding(0, 6, 8, 0);
-            label12.Name = "label12";
-            label12.Size = new Size(427, 16);
-            label12.TabIndex = 28;
-            label12.Text = "Reminder: All text fields marked with a red asterisk (*) are required.";
+            label26.AutoSize = true;
+            label26.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label26.ForeColor = Color.Red;
+            label26.Location = new Point(660, 25);
+            label26.Margin = new Padding(0, 0, 0, 4);
+            label26.Name = "label26";
+            label26.Size = new Size(14, 18);
+            label26.TabIndex = 19;
+            label26.Text = "*";
             // 
             // frmNewEntryEmployee
             // 
@@ -1066,5 +1080,6 @@
         private ComboBox cmbEmploymentStatus;
         private Label label4;
         private Label label12;
+        private Label label26;
     }
 }
