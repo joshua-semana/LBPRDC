@@ -266,7 +266,6 @@
             cmbRole.AccessibleName = "Role";
             cmbRole.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbRole.FormattingEnabled = true;
-            cmbRole.Items.AddRange(new object[] { "(Choose Role)", "Standard", "Admin" });
             cmbRole.Location = new Point(10, 115);
             cmbRole.Name = "cmbRole";
             cmbRole.Size = new Size(197, 26);

@@ -19,32 +19,7 @@ namespace LBPRDC.Source.Services
             public string? Description { get; set; }
         }
 
-        // Entity Framework
-
-        public static async Task<List<Models.Location.View>> GetAllItemsWithView()
-        {
-            List<Models.Location.View> items = new();
-
-            try
-            {
-                using var context = new Context();
-                items = await context.Locations.Select(s => new Models.Location.View
-                {
-                    ID = s.ID,
-                    Type = s.Type,
-                    Name = s.Name,
-                    DepartmentID = s.DepartmentID,
-                    Status = s.Status,
-                    Description = s.Description,
-                    DepartmentName = s.Department.Name
-                })
-                .ToListAsync();
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
-
-            return items;
-        }
-
+        // TODO: Being used for GetEmployeeBase in EmployeeService which is to be remove
         public static List<Location> GetAllItems()
         {
             List<Location> items = new();
@@ -62,6 +37,34 @@ namespace LBPRDC.Source.Services
             return items;
         }
 
+        public static async Task<List<Models.Location.View>> GetAllItemsWithView()
+        {
+            List<Models.Location.View> items = new();
+
+            try
+            {
+                using var context = new Context();
+                items = await context.Locations
+                    .Include(i => i.Department)
+                    .Where(w => w.Department.Client.PayFrequencyID == PayFrequencyService.CurrentPayFrequencyID)
+                    .Select(s => new Models.Location.View
+                    {
+                        ID = s.ID,
+                        Type = s.Type,
+                        Name = s.Name,
+                        DepartmentID = s.DepartmentID,
+                        Status = s.Status,
+                        Description = s.Description,
+                        DepartmentClientName = s.Department.Client.Name,
+                        DepartmentName = s.Department.Name
+                    })
+                    .ToListAsync();
+            }
+            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
+
+            return items;
+        }
+
         public static async Task<List<Models.Location>> GetAllItemsForComboBoxByID(int departmentID)
         {
             List<Models.Location> items = new();
@@ -71,9 +74,9 @@ namespace LBPRDC.Source.Services
                 using var context = new Context();
 
                 items = await context.Locations
-                    .Where(l => 
-                        l.Status == StringConstants.Status.ACTIVE &&
-                        l.DepartmentID == departmentID)
+                    .Include(i => i.Department)
+                    .Where(w => w.Department.Client.PayFrequencyID == PayFrequencyService.CurrentPayFrequencyID)
+                    .Where(l => l.Status == StringConstants.Status.ACTIVE && l.DepartmentID == departmentID)
                     .Select(l => new Models.Location()
                     {
                         ID = l.ID,
@@ -103,50 +106,22 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
-        public static async Task<bool> Add(Location data)
+        public static async Task<bool> Add(Models.Location data)
         {
             try
             {
-                using var connection = Database.Connect();
-                using var transaction = connection?.BeginTransaction();
+                using var context = new Context();
+                context.Locations.Add(data);
+                await context.SaveChangesAsync();
 
-                try
+                await LoggingService.AddLog(new()
                 {
-                    string QueryInsert = @"
-                        INSERT INTO Locations (
-                            Type,
-                            Name, 
-                            DepartmentID,
-                            Description, 
-                            Status
-                        ) VALUES (
-                            @Type,
-                            @Name, 
-                            @DepartmentID,
-                            @Description, 
-                            @Status
-                        )";
+                    UserID = UserService.CurrentUser.ID,
+                    Type = MessagesConstants.Add.TITLE,
+                    Details = $"Added a new location: {data.Name}"
+                });
 
-                    int affectedRows = await connection.ExecuteAsync(QueryInsert, data, transaction);
-                    transaction?.Commit();
-
-                    if (affectedRows > 0)
-                    {
-                        LoggingService.Log newLog = new()
-                        {
-                            UserID = UserService.CurrentUser.UserID,
-                            ActivityType = MessagesConstants.Add.TITLE,
-                            ActivityDetails = $"This user added a new item for the location category with a name of {data.Name}."
-                        };
-                    }
-
-                    return (affectedRows > 0);
-                }
-                catch (Exception)
-                {
-                    transaction?.Rollback();
-                    return false;
-                }
+                return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
         }
@@ -160,38 +135,24 @@ namespace LBPRDC.Source.Services
                 var item = await context.Locations.FindAsync(data.ID);
 
                 if (item == null) { return false; }
-                if (AreEqual(item, data)) { return true; }
 
                 item.Name = data.Name;
                 item.DepartmentID = data.DepartmentID;
                 item.Description = data.Description;
                 item.Status = data.Status;
 
-                int affectedRows = await context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
-                if (affectedRows > 0)
+                await LoggingService.AddLog(new()
                 {
-                    if (UserService.CurrentUser != null)
-                    {
-                        await LoggingService.LogActivity(new()
-                        {
-                            UserID = UserService.CurrentUser.UserID,
-                            ActivityType = MessagesConstants.UPDATE,
-                            ActivityDetails = $"This user updated an item under the location category with an ID of {data.ID}."
-                        });
-                    }
-                }
-                return (affectedRows > 0);
+                    UserID = UserService.CurrentUser.ID,
+                    Type = MessagesConstants.UPDATE,
+                    Details = $"Updated a location's information with ID: {data.ID}"
+                });
+
+                return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        private static bool AreEqual(Models.Location item1, Models.Location item2)
-        {
-            return item1.Name == item2.Name &&
-                   item1.DepartmentID == item2.DepartmentID &&
-                   item1.Description == item2.Description &&
-                   item1.Status == item2.Status;
         }
     }
 }

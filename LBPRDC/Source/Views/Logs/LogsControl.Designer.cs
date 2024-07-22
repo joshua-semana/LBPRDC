@@ -39,7 +39,7 @@
             pnlLine2 = new Panel();
             btnReset = new Button();
             btnFilter = new Button();
-            label1 = new Label();
+            lblFilter = new Label();
             dtpDate = new DateTimePicker();
             txtSearch = new TextBox();
             btnSearch = new Button();
@@ -58,7 +58,7 @@
             pnlBody.Controls.Add(pnlLine2);
             pnlBody.Controls.Add(btnReset);
             pnlBody.Controls.Add(btnFilter);
-            pnlBody.Controls.Add(label1);
+            pnlBody.Controls.Add(lblFilter);
             pnlBody.Controls.Add(dtpDate);
             pnlBody.Controls.Add(txtSearch);
             pnlBody.Controls.Add(btnSearch);
@@ -154,17 +154,17 @@
             btnFilter.UseVisualStyleBackColor = true;
             btnFilter.Click += btnFilter_Click;
             // 
-            // label1
+            // lblFilter
             // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.ForeColor = SystemColors.ControlText;
-            label1.Location = new Point(20, 87);
-            label1.Margin = new Padding(0, 0, 0, 8);
-            label1.Name = "label1";
-            label1.Size = new Size(52, 16);
-            label1.TabIndex = 26;
-            label1.Text = "Filters";
+            lblFilter.AutoSize = true;
+            lblFilter.Font = new Font("Arial", 10F, FontStyle.Bold, GraphicsUnit.Point);
+            lblFilter.ForeColor = SystemColors.ControlText;
+            lblFilter.Location = new Point(20, 87);
+            lblFilter.Margin = new Padding(0, 0, 0, 8);
+            lblFilter.Name = "lblFilter";
+            lblFilter.Size = new Size(52, 16);
+            lblFilter.TabIndex = 26;
+            lblFilter.Text = "Filters";
             // 
             // dtpDate
             // 
@@ -314,5 +314,6 @@
         private Button btnSearch;
         private Label label1;
         private Panel pnlLine2;
+        private Label lblFilter;
     }
 }

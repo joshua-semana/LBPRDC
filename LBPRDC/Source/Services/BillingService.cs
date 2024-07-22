@@ -131,11 +131,11 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    await LoggingService.LogActivity(new()
+                    await LoggingService.AddLog(new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = MessagesConstants.UPDATE,
-                        ActivityDetails = $"User updated the information of billing '{billing.Name}'."
+                        UserID = UserService.CurrentUser.ID,
+                        Type = MessagesConstants.UPDATE,
+                        Details = $"User updated the information of billing '{billing.Name}'."
                     });
                 }
 
@@ -314,7 +314,7 @@ namespace LBPRDC.Source.Services
                     INNER JOIN 
                         Users 
                     ON 
-                        Billing.UserID = Users.UserID 
+                        Billing.UserID = Users.ID 
                     WHERE 
                         Billing.Status = @Status
                     AND
@@ -425,11 +425,11 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    await LoggingService.LogActivity(new()
+                    await LoggingService.AddLog(new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = MessagesConstants.Logs.TITLE_NEW_BILLING,
-                        ActivityDetails = $"{MessagesConstants.Logs.NEW_BILLING}{data.Name}."
+                        UserID = UserService.CurrentUser.ID,
+                        Type = MessagesConstants.Logs.TITLE_NEW_BILLING,
+                        Details = $"{MessagesConstants.Logs.NEW_BILLING}{data.Name}."
                     });
 
                     return (true, data.ID);
@@ -460,11 +460,11 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    await LoggingService.LogActivity(new()
+                    await LoggingService.AddLog(new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Upload",
-                        ActivityDetails = $"User uploaded a report and timekeep data to a billing with ID of {BillingID}."
+                        UserID = UserService.CurrentUser.ID,
+                        Type = "Upload",
+                        Details = $"User uploaded a report and timekeep data to a billing with ID of {BillingID}."
                     });
                 }
 
@@ -492,11 +492,11 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    await LoggingService.LogActivity(new()
+                    await LoggingService.AddLog(new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Save",
-                        ActivityDetails = $"User saves a verification progress to a billing named as {billingName}."
+                        UserID = UserService.CurrentUser.ID,
+                        Type = "Save",
+                        Details = $"User saves a verification progress to a billing named as {billingName}."
                     });
                 }
 
@@ -524,11 +524,11 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    await LoggingService.LogActivity(new()
+                    await LoggingService.AddLog(new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = "Upload",
-                        ActivityDetails = $"User uploaded accruals data to a billing with ID of {BillingID}."
+                        UserID = UserService.CurrentUser.ID,
+                        Type = "Upload",
+                        Details = $"User uploaded accruals data to a billing with ID of {BillingID}."
                     });
                 }
 
@@ -556,11 +556,11 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    await LoggingService.LogActivity(new()
+                    await LoggingService.AddLog(new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = MessagesConstants.UPDATE,
-                        ActivityDetails = $"User updated the status of a billing with ID of {BillingID} to {status}."
+                        UserID = UserService.CurrentUser.ID,
+                        Type = MessagesConstants.UPDATE,
+                        Details = $"User updated the status of a billing with ID of {BillingID} to {status}."
                     });
                 }
 
@@ -587,11 +587,11 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    await LoggingService.LogActivity(new()
+                    await LoggingService.AddLog(new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = MessagesConstants.UPDATE,
-                        ActivityDetails = $"User updated the verification status of a billing with ID of {BillingID} to {status}."
+                        UserID = UserService.CurrentUser.ID,
+                        Type = MessagesConstants.UPDATE,
+                        Details = $"User updated the verification status of a billing with ID of {BillingID} to {status}."
                     });
                 }
 
@@ -620,11 +620,11 @@ namespace LBPRDC.Source.Services
 
                 if (affectedRows > 0)
                 {
-                    await LoggingService.LogActivity(new()
+                    await LoggingService.AddLog(new()
                     {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = MessagesConstants.UPDATE,
-                        ActivityDetails = $"User locked a billing with an ID of {BillingID}"
+                        UserID = UserService.CurrentUser.ID,
+                        Type = MessagesConstants.UPDATE,
+                        Details = $"User locked a billing with an ID of {BillingID}"
                     });
                 }
 
@@ -676,11 +676,11 @@ namespace LBPRDC.Source.Services
 
                     if (updateStatus && updateLockStatus)
                     {
-                        await LoggingService.LogActivity(new()
+                        await LoggingService.AddLog(new()
                         {
-                            UserID = UserService.CurrentUser.UserID,
-                            ActivityType = "Release",
-                            ActivityDetails = $"User released a billing with ID of {BillingID}."
+                            UserID = UserService.CurrentUser.ID,
+                            Type = "Release",
+                            Details = $"User released a billing with ID of {BillingID}."
                         });
                     }
 

@@ -1,152 +1,102 @@
-﻿using System.Data.SqlClient;
+﻿using Microsoft.EntityFrameworkCore;
+using static LBPRDC.Source.Data.Database;
 
 namespace LBPRDC.Source.Services
 {
     internal class LoggingService
     {
-        public class Log
-        {
-            public int LogID { get; set; }
-            public int UserID { get; set; }
-            public string ActivityType { get; set; } = "";
-            public string ActivityDetails { get; set; } = "";
-            public DateTime? Timestamp { get; set; } = DateTime.Now;
-            public string FullName { get; set; } = "";
-        }
-
-        public static async Task LogActivity(Log log)
+        public static async Task AddLog(Models.AuditLog log)
         {
             try
             {
-                string query = "INSERT INTO AuditLogs (UserID, ActivityType, ActivityDetails, Timestamp) " +
-                               "VALUES (@UserID, @ActivityType, @ActivityDetails, @Timestamp)";
-
-                using (SqlConnection connection = new SqlConnection(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@UserID", log.UserID);
-                    command.Parameters.AddWithValue("@ActivityType", log.ActivityType);
-                    command.Parameters.AddWithValue("@ActivityDetails", log.ActivityDetails);
-                    command.Parameters.AddWithValue("@Timestamp", DateTime.Now);
-
-                    connection.Open();
-
-                    await command.ExecuteNonQueryAsync();
-                };
+                using var context = new Context();
+                await context.AuditLogs.AddAsync(log);
+                await context.SaveChangesAsync();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
 
-        public static async Task<List<Log>> GetAllItems()
+        public static async Task<List<string>> GetAllDistinctTypes(DateTime? date = null)
         {
-            List<Log> items = new();
+            List<string> types = new();
 
             try
             {
-                string query = "SELECT * FROM AuditLogs";
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                using (SqlCommand command = new(query, connection))
+                using var context = new Context();
+
+                var query = context.AuditLogs.AsQueryable();
+
+                if (date != null)
                 {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        Log item = new()
-                        {
-                            LogID = reader["LogID"] as int? ?? 0,
-                            UserID = reader["UserID"] as int? ?? 0,
-                            ActivityType = reader["ActivityType"] as string,
-                            ActivityDetails = reader["ActivityDetails"] as string,
-                            Timestamp = reader["Timestamp"] as DateTime?
-                        };
+                    DateTime startDate = date.Value.Date;
+                    DateTime endDate = date.Value.Date.AddDays(1).AddTicks(-1);
 
-                        var users = await UserService.GetUsers(item.UserID);
-
-                        if (users != null)
-                        {
-                            var currentUser = users.First();
-                            item.FullName = $"{currentUser.FirstName} {currentUser.LastName}";
-                        }
-
-                        items.Add(item);
-                    }
+                    query = query.Where(w => w.Timestamp >= startDate && w.Timestamp <= endDate);
                 }
+
+                types = await query.Select(s => s.Type).Distinct().ToListAsync();
+                types.Sort();
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
-            return items;
+            return types;
         }
 
-        public static (List<Log> Items, int TotalCount) GetFilteredItems(List<string> activityTypes, string searchWord, DateTime? filterDate)
+        public static async Task<(List<Models.AuditLog.View> Items, int TotalCount)> GetFilteredItems(List<string>? types = null, string? search = null, DateTime? date = null)
         {
-            List<Log> items = new();
-            int totalCount = 0;
+            List<Models.AuditLog.View> logs = new();
+            int count = 0;
 
             try
             {
-                string query = "SELECT AuditLogs.*, Users.FirstName, Users.LastName " +
-                               "FROM AuditLogs " +
-                               "INNER JOIN Users " +
-                               "ON AuditLogs.UserID = Users.UserID " +
-                               "WHERE 1 = 1";
-                string queryCount = "SELECT COUNT(*) FROM AuditLogs";
+                using var context = new Context();
 
-                if (activityTypes != null && activityTypes.Count > 0)
+                var query = context.AuditLogs.Include(i => i.User).AsQueryable();
+
+                if (types != null && types.Any())
                 {
-                    string activityTypeFilter = string.Join(",", activityTypes.Select(type => $"'{type}'"));
-                    query += $" AND AuditLogs.ActivityType IN ({activityTypeFilter})";
+                    query = query.Where(w => types.Contains(w.Type));
                 }
 
-                if (!string.IsNullOrEmpty(searchWord))
+                if (!string.IsNullOrEmpty(search))
                 {
-                    query += $" AND (AuditLogs.ActivityDetails LIKE '%{searchWord}%'" +
-                             $" OR Users.FirstName + ' ' + Users.LastName LIKE '%{searchWord}%')";
+                    string pattern = $"%{search}%";
+                    query = query
+                        .Where(w => EF.Functions.Like(w.Details, pattern) || 
+                                    EF.Functions.Like(w.User.FirstName + " " + w.User.LastName, pattern));
                 }
 
-                if (filterDate.HasValue)
+                if (date != null && date.HasValue)
                 {
-                    query += $" AND FORMAT(AuditLogs.Timestamp, 'yyyy-MM-dd') = @Date";
+                    DateTime startDate = date.Value.Date;
+                    DateTime endDate = date.Value.Date.AddDays(1).AddTicks(-1);
+
+                    query = query.Where(w => w.Timestamp >= startDate && w.Timestamp <= endDate);
+                    count = await context.AuditLogs.Where(w => w.Timestamp >= startDate && w.Timestamp <= endDate).CountAsync();
+                }
+                else
+                {
+                    count = await context.AuditLogs.CountAsync();
                 }
 
-                query += " ORDER BY Timestamp DESC";
-
-                using (SqlConnection connection = new(Data.DataAccessHelper.GetConnectionString()))
-                {
-                    connection.Open();
-
-                    using (SqlCommand commandCount = new(queryCount, connection))
+                var result = await query
+                    .Select(s => new Models.AuditLog.View
                     {
-                        totalCount = (int)commandCount.ExecuteScalar();
-                    }
+                        ID = s.ID,
+                        UserID = s.UserID,
+                        FullName = $"{s.User.FirstName} {s.User.LastName}",
+                        Type = s.Type,
+                        Details = s.Details,
+                        Timestamp = s.Timestamp,
+                    })
+                    .OrderByDescending(o => o.Timestamp)
+                    .ToListAsync();
 
-                    using (SqlCommand command = new(query, connection))
-                    {
-                        if (filterDate.HasValue)
-                        {
-                            command.Parameters.AddWithValue("@Date", filterDate.Value.Date);
-                        }
-
-                        SqlDataReader reader = command.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            Log item = new()
-                            {
-                                LogID = reader["LogID"] as int? ?? 0,
-                                UserID = reader["UserID"] as int? ?? 0,
-                                ActivityType = reader["ActivityType"] as string,
-                                ActivityDetails = reader["ActivityDetails"] as string,
-                                Timestamp = reader["Timestamp"] as DateTime?,
-                                FullName = $"{reader["FirstName"]} {reader["LastName"]}"
-                            };
-
-                            items.Add(item);
-                        }
-                    }
-                }
+                logs = result;
             }
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
-            return (items, totalCount);
+            return (logs, count);
         }
     }
 }

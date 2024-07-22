@@ -68,7 +68,10 @@
         {
             public const string NOTHING = "Nothing";
             public const string NOTHING_FOUND = "Nothing Found";
+            public const string DEFAULT_USER_ROLE = "(Choose Role)";
+            public const string DEFAULT_SUFFIX = "(Choose Suffix)";
             public const string DEFAULT_EMPLOYMENT_STATUS = "(Choose Employment Status)";
+            public const string DEFAULT_PAY_FREQUENCY = "(Choose Pay Frequency)";
             public const string DEFAULT_CLIENT = "(Choose Client)";
             public const string DEFAULT_CLASSIFICATION = "(Choose Classification)";
             public const string DEFAULT_WAGE = "(Choose Wage Type)";
@@ -114,6 +117,7 @@
 
         public static class CategoriesSingular
         {
+            public const string PAY_FREQUENCY = "Pay Frequency";
             public const string CLIENT = "Client";
             public const string CLASSIFICATION = "Classification";
             public const string WAGE = "Wage";

@@ -11,9 +11,17 @@ namespace LBPRDC.Source.Data
     {
         public class Context : DbContext
         {
+            public DbSet<Models.AccessPermission> AccessPermissions { get; set; }
+            public DbSet<Models.RolePermission> RolePermissions { get; set; }
+
+
+            public DbSet<Models.PayFrequency> PayFrequencies { get; set; }
             public DbSet<Models.User> Users { get; set; }
+            public DbSet<Models.UserRole> UserRoles { get; set; }
+            public DbSet<Models.AuditLog> AuditLogs { get; set; }
 
             public DbSet<Models.Employee> Employees { get; set; }
+            public DbSet<Models.Suffix> Suffixes { get; set; }
             public DbSet<Models.EmployeeArchive> EmployeeArchives { get; set; }
 
             public DbSet<Models.EmploymentStatus> EmploymentStatus { get; set; }

@@ -52,7 +52,7 @@ namespace LBPRDC.Source.Views.Profile
             if (users.Any())
             {
                 var user = users.First();
-                lblHiddenUserID.Text = user.UserID.ToString();
+                lblHiddenUserID.Text = user.ID.ToString();
                 txtFirstName.Text = user.FirstName;
                 txtLastName.Text = user.LastName;
                 txtEmailAddress.Text = user.Email;
@@ -123,21 +123,25 @@ namespace LBPRDC.Source.Views.Profile
 
         private async Task UpdateUserInformationAsync(int userId)
         {
-            UserService.User userUpdate = new()
+            Models.User userUpdate = new()
             {
-                UserID = userId,
+                ID = userId,
                 FirstName = txtFirstName.Text,
+                MiddleName = txtMiddleName.Text,
                 LastName = txtLastName.Text,
                 Email = txtEmailAddress.Text,
-                MiddleName = txtMiddleName.Text,
                 PositionTitle = txtPositionTitle.Text,
             };
 
-            var isUpdated = await UserService.UpdateUserBasicInformation(userUpdate);
+            var isUpdated = await UserService.UpdateCurrentUserBasicInformation(userUpdate);
             if (isUpdated)
             {
                 MessageBox.Show("You have successfully updated your account information. Reminders, some changes may require you to re-login or restart the app for them to take effect", "Update Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 btnUpdateBasicInformation.Enabled = false;
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.ACTION, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -153,7 +157,7 @@ namespace LBPRDC.Source.Views.Profile
 
             var user = users.First();
 
-            if (!AuthenticationService.ValidateCredentials(user.Username, txtOldPassword.Text))
+            if (! await UserService.Authenticate(user.Username, txtOldPassword.Text))
             {
                 MessageBox.Show("Your current password do not match to your entered old password.", MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -165,18 +169,22 @@ namespace LBPRDC.Source.Views.Profile
                 return;
             }
 
-            UserService.User userUpdate = new()
+            Models.User userUpdate = new()
             {
-                UserID = userId,
-                Password = txtConfirmPassword.Text
+                ID = userId,
+                PasswordHash = txtConfirmPassword.Text
             };
 
-            var isUpdated = await UserService.UpdatePassword(userUpdate);
+            var isUpdated = await UserService.UpdateCurrentUserPassword(userUpdate);
             if (isUpdated)
             {
                 MessageBox.Show("You have successfully updated your account's password.", "Update Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 grpPasswordData.Enabled = false;
                 chkChangePassword.Checked = false;
+            }
+            else
+            {
+                MessageBox.Show(MessagesConstants.Error.ACTION, MessagesConstants.Error.TITLE, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

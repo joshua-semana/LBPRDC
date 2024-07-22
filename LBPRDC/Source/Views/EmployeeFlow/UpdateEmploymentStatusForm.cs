@@ -35,16 +35,16 @@ namespace LBPRDC.Source.Views.EmployeeFlow
             }
         }
 
-        private void InitializePositionComboBoxItems()
+        private async void InitializePositionComboBoxItems()
         {
-            cmbEmploymentStatus.DataSource = EmploymentStatusService.GetAllItemsForComboBox();
+            cmbEmploymentStatus.DataSource = await EmploymentStatusService.GetAllItemsForComboBox();
             cmbEmploymentStatus.DisplayMember = "Name";
             cmbEmploymentStatus.ValueMember = "ID";
         }
 
         private async void InitializeEmployeeInformation(int ClientID, int EmployeeID)
         {
-            var employees = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
+            var employees = await EmployeeService.GetEmployees(ClientID, EmployeeID);
 
             if (employees.Any())
             {
@@ -80,15 +80,13 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void UpdateEmployeeInformation()
         {
-            EmployeeService.EmployeeEmploymentStatusUpdate data = new()
+            bool isUpdated = await EmployeeService.UpdateEmployeeEmploymentStatus(new()
             {
                 EmployeeID = EmployeeID,
                 EmploymentStatusID = Convert.ToInt32(cmbEmploymentStatus.SelectedValue),
                 Remarks = txtRemarks.Text,
-                Date = DateTime.Now,
-            };
-
-            bool isUpdated = await EmployeeService.UpdateEmployeeEmploymentStatus(data);
+                Timestamp = DateTime.Now,
+            });
 
             if (isUpdated)
             {

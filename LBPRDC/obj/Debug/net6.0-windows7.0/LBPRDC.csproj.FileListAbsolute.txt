@@ -183,3 +183,5 @@ C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\refint\LBP
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.pdb
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.genruntimeconfig.cache
 C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\ref\LBPRDC.dll
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.PayFrequencyForm.resources
+C:\Users\joshu\source\repos\LBPRDC\LBPRDC\obj\Debug\net6.0-windows7.0\LBPRDC.Source.Views.Categories.PermissionsForm.resources

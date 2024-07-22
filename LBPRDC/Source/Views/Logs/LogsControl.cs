@@ -1,13 +1,12 @@
 ﻿using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
-using LBPRDC.Source.Views.Shared;
 using static LBPRDC.Source.Views.Shared.DynamicCheckedListBoxControl;
 
 namespace LBPRDC.Source.Views.Logs
 {
     public partial class LogsControl : UserControl
     {
-        UserControl loadingControl = new ucLoading() { Dock = DockStyle.Fill };
+        readonly UserControl loadingControl = new ucLoading() { Dock = DockStyle.Fill };
 
         public LogsControl()
         {
@@ -16,7 +15,16 @@ namespace LBPRDC.Source.Views.Logs
             loadingControl.BringToFront();
         }
 
-        public void ApplyFilterAndSearchThenPopulate()
+        private async void LogsControl_VisibleChanged(object sender, EventArgs e)
+        {
+            if (this.Visible)
+            {
+                await GetFilters();
+                ApplyFilterAndSearchThenPopulate();
+            }
+        }
+
+        private void ApplyFilterAndSearchThenPopulate()
         {
             List<string> types = dchkListFilterType.GetCheckedItems().Select(s => s.Name).ToList();
             string searchWord = txtSearch.Text.Trim().ToLower();
@@ -24,41 +32,17 @@ namespace LBPRDC.Source.Views.Logs
             PopulateTableWithFilterAndSearch(types, searchWord);
         }
 
-        public void ResetTableSearchFilter()
+        private async Task GetFilters()
         {
-            txtSearch.Text = string.Empty;
-            ControlUtils.ResetFilters(flowFilters);
-            ApplyFilterAndSearchThenPopulate();
-        }
-
-        private void LogsControl_VisibleChanged(object sender, EventArgs e)
-        {
-            if (this.Visible == true)
-            {
-                ApplyFilterAndSearchThenPopulate();
-                PopulateFilters();
-            }
-        }
-
-        private async void PopulateFilters()
-        {
-            var logs = await LoggingService.GetAllItems();
-            InitializeFilter(dchkListFilterType, logs.DistinctBy(d => d.ActivityType).Select(s => new CheckedListBoxItems(0, s.ActivityType)).ToList());
-        }
-
-        private static void InitializeFilter(DynamicCheckedListBoxControl control, List<CheckedListBoxItems> items)
-        {
-            if (items.Count > 0)
-            {
-                control.SetItems(items);
-                control.DisplayItems();
-            }
+            var types = await LoggingService.GetAllDistinctTypes(dtpDate.Value);
+            dchkListFilterType.SetItems(types.Select(s => new CheckedListBoxItems(0, s)).ToList());
+            dchkListFilterType.DisplayItems();
         }
 
         private async void PopulateTableWithFilterAndSearch(List<string> types, string searchWord)
         {
             ShowLoadingProgressBar(true);
-            var (Items, TotalCount) = await Task.Run(() => LoggingService.GetFilteredItems(types, searchWord, dtpDate.Value));
+            var (Items, TotalCount) = await LoggingService.GetFilteredItems(types, searchWord, dtpDate.Value);
 
             dgvLogs.Columns.Clear();
             dgvLogs.AutoGenerateColumns = false;
@@ -71,10 +55,20 @@ namespace LBPRDC.Source.Views.Logs
 
         private void ApplySettingsToTable()
         {
+            ControlUtils.AddColumn(dgvLogs, "ID", "ID", "ID", true, true);
+            ControlUtils.AddColumn(dgvLogs, "UserID", "User ID", "UserID", true, true);
+            ControlUtils.AddColumn(dgvLogs, "FullName", "User Name", "FullName", true, true);
+            ControlUtils.AddColumn(dgvLogs, "Type", "Type", "Type", true, true);
+            ControlUtils.AddColumn(dgvLogs, "Details", "Details", "Details", true, true);
             ControlUtils.AddColumn(dgvLogs, "Timestamp", "Date & Time", "Timestamp", true, true);
-            ControlUtils.AddColumn(dgvLogs, "FullName", "Full Name", "FullName", true, true);
-            ControlUtils.AddColumn(dgvLogs, "ActivityType", "Type", "ActivityType", true, true);
-            ControlUtils.AddColumn(dgvLogs, "ActivityDetails", "Details", "ActivityDetails", true, true);
+        }
+
+        private void ResetTableSearchFilter()
+        {
+            dtpDate.Value = DateTime.Now;
+            txtSearch.Text = string.Empty;
+            ControlUtils.ResetFilters(flowFilters);
+            ApplyFilterAndSearchThenPopulate();
         }
 
         private void ShowLoadingProgressBar(bool state)
@@ -100,8 +94,10 @@ namespace LBPRDC.Source.Views.Logs
             }
         }
 
-        private void dtpDate_ValueChanged(object sender, EventArgs e)
+        private async void dtpDate_ValueChanged(object sender, EventArgs e)
         {
+            dchkListFilterType.ClearCheckedItems();
+            await GetFilters();
             ApplyFilterAndSearchThenPopulate();
         }
 

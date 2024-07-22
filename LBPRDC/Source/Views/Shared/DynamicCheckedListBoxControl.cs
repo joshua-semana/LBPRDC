@@ -17,13 +17,14 @@ namespace LBPRDC.Source.Views.Shared
             }
         }
 
-        private List<CheckedListBoxItems> items = new();
+        public List<CheckedListBoxItems> items = new();
         private bool isCollapsed = true;
 
         public DynamicCheckedListBoxControl()
         {
             InitializeComponent();
         }
+
         private void DynamicCheckedListBoxControl_Load(object sender, EventArgs e)
         {
             //DisplayItems();

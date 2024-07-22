@@ -1,14 +1,9 @@
-﻿using Dapper;
-using LBPRDC.Source.Config;
-using LBPRDC.Source.Data;
+﻿using LBPRDC.Source.Config;
 using LBPRDC.Source.Utilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 using System.Data.SqlClient;
-using System.Reflection;
 using static LBPRDC.Source.Config.StringConstants;
 using static LBPRDC.Source.Data.Database;
-using static LBPRDC.Source.Services.LocationService;
 
 namespace LBPRDC.Source.Services
 {
@@ -34,40 +29,6 @@ namespace LBPRDC.Source.Services
 
     internal class EmployeeService
     {
-        public class EmployeeUpdateBase
-        {
-            public int EmployeeID { get; set; }
-            public DateTime Date { get; set; }
-            public string? Remarks { get; set; }
-        }
-
-        public class EmployeePositionUpdate : EmployeeUpdateBase
-        {
-            public int OldPositionID { get; set; }
-            public int PositionID { get; set; }
-            public string PositionTitle { get; set; } = "";
-        }
-
-        public class EmployeeDepartmentLocationUpdate : EmployeeUpdateBase 
-        {
-            public int DepartmentID { get; set; }
-            public int LocationID { get; set; }
-            public string DepartmentName { get; set; } = "";
-            public string LocationName { get; set; } = "";
-        }
-
-        public class EmployeeCivilStatusUpdate : EmployeeUpdateBase
-        {
-            public int CivilStatusID { get; set; }
-        }
-
-        public class EmployeeEmploymentStatusUpdate : EmployeeUpdateBase
-        {
-            public int EmploymentStatusID { get; set; }
-        }
-
-        // Entity Framework
-
         public static async Task<List<Models.Employee.Identifier>> GetAllIdentifiersByClientID(int ClientID)
         {
             List<Models.Employee.Identifier> employees = new();
@@ -89,14 +50,28 @@ namespace LBPRDC.Source.Services
             return employees;
         }
 
-        public static async Task<List<Models.Employee.View>> GetAllEmployeeInfoByClientID(int ClientID, int? ID = null)
+        public static async Task<List<Models.Employee.View>> GetEmployees(int? ClientID = null, int? ID = null)
         {
             List<Models.Employee.View> employees = new();
 
             try
             {
                 using var context = new Context();
-                var query = context.Employees.Where(e => e.ClientID == ClientID);
+                var query = context.Employees
+                    .Include(i => i.Suffix)
+                    .Include(i => i.EmploymentStatus)
+                    .Include(i => i.Client)
+                    .Include(i => i.Classification)
+                    .Include(i => i.Wage)
+                    .Include(i => i.Position)
+                    .Include(i => i.Department)
+                    .Include(i => i.Location)
+                    .AsQueryable();
+
+                if (ClientID.HasValue)
+                {
+                    query = query.Where(w => w.ClientID == ClientID);
+                }
 
                 if (ID.HasValue)
                 {
@@ -312,11 +287,11 @@ namespace LBPRDC.Source.Services
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                await LoggingService.LogActivity(new()
+                await LoggingService.AddLog(new()
                 {
-                    UserID = UserService.CurrentUser.UserID,
-                    ActivityType = MessagesConstants.Operation.ADD,
-                    ActivityDetails = $"{MessagesConstants.Operation.ADD}ed Employee: {employee.ID} - {employee.EmployeeID}"
+                    UserID = UserService.CurrentUser.ID,
+                    Type = MessagesConstants.Operation.ADD,
+                    Details = $"{MessagesConstants.Operation.ADD}ed Employee: {employee.ID} - {employee.EmployeeID}"
                 });
 
                 return true;
@@ -410,11 +385,11 @@ namespace LBPRDC.Source.Services
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                await LoggingService.LogActivity(new()
+                await LoggingService.AddLog(new()
                 {
-                    UserID = UserService.CurrentUser.UserID,
-                    ActivityType = MessagesConstants.Operation.UPDATE,
-                    ActivityDetails = $"{MessagesConstants.Operation.UPDATE}d Employee: {entity.ID} - {entity.EmployeeID}"
+                    UserID = UserService.CurrentUser.ID,
+                    Type = MessagesConstants.Operation.UPDATE,
+                    Details = $"{MessagesConstants.Operation.UPDATE}d Employee: {entity.ID} - {entity.EmployeeID}"
                 });
 
                 return true;
@@ -427,26 +402,263 @@ namespace LBPRDC.Source.Services
             }
         }
 
+        public static async Task<bool> IDExists(int ClientID, string EmployeeID)
+        {
+            try
+            {
+                using var context = new Context();
 
+                var entities = await context.Employees
+                    .Where(w => w.ClientID == ClientID && w.EmployeeID == EmployeeID)
+                    .ToListAsync();
 
+                return entities.Any();
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
 
+        public static async Task<bool> UpdateEmployeePosition(Models.Position.HistoryAdditional data, int ClientID)
+        {
+            try
+            {
+                using var context = new Context();
+                using var transaction = await context.Database.BeginTransactionAsync();
 
+                try
+                {
+                    var employee = await context.Employees.FindAsync(data.EmployeeID);
+                    if (employee == null) { return false; }
 
+                    employee.PositionID = data.PositionID;
 
+                    var formerPosition = await context.Position
+                        .Where(w => w.ClientID == ClientID && w.ID == data.OldPositionID)
+                        .FirstOrDefaultAsync();
 
+                    var activeHistoryEntity = await context.EmployeePositionHistory
+                        .Where(w => w.EmployeeID == data.EmployeeID && w.Status == data.Status)
+                        .FirstOrDefaultAsync();
 
+                    if (formerPosition == null || activeHistoryEntity == null) { throw new Exception(); }
 
+                    activeHistoryEntity.DailySalaryRate = formerPosition.DailySalaryRate;
+                    activeHistoryEntity.DailyBillingRate = formerPosition.DailyBillingRate;
+                    activeHistoryEntity.MonthlySalaryRate = formerPosition.MonthlySalaryRate;
+                    activeHistoryEntity.MonthlyBillingRate = formerPosition.MonthlyBillingRate;
+                    activeHistoryEntity.Status = StringConstants.Status.INACTIVE;
 
+                    context.EmployeePositionHistory.Add(data);
 
+                    await context.SaveChangesAsync();
+                    await transaction.CommitAsync();
 
+                    await LoggingService.AddLog(new()
+                    {
+                        UserID = UserService.CurrentUser.ID,
+                        Type = MessagesConstants.UPDATE,
+                        Details = $"Promoted/demoted the position of an employee with the ID: {data.EmployeeID} under Client: {ClientID}"
+                    });
 
+                    return true;
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
 
+        public static async Task<bool> UpdateEmployeeDepartmentLocation(Models.Department.HistoryAdditional data)
+        {
+            try
+            {
+                using var context = new Context();
+                using var transaction = await context.Database.BeginTransactionAsync();
 
+                try
+                {
+                    var employee = await context.Employees.FindAsync(data.EmployeeID);
 
+                    if (employee == null) { return false; }
 
+                    employee.DepartmentID = data.DepartmentID;
+                    employee.LocationID = data.LocationID;
 
+                    var activeHistoryEntity = await context.EmployeeDepartmentLocationHistory
+                        .Where(w => w.Status == Status.ACTIVE)
+                        .FirstOrDefaultAsync() ?? throw new Exception();
 
+                    activeHistoryEntity.Status = Status.INACTIVE;
 
+                    context.EmployeeDepartmentLocationHistory.Add(new()
+                    {
+                        EmployeeID = data.EmployeeID,
+                        DepartmentName = data.DepartmentName,
+                        LocationName = data.LocationName,
+                        Timestamp = data.Timestamp,
+                        Remarks = data.Remarks,
+                        Status = Status.ACTIVE
+                    });
+
+                    await context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    await LoggingService.AddLog(new()
+                    {
+                        UserID = UserService.CurrentUser.ID,
+                        Type = MessagesConstants.UPDATE,
+                        Details = $"Updated the department and location of an employee with the ID: {data.EmployeeID}"
+                    });
+
+                    return true;
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> UpdateEmployeeEmploymentStatus(Models.EmploymentStatus.History data)
+        {
+            try
+            {
+                using var context = new Context();
+                using var transaction = await context.Database.BeginTransactionAsync();
+
+                try
+                {
+                    var employee = await context.Employees.FindAsync(data.EmployeeID);
+
+                    if (employee == null) { return false; }
+
+                    employee.EmploymentStatusID = data.EmploymentStatusID;
+
+                    var activeHistoryEntity = await context.EmployeeEmploymentHistory
+                        .Where(w => w.Status == Status.ACTIVE)
+                        .FirstOrDefaultAsync() ?? throw new Exception();
+
+                    activeHistoryEntity.Status = Status.INACTIVE;
+
+                    context.EmployeeEmploymentHistory.Add(new()
+                    {
+                        EmployeeID = data.EmployeeID,
+                        EmploymentStatusID = data.EmploymentStatusID,
+                        Timestamp = data.Timestamp,
+                        Remarks = data.Remarks,
+                        Status = Status.ACTIVE
+                    });
+
+                    await LoggingService.AddLog(new()
+                    {
+                        UserID = UserService.CurrentUser.ID,
+                        Type = MessagesConstants.UPDATE,
+                        Details = $"Updated the employment status of an employee with the ID {data.EmployeeID}"
+                    });
+
+                    await context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        public static async Task<bool> ArchiveEmployee(int EmployeeID, int ClientID)
+        {
+            try
+            {
+                using var context = new Context();
+                using var transaction = await context.Database.BeginTransactionAsync();
+
+                try
+                {
+                    var employees = await GetEmployees(ClientID, EmployeeID);
+                    if (!employees.Any()) { return false; }
+                    var e = employees.First();
+
+                    context.EmployeeArchives.Add(new()
+                    {
+                        ClientID = e.ClientID,
+                        ClientName = e.ClientName,
+                        EmployeeID = e.EmployeeID,
+                        FirstName = e.FirstName,
+                        MiddleName = e.MiddleName,
+                        LastName = e.LastName,
+                        Suffix = e.SuffixName,
+                        Gender = e.Gender,
+                        EmailAddress1 = e.EmailAddress1,
+                        EmailAddress2 = e.EmailAddress2,
+                        ContactNumber1 = e.ContactNumber1,
+                        ContactNumber2 = e.ContactNumber2,
+                        EmploymentStatus = e.EmploymentStatusName,
+                        Classification = e.ClassificationName,
+                        Position = e.PositionName,
+                        Department = e.DepartmentName,
+                        Location = e.LocationName,
+                        Remarks = e.Remarks,
+                        Timestamp = DateTime.Now
+                    });
+
+                    var employeeDepartmentLocationHistory = await context.EmployeeDepartmentLocationHistory.Where(h => h.EmployeeID == EmployeeID).ToListAsync();
+                    var employeeEmploymentHistory = await context.EmployeeEmploymentHistory.Where(h => h.EmployeeID == EmployeeID).ToListAsync();
+                    var employeePositionHistory = await context.EmployeePositionHistory.Where(h => h.EmployeeID == EmployeeID).ToListAsync();
+                    var employeeFormerRecord = await context.EmployeePreviousRecord.Where(h => h.EmployeeID == EmployeeID).ToListAsync();
+                    var employeeToRemove = await context.Employees.FindAsync(EmployeeID) ?? throw new Exception();
+
+                    if (employeeDepartmentLocationHistory.Any())
+                    {
+                        context.EmployeeDepartmentLocationHistory.RemoveRange(employeeDepartmentLocationHistory);
+                    }
+
+                    if (employeeEmploymentHistory.Any())
+                    {
+                        context.EmployeeEmploymentHistory.RemoveRange(employeeEmploymentHistory);
+                    }
+
+                    if (employeePositionHistory.Any())
+                    {
+                        context.EmployeePositionHistory.RemoveRange(employeePositionHistory);
+                    }
+
+                    if (employeeFormerRecord.Any())
+                    {
+                        context.EmployeePreviousRecord.RemoveRange(employeeFormerRecord);
+                    }
+
+                    context.Employees.Remove(employeeToRemove);
+
+                    await context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    await LoggingService.AddLog(new()
+                    {
+                        UserID = UserService.CurrentUser.ID,
+                        Type = MessagesConstants.Operation.ARCHIVE,
+                        Details = $"Archived an employee with an ID: {EmployeeID}"
+                    });
+
+                    return true;
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+            }
+            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
+        }
+
+        // TODO: Don't know if I still need this one
         public static async Task<List<EmployeeBase>> GetAllEmployeesBase()
         {
             List<EmployeeBase> employees = new();
@@ -483,275 +695,6 @@ namespace LBPRDC.Source.Services
             catch (Exception ex) { ExceptionHandler.HandleException(ex); }
 
             return employees;
-        }
-
-        public static async Task<bool> IDExists(int ClientID, string EmployeeID)
-        {
-            try
-            {
-                using var context = new Context();
-
-                var entities = await context.Employees
-                    .Where(w => w.ClientID == ClientID && w.EmployeeID == EmployeeID)
-                    .ToListAsync();
-
-                return entities.Any();
-            }
-            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        public static async Task<bool> UpdateEmployeePosition(EmployeePositionUpdate data)
-        {
-            try
-            {
-                using var context = new Context();
-
-                var employee = await context.Employees.FindAsync(data.EmployeeID);
-
-                if (employee == null) { return false; }
-
-                employee.PositionID = data.PositionID;
-
-                int affectedRows = await context.SaveChangesAsync();
-
-                if (affectedRows > 0)
-                {
-                    Models.Position.HistoryAdditional newHistory = new()
-                    {
-                        EmployeeID = data.EmployeeID,
-                        OldPositionID = data.OldPositionID,
-                        PositionID = data.PositionID,
-                        PositionTitle = data.PositionTitle,
-                        DailySalaryRate = 0,
-                        DailyBillingRate = 0,
-                        MonthlySalaryRate = 0,
-                        MonthlyBillingRate = 0,
-                        Timestamp = data.Date,
-                        Remarks = data.Remarks,
-                        Status = StringConstants.Status.ACTIVE
-                    };
-
-                    PositionService.AddNewHistory(newHistory);
-
-                    if (UserService.CurrentUser != null)
-                    {
-                        await LoggingService.LogActivity(new()
-                        {
-                            UserID = UserService.CurrentUser.UserID,
-                            ActivityType = MessagesConstants.UPDATE,
-                            ActivityDetails = $"This user has promoted/demoted the position of employee with the ID {data.EmployeeID}."
-                        });
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        public static async Task<bool> UpdateEmployeeDepartmentLocation(EmployeeDepartmentLocationUpdate data)
-        {
-            try
-            {
-                using var context = new Context();
-                var employee = await context.Employees.FindAsync(data.EmployeeID);
-
-                if (employee == null)
-                {
-                    return false;
-                }
-
-                employee.DepartmentID = data.DepartmentID;
-                employee.LocationID = data.LocationID;
-
-                int affectedRows = await context.SaveChangesAsync();
-
-                if (affectedRows > 0)
-                {
-                    DepartmentService.History newHistory = new()
-                    {
-                        EmployeeID = data.EmployeeID,
-                        DepartmentName = data.DepartmentName,
-                        LocationName = data.LocationName,
-                        Timestamp = data.Date,
-                        Remarks = data.Remarks,
-                        Status = StringConstants.Status.ACTIVE
-                    };
-
-                    DepartmentService.AddNewHistory(newHistory);
-
-                    if (UserService.CurrentUser != null)
-                    {
-                        LoggingService.Log newLog = new()
-                        {
-                            UserID = UserService.CurrentUser.UserID,
-                            ActivityType = MessagesConstants.UPDATE,
-                            ActivityDetails = $"This user has updated the department and location of employee with the ID {data.EmployeeID}."
-                        };
-
-                        await LoggingService.LogActivity(newLog);
-                    }
-                }
-
-                return true;
-            }
-            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        public static async Task<bool> UpdateEmployeeEmploymentStatus(EmployeeEmploymentStatusUpdate data)
-        {
-            try
-            {
-                using var context = new Context();
-
-                var employee = await context.Employees.FindAsync(data.EmployeeID);
-
-                if (employee == null)
-                {
-                    return false;
-                }
-
-                employee.EmploymentStatusID = data.EmploymentStatusID;
-                int affectedRows = await context.SaveChangesAsync();
-
-                if (affectedRows > 0)
-                {
-                    EmploymentStatusService.History newHistory = new()
-                    {
-                        EmployeeID = data.EmployeeID,
-                        EmploymentStatusID = data.EmploymentStatusID,
-                        Timestamp = data.Date,
-                        Remarks = data.Remarks,
-                        Status = StringConstants.Status.ACTIVE
-                    };
-
-                    EmploymentStatusService.AddNewHistory(newHistory);
-
-                    if (UserService.CurrentUser != null)
-                    {
-                        LoggingService.Log newLog = new()
-                        {
-                            UserID = UserService.CurrentUser.UserID,
-                            ActivityType = MessagesConstants.UPDATE,
-                            ActivityDetails = $"This user has updated the employment status of employee with the ID {data.EmployeeID}."
-                        };
-
-                        await LoggingService.LogActivity(newLog);
-                    }
-                }
-
-                return true;
-            }
-            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        // TODO
-        public static async Task<bool> ArchiveEmployee(int EmployeeID, int ClientID)
-        {
-            try
-            {
-                using var context = new Context();
-                bool isRemoved = false;
-                var employees = await GetAllEmployeeInfoByClientID(ClientID);
-                var employee = employees.FirstOrDefault(e => e.ID == EmployeeID);
-
-                if (employee == null)
-                {
-                    return false;
-                }
-
-                Models.EmployeeArchive employeeArchive = new()
-                {
-                    ClientID = employee.ClientID,
-                    ClientName = employee.ClientName,
-                    EmployeeID = employee.EmployeeID,
-                    LastName = employee.LastName,
-                    FirstName = employee.FirstName,
-                    MiddleName = employee.MiddleName,
-                    Suffix = employee.SuffixName,
-                    Gender = employee.Gender,
-                    Department = employee.DepartmentName,
-                    Location = employee.LocationName,
-                    EmailAddress1 = employee.EmailAddress1,
-                    EmailAddress2 = employee.EmailAddress2,
-                    ContactNumber1 = employee.ContactNumber1,
-                    ContactNumber2 = employee.ContactNumber2,
-                    Position = employee.PositionName,
-                    EmploymentStatus = employee.EmploymentStatusName,
-                    Remarks = employee.Remarks
-                };
-
-                context.EmployeeArchives.Add(employeeArchive);
-                int result = await context.SaveChangesAsync();
-
-                if (result > 0)
-                {
-                    isRemoved = await RemoveEmployeeRecord(EmployeeID);
-                }
-
-                if (isRemoved && UserService.CurrentUser != null)
-                {
-                    await LoggingService.LogActivity(new()
-                    {
-                        UserID = UserService.CurrentUser.UserID,
-                        ActivityType = MessagesConstants.Archive.TITLE,
-                        ActivityDetails = $"This user has archived an employee with the ID: {EmployeeID}."
-                    });
-                }
-
-                return isRemoved;
-            }
-            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        private static async Task<bool> RemoveEmployeeRecord(int EmployeeID)
-        {
-            try
-            {
-                using var context = new Context();
-
-                await DepartmentService.RemoveHistoryByEmployeeID(EmployeeID);
-                await EmploymentStatusService.RemoveHistoryByEmployeeID(EmployeeID);
-                await PositionService.RemoveHistoryByEmployeeID(EmployeeID);
-                await RemoveHistoryByEmployeeID(EmployeeID);
-
-                var employeeToRemove = await context.Employees.FindAsync(EmployeeID);
-
-                if (employeeToRemove != null)
-                {
-                    context.Employees.Remove(employeeToRemove);
-                    await context.SaveChangesAsync();
-                }
-                else
-                {
-                    return false;
-                }
-
-                return true;
-            }
-            catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        public static async Task RemoveHistoryByEmployeeID(int EmployeeID)
-        {
-            try
-            {
-                using var context = new Context();
-                var historiesToRemove = await context.EmployeePreviousRecord
-                    .Where(h => h.EmployeeID == EmployeeID)
-                    .ToListAsync();
-
-                if (historiesToRemove.Any())
-                {
-                    context.EmployeePreviousRecord.RemoveRange(historiesToRemove);
-                    await context.SaveChangesAsync();
-                }
-            }
-            catch (Exception ex) { ExceptionHandler.HandleException(ex); }
         }
     }
 }

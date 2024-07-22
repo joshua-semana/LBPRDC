@@ -301,9 +301,9 @@ namespace LBPRDC.Source.Services
                 }
 
                 // Getting data from Timekeep Sheet
-                var employees = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID);
-                var allPositionHistory = PositionService.GetAllHistory();
-                var positionAndRates = await PositionService.GetItemsByClientID(ClientID);
+                var employees = await EmployeeService.GetEmployees(ClientID);
+                var allPositionHistory = await PositionService.GetHistories();
+                var positionAndRates = await PositionService.GetItems(ClientID);
 
                 var databaseGuids = new HashSet<Guid>(BillingRecordService.GetGuids());
 
@@ -421,11 +421,11 @@ namespace LBPRDC.Source.Services
             return entries;
         }
 
-        public static int GetPositionIdByDate(List<PositionService.History> positions, DateTime date)
+        public static int GetPositionIdByDate(List<Models.Position.History> positions, DateTime date)
         {
             for (int i = 0; i < positions.Count; i++)
             {
-                if (date.Date >= positions[i].Timestamp.Value.Date)
+                if (date.Date >= positions[i].Timestamp.Date)
                 {
                     return positions[i].PositionID;
                 }
@@ -511,8 +511,8 @@ namespace LBPRDC.Source.Services
 
             var clientInfo = await ClientService.GetClientByID(ClientID);
             var billing = await BillingService.GetBillingDetailsById(BillingID);
-            var departments = await DepartmentService.GetItemsByClientID(ClientID);
-            var positionAndRates = await PositionService.GetItemsByClientID(ClientID);
+            var departments = await DepartmentService.GetItems(ClientID);
+            var positionAndRates = await PositionService.GetItems(ClientID);
 
             try
             {
@@ -965,7 +965,7 @@ namespace LBPRDC.Source.Services
 
             row += 2;
             var user = UserService.CurrentUser;
-            sheet.Cells[$"B{row}"].Value = $"{user?.FirstName?.ToUpper()} {user?.MiddleName?[..1].ToUpper()}. {user?.LastName?.ToUpper()}";
+            sheet.Cells[$"B{row}"].Value = $"{user?.FirstName?.ToUpper()} {user?.LastName?.ToUpper()}";
             AddUnderlineBorders(sheet, $"B{row}");
             SetCellToCenter(sheet, $"B{row}");
 
@@ -1191,9 +1191,9 @@ namespace LBPRDC.Source.Services
             try
             {
                 var billing = await BillingService.GetBillingDetailsById(BillingID);
-                var employeesList = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID);
-                var departmentsList = await DepartmentService.GetItemsByClientID(ClientID);
-                var positionsList = await PositionService.GetItemsByClientID(ClientID);
+                var employeesList = await EmployeeService.GetEmployees(ClientID);
+                var departmentsList = await DepartmentService.GetItems(ClientID);
+                var positionsList = await PositionService.GetItems(ClientID);
                 var billingRecords = await BillingRecordService.GetRecordsByBillingId(BillingID);
                 var groupedRecords = billingRecords.GroupBy(gb => gb.Department).ToList();
                 var uploadedAccruals = JsonSerializer.Deserialize<List<AccrualsEntry>>(billing.AccrualsJSON);

@@ -2,6 +2,7 @@
 using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
 using System.Reflection;
+using static OfficeOpenXml.ExcelErrorValue;
 
 namespace LBPRDC.Source.Views.Categories
 {
@@ -13,6 +14,7 @@ namespace LBPRDC.Source.Views.Categories
 
         private readonly Dictionary<string, string> Categories = new(); // Key = "Property Value", Value = "Property Key" || Clients, CLIENT
         private readonly List<Control> CommonFields;
+        private readonly List<Control> ClientSpecificFields;
         private readonly List<Control> ClassificationSpecificFields;
         private readonly List<Control> PositionSpecificFields;
         private readonly List<Control> LocationSpecificFields;
@@ -48,6 +50,14 @@ namespace LBPRDC.Source.Views.Categories
                 txtDescription,
                 lblStatus,
                 cmbStatus
+            };
+
+            ClientSpecificFields = new()
+            {
+                lblPayFrequency,
+                cmbPayFrequency,
+                lblCode,
+                txtCode,
             };
 
             ClassificationSpecificFields = new()
@@ -106,7 +116,9 @@ namespace LBPRDC.Source.Views.Categories
             switch (CurrentCategoryKey)
             {
                 case StringConstants.Categories.CLIENT:
-                    dgvCategory.DataSource = ClientService.GetClients();
+                    dgvCategory.DataSource = await ClientService.GetItemsWithView();
+                    //PolishColumnHeaderTexts(StringConstants.CategoriesSingular.PAY_FREQUENCY);
+                    ControlUtils.ToggleControlVisibility(ClientSpecificFields, true);
                     break;
 
                 case StringConstants.Categories.CLASSIFICATION:
@@ -143,11 +155,13 @@ namespace LBPRDC.Source.Views.Categories
                 case StringConstants.Categories.LOCATION:
                     dgvCategory.DataSource = await LocationService.GetAllItemsWithView();
                     PolishColumnHeaderTexts(StringConstants.CategoriesSingular.DEPARTMENT);
+                    dgvCategory.Columns[nameof(Models.Location.View.DepartmentClientName)].HeaderText = "Client";
+                    dgvCategory.Columns[nameof(Models.Location.View.DepartmentClientName)].DisplayIndex = 1;
                     ControlUtils.ToggleControlVisibility(LocationSpecificFields, true);
                     break;
 
                 case StringConstants.Categories.EMPLOYMENT_STATUS:
-                    dgvCategory.DataSource = EmploymentStatusService.GetAllItems();
+                    dgvCategory.DataSource = await EmploymentStatusService.GetItems();
                     break;
 
                 case StringConstants.Categories.WAGE:
@@ -165,8 +179,6 @@ namespace LBPRDC.Source.Views.Categories
             {
                 flowRightContent.Enabled = true;
                 flowFooterActions.Enabled = true;
-                //UpdateOriginalValues();
-                //UpdateRequiredFields();
             }
 
             ShowLoadingProgressBar(false);
@@ -174,10 +186,11 @@ namespace LBPRDC.Source.Views.Categories
 
         private void PolishColumnHeaderTexts(string columnName)
         {
-            dgvCategory.Columns[columnName].Visible = false;
-            dgvCategory.Columns[$"{columnName}ID"].Visible = false;
-            dgvCategory.Columns[$"{columnName}Name"].HeaderText = columnName;
-            dgvCategory.Columns[$"{columnName}Name"].DisplayIndex = 2;
+            string formattedName = columnName.Replace(" ", "");
+            dgvCategory.Columns[formattedName].Visible = false;
+            dgvCategory.Columns[$"{formattedName}ID"].Visible = false;
+            dgvCategory.Columns[$"{formattedName}Name"].HeaderText = columnName;
+            dgvCategory.Columns[$"{formattedName}Name"].DisplayIndex = 2;
         }
 
         private void CategoriesControl_VisibleChanged(object sender, EventArgs e)
@@ -193,12 +206,6 @@ namespace LBPRDC.Source.Views.Categories
             cmbCategories.DataSource = Categories.Keys.ToList();
             cmbCategories.MouseWheel += ComboBoxUtils.HandleMouseWheel;
             cmbCategories.KeyDown += ComboBoxUtils.HandleKeyDown;
-        }
-
-        private void btnSelect_Click(object sender, EventArgs e)
-        {
-            CurrentCategoryKey = cmbCategories.Text.ToString();
-            PopulateTableAndFields();
         }
 
         private void UpdateRequiredFields()
@@ -220,17 +227,15 @@ namespace LBPRDC.Source.Views.Categories
         {
             if (this.Visible && dgvCategory.SelectedRows.Count > 0)
             {
-                //foreach (var kv in OriginalValues)
-                //{
-                //    kv.Key.TextChanged -= ControlValue_Changed;
-                //}
-
                 var selectedRow = dgvCategory.SelectedRows[0];
 
                 PopulateCommonTextFieldData(selectedRow);
 
                 switch (CurrentCategoryKey)
                 {
+                    case StringConstants.Categories.CLIENT:
+                        PopulateClientSpecificTextFieldData(selectedRow);
+                        break;
                     case StringConstants.Categories.CLASSIFICATION:
                         PopulateClassificationSpecificTextFieldData(selectedRow);
                         break;
@@ -245,8 +250,6 @@ namespace LBPRDC.Source.Views.Categories
                         break;
                 }
                 UpdateRequiredFields();
-                //UpdateOriginalValues();
-                //btnUpdate.Enabled = false;
             }
         }
 
@@ -258,19 +261,31 @@ namespace LBPRDC.Source.Views.Categories
             cmbStatus.SelectedItem = data.Cells["Status"].Value.ToString();
         }
 
+        private async void PopulateClientSpecificTextFieldData(DataGridViewRow data)
+        {
+            cmbPayFrequency.DataSource = await PayFrequencyService.GetAllItemsForComboBox();
+            cmbPayFrequency.DisplayMember = nameof(Models.Client.Name);
+            cmbPayFrequency.ValueMember = nameof(Models.Client.ID);
+            cmbPayFrequency.SelectedValue = Convert.ToInt32(data.Cells[nameof(Models.Client.PayFrequencyID)].Value ?? 0);
+
+            var code = data.Cells[nameof(Models.Client.Code)].Value.ToString();
+            txtCode.Text = code;
+            txtCode.Tag = code;
+        }
+
         private void PopulateClassificationSpecificTextFieldData(DataGridViewRow data)
         {
-            GetClientComboBoxValue(Convert.ToInt32(data.Cells["ClientID"].Value));
+            GetClientComboBoxValue(Convert.ToInt32(data.Cells[nameof(Models.Classification.ClientID)].Value));
         }
 
         private void PopulatePositionSpecificTextFieldData(DataGridViewRow data)
         {
-            GetClientComboBoxValue(Convert.ToInt32(data.Cells["ClientID"].Value));
-            var code = data.Cells["Code"].Value.ToString();
-            var dailySalaryRate = data.Cells["DailySalaryRate"].Value.ToString();
-            var dailySalaryRAte = data.Cells["DailyBillingRate"].Value.ToString();
-            var monthlySalaryRate = data.Cells["MonthlySalaryRate"].Value.ToString();
-            var monthlySalaryRAte = data.Cells["MonthlyBillingRate"].Value.ToString();
+            GetClientComboBoxValue(Convert.ToInt32(data.Cells[nameof(Models.Position.ClientID)].Value));
+            var code = data.Cells[nameof(Models.Position.Code)].Value.ToString();
+            var dailySalaryRate = data.Cells[nameof(Models.Position.DailySalaryRate)].Value.ToString();
+            var dailySalaryRAte = data.Cells[nameof(Models.Position.DailyBillingRate)].Value.ToString();
+            var monthlySalaryRate = data.Cells[nameof(Models.Position.MonthlySalaryRate)].Value.ToString();
+            var monthlySalaryRAte = data.Cells[nameof(Models.Position.MonthlyBillingRate)].Value.ToString();
 
             txtCode.Text = code;
             txtCode.Tag = code;
@@ -286,31 +301,31 @@ namespace LBPRDC.Source.Views.Categories
 
         private void PopulateLocationSpecificTextFieldData(DataGridViewRow data)
         {
-            bool isDefault = data.Cells["Type"].Value.ToString() == StringConstants.Type.DEFAULT;
+            bool isDefault = data.Cells[nameof(Models.Location.Type)].Value.ToString() == StringConstants.Type.DEFAULT;
             btnDelete.Enabled = txtName.Enabled = cmbDepartment.Enabled = txtDescription.Enabled = cmbStatus.Enabled = !isDefault;
-            GetDeparmentComboBoxValue(Convert.ToInt32(data.Cells["DepartmentID"].Value));
+            GetDeparmentComboBoxValue(Convert.ToInt32(data.Cells[nameof(Models.Location.DepartmentID)].Value));
         }
 
         private void PopulateDepartmentSpecificTextFieldDate(DataGridViewRow data)
         {
-            GetClientComboBoxValue(Convert.ToInt32(data.Cells["ClientID"].Value));
-            txtCode.Text = data.Cells["Code"].Value.ToString();
-            txtCode.Tag = data.Cells["Code"].Value.ToString();
+            GetClientComboBoxValue(Convert.ToInt32(data.Cells[nameof(Models.Department.ClientID)].Value));
+            txtCode.Text = data.Cells[nameof(Models.Department.Code)].Value.ToString();
+            txtCode.Tag = data.Cells[nameof(Models.Department.Code)].Value.ToString();
         }
 
         private async void GetDeparmentComboBoxValue(int value)
         {
             cmbDepartment.DataSource = await DepartmentService.GetAllItemsForComboBox();
-            cmbDepartment.DisplayMember = "Name";
-            cmbDepartment.ValueMember = "ID";
+            cmbDepartment.DisplayMember = nameof(Models.Department.Name);
+            cmbDepartment.ValueMember = nameof(Models.Department.ID);
             cmbDepartment.SelectedValue = value;
         }
 
-        private void GetClientComboBoxValue(int value)
+        private async void GetClientComboBoxValue(int value)
         {
-            cmbClient.DataSource = ClientService.GetClientsForComboBoxByStatus(StringConstants.Status.ACTIVE, true);
-            cmbClient.DisplayMember = "Description";
-            cmbClient.ValueMember = "ID";
+            cmbClient.DataSource = await ClientService.GetAllItemsForComboBox(StringConstants.Status.ACTIVE);
+            cmbClient.DisplayMember = nameof(Models.Client.Name);
+            cmbClient.ValueMember = nameof(Models.Client.ID);
             cmbClient.SelectedValue = value;
         }
 
@@ -410,6 +425,8 @@ namespace LBPRDC.Source.Views.Categories
                         isUpdated = await ClientService.Update(new()
                         {
                             ID = ID,
+                            PayFrequencyID = Convert.ToInt32(cmbPayFrequency.SelectedValue),
+                            Code = txtCode.Text.ToUpper().Trim(),
                             Name = name,
                             Description = description,
                             Status = status
@@ -418,7 +435,7 @@ namespace LBPRDC.Source.Views.Categories
                         break;
 
                     case StringConstants.Categories.CLASSIFICATION:
-                        isUpdated = await ClassificationService.UpdateClassification(new()
+                        isUpdated = await ClassificationService.Update(new()
                         {
                             ID = ID,
                             Name = name,

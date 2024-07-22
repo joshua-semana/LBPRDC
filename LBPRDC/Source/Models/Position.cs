@@ -14,8 +14,6 @@ namespace LBPRDC.Source.Models
         public decimal MonthlyBillingRate { get; set; }
         public string Status { get; set; } = StringConstants.Status.ACTIVE;
         public string Description { get; set; } = "";
-
-        // Navigation Properties
         public Client Client { get; set; }
 
         public class View : Position
@@ -39,16 +37,16 @@ namespace LBPRDC.Source.Models
             public string Status { get; set; } = StringConstants.Status.INACTIVE;
         }
 
+        public class HistoryAdditional : History
+        {
+            public int OldPositionID { get; set; }
+        }
+
         public class HistoryView : History
         {
             public string Indicator { get; set; } = "";
             public string PositionName { get; set; } = "";
             public string EffectiveDate { get; set; } = "";
-        }
-
-        public class HistoryAdditional : History
-        {
-            public int OldPositionID { get; set; }
         }
 
         public class RatesHistory

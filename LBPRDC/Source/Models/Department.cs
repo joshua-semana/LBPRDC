@@ -1,4 +1,5 @@
 ﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Services;
 
 namespace LBPRDC.Source.Models
 {
@@ -10,8 +11,6 @@ namespace LBPRDC.Source.Models
         public string Name { get; set; } = "";
         public string Status { get; set; } = StringConstants.Status.ACTIVE;
         public string Description { get; set; } = "";
-
-        // Navigation Properties
         public Client Client { get; set; }
 
         public class View : Department
@@ -28,6 +27,19 @@ namespace LBPRDC.Source.Models
             public DateTime Timestamp { get; set; } = DateTime.Now;
             public string Remarks { get; set; } = "";
             public string Status { get; set; } = StringConstants.Status.ACTIVE;
+        }
+
+        public class HistoryAdditional : History
+        {
+            public int DepartmentID { get; set; }
+            public int LocationID { get; set; }
+        }
+
+        public class HistoryView : History
+        {
+            public string Indicator { get; set; } = "";
+            public string EffectiveDate { get; set; } = "";
+
         }
     }
 }

@@ -42,6 +42,7 @@
             btnSearch = new Button();
             panel2 = new Panel();
             dgvUsers = new DataGridView();
+            btnPermissions = new Button();
             pnlFooter.SuspendLayout();
             flowControls.SuspendLayout();
             panel1.SuspendLayout();
@@ -63,20 +64,21 @@
             flowControls.BackColor = SystemColors.Menu;
             flowControls.Controls.Add(btnAdd);
             flowControls.Controls.Add(btnEdit);
+            flowControls.Controls.Add(btnPermissions);
             flowControls.Controls.Add(btnReset);
             flowControls.Dock = DockStyle.Right;
             flowControls.FlowDirection = FlowDirection.RightToLeft;
-            flowControls.Location = new Point(922, 0);
+            flowControls.Location = new Point(691, 0);
             flowControls.Name = "flowControls";
             flowControls.Padding = new Padding(23, 16, 0, 16);
-            flowControls.Size = new Size(291, 60);
+            flowControls.Size = new Size(522, 60);
             flowControls.TabIndex = 2;
             // 
             // btnAdd
             // 
             btnAdd.AutoSize = true;
             btnAdd.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnAdd.Location = new Point(193, 16);
+            btnAdd.Location = new Point(424, 16);
             btnAdd.Margin = new Padding(8, 0, 0, 0);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(75, 28);
@@ -89,7 +91,7 @@
             // 
             btnEdit.AutoSize = true;
             btnEdit.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnEdit.Location = new Point(110, 16);
+            btnEdit.Location = new Point(341, 16);
             btnEdit.Margin = new Padding(8, 0, 0, 0);
             btnEdit.Name = "btnEdit";
             btnEdit.Size = new Size(75, 28);
@@ -102,12 +104,12 @@
             // 
             btnReset.AutoSize = true;
             btnReset.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
-            btnReset.Location = new Point(27, 16);
+            btnReset.Location = new Point(113, 16);
             btnReset.Margin = new Padding(0);
             btnReset.Name = "btnReset";
-            btnReset.Size = new Size(75, 28);
+            btnReset.Size = new Size(119, 28);
             btnReset.TabIndex = 8;
-            btnReset.Text = "Reset";
+            btnReset.Text = "Reset Password";
             btnReset.UseVisualStyleBackColor = true;
             btnReset.Click += btnReset_Click;
             // 
@@ -220,6 +222,19 @@
             dgvUsers.TabIndex = 5;
             dgvUsers.VirtualMode = true;
             // 
+            // btnPermissions
+            // 
+            btnPermissions.AutoSize = true;
+            btnPermissions.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            btnPermissions.Location = new Point(240, 16);
+            btnPermissions.Margin = new Padding(8, 0, 0, 0);
+            btnPermissions.Name = "btnPermissions";
+            btnPermissions.Size = new Size(93, 28);
+            btnPermissions.TabIndex = 9;
+            btnPermissions.Text = "Permissions";
+            btnPermissions.UseVisualStyleBackColor = true;
+            btnPermissions.Click += btnPermissions_Click;
+            // 
             // AccountsControl
             // 
             AutoScaleMode = AutoScaleMode.None;
@@ -252,5 +267,6 @@
         private Button btnEdit;
         private Button btnReset;
         private Button btnSearch;
+        private Button btnPermissions;
     }
 }

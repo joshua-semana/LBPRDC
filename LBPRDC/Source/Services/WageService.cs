@@ -1,8 +1,5 @@
-﻿using Dapper;
-using LBPRDC.Source.Config;
-using LBPRDC.Source.Data;
+﻿using LBPRDC.Source.Config;
 using Microsoft.EntityFrameworkCore;
-using static Dapper.SqlMapper;
 using static LBPRDC.Source.Data.Database;
 
 namespace LBPRDC.Source.Services
@@ -44,7 +41,6 @@ namespace LBPRDC.Source.Services
                 var item = await context.Wages.FindAsync(data.ID);
 
                 if (item == null) { return false; }
-                if (AreEqual(item, data)) { return true; }
 
                 item.Name = data.Name;
                 item.Description = data.Description;
@@ -52,31 +48,18 @@ namespace LBPRDC.Source.Services
 
                 context.Entry(item).State = EntityState.Modified;
 
-                int affectedRows = await context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
-                if (affectedRows > 0)
+                await LoggingService.AddLog(new()
                 {
-                    if (UserService.CurrentUser != null)
-                    {
-                        await LoggingService.LogActivity(new()
-                        {
-                            UserID = UserService.CurrentUser.UserID,
-                            ActivityType = MessagesConstants.UPDATE,
-                            ActivityDetails = $"This user updated an item under the wage category with an ID of {data.ID}."
-                        });
-                    }
-                }
+                    UserID = UserService.CurrentUser.ID,
+                    Type = MessagesConstants.UPDATE,
+                    Details = $"Updated wage's information with ID of: {data.ID}"
+                });
 
-                return (affectedRows > 0);
+                return true;
             }
             catch (Exception ex) { return ExceptionHandler.HandleException(ex); }
-        }
-
-        private static bool AreEqual(Models.Wage item1, Models.Wage item2)
-        {
-            return item1.Name == item2.Name &&
-                   item1.Description == item2.Description &&
-                   item1.Status == item2.Status;
         }
 
         public static async Task<List<Models.Wage>> GetAllItemsForComboBox(bool WithDefault = true)

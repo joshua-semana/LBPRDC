@@ -31,7 +31,6 @@ namespace LBPRDC.Source.Views.EmployeeFlow
                 case "Position":
                     PopulateTableWithPositions();
                     break;
-                    break;
                 case "Employment Status":
                     PopulateTableWithEmploymentStatus();
                     break;
@@ -43,7 +42,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void InitializeEmployeeInformation(int ClientID, int EmployeeID)
         {
-            var employees = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
+            var employees = await EmployeeService.GetEmployees(ClientID, EmployeeID);
 
             if (employees.Any())
             {
@@ -60,7 +59,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void PopulateTableWithPositions()
         {
-            var records = await Task.Run(() => PositionService.GetAllHistoryByID(ClientID, EmployeeID));
+            var records = await Task.Run(() => PositionService.GetHistoriesWithView(ClientID, EmployeeID));
             records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;
@@ -79,12 +78,12 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void PopulateTableWithEmploymentStatus()
         {
-            var records = await Task.Run(() => EmploymentStatusService.GetAllHistoryByID(EmployeeID));
+            var records = await Task.Run(() => EmploymentStatusService.GetHistoriesWithView(EmployeeID));
             records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;
-            AddColumn("StatusName", "", "StatusName");
-            AddColumn("Name", "Status Name", "Name");
+            AddColumn("Indicator", "", "Indicator");
+            AddColumn("EmploymentStatusName", "Status Name", "EmploymentStatusName");
             AddColumn("EffectiveDate", "Effective Date", "EffectiveDate");
             AddColumn("Remarks", "Remarks", "Remarks");
             dgvHistory.DataSource = records;
@@ -92,11 +91,11 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void PopulateTableWithDepartmentLocation()
         {
-            var records = await Task.Run(() => DepartmentService.GetAllHistoryByID(EmployeeID));
+            var records = await Task.Run(() => DepartmentService.GetHistoriesWithView(EmployeeID));
             records = records.OrderByDescending(o => o.Timestamp).ToList();
             dgvHistory.Columns.Clear();
             dgvHistory.AutoGenerateColumns = false;
-            AddColumn("StatusName", "", "StatusName");
+            AddColumn("Indicator", "", "Indicator");
             AddColumn("DepartmentName", "Department", "DepartmentName");
             AddColumn("LocationName", "Location", "LocationName");
             AddColumn("EffectiveDate", "Effective Date", "EffectiveDate");

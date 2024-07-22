@@ -37,6 +37,9 @@
             btnCancel = new Button();
             pnlMain = new Panel();
             grpAccountData = new GroupBox();
+            cmbUserRole = new ComboBox();
+            label16 = new Label();
+            label15 = new Label();
             label6 = new Label();
             txtConfirmPassword = new TextBox();
             label8 = new Label();
@@ -50,7 +53,6 @@
             label13 = new Label();
             txtPositionTitle = new TextBox();
             label14 = new Label();
-            label11 = new Label();
             label12 = new Label();
             txtMiddleName = new TextBox();
             label9 = new Label();
@@ -87,7 +89,7 @@
             pnlFooter.Controls.Add(panel2);
             pnlFooter.Controls.Add(flowControls);
             pnlFooter.Dock = DockStyle.Bottom;
-            pnlFooter.Location = new Point(0, 494);
+            pnlFooter.Location = new Point(0, 555);
             pnlFooter.Name = "pnlFooter";
             pnlFooter.Size = new Size(452, 60);
             pnlFooter.TabIndex = 4;
@@ -161,11 +163,14 @@
             pnlMain.Location = new Point(0, 41);
             pnlMain.Name = "pnlMain";
             pnlMain.Padding = new Padding(16);
-            pnlMain.Size = new Size(452, 453);
+            pnlMain.Size = new Size(452, 514);
             pnlMain.TabIndex = 5;
             // 
             // grpAccountData
             // 
+            grpAccountData.Controls.Add(cmbUserRole);
+            grpAccountData.Controls.Add(label16);
+            grpAccountData.Controls.Add(label15);
             grpAccountData.Controls.Add(label6);
             grpAccountData.Controls.Add(txtConfirmPassword);
             grpAccountData.Controls.Add(label8);
@@ -179,10 +184,44 @@
             grpAccountData.Margin = new Padding(0, 0, 0, 16);
             grpAccountData.Name = "grpAccountData";
             grpAccountData.Padding = new Padding(3, 8, 3, 3);
-            grpAccountData.Size = new Size(420, 231);
+            grpAccountData.Size = new Size(420, 297);
             grpAccountData.TabIndex = 21;
             grpAccountData.TabStop = false;
             grpAccountData.Text = "Account Information";
+            // 
+            // cmbUserRole
+            // 
+            cmbUserRole.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbUserRole.FormattingEnabled = true;
+            cmbUserRole.Location = new Point(10, 245);
+            cmbUserRole.Name = "cmbUserRole";
+            cmbUserRole.Size = new Size(400, 26);
+            cmbUserRole.TabIndex = 25;
+            // 
+            // label16
+            // 
+            label16.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label16.AutoSize = true;
+            label16.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label16.ForeColor = Color.Red;
+            label16.Location = new Point(42, 220);
+            label16.Margin = new Padding(0, 0, 0, 4);
+            label16.Name = "label16";
+            label16.Size = new Size(14, 18);
+            label16.TabIndex = 24;
+            label16.Text = "*";
+            // 
+            // label15
+            // 
+            label15.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            label15.AutoSize = true;
+            label15.Font = new Font("Arial", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            label15.Location = new Point(10, 222);
+            label15.Margin = new Padding(3, 0, 0, 4);
+            label15.Name = "label15";
+            label15.Size = new Size(36, 16);
+            label15.TabIndex = 23;
+            label15.Text = "Role";
             // 
             // label6
             // 
@@ -296,7 +335,6 @@
             grpPersonalData.Controls.Add(label13);
             grpPersonalData.Controls.Add(txtPositionTitle);
             grpPersonalData.Controls.Add(label14);
-            grpPersonalData.Controls.Add(label11);
             grpPersonalData.Controls.Add(label12);
             grpPersonalData.Controls.Add(txtMiddleName);
             grpPersonalData.Controls.Add(label9);
@@ -349,18 +387,6 @@
             label14.Size = new Size(87, 16);
             label14.TabIndex = 27;
             label14.Text = "Position Title";
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
-            label11.ForeColor = Color.Red;
-            label11.Location = new Point(226, 25);
-            label11.Margin = new Padding(0, 0, 0, 4);
-            label11.Name = "label11";
-            label11.Size = new Size(14, 18);
-            label11.TabIndex = 26;
-            label11.Text = "*";
             // 
             // label12
             // 
@@ -507,7 +533,7 @@
             // 
             AutoScaleMode = AutoScaleMode.None;
             BackColor = Color.White;
-            ClientSize = new Size(452, 554);
+            ClientSize = new Size(452, 615);
             Controls.Add(pnlMain);
             Controls.Add(pnlHeader);
             Controls.Add(pnlFooter);
@@ -519,6 +545,7 @@
             Name = "AddNewUser";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
+            Load += AddNewUser_Load;
             pnlFooter.ResumeLayout(false);
             panel2.ResumeLayout(false);
             flowControls.ResumeLayout(false);
@@ -571,5 +598,8 @@
         private Label label13;
         private TextBox txtPositionTitle;
         private Label label14;
+        private Label label16;
+        private Label label15;
+        private ComboBox cmbUserRole;
     }
 }

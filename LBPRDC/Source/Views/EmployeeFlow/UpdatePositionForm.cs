@@ -1,6 +1,8 @@
 ﻿using LBPRDC.Source.Config;
+using LBPRDC.Source.Models;
 using LBPRDC.Source.Services;
 using LBPRDC.Source.Utilities;
+using static LBPRDC.Source.Config.StringConstants;
 
 namespace LBPRDC.Source.Views.EmployeeFlow
 {
@@ -45,20 +47,18 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private async void InitializeEmployeeInformation(int ClientID, int EmployeeID)
         {
-            var employees = await EmployeeService.GetAllEmployeeInfoByClientID(ClientID, EmployeeID);
-            List<PositionService.History> positions = PositionService.GetAllHistory();
+            var employees = await EmployeeService.GetEmployees(ClientID, EmployeeID);
+            var positions = await PositionService.GetHistories(EmployeeID, Status.ACTIVE);
 
-            if (employees.Any())
+            if (employees.Any() && positions.Any())
             {
-                var employee = employees.First();
-                var currentPosition = positions.First(w => w.EmployeeID == EmployeeID && w.Status == StringConstants.Status.ACTIVE);
+                var e = employees.First();
+                var currentPosition = positions.First();
 
-                ClientID = employee.ClientID;
-
-                txtEmployeeID.Text = employee.EmployeeID;
-                txtFullName.Text = $"{employee.LastName}, {employee.FirstName} {employee.MiddleName}";
-                txtCurrentPosition.Tag = employee.PositionID;
-                txtCurrentPosition.Text = employee.PositionName;
+                txtEmployeeID.Text = e.EmployeeID;
+                txtFullName.Text = $"{e.LastName}, {e.FirstName} {e.MiddleName}";
+                txtCurrentPosition.Tag = e.PositionID;
+                txtCurrentPosition.Text = e.PositionName;
                 txtCurrentPositionTitle.Text = currentPosition.PositionTitle;
             }
             else
@@ -80,17 +80,21 @@ namespace LBPRDC.Source.Views.EmployeeFlow
         }
         private async void UpdateEmployeeInformation()
         {
-            EmployeeService.EmployeePositionUpdate data = new()
+            bool isUpdated = await EmployeeService.UpdateEmployeePosition(new()
             {
                 EmployeeID = EmployeeID,
                 OldPositionID = Convert.ToInt32(txtCurrentPosition.Tag),
                 PositionID = Convert.ToInt32(cmbPosition.SelectedValue),
                 PositionTitle = txtPositionTitle.Text.ToUpper().Trim(),
+                DailySalaryRate = 0,
+                DailyBillingRate = 0,
+                MonthlySalaryRate = 0,
+                MonthlyBillingRate = 0,
                 Remarks = txtRemarks.Text,
-                Date = dtpEffectiveDate.Value
-            };
-
-            bool isUpdated = await EmployeeService.UpdateEmployeePosition(data);
+                Timestamp = dtpEffectiveDate.Value,
+                Status = StringConstants.Status.ACTIVE
+            },
+            ClientID);
 
             if (isUpdated)
             {
@@ -106,11 +110,7 @@ namespace LBPRDC.Source.Views.EmployeeFlow
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            var result = MessageBox.Show(MessagesConstants.Cancel.QUESTION, MessagesConstants.Cancel.TITLE, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result == DialogResult.Yes)
-            {
-                this.Close();
-            }
+            this.Close();
         }
     }
 }

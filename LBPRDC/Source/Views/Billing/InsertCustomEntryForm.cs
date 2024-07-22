@@ -49,7 +49,7 @@ namespace LBPRDC.Source.Views.Billing
 
         private async void InitializeDepartmentComboBoxItems()
         {
-            cmbDepartment.DataSource = await DepartmentService.GetAllItemsForComboBoxByClientID(ClientID);
+            cmbDepartment.DataSource = await DepartmentService.GetAllItemsForComboBox(ClientID);
             cmbDepartment.DisplayMember = "Name";
             cmbDepartment.ValueMember = "ID";
         }

@@ -48,7 +48,7 @@
             flowSideNavTop = new FlowLayoutPanel();
             btnNavHome = new Button();
             btnBilling = new Button();
-            btnNavEmployees = new Button();
+            btnEmployees = new Button();
             btnCategories = new Button();
             btnLogs = new Button();
             btnAccounts = new Button();
@@ -253,7 +253,7 @@
             // 
             flowSideNavTop.Controls.Add(btnNavHome);
             flowSideNavTop.Controls.Add(btnBilling);
-            flowSideNavTop.Controls.Add(btnNavEmployees);
+            flowSideNavTop.Controls.Add(btnEmployees);
             flowSideNavTop.Controls.Add(btnCategories);
             flowSideNavTop.Controls.Add(btnLogs);
             flowSideNavTop.Controls.Add(btnAccounts);
@@ -293,20 +293,20 @@
             btnBilling.Tag = "Billing";
             btnBilling.UseVisualStyleBackColor = true;
             // 
-            // btnNavEmployees
+            // btnEmployees
             // 
-            btnNavEmployees.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnNavEmployees.Cursor = Cursors.Hand;
-            btnNavEmployees.FlatAppearance.BorderSize = 0;
-            btnNavEmployees.FlatStyle = FlatStyle.Flat;
-            btnNavEmployees.Image = (Image)resources.GetObject("btnNavEmployees.Image");
-            btnNavEmployees.Location = new Point(0, 100);
-            btnNavEmployees.Margin = new Padding(0);
-            btnNavEmployees.Name = "btnNavEmployees";
-            btnNavEmployees.Size = new Size(50, 50);
-            btnNavEmployees.TabIndex = 9;
-            btnNavEmployees.Tag = "Employees";
-            btnNavEmployees.UseVisualStyleBackColor = true;
+            btnEmployees.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnEmployees.Cursor = Cursors.Hand;
+            btnEmployees.FlatAppearance.BorderSize = 0;
+            btnEmployees.FlatStyle = FlatStyle.Flat;
+            btnEmployees.Image = (Image)resources.GetObject("btnEmployees.Image");
+            btnEmployees.Location = new Point(0, 100);
+            btnEmployees.Margin = new Padding(0);
+            btnEmployees.Name = "btnEmployees";
+            btnEmployees.Size = new Size(50, 50);
+            btnEmployees.TabIndex = 9;
+            btnEmployees.Tag = "Employees";
+            btnEmployees.UseVisualStyleBackColor = true;
             // 
             // btnCategories
             // 
@@ -394,7 +394,7 @@
         private FlowLayoutPanel flowHeaderRight;
         private FlowLayoutPanel flowHeaderPages;
         private FlowLayoutPanel flowHeaderLeft;
-        private Button btnNavEmployees;
+        private Button btnEmployees;
         private Label lblGreetUser;
         private Label lblDateToday;
         private Label lblLine1;
